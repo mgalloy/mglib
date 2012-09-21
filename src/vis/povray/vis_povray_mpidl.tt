@@ -1,0 +1,77 @@
+function vis_povray_mpidl_calcsubset, rank, tile_size=tile_size, full_size=full_size
+  compile_opt strictarr
+
+  tiles = ceil(float(full_size) / float(tile_size))
+  row = rank / tiles[0]
+  col = rank mod tiles[0]
+  start = [col, row] * tile_size
+  thisTileSize = (full_size - [col, row] * tile_size) < tile_size
+  subset = [start, thisTileSize]
+
+  return, subset
+end
+
+;+
+; mpiDL routine to run VIS_POVRAY using mpiDL.
+;
+; Passed into template: 
+;    basename : type=string
+;    tile_size : type=lonarr(2)
+;    full_size : type=lonarr(2)
+;-
+pro vis_povray_mpidl
+  compile_opt strictarr
+
+  ; fill these variables in with the template
+  basename = '[% basename %]'   
+  tile_size = [[% strjoin(strtrim(tile_size, 2), ', ') %]]   
+  full_size = [[% strjoin(strtrim(full_size, 2), ', ') %]]
+
+  rank = mpidl_comm_rank()
+  nprocs = mpidl_comm_size()
+  
+  tiles = ceil(float(full_size) / float(tile_size))
+  ntiles = tiles[0] * tiles[1]
+  
+  ; number of jobs this rank has to do
+  njobs = ntiles / nprocs + (ntiles mod nprocs gt rank)
+  
+  ; TODO: allocate the full sized array
+  rankResults = ...
+  
+  for j = 0L, njobs - 1L do begin
+    job = rank + j * nprocs
+    
+    ; determine subset to calculate
+    subset = vis_povray_mpidl_calcsubset(job, $
+                                         full_size=full_size, $
+                                         tile_size=tile_size)
+
+    ; run VIS_POVRAY on that subset
+    subsetImage = vis_povray(basename, $
+                             basename + '-' + strtrim(rank, 2), $
+                             subset=subset) 
+                             
+                             
+    ; TODO: place subsetImage into rankResults
+    rankResults[...] = subsetImage                                        
+  endfor
+  
+  ; report back with mpidl_gather
+  results = mpidl_gather(rankResults)
+
+  ; piece the subsets together
+  if (rank eq 0L) then begin
+     ; TODO: piece together the subsets
+     final_image = bytarr(3, full_size[0], full_size[1])
+     
+     ; TODO: fix
+     for i = 0L, nprocs - 1L do begin
+        s = vis_povray_mpidl_calcsubset(i, full_size=full_size, tile_size=tile_size)
+        final_image[0, s[0], full_size[1] - tile_size[1] - s[1]] $
+          = results[*, *, i * tile_size[1]:(i + 1) * tile_size[1] - 1L]
+     endfor
+     
+     write_png, basename + '.png', final_image
+  endif
+end

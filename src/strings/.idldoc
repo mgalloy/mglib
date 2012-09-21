@@ -1,0 +1,16 @@
+This directory contains routines useful for handling strings.
+
+The DLM contains some wrappers to the `TRE <http://laurikari.net/tre/>` regular expression engine.
+
+All the matches in a string can be found using the `ALL` keyword::
+
+   IDL> s = 'ii j i iiii jj ii'                                                                 
+   IDL> print, mg_stregex(s, 'i+', /all, /extract)
+   ii i iiii ii
+
+Approximate matches can be found using the `APPROXIMATE` keyword::
+
+  IDL> s = 'mike mjke Mike Mjke'
+  IDL> print, mg_stregex(s, 'mike', /approx, /all, max_cost=1, /extract)
+  mike mjke Mike
+

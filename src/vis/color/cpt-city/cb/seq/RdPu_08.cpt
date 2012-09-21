@@ -1,0 +1,17 @@
+# GMT palette RdPu_08.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 8 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 255 247 243   1.00 255 247 243
+ 1.00 253 224 221   2.00 253 224 221
+ 2.00 252 197 192   3.00 252 197 192
+ 3.00 250 159 181   4.00 250 159 181
+ 4.00 247 104 161   5.00 247 104 161
+ 5.00 221 052 151   6.00 221 052 151
+ 6.00 174 001 126   7.00 174 001 126
+ 7.00 122 001 119   8.00 122 001 119

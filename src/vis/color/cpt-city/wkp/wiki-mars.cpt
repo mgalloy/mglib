@@ -1,0 +1,35 @@
+# wiki-mars.cpt
+#
+# extracted from "Palette pour la planète Mars by Sémhur 
+# and others, released under the following licence:
+#
+# Permission is granted to copy, distribute and/or modify this document 
+# under the terms of the GNU Free Documentation License, Version 1.2 or 
+# any later version published by the Free Software Foundation; with no 
+# Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A 
+# copy of the license is included in the section entitled "GNU Free 
+# Documentation License".
+#
+# Translated by J.J. Green 2009, translation under same licence
+#
+# $Id: wiki-mars.cpt.body,v 1.2 2009/10/21 00:39:42 jjg Exp $
+# COLOR_MODEL = RGB
+-4 120  65  20 -3 120  65  20
+-3 141  84  43 -2 141  84  43
+-2 164 114  66 -1 164 114  66
+-1 188 144  89  0 188 144  89
+0  211 174 112  1 211 174 112
+1  235 205 136  2 235 205 136
+2  219 185 120  3 219 185 120
+3  204 165 105  4 204 165 105
+4  189 145  90  5 189 145  90
+5  174 125  75  6 174 125  75
+6  159 110  70  7 159 110  70
+7  160 120  80  8 160 120  80
+8  174 134 100  9 174 134 100
+9  189 163 140 10 189 163 140
+10 204 191 180 11 204 191 180
+11 220 212 205 12 220 212 205
+12 240 232 225 13 240 232 225
+13 255 255 255 14 255 255 255
+

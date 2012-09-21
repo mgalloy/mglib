@@ -1,0 +1,16 @@
+# GMT palette PRGn_07.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 7 colours
+# 
+# COLOR_MODEL = RGB
+-3.50 118 042 131  -2.50 118 042 131
+-2.50 175 141 195  -1.50 175 141 195
+-1.50 231 212 232  -0.50 231 212 232
+-0.50 247 247 247   0.50 247 247 247
+ 0.50 217 240 211   1.50 217 240 211
+ 1.50 127 191 123   2.50 127 191 123
+ 2.50 027 120 055   3.50 027 120 055

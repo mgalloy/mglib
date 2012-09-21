@@ -1,0 +1,32 @@
+The `dist_tools` package is a collection of routines useful in several areas when creating applications for distribution to others.
+
+The main directory `./` provides basic routines that are extremely valuable whenever distributing an application like the `MG_SRC_ROOT` routine, `MGffPrefs` class, or `MG_IDLVERSION` routine. The `MG_LOG` routine and `MGffLogger` class provide a mechanism for logging in applications.
+
+
+Installation
+------------
+
+To get the current version of the `dist_tools`, use a Subversion client to grab the current trunk of the repository. For example, to use the command line `svn` command from a system prompt::
+
+   $ svn co http://svn.idldev.com/dist_tools/trunk dist_tools
+
+:Author:
+   Michael Galloy
+   
+:Copyright:
+   BSD license
+   
+:Dirs:
+   ./
+      This directory contains the main `dist_tools` package routines for
+      logging, preferences, and other miscellaneous routines useful in
+      distributing applications.
+   bindings/
+      The `bindings` directory provides a method for wrapping C routines with
+      a DLM in a quick and nearly automatic manner using the `MG_DLM` class.
+   collection/ : private
+      code for collection external from the `idllib` package
+   objects/ : private
+      code needed by collection external from the `idllib` package
+   strings/ : private
+      code for string handling external from the `idllib` package

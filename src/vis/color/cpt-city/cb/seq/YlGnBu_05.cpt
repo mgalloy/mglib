@@ -1,0 +1,14 @@
+# GMT palette YlGnBu_05.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 5 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 255 255 204   1.00 255 255 204
+ 1.00 161 218 180   2.00 161 218 180
+ 2.00 065 182 196   3.00 065 182 196
+ 3.00 044 127 184   4.00 044 127 184
+ 4.00 037 052 148   5.00 037 052 148

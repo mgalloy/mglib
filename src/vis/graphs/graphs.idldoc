@@ -1,0 +1,7 @@
+.. title:: Graphs
+
+Graphs are specified by a collection of nodes with some particular properties. The collection is specified by an `IDL_Container` and the nodes are any objects with a few properties: `CHILDREN` (an array of connected nodes) and `NAME` (a string specifying the node). `COLOR` is an optional attribute.
+
+Furthermore, treemaps have an additional property: `SIZE` (float).
+
+A good overview of different visualizations of trees can be found on `Ben Fry's site <http://benfry.com/writing/archives/394>`.

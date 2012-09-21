@@ -1,0 +1,15 @@
+# GMT palette YlOrRd_06.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 6 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 255 255 178   1.00 255 255 178
+ 1.00 254 217 118   2.00 254 217 118
+ 2.00 254 178 076   3.00 254 178 076
+ 3.00 253 141 060   4.00 253 141 060
+ 4.00 240 059 032   5.00 240 059 032
+ 5.00 189 000 038   6.00 189 000 038

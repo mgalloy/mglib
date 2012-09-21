@@ -1,0 +1,1 @@
+[% FOREACH o IN objects %][% SCOPE o %][% a %][% END %][% END %]

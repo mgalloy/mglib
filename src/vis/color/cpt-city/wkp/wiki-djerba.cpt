@@ -1,0 +1,31 @@
+# djerba.cpt
+#
+# extracted from Djerba_topographic_map-fr.svg 
+# by Eric Gaba (Wikimedia Commons user: Sting) released under 
+# the following licence:
+#
+# Permission is granted to copy, distribute and/or modify this document 
+# under the terms of the GNU Free Documentation License, Version 1.2 or 
+# any later version published by the Free Software Foundation; with no 
+# Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A 
+# copy of the license is included in the section entitled "GNU Free 
+# Documentation License".
+#
+# Translated by J.J. Green 2009, translation under same licence
+#
+# $Id: wiki-djerba.cpt.body,v 1.1 2009/05/04 17:07:55 jjg Exp $
+# COLOR_MODEL = RGB
+-50 172 219 251 -20 172 219 251
+-20 185 227 255 -10 185 227 255
+-10 200 235 255 -5  200 235 255
+-5  216 242 254 0   216 242 254 
+0   172 208 165 5   172 208 165
+5   148 191 139 10  148 191 139
+10  168 198 143 20  168 198 143
+20  189 204 150 30  189 204 150
+30  209 215 171 40  209 215 171
+40  225 228 181 50  225 228 181 
+50  239 235 192 60  239 235 192
+B   0   0   0
+F 255 255 255
+N 255   0   0

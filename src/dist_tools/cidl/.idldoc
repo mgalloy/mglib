@@ -1,0 +1,12 @@
+cIDL is a language between IDL and C which uses IDL syntax and C type declarations to provide fast execution of programs.
+
+  function mg_cidl_sum, float arr[]
+    int i
+    float sum = 0
+    
+    for i = 0, n_elements(arr) - 1 do begin
+      sum += arr[i]
+    endfor
+    
+    return, sum
+  end

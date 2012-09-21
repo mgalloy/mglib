@@ -1,0 +1,16 @@
+# GMT palette Spectral_07.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 7 colours
+# 
+# COLOR_MODEL = RGB
+-3.50 213 062 079  -2.50 213 062 079
+-2.50 252 141 089  -1.50 252 141 089
+-1.50 254 224 139  -0.50 254 224 139
+-0.50 255 255 191   0.50 255 255 191
+ 0.50 230 245 152   1.50 230 245 152
+ 1.50 153 213 148   2.50 153 213 148
+ 2.50 050 136 189   3.50 050 136 189

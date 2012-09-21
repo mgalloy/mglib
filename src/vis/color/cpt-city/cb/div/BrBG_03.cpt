@@ -1,0 +1,12 @@
+# GMT palette BrBG_03.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 3 colours
+# 
+# COLOR_MODEL = RGB
+-1.50 216 179 101  -0.50 216 179 101
+-0.50 245 245 245   0.50 245 245 245
+ 0.50 090 180 172   1.50 090 180 172

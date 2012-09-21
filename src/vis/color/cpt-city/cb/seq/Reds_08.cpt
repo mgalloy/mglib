@@ -1,0 +1,17 @@
+# GMT palette Reds_08.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 8 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 255 245 240   1.00 255 245 240
+ 1.00 254 224 210   2.00 254 224 210
+ 2.00 252 187 161   3.00 252 187 161
+ 3.00 252 146 114   4.00 252 146 114
+ 4.00 251 106 074   5.00 251 106 074
+ 5.00 239 059 044   6.00 239 059 044
+ 6.00 203 024 029   7.00 203 024 029
+ 7.00 153 000 013   8.00 153 000 013

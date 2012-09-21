@@ -1,0 +1,17 @@
+# GMT palette RdYlGn_08.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 8 colours
+# 
+# COLOR_MODEL = RGB
+-4.00 215 048 039  -3.00 215 048 039
+-3.00 244 109 067  -2.00 244 109 067
+-2.00 253 174 097  -1.00 253 174 097
+-1.00 254 224 139   0.00 254 224 139
+ 0.00 217 239 139   1.00 217 239 139
+ 1.00 166 217 106   2.00 166 217 106
+ 2.00 102 189 099   3.00 102 189 099
+ 3.00 026 152 080   4.00 026 152 080

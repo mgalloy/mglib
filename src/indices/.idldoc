@@ -1,0 +1,7 @@
+This directory contains routines for handling array indices. 
+
+MG_COMPLEMENT, MG_SETUNION, MG_SETINTERSECTION, and MG_SETDIFFERENCE are set
+operations for non-negative integers with -1L representing the empty set.
+These are ideal for manipulating array indices.
+
+MG_MAKERANGE is an easier way to create regularly spaced arrays by specifying start, stop, and increment values.

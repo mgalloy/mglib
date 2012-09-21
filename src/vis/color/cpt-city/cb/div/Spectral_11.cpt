@@ -1,0 +1,20 @@
+# GMT palette Spectral_11.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 11 colours
+# 
+# COLOR_MODEL = RGB
+-5.50 158 001 066  -4.50 158 001 066
+-4.50 213 062 079  -3.50 213 062 079
+-3.50 244 109 067  -2.50 244 109 067
+-2.50 253 174 097  -1.50 253 174 097
+-1.50 254 224 139  -0.50 254 224 139
+-0.50 255 255 191   0.50 255 255 191
+ 0.50 230 245 152   1.50 230 245 152
+ 1.50 171 221 164   2.50 171 221 164
+ 2.50 102 194 165   3.50 102 194 165
+ 3.50 050 136 189   4.50 050 136 189
+ 4.50 094 079 162   5.50 094 079 162

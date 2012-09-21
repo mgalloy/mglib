@@ -1,0 +1,15 @@
+# GMT palette PuRd_06.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 6 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 241 238 246   1.00 241 238 246
+ 1.00 212 185 218   2.00 212 185 218
+ 2.00 201 148 199   3.00 201 148 199
+ 3.00 223 101 176   4.00 223 101 176
+ 4.00 221 028 119   5.00 221 028 119
+ 5.00 152 000 067   6.00 152 000 067

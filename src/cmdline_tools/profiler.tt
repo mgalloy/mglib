@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <style type="text/css" media="all">
+      body {
+        font-family: Helvetica;
+        font-size: 100%;
+      }
+      span.routine_name {
+        font-family: Monaco;
+        text-transform: lowercase;
+        font-size: 90%;
+      }
+      tr.header th { font-weight: normal; border-bottom: 2px solid #aaa;}
+      //tr.odd { background: #eeeeff; }
+      tr.group td { border-bottom: 1px solid #aaa; }
+      td.count { text-align: right; }
+      td.time { text-align: right; }
+      td.system { text-align: center; }
+    </style>
+  </head>
+
+  <body>
+    
+    <p>[% n_elements(name) %] routines profiled</p>
+    
+    <table>
+      <tr class="header">
+        <th>Routine</th>
+        <th>Count</th>
+        <th>Only time</th>
+        <th>Time</th>
+        <th>System/User</th>
+      </tr>
+    [% FOREACH i IN indgen(n_elements(name)) %]
+      <tr class="[% i mod 2 ? 'odd' : 'even' %] [% i mod 5 eq 4 ? 'group' : '' %]">
+        <td><span class="routine_name">[% name[i] %]</span></td>
+        <td class="count">[% count[i] %]</td>
+        <td class="time">[% string(only_time[i], format='(%"%9.5f")') %]</td>
+        <td class="time">[% string(time[i], format='(%"%9.5f")') %]</td>
+        <td class="system">[% system[i] ? "System" : "User" %]</td>
+      </tr>
+    [% END %]
+    </table>
+  </body>
+</html>

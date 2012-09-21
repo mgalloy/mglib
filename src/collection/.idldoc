@@ -1,0 +1,7 @@
+The collection framework defines classes to provide various types of containers, primarily list (`MGcoArrayList`) and hash table (`MGcoHashTable`) implementation. These containers are more general than `IDL_Container`, in that they allow elements of any IDL type instead of just objects.
+
+:Author:
+   Michael Galloy
+
+:Copyright:
+   BSD licensed

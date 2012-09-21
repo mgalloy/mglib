@@ -1,0 +1,39 @@
+# galapagos.cpt
+#
+# extracted from Galapagos_Islands_topographic_map-fr.svg 
+# by Eric Gaba (Wikimedia Commons user: Sting) released under 
+# the following licence:
+#
+# Permission is granted to copy, distribute and/or modify this document 
+# under the terms of the GNU Free Documentation License, Version 1.2 or 
+# any later version published by the Free Software Foundation; with no 
+# Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A 
+# copy of the license is included in the section entitled "GNU Free 
+# Documentation License".
+#
+# Translated by J.J. Green 2009, translation under same licence
+#
+# $Id$
+# COLOR_MODEL = RGB
+-3650 113 171 216 -3500 113 171 216
+-3500 121 178 222 -3000 121 178 222
+-3000 132 186 227 -2500 132 186 227
+-2500 141 194 234 -2000 141 194 234
+-2000 150 201 240 -1500 150 201 240
+-1500 161 210 247 -1000 161 210 247
+-1000 172 220 251 -750  172 220 251
+-750  185 227 255 -500  185 227 255
+-500  200 235 255 -200  200 235 255
+-200  216 242 254 0     216 242 254
+0     172 208 165 50    172 208 165
+50    148 191 139 100   148 191 139
+100   168 198 143 250   168 198 143
+250   189 204 150 500   189 204 150
+500   209 215 171 750   209 215 171
+750   225 228 181 1000  225 228 181
+1000  239 235 192 1250  239 235 192
+1250  222 214 163 1500  222 214 163
+1500  202 185 130 1707  202 185 130
+B   0   0   0
+F 255 255 255
+N 255   0   0

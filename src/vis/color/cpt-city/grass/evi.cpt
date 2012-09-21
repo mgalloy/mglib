@@ -1,0 +1,6 @@
+# GMT colour palette table (cpt)
+# grass2cpt ouput
+# COLOR_MODEL = RGB
+-1.000000e+00 255 255 255 -3.000000e-01   0   0 255
+-3.000000e-01   0   0 255 -2.000000e-01 205 193 173
+N 128 128 128

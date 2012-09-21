@@ -1,0 +1,53 @@
+Library of routines to facilitate creating better visualizations controlled 
+from IDL, though not using IDL exclusively. Some routines use external applications such as ImageMagick and POV-Ray.
+
+Both direct graphics and object graphics systems are addressed; many routines
+calculate graphics system independent data like a set of vertices and 
+connectivity list that can be visualized in either graphics system.
+
+:Dirs:
+   animation/
+      routines and classes for creating animations
+   animation/animators/
+      animator classes that perform some animation action
+   animation/easing/
+      classes representing easing functions i.e. functions that control the
+      rate of an animator
+   color/
+      routines for dealing with specifying colors and color tables
+   directgraphics/
+      helper routines for direct graphics
+   flow/
+      routines for visualization of vector fields
+   geometry/
+      routines for manipulating polygons and other geometric structures
+   googlechart/
+      IDL interface to Google Charts API
+   graphs/
+      routines for visualization of trees and graphs
+   images/
+	    routines for display of images
+   lineplots/
+      routines for creating various types of line plots
+   misc/
+      more in-depth examples of using vis library routines
+   objectgraphics/
+      helper routines and classes for the object graphics systems
+   povray/
+      routines to create POV-Ray renderings of data in IDL
+   surfaces/
+      routines to visualize surface/elevation data
+   svg/
+      routines for creating SVG (Scalable Vector Graphics) output
+   tables/
+      routines for creating tables containing text and graphics
+   text/
+      routines for handling text in graphics
+   treemaps/
+      routines for creating treemaps, visual displays of weighted trees
+   util/
+      utility routines for other routines
+   vtk/
+      VTK file access library
+   x3dom/
+      x3dom output from IDL object graphics

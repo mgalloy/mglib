@@ -1,0 +1,35 @@
+# Bathymetry colors approximating the GEBCO charts
+# but with a narrower range, thus suited to maps of
+# continental shelf bathymetry.
+#
+# The continental shelf has legal meaning in various
+# international treaties and is, for example, defined
+# by the UN Division for Ocean Affairs and the Laws of 
+# the Sea to be 200m deep.
+# 
+# http://www.un.org/Depts/los/clcs_new/continental_shelf_description.htm
+#
+# I have rescaled the gebco palette to 700m, as many shelf
+# maps extend outside the shelf, also this made the conversion
+# easier!  
+#
+# J.J.Green 2004
+# This file is a modified version of the file GMT_gebco.cpt
+# by Andrew Goodwillie (Scripps) which is distributed with the 
+# Generic Mapping Tools (GMT)
+#
+# $Id: gebco-shelf.cpt,v 1.3 2004/11/28 22:12:45 jjg Exp $
+#
+# COLOR_MODEL = RGB
+-700   0       240     255     -600   0       240     255
+-600   35      255     255     -500   35      255     255
+-500   90      255     255     -400   90      255     255
+-400   140     255     230     -300   140     255     230
+-300   165     255     215     -200   165     255     215
+-200   195     255     215     -100   195     255     215
+-100   210     255     215     -50    210     255     215
+-50    230     255     240     -20    230     255     240
+-20    235     255     255     -0     235     255     255
+F	255	255	255				
+B	0	0	0
+N	128	128	128

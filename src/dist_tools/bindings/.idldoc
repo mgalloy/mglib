@@ -1,0 +1,7 @@
+This directory contains routines and classes to autogenerate a DLM of wrapper
+routines.
+
+To see an example of this, run the main-level program at the end of the 
+`mg_dlm__define.pro` file::
+
+   IDL> .run mg_dlm__define

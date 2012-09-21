@@ -1,0 +1,37 @@
+# tunis-gulf.cpt
+#
+# extracted from Tunis_Gulf_topo_map-fr.svg 
+# by Eric Gaba (Wikimedia Commons user: Sting) released under 
+# the following licence:
+#
+# Permission is granted to copy, distribute and/or modify this document 
+# under the terms of the GNU Free Documentation License, Version 1.2 or 
+# any later version published by the Free Software Foundation; with no 
+# Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A 
+# copy of the license is included in the section entitled "GNU Free 
+# Documentation License".
+#
+# Translated by J.J. Green 2009, translation under same licence
+#
+# $Id: wiki-tunis-gulf.cpt.body,v 1.1 2009/05/04 17:07:51 jjg Exp $
+# COLOR_MODEL = RGB
+-200 150 201 240 -100 150 201 240
+-100 161 210 247 -50  161 210 247
+-50  172 219 251 -20  172 219 251
+-20  185 227 255 -10  185 227 255
+-10  200 235 255 -5   200 235 255  
+-5   216 242 254 0    216 242 254 
+0    172 208 165 25   172 208 165
+25   148 191 139 50   148 191 139  
+50   168 198 143 100  168 198 143  
+100  189 204 150 150  189 204 150
+150  209 215 171 200  209 215 171  
+200  225 228 181 300  225 228 181  
+300  239 235 192 400  239 235 192
+400  222 214 163 500  222 214 163
+500  202 185 130 600  202 185 130
+600  195 167 107 700  195 167 107
+700  192 154  83 800  192 154  83
+B   0   0   0
+F 255 255 255
+N 255   0   0

@@ -1,0 +1,14 @@
+# GMT palette RdBu_05.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 5 colours
+# 
+# COLOR_MODEL = RGB
+-2.50 202 000 032  -1.50 202 000 032
+-1.50 244 165 130  -0.50 244 165 130
+-0.50 247 247 247   0.50 247 247 247
+ 0.50 146 197 222   1.50 146 197 222
+ 1.50 005 113 176   2.50 005 113 176

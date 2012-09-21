@@ -1,0 +1,10 @@
+This directory contains a DLM to convert Markdown annotated text to HTML.
+
+For an example of using `MG_MARKDOWN`, try::
+
+   IDL> print, mg_markdown('Build the `mg_markdown.*.so` file.')
+   <p>Build the <code>mg_markdown.*.so</code> file.</p>
+   
+See the `Markdown docs <http://daringfireball.net/projects/markdown/>` for more information about Markdown syntax.
+
+This DLM is a wrapper around the `discount <http://www.pell.portland.or.us/~orc/Code/discount/>` project's C routines.

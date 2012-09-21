@@ -1,0 +1,15 @@
+# GMT palette PuOr_06.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Diverging palette with 6 colours
+# 
+# COLOR_MODEL = RGB
+-3.00 179 088 006  -2.00 179 088 006
+-2.00 241 163 064  -1.00 241 163 064
+-1.00 254 224 182   0.00 254 224 182
+ 0.00 216 218 235   1.00 216 218 235
+ 1.00 153 142 195   2.00 153 142 195
+ 2.00 084 039 136   3.00 084 039 136

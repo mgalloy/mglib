@@ -1,0 +1,7 @@
+#	$Id: GMT_red2green.cpt,v 1.1.1.1 2000/12/28 01:23:45 gmt Exp $
+#
+# Like POLAR, but red to green instead
+# Designed by P. Wessel, SOEST
+# COLOR_MODEL = RGB
+-1	255	0	0	0	255	255	255
+0	255	255	255	1	0	255	0

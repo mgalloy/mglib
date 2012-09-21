@@ -1,0 +1,17 @@
+# GMT palette PuBu_08.cpt
+# 
+# This product includes color specifications and designs
+# developed by Cynthia Brewer (http://colorbrewer.org/).
+# 
+# Converted to the cpt format by J.J.Green
+# Sequential palette with 8 colours
+# 
+# COLOR_MODEL = RGB
+ 0.00 255 247 251   1.00 255 247 251
+ 1.00 236 231 242   2.00 236 231 242
+ 2.00 208 209 230   3.00 208 209 230
+ 3.00 166 189 219   4.00 166 189 219
+ 4.00 116 169 207   5.00 116 169 207
+ 5.00 054 144 192   6.00 054 144 192
+ 6.00 005 112 176   7.00 005 112 176
+ 7.00 003 078 123   8.00 003 078 123

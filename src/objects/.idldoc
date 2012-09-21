@@ -1,0 +1,5 @@
+This directory contains useful for routines for handling objects.
+
+In particular, `IDL_Object` is a class which provides an empty stub definition so that classes that inherit from `IDL_Object` will compile in versions before IDL 8.0. Similarly, `MG_N_ELEMENTS` provides a way to find the number of elements of a variable of type object, i.e., to distinguish between an object which inherits from `IDL_Object` and an object array.
+
+`MG_CLASS_HIERARCHY` prints the class hierarchy for an object or class. `MG_Object` is a base class (inheriting from `IDL_Object`) which provides a few conveniences.

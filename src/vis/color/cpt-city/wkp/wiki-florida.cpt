@@ -1,0 +1,35 @@
+# florida.cpt
+#
+# extracted from Florida_topographic_map-en.svg 
+# by Eric Gaba (Wikimedia Commons user: Sting) released under 
+# the following licence:
+#
+# Permission is granted to copy, distribute and/or modify this document 
+# under the terms of the GNU Free Documentation License, Version 1.2 or 
+# any later version published by the Free Software Foundation; with no 
+# Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A 
+# copy of the license is included in the section entitled "GNU Free 
+# Documentation License".
+#
+# Translated by J.J. Green 2009, translation under same licence
+#
+# $Id: wiki-quebec.cpt.body,v 1.1 2009/08/21 23:50:04 jjg Exp $
+# COLOR_MODEL = RGB
+-3692 113 171 216 -3000 113 171 216
+-3000 121 178 222 -2000 121 178 222
+-2000 132 184 227 -1500 132 184 227
+-1500 141 194 234 -1000 141 194 234
+-1000 150 201 240 -750  150 201 240
+-750  161 210 247 -500  161 210 247
+-500  172 220 251 -200  172 220 251
+-200  185 227 255 -100  185 227 255
+-100  200 235 255 -50   200 235 255
+-50   216 242 254 0     216 242 254
+0     172 208 165 25    172 208 165
+25    148 191 139 50    148 191 139
+50    168 198 143 75    168 198 143
+75    189 204 150 100   189 204 150
+100   209 215 171 150   209 215 171
+B   0   0   0
+F 255 255 255
+N 255   0   0

@@ -1,0 +1,103 @@
+The `cmdline_tools` package is a library of routines to make using the IDL command line more convenient.
+
+There are several routines that are convenient in normal interactive use of IDL. For example, `pwd` is similar to the UNIX command of the same name for printing the name of the current working directory::
+
+   IDL> pwd
+   /Users/mgalloy/projects/cmdline_tools
+
+The `ls` command is also useful in normal interactive use for printing a listing of files::
+
+   IDL> ls
+   COPYING                             mg_build_cmdline_tools_docs.pro     
+   INSTALL                             mg_build_cmdline_tools_userdocs.pro 
+   Makefile                            overview.txt                        
+   api-docs/                           src/                                
+   api-userdocs/                       unittests/                          
+   docs/
+
+The `more` command pages though the contents of a file::
+
+   IDL> more, 'COPYING'
+   cmdline_tools is released under a BSD-type license.
+ 
+   Copyright (c) 2009, Michael Galloy <mgalloy@idldev.com>
+ 
+   All rights reserved.
+   ...
+
+The `man` command shows the syntax for calling and header docs for a routine::
+
+   IDL> man, 'ls'
+   Filename: /Users/mgalloy/projects/cmdline_tools/src/ls.pro
+   ls, pattern, ALL=all, LONG=long
+
+   Substitute for UNIX `ls` command. Automatically uses `-hF` options.
+   ...
+
+There are also routines that handle command line issues like setting/querying preferences. The `MG_SET_PATH` routine sets the `!path`, or `!dlm_path` if the `DLM` keyword is set, using `PREF_SET`. `MG_SET_PATH` handles expanding path specifications using `EXPAND_PATH` and also allows particular elements of the directory specification array to be commented out using a `;`.
+
+The `MG_FILE_WHICH` routine is a wrapper for `FILE_WHICH`, but adds an `ALL` boolean keyword that reports all files found instead of just the first one::
+
+   IDL> print, mg_file_which('mgcoarraylist__define.pro', /all)
+   /Users/mgalloy/projects/dist_tools/src/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/idllib/src/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/idldoc/src/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/idldoc/src/dist_tools/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/idldoc/src/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/idldoc/src/dist_tools/collection/mgcoarraylist__define.pro
+   /Users/mgalloy/projects/mgunit/src/dist_tools/collection/mgcoarraylist__define.pro
+
+The `MG_PRINT_PATH` routine prints a path, defaulting to `!path`, formatted for the output log::
+
+   IDL> mg_print_path, !dlm_path
+   /Users/mgalloy/projects/gpulib/IDL
+   /usr/local/lib
+   /Users/mgalloy/projects/vis/src/flow
+   /Users/mgalloy/projects/vis/src/lineplots
+   /Users/mgalloy/projects/idllib/src/analysis
+   /Users/mgalloy/projects/idllib/src/cula
+   /Users/mgalloy/projects/idllib/src/gsl
+   /Users/mgalloy/projects/idllib/src/introspection
+   /Users/mgalloy/projects/idllib/src/net
+   /Users/mgalloy/projects/cmdline_tools/src
+   /Users/mgalloy/projects/dist_tools/src
+   /Applications/itt/idl/idl80/bin/bin.darwin.x86_64
+
+Using the command line for debugging can be tedious, but the `MG_BREAKPOINT` routine helps by finding routines in your `!path` instead of having to manually specify a path to the routine::
+
+   IDL> mg_breakpoint, 'man', 487
+
+This will find the file containing the `MAN` routine and set a breakpoint on line 487.
+
+Querying the terminal for its properties and printing to the terminal is another category of routines in this library. `MG_TERMLINES`, `MG_TERMCOLUMNS`, and `MG_TERMISTTY` provide characteristics of the current terminal window. For example, when I use IDL from a command line terminal, the output looks like::
+
+   IDL> print, mg_termistty()                  
+              1
+   IDL> print, mg_termcolumns(), mg_termlines()
+            101          39
+
+From the IDL Workbench, it is something like::
+
+   IDL> print, mg_termistty()
+              0
+   IDL> print, mg_termcolumns(), mg_termlines()
+            102          12
+
+If `MG_TERMISTTY()` is true, then `MG_ANSICODE` can produce output in bold and a few different colors by placing some special characters understood by terminals before and after the text::
+
+   IDL> print, byte('Red')                           
+     82 101 100
+   IDL> print, byte(mg_ansicode('Red', /red))        
+     27  91  51  49 109  82 101 100  27  91  48 109
+
+The `MG_PRINT` routine is a handy wrapper to make printing to the output log using C style format codes::
+
+   IDL> mg_print, 37., 'Boulder', format='It is %0.1f degrees in %s.'
+   It is 37.0 degrees in Boulder.
+
+   
+:Author:
+   Michael Galloy
+   
+:Copyright:
+   BSD licensed
