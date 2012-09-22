@@ -13,7 +13,7 @@ tex = smooth(tex, 5, /edge_truncate)
 u = rebin(u, 128 * scale, 64 * scale)
 v = rebin(v, 128 * scale, 64 * scale)
 
-im = vis_lic(u, v, texture=tex)
+im = mg_lic(u, v, texture=tex)
 
 window, xsize=128 * scale, ysize=2 * 64 * scale
 

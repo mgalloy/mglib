@@ -1,564 +1,207 @@
-;+
-; Test binary VTK file office.binary.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
+function mgffserialvtk_ut::_test_polygon, name, polygon=p, _extra=e
+  compile_opt strictarr
+
+  oVtk = obj_new('MGffSerialVTK', $
+                 filepath(name, root=self.vtkDataPath), $
+                 _extra=e)
+
+  p = oVtk->read()
+
+  if (self.view) then begin
+    p->setProperty, color=[200, 150, 50]
+    xobjview, p, /block
+  endif
+
+  isPolygon = obj_isa(p, 'IDLgrPolygon')
+
+  obj_destroy, [p, oVtk]
+
+  assert, isPolyline, 'not an IDLgrPolyline'
+
+  return, 1
+  
+end
+
+
 function mgffserialvtk_ut::test_office
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'office.binary.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('office.binary.vtk')
+  return, pass
 end
 
 
-;+
-; Test binary VTK file track1.binary.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_track1
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'track1.binary.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('track1.binary.vtk')
+  return, pass
 end
 
 
-;+
-; Test binary VTK file track2.binary.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_track2
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'track2.binary.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('track2.binary.vtk')
+  return, pass
 end
 
-;+
-; Test binary VTK file track3.binary.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
-function mgffserialvtk_ut::test_track2
+
+function mgffserialvtk_ut::test_track3
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'track3.binary.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('track3.binary.vtk')
+  return, pass
 end
 
 
-;+
-; Test binary VTK file ironProt.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_ironProt
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'ironProt.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('ironProt.vtk')
+  return, pass
 end
 
 
-;+
-; Test binary VTK file faults.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_faults
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'faults.vtk', $
-                 /swap_if_little_endian)
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolyline = obj_isa(o, 'IDLgrPolyline')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolyline then message, 'Not an IDLgrPolyline'
-
-  return, 1
+  pass = self->_test_polygon('faults.vtk', /swap_if_little_endian)
+  return, pass
 end
 
 
-;+
-; Test uGridEx.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_uGridEx
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'uGridEx.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('uGridEx.vtk')
+  return, pass
 end
 
 
-;+
-; Test texThres2.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_texThres2
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'texThres2.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('texThres2.vtk')
+  return, pass
 end
 
 
-;+
-; Test tetraMesh.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_tetraMesh
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'tetraMesh.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('tetraMesh.vtk')
+  return, pass
 end
 
 
-;+
-; Test matrix.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_matrix
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'matrix.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('matrix.vtk')
+  return, pass
 end
 
 
-;+
-; Test qualityEx.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_qualityEx
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'qualityEx.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('qualtiyEx.vtk')
+  return, pass
 end
 
-;+
-; Test tensors.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
+
 function mgffserialvtk_ut::test_tensors
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'tensors.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('tensors.vtk')
+  return, pass
 end
 
 
-;+
-; Test fieldfile.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_fieldFile
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'fieldfile.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('fieldfile.vtk')
+  return, pass
 end
 
 
-;+
-; Test financial.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_financial
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'financial.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('financial.vtk')
+  return, pass
 end
 
 
-;+
-; Test blowAttr.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_blowAttr
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'blowAttr.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('blowAttr.vtk')
+  return, pass
 end
 
 
-;+
-; Test blow.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_blow
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'blow.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
- 
- if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('blow.vtk')
+  return, pass
 end
 
 
-;+
-; Test blowGeom.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_blowGeom
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'blowGeom.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('blowGeom.vtk')
+  return, pass
 end
 
 
-;+
-; Test RectGrid2.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_rectGrid2
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'RectGrid2.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('RectGrid2.vtk')
+  return, pass
 end
 
 
-;+
-; Test PentaHexa.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_pentaHexa
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'PentaHexa.vtk')
-
-  o = oVtk->read()
-
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('PentaHexa.vtk')
+  return, pass
 end
 
 
-;+
-; Test brainImageSmooth.vtk; a set of polygons in the shape of a brain.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_brainImageSmooth
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'brainImageSmooth.vtk')
+  pass = self->_test_polygon('brainImageSmooth.vtk', polygons=p)
 
-  o = oVtk->read()
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-  o->getProperty, normals=normals, data=data, polygons=polygons
+  p->getProperty, normals=normals, data=data, polygons=polygons
   hasNormals = n_elements(normals) gt 1
   hasCorrectSize = array_equal(size(data, /dimensions), [3, 5153])
   hasCorrectNPolygons = n_elements(polygons) eq 4L * 9522L
 
-  if self.view then begin
-    o->setProperty, color=[200, 150, 50]
-    xobjview, o, /block
-  endif
+  assert, isPolyline, 'not an IDLgrPolyline'
+  assert, hasNormals, 'doesn''t have precomputed normals'
+  assert, hasCorrectSize, 'doesn''t have correct number of points'
+  assert, hasCorrectPolygons, 'doesn''t have the correct number of polygons'
 
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-  if ~hasNormals then message, 'Doesn''t have precomputed normals'
-  if ~hasCorrectSize then message, 'Doesn''t have correct number of points'
-  if ~hasCorrectNPolygons then begin
-    message, 'Doesn''t have the correct number of polygons'
-  endif
-
-  return, 1
+  return, pass
 end
 
 
-;+
-; Test fran_cut.vtk; a set of polygons showing a human face.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_francut
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'fran_cut.vtk')
+  oVtk = obj_new('MGffSerialVTK', filepath('fran_cut.vtk', root=self.vtkDataPath))
 
   o = oVtk->read()
 
-  if self.view then begin
+  if (self.view) then begin
     face = read_png(self.vtkDataPath + 'fran_cut.png')
     oImage = obj_new('IDLgrImage', face)
     o->setProperty, texture_map=oImage
@@ -570,193 +213,83 @@ function mgffserialvtk_ut::test_francut
   obj_destroy, [o, oVtk]
   if obj_valid(oImage) then obj_destroy, oImage
 
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
+  assert, isPolyline, 'not an IDLgrPolyline'
 
   return, 1
 end
 
 
-;+
-; Test plate.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_plate
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'plate.vtk')
+  pass = self->_test_polygon('plate.vtk')
+  assert, 0, 'doesn''t do anything with VECTORS in POINT_DATA'
 
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-  message, 'Doesn''t do anything with VECTORS in POINT_DATA'
-
-  return, 1
+  return, pass
 end
 
 
-;+
-; Test polyEx.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_polyex
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'polyEx.vtk')
+  pass = self->_test_polygon('polyEx.vtk')
+  assert, 0, 'doesn''t read CELL_DATA or POINT_DATA yet.'
 
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-  message, 'Doesn''t read CELL_DATA or POINT_DATA yet.'
-  
-  return, 1
+  return, pass
 end
 
 
-;+
-; Test bore.vtk.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_bore
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'bore.vtk')
-
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolyline = obj_isa(o, 'IDLgrPolyline')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolyline then message, 'Not an IDLgrPolyline'
-
-  return, 1
+  pass = self->_test_polygon('bore.vtk')
+  return, pass
 end
 
 
-;+
-; Test vtk.vtk; a set of polylines spelling out "vtk."
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_vtk
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'vtk.vtk')
-
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolyline = obj_isa(o, 'IDLgrPolyline')
-
-  obj_destroy, [o, ovtk]
-
-  if ~isPolyline then message, 'Not an IDLgrPolyline'
-
-  return, 1
+  pass = self->_test_polygon('vtk.vtk')
+  return, pass
 end
 
 
-;+
-; Test usa.vtk; one polygon for each state in the United States.
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_usa
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'usa.vtk')
-
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolygon = obj_isa(o, 'IDLgrPolygon')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolygon then message, 'Not an IDLgrPolygon'
-
-  return, 1
+  pass = self->_test_polygon('usa.vtk')
+  return, pass
 end
 
 
-;+
-; Test hello.vtk; a set of polylines that spells out "Hello."
-;
-; @returns 1 for success, 0 for failure
-;-
 function mgffserialvtk_ut::test_hello
   compile_opt strictarr
 
-  oVtk = obj_new('MGffSerialVTK', self.vtkDataPath + 'hello.vtk')
-
-  o = oVtk->read()
-
-  if self.view then xobjview, o, /block
-
-  isPolyline = obj_isa(o, 'IDLgrPolyline')
-
-  obj_destroy, [o, oVtk]
-
-  if ~isPolyline then message, 'Not an IDLgrPolyline'
-
-  return, 1
+  pass = self->_test_polygon('hello.vtk')
+  return, pass
 end
 
 
-;+
-; Initialize the test.
-; 
-; @returns 1 for success, 0 for failure
-; @keyword _extra {in}{optional}{type=keywords}
-;          keywords to MGutTestCase::init
-;-
 function mgffserialvtk_ut::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mguttestcase::init(_extra=e)) then return, 0
+  if (~self->mgutlibtestcase::init(_extra=e)) then return, 0
+  print, self.root
+  self.vtkDataPath = filepath('', $
+                              subdir=['vis_ut', 'vtk_ut', 'vtkdata'], $
+                              root=self.root)
 
-  traceback = scope_traceback(/structure)
-  nLevels = n_elements(traceback)
-  self.vtkDataPath = file_dirname(traceback[nLevels - 1L].filename, $
-                                  /mark_directory)
-  self.vtkDataPath += 'vtkdata' + path_sep()
-  ;self.vtkDataPath = '/Users/mgalloy/projects/VTKData/Data/'
   self.view = 0B
 
   return, 1
 end
 
 
-;+
-; Define member variables.
-;
-; @field vtkDataPath file path ending in / to the VTK data files
-; @field view boolean on whether to view the results in XOBJVIEW or just do the 
-;        analytic testing
-;-
 pro mgffserialvtk_ut__define
   compile_opt strictarr
 
-  define = { mgffserialvtk_ut, inherits MGutTestCase, $
+  define = { mgffserialvtk_ut, inherits MGutLibTestCase, $
              vtkDataPath : '', $
              view : 0B $
            }

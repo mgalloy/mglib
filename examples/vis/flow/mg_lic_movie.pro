@@ -1,13 +1,13 @@
 ; docformat = 'rst'
 
 ;+
-; Main-level program that demonstrates the use of VIS_LIC with the TEXTURE
+; Main-level program that demonstrates the use of `MG_LIC` with the `TEXTURE`
 ; keyword to make a movie.
 ;-
 
 restore, filename='ye.sav'
 
-vis_loadct, 9, /brewer
+mg_loadct, 9, /brewer
 tvlct, ctr, ctg, ctb, /get
 lic_im = bytarr(3, 300, 300)
 
@@ -20,7 +20,7 @@ for i = 0, 299 do begin
   u = rebin(reform(ye[0, *, *, i]), 300, 300)
   v = rebin(reform(ye[1, *, *, i]), 300, 300)
   
-  im = vis_lic(u, v, texture=tex)
+  im = mg_lic(u, v, texture=tex)
   
   lic_im[0, *, *] = im
   lic_im[1, *, *] = im
@@ -41,7 +41,10 @@ for i = 0, 299 do begin
   if (count gt 0) then im2[[3 * ind, 3 * ind + 1, 3 * ind + 2]] = 255B
   
   tv, im2, true=1
-  write_png, filepath('ye' + strtrim(i, 2) + '.png', subdir='lic_movie', root='.'), im2
+  write_png, filepath('ye' + strtrim(i, 2) + '.png', $
+                      subdir='lic_movie', $
+                      root='.'), $
+             im2
 endfor
 
 end

@@ -1,24 +1,24 @@
-function vis_color_ut::test_index
+function mg_color_ut::test_index
   compile_opt strictarr
   
-  black = vis_color('black', /index)
+  black = mg_color('black', /index)
   assert, black eq '000000'x, 'black color value not correct'
   
-  salmon = vis_color('salmon', /index)
+  salmon = mg_color('salmon', /index)
   assert, salmon eq '7280fa'x, 'salmon color value not correct'
   
   return, 1
 end
 
 
-function vis_color_ut::test_basic
+function mg_color_ut::test_basic
   compile_opt strictarr
 
-  black = vis_color('black')
+  black = mg_color('black')
   assert, array_equal(black, [0B, 0B, 0B], /no_typeconv), $
           'black color value not correct'
   
-  salmon = vis_color('salmon')
+  salmon = mg_color('salmon')
   assert, array_equal(salmon, [250B, 128B, 114B], /no_typeconv), $
           'salmon color value not correct'
   
@@ -26,18 +26,18 @@ function vis_color_ut::test_basic
 end
 
 
-function vis_color_ut::test_dimensions
+function mg_color_ut::test_dimensions
   compile_opt strictarr
 
-  black = vis_color('black', /index)
+  black = mg_color('black', /index)
   assert, size(black, /n_dimensions) eq 0L, 'should be scalar'
   
-  red = vis_color('red')
+  red = mg_color('red')
   assert, size(red, /n_dimensions) eq 1, 'should be 1-dimensional'
   assert, array_equal(size(red, /dimensions), [3L]), $
           'should be 3 elements'
           
-  colors = vis_color(['red', 'green'])
+  colors = mg_color(['red', 'green'])
   assert, size(colors, /n_dimensions) eq 2, 'should be 2-dimensional'
   assert, array_equal(size(colors, /dimensions), [2L, 3L]), $
           'should be 2 by 3'
@@ -46,10 +46,10 @@ function vis_color_ut::test_dimensions
 end
 
 
-function vis_color_ut::test_names
+function mg_color_ut::test_names
   compile_opt strictarr
 
-  names = vis_color(/names)
+  names = mg_color(/names)
   
   assert, size(names, /type) eq 7, 'incorrect type for string names'
   assert, n_elements(names) eq 147, 'incorrect number of colors'
@@ -63,8 +63,8 @@ function vis_color_ut::test_names
 end
 
 
-pro vis_color_ut__define
+pro mg_color_ut__define
   compile_opt strictarr
   
-  define = { vis_color_ut, inherits VISutTestCase }
+  define = { mg_color_ut, inherits MGutLibTestCase }
 end

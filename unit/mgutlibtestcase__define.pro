@@ -55,6 +55,8 @@ function mgutlibtestcase::init, _extra=e
     ; disable automatic garbage collection to test memory management
     dummy = heap_refcount(/disable)
   endif
+
+  self.root = mg_src_root()
   
   return, 1
 end
@@ -67,6 +69,7 @@ pro mgutlibtestcase__define
              nptrs: 0L, $
              nobjs: 0L, $
              idl_major_version: 0L, $
-             refcount_enabled: 0B $
+             refcount_enabled: 0B, $
+             root: '' $
            }
 end  

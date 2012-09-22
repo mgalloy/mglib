@@ -7,11 +7,11 @@ Simple example
 
 run the cow example::
 
-    IDL> .run visgrpovray__define
+    IDL> .run mggrpovray__define
     IDL> .continue
-    
+
 show code for POV-Ray destination
-    
+
 
 Goals
 -----
@@ -20,7 +20,7 @@ There are two main goals for the POV-Ray destination:
 
 #. create higher quality output of a standard object graphics scene
 
-   nothing needs to be done; just use the VISgrPOVRay destination
+   nothing needs to be done; just use the MGgrPOVRay destination
 
 #. create an easier to use interface to POV-Ray
 
@@ -46,12 +46,12 @@ Advanced usage
 
 The following classes can be used to access POV-Ray specific functionality:
 
-#. `VISgrPOVRayFinish`
-#. `VISgrPOVRayGrid`
-#. `VISgrPOVRayLight`
-#. `VISgrPOVRayPolygon`
-#. `VISgrPOVRayTubes`
-#. `VISgrPOVRayView`
+#. `MGgrPOVRayFinish`
+#. `MGgrPOVRayGrid`
+#. `MGgrPOVRayLight`
+#. `MGgrPOVRayPolygon`
+#. `MGgrPOVRayTubes`
+#. `MGgrPOVRayView`
 
 Show examples of each one of these.
 
@@ -60,6 +60,6 @@ Misc
 ----
 
 #. creating the final images requires an installation of POV-Ray
-#. `VISgrPOVRayWindow`
-#. `VIS_XPOVRAY`
+#. `MGgrPOVRayWindow`
+#. `MG_XPOVRAY`
 
