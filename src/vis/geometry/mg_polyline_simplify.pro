@@ -9,7 +9,7 @@
 ;    See the main-level program at the end of this file for some examples. To
 ;    run them, type::
 ;
-;       IDL> .run vis_polyline_simplify
+;       IDL> .run mg_polyline_simplify
 ;
 ; :History:
 ;   Original written by: Brad Gom, April 2004
@@ -31,7 +31,7 @@
 ;    y : in, required, type=vector
 ;      first parameter
 ;-
-function vis_polyline_simplify_dot, x, y
+function mg_polyline_simplify_dot, x, y
   compile_opt strictarr
   
   return, total(x * y)
@@ -50,7 +50,7 @@ end
 ;    y : in, required, type=fltarr(2)
 ;       second point
 ;-
-function vis_polyline_simplify_d2, x, y
+function mg_polyline_simplify_d2, x, y
   compile_opt strictarr
   
   diff = x - y
@@ -75,7 +75,7 @@ end
 ;    mk : in, out, required, type=bytarr(n)
 ;       array of markers matching vertex array `vertices`
 ;-
-pro vis_polyline_simplify_dp, tol2, vertices, j, k, mk
+pro mg_polyline_simplify_dp, tol2, vertices, j, k, mk
   compile_opt strictarr
   
   if (k le j + 1L) then return ; there is nothing to simplify
@@ -86,22 +86,22 @@ pro vis_polyline_simplify_dp, tol2, vertices, j, k, mk
   maxd2 = 0. ; distance squared of farthest vertex
   s = [[vertices[*, j]], [vertices[*, k]]]  ; segment from vertices[j] to vertices[k]
   u = s[*, 1L] - s[*, 0L]  ; segment direction vector
-  cu = vis_polyline_simplify_dot(u, u)  ; segment length squared
+  cu = mg_polyline_simplify_dot(u, u)  ; segment length squared
 
   for i = j + 1L, k - 1L do begin
     ; compute distance squared
     w = vertices[*, i] - s[*, 0L]
-    cw = vis_polyline_simplify_dot(w, u)
+    cw = mg_polyline_simplify_dot(w, u)
     if (cw le 0.) then begin
       ; dv2 = distance vertices[i] to s squared
-      dv2 = vis_polyline_simplify_d2(vertices[*, i], s[*, 0L])
+      dv2 = mg_polyline_simplify_d2(vertices[*, i], s[*, 0L])
       endif else begin
       if (cu le cw) then begin
-        dv2 = vis_polyline_simplify_d2(vertices[*, i], s[*, 1L])
+        dv2 = mg_polyline_simplify_d2(vertices[*, i], s[*, 1L])
       endif else begin
         b = cw / cu
         pb = s[*, 0L] + b * u ; base of perpendicular from vertices[i] to s
-        dv2 = vis_polyline_simplify_d2(vertices[*, i], pb)
+        dv2 = mg_polyline_simplify_d2(vertices[*, i], pb)
       endelse
     endelse
       
@@ -120,9 +120,9 @@ pro vis_polyline_simplify_dp, tol2, vertices, j, k, mk
     ; recursively simplify the two subpolylines at vertices[*, maxi]
     
     ; vertices[j] to vertices[maxi]
-    vis_polyline_simplify_dp, tol2, vertices, j, maxi, mk 
+    mg_polyline_simplify_dp, tol2, vertices, j, maxi, mk 
     ; vertices[maxi] to vertices[k]
-    vis_polyline_simplify_dp, tol2, vertices, maxi, k, mk 
+    mg_polyline_simplify_dp, tol2, vertices, maxi, k, mk 
   endif
   ; else the approximation is OK, so ignore intermediate vertices
   
@@ -166,7 +166,7 @@ end
 ;    This function returns the simplified array of vertices. If an error
 ;    occurs, the output vertices will all be -1L.
 ;-
-function vis_polyline_simplify, vertices, tolerance=tolerance, factor=factor
+function mg_polyline_simplify, vertices, tolerance=tolerance, factor=factor
   compile_opt strictarr
   
   _factor = n_elements(factor) eq 0L ? 1. : factor
@@ -213,7 +213,7 @@ function vis_polyline_simplify, vertices, tolerance=tolerance, factor=factor
   pv = 0L
   tol2 = _tolerance * _tolerance
   for i = 1L, n - 1L do begin
-    if (vis_polyline_simplify_d2(vertices[*, i], vertices[*, pv]) lt tol2) then continue
+    if (mg_polyline_simplify_d2(vertices[*, i], vertices[*, pv]) lt tol2) then continue
     vt[*, k++] = vertices[*, i]
     pv = i
   endfor
@@ -230,7 +230,7 @@ function vis_polyline_simplify, vertices, tolerance=tolerance, factor=factor
   mk[0L] = 1B
   mk[k - 1L] = 1B 
 
-  vis_polyline_simplify_dp, tol2, vt, 0L, k - 1L, mk
+  mg_polyline_simplify_dp, tol2, vt, 0L, k - 1L, mk
 
   return, vt[*, where(mk)] ; return simplified polyline
 end
@@ -238,7 +238,7 @@ end
 
 ; main-level example program
 
-vis_decomposed, 0, old_decomposed=oldDecomposed
+mg_decomposed, 0, old_decomposed=oldDecomposed
 
 red   = [0, 220, 255, 255, 255,   0,   0, 255, 160, 255]
 green = [0, 140,   0, 127, 255, 255,   0,   0, 160, 255]
@@ -278,15 +278,15 @@ factor = 100L
 n = 1L
 
 t = systime(/seconds)
-for i = 0L, n - 1L do a = vis_polyline_simplify(vertices, tolerance=dmin)
+for i = 0L, n - 1L do a = mg_polyline_simplify(vertices, tolerance=dmin)
 ta = systime(/seconds) - t
 
 t = systime(/seconds)
-for i = 0L, n - 1L do b = vis_polyline_simplify(vertices, tolerance=davg)
+for i = 0L, n - 1L do b = mg_polyline_simplify(vertices, tolerance=davg)
 tb = systime(/seconds) - t
   
 t = systime(/seconds)
-for i=0,n-1 do c = vis_polyline_simplify(vertices, factor=factor)
+for i=0,n-1 do c = mg_polyline_simplify(vertices, factor=factor)
 tc = systime(/seconds) - t
 
 t = systime(/seconds)
@@ -315,6 +315,6 @@ print, n_elements(c) / 2, strtrim(tc / n), $
        format='(%" number of output vertices: %d\n time: %f")'
 plots, c, psym=-4, color=6
 
-vis_decomposed, oldDecomposed
+mg_decomposed, oldDecomposed
 
 end

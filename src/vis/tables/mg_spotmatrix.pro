@@ -17,7 +17,7 @@
 ; :Examples:
 ;    Run the main-level example program at the end of this file with::
 ;    
-;       IDL> .run vis_spotmatrix
+;       IDL> .run mg_spotmatrix
 ;       
 ;    This should produce:
 ;    
@@ -36,7 +36,7 @@
 ;    y : in, required, type=float
 ;       y value for center of glyph
 ;-
-pro vis_spotmatrix_makeglyph, val, x, y, _extra=e
+pro mg_spotmatrix_makeglyph, val, x, y, _extra=e
   compile_opt strictarr
   
   r = 0.35
@@ -64,7 +64,7 @@ end
 ;    rowTitles : in, required, type=strarr(m)
 ;       row headers
 ;-
-pro vis_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleColor, _extra=e 
+pro mg_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleColor, _extra=e 
   compile_opt strictarr
   
   ; normal data
@@ -77,7 +77,7 @@ pro vis_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleCo
   
   for col = 0L, n_elements(colTitles) - 1L do begin
     for row = 0L, n_elements(rowTitles) - 1L do begin
-      vis_spotmatrix_makeglyph, _data[col, row], col, row, color=color, _extra=e    
+      mg_spotmatrix_makeglyph, _data[col, row], col, row, color=color, _extra=e    
     endfor
   endfor
   
@@ -101,7 +101,7 @@ dims = [400, 200]
 window, /free, title='Spot matrix', xsize=dims[0], ysize=dims[1]
 
 if (keyword_set(ps)) then begin
-  vis_psbegin, /image, filename='spotmatrix.ps', $
+  mg_psbegin, /image, filename='spotmatrix.ps', $
                xsize=dims[0] / 100, ysize=dims[1] / 100, /inches
 endif else begin
   device, get_decomposed=dec
@@ -117,13 +117,13 @@ colTitles = ['Chicago', 'Denver', 'Boulder', 'New York', 'Los Angeles', $
              'Houston', 'Dallas', 'Boston', 'Baltimore', 'Miami']
 rowTitles = ['Restaurants', 'Airports', 'Transportation', 'Air quality', 'Roads']
 
-vis_spotmatrix, randomu(seed, 10, 5), colTitles, rowTitles, $
-                background=0, color=255, title_color=254, $
-                charsize=1.0
+mg_spotmatrix, randomu(seed, 10, 5), colTitles, rowTitles, $
+               background=0, color=255, title_color=254, $
+               charsize=1.0
 
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'spotmatrix', max_dimension=dims, output=im
+  mg_psend
+  mg_convert, 'spotmatrix', max_dimension=dims, output=im
   im = bytscl(im)
   tv, im, true=1
 endif else device, decomposed=dec

@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_bezier
+;       IDL> .run mg_bezier
 ;
 ;    This should produce:
 ;
@@ -24,7 +24,7 @@
 ;    n : in, required, type=long
 ;       degree of binomial coefficients, 0, 1, 2, ... n
 ;-
-function vis_bezier_binomial, n
+function mg_bezier_binomial, n
   compile_opt strictarr
 
   coeffs = lonarr(n + 1L)
@@ -63,14 +63,14 @@ end
 ;    n_points : in, optional, type=long, default=20L
 ;       number of points
 ;-
-function vis_bezier, x, y, z, n_points=npoints
+function mg_bezier, x, y, z, n_points=npoints
   compile_opt strictarr
   on_error, 2
   
   _npoints = n_elements(npoints) eq 0L ? 20L : npoints
   t = reform(findgen(_npoints) / (_npoints - 1L), 1, _npoints)
   n = n_elements(x)
-  bcoeffs = vis_bezier_binomial(n - 1L)
+  bcoeffs = mg_bezier_binomial(n - 1L)
   
   sum = 0.0
   if (n_elements(z) eq 0L) then begin
@@ -89,7 +89,7 @@ end
 
 ; main-level example program
 
-vis_window, xsize=5, ysize=5, /inches, /free
+mg_window, xsize=5, ysize=5, /inches, /free
 plot, findgen(11), /nodata, xstyle=5, ystyle=5, xmargin=[0, 0], ymargin=[0, 0]
 
 r = 4L
@@ -103,8 +103,8 @@ plots, [x, x[0]], [y, y[0]]
 
 ; spokes
 for i = 0L, n - 1L do begin
-  plots, vis_bezier([x[i], 0.5 * (x[(i + 2) mod n] - 5.) + 5., 5.], $
-                    [y[i], 0.5 * (y[(i + 2) mod n] - 5.) + 5., 5.])
+  plots, mg_bezier([x[i], 0.5 * (x[(i + 2) mod n] - 5.) + 5., 5.], $
+                   [y[i], 0.5 * (y[(i + 2) mod n] - 5.) + 5., 5.])
 endfor
 
 end

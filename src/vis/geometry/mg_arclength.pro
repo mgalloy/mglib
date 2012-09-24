@@ -12,7 +12,7 @@
 ;    y : in, required, type=fltarr(n)
 ;       y-coords of path
 ;-
-function vis_arclength, x, y
+function mg_arclength, x, y
   compile_opt strictarr
   
   _x = [shift(x, -1), 0.]
@@ -28,6 +28,6 @@ end
 x = [0, 1, 1, 0]
 y = [0, 0, 1, 0]
 
-print, vis_arclength(x, y)
+print, mg_arclength(x, y)
 
 end

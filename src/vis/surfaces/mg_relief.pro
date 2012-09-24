@@ -7,11 +7,11 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_relief
+;       IDL> .run mg_relief
 ;
 ;    This should produce::
 ;
-;    .. image:: vis_relief.png
+;    .. image:: mg_relief.png
 ;
 ; :Returns:
 ;    `bytarr(3, xsize, ysize)`
@@ -28,8 +28,8 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to `VISgrPalette::loadct`
 ;-
-function vis_relief, elevation, dimensions=dims, color_table=color_table, $
-                     _extra=e
+function mg_relief, elevation, dimensions=dims, color_table=color_table, $
+                    _extra=e
   compile_opt strictarr
 
   _dims = n_elements(dims) eq 0 ? size(elevation, /dimensions) : dims
@@ -50,9 +50,9 @@ function vis_relief, elevation, dimensions=dims, color_table=color_table, $
   model->add, s
 
   s->getProperty, xrange=xr, yrange=yr, zrange=zr
-  s->setProperty, xcoord_conv=vis_linear_function(xr, [-1., 1.]), $
-                  ycoord_conv=vis_linear_function(yr, [-1., 1.]), $
-                  zcoord_conv=vis_linear_function(zr, [-1., 1.])
+  s->setProperty, xcoord_conv=mg_linear_function(xr, [-1., 1.]), $
+                  ycoord_conv=mg_linear_function(yr, [-1., 1.]), $
+                  zcoord_conv=mg_linear_function(zr, [-1., 1.])
 
   sun_light = obj_new('IDLgrLight', type=2, intensity=0.5, $
                       location=[-1., 1., 1])
@@ -76,6 +76,6 @@ end
 restore, filename=file_which('marbells.dat')
 dims = size(elev, /dimensions)
 window, xsize=dims[0], ysize=dims[1], /free, title='Marbells relief'
-tv, vis_relief(elev, color_table=26, /brewer, /reverse), true=1
+tv, mg_relief(elev, color_table=26, /brewer, /reverse), true=1
 
 end

@@ -24,7 +24,7 @@
 ;    level : in, required, type=long
 ;       set to subscript/superscript level to get appropriate format code
 ;-
-function vis_subsuper, token, level=level
+function mg_subsuper, token, level=level
   compile_opt strictarr
   on_error, 2
   
@@ -47,7 +47,7 @@ end
 ;    input : in, required, type=string
 ;       input string to search
 ;-
-function vis_matchdelim, input
+function mg_matchdelim, input
   compile_opt strictarr
   on_error, 2
 
@@ -89,7 +89,7 @@ end
 ;    substr : in, required, type=string
 ;       substring to search for
 ;-
-function vis_strcnt, input, substr
+function mg_strcnt, input, substr
   compile_opt strictarr
   on_error, 2
 
@@ -132,7 +132,7 @@ end
 ;     position : out, optional, type=long
 ;        position in str of next token
 ;-
-function vis_nexttoken, str, tokens, position=position
+function mg_nexttoken, str, tokens, position=position
   on_error, 2
 
   bStr = byte(str)
@@ -183,7 +183,7 @@ end
 ;    token : in, required, type=string
 ;       substring to find in the input string
 ;-
-function vis_token, str, token
+function mg_token, str, token
   on_error, 2
   
   pos = strpos(str, token)
@@ -216,7 +216,7 @@ end
 ;       set to subscript/superscipt level to indicate which format code is 
 ;       used to format it (and hence !E and !I are used instead of !U and !D)
 ;-
-function vis_convert_subsuper, input, level=level
+function mg_convert_subsuper, input, level=level
   on_error, 2
   
   _level = n_elements(level) eq 0 ? 0L : level
@@ -233,20 +233,20 @@ function vis_convert_subsuper, input, level=level
   lenLastScript = 0L
 
   ; find subscript/superscript location
-  token = vis_nexttoken(_input, '^_', position=pos)
+  token = mg_nexttoken(_input, '^_', position=pos)
   if (pos eq -1L) then return, input
 
-  fontChange = vis_subsuper(token, level=_level)
+  fontChange = mg_subsuper(token, level=_level)
 
   ; get substring up to next '^' or '_'
-  phrase = vis_token(_input, token)
+  phrase = mg_token(_input, token)
 
   while (strlen(_input) gt 0L) do  begin
     script = strmid(_input, 0L, 1L)
     endOfScript = 0L
     if (script eq '{') then begin
-      endOfScript = vis_matchdelim(_input)      
-      script = vis_convert_subsuper(strmid(_input, 1L, endOfScript - 1L), $
+      endOfScript = mg_matchdelim(_input)      
+      script = mg_convert_subsuper(strmid(_input, 1L, endOfScript - 1L), $
                                    level=_level + 1L)
     endif
     
@@ -254,16 +254,16 @@ function vis_convert_subsuper, input, level=level
     _input = strmid(_input, endOfScript + 1L, strlen(_input) - endOfScript - 1L)
 
     ; find next script
-    fontChange = vis_subsuper(token, level=_level)
+    fontChange = mg_subsuper(token, level=_level)
     oldToken = token
-    token = vis_nexttoken(_input, '^_', position=pos)
+    token = mg_nexttoken(_input, '^_', position=pos)
 
     ; make subscript and superscript align by saving position
     if (savePos eq '!S') then begin
       savePos = ''
       restorePos = ''
       ; the number of format codes is twice the number of !'s
-      nspaces = lenLastScript - (strlen(script) - 2 * vis_strcnt(script, '!'))
+      nspaces = lenLastScript - (strlen(script) - 2 * mg_strcnt(script, '!'))
       nspaces = (nspaces + 1) > 0
       if (nspaces gt 0L) then script += string(replicate(bSpace, nspaces))
     endif else begin
@@ -271,7 +271,7 @@ function vis_convert_subsuper, input, level=level
         ; the next script follows this one
         savePos = '!S'
         restorePos = '!R'
-        lenLastScript = strlen(script) - 2 * vis_strcnt(script, '!')
+        lenLastScript = strlen(script) - 2 * mg_strcnt(script, '!')
       endif
     endelse  
 
@@ -279,7 +279,7 @@ function vis_convert_subsuper, input, level=level
     phrase += savePos + fontChange + script + restorePos + fontRestore
 
     if (pos ne -1L) then begin   
-      phrase += vis_token(_input, token)   
+      phrase += mg_token(_input, token)   
     endif else begin
       phrase += _input
       _input = ''
@@ -304,7 +304,7 @@ end
 ;    postscript : in, optional, type=boolean
 ;       set to use postscript fonts
 ;-
-function vis_convert_fraction, input, postscript=postscript
+function mg_convert_fraction, input, postscript=postscript
   compile_opt strictarr
   
   bar = keyword_set(postscript) ? 190B : (byte('L'))[0]
@@ -316,7 +316,7 @@ function vis_convert_fraction, input, postscript=postscript
   ; TODO: not sure how to compute the number of bar characters to use
   ; TODO: 190B is only correct for postscript
   replace = '!S!S!A$1!R!B$2!N!R!9' + string(bytarr(6) + bar) + '!X'
-  return, vis_streplace(input, pattern, replace, /global)
+  return, mg_streplace(input, pattern, replace, /global)
 end
 
 
@@ -331,7 +331,7 @@ end
 ;    postscript : in, optional, type=boolean
 ;       set to use postscript fonts
 ;-
-function vis_textable, postscript=postscript
+function mg_textable, postscript=postscript
   on_error, 2
   
   ; 1 => vector font, 2 => postscript font
@@ -499,7 +499,7 @@ end
 ;    font : in, optional, type=long
 ;       set to -1 to translate for vector fonts, 0 for hardware fonts
 ;-
-function vis_tex2idl, input, font=font
+function mg_tex2idl, input, font=font
   compile_opt strictarr
   on_error, 2
   
@@ -517,7 +517,7 @@ function vis_tex2idl, input, font=font
     return, input               
   endif 
     
-  table = vis_textable(postscript=postscript)
+  table = mg_textable(postscript=postscript)
 
   ; translate TeX sequences
   sequences = reform(table[0, *])  
@@ -526,29 +526,29 @@ function vis_tex2idl, input, font=font
     
   for s = 0L, n_elements(sequences) - 1L do begin
     ; need an extra \ to escape the \ symbol
-    output = vis_streplace(output, '\' + sequences[s], results[s], /global)
+    output = mg_streplace(output, '\' + sequences[s], results[s], /global)
   endfor
     
   ; place {}'s around TeX sequences in subscripts or superscripts
   for s = 0L, n_elements(sequences) - 1L do begin
-    output = vis_streplace(output, $
-                           '\^\' + sequences[s], $
-                           '^{' + sequences[s] + '}', $
-                           /global)
-    output = vis_streplace(output, $
-                           '\_\' + sequences[s], $
-                           '_{' + sequences[s] + '}', $
-                           /global)
+    output = mg_streplace(output, $
+                          '\^\' + sequences[s], $
+                          '^{' + sequences[s] + '}', $
+                          /global)
+    output = mg_streplace(output, $
+                          '\_\' + sequences[s], $
+                          '_{' + sequences[s] + '}', $
+                          /global)
   endfor
 
   ; take care of subscripts and superscripts
   for i = 0L, n_elements(output) - 1L do begin
-    output[i] = vis_convert_subsuper(output[i]) 
+    output[i] = mg_convert_subsuper(output[i]) 
   endfor
 
   ; take care of fractions
   for i = 0L, n_elements(output) - 1L do begin
-    output[i] = vis_convert_fraction(output[i], postscript=postscript) 
+    output[i] = mg_convert_fraction(output[i], postscript=postscript) 
   endfor
   
   return, output
@@ -558,45 +558,45 @@ end
 ; Main-level example program
 
 if (keyword_set(ps)) then begin
-  vis_psbegin, /image, filename='tex.ps'
+  mg_psbegin, /image, filename='tex.ps'
 endif
 
-xyouts, 0.5, 0.90, vis_tex2idl('sin(2\pi t) where 0 \leq t \leq 1'), /normal, $
+xyouts, 0.5, 0.90, mg_tex2idl('sin(2\pi t) where 0 \leq t \leq 1'), /normal, $
         charsize=2.0, alignment=0.5
 
-xyouts, 0.5, 0.80, vis_tex2idl('a^5_b'), /normal, $
+xyouts, 0.5, 0.80, mg_tex2idl('a^5_b'), /normal, $
         charsize=2.0, alignment=0.5
 
-xyouts, 0.5, 0.70, vis_tex2idl('a_{b_0}'), /normal, $
+xyouts, 0.5, 0.70, mg_tex2idl('a_{b_0}'), /normal, $
         charsize=2.0, alignment=0.5
 
 xyouts, 0.5, 0.60, 'a!Db!Lc!N', /normal, $
         charsize=2.0, alignment=0.5
 
-xyouts, 0.5, 0.50, vis_tex2idl('a_{b_c}'), /normal, $
+xyouts, 0.5, 0.50, mg_tex2idl('a_{b_c}'), /normal, $
         charsize=2.0, alignment=0.5
         
-xyouts, 0.5, 0.40, vis_tex2idl('a^{b^c}'), /normal, $
+xyouts, 0.5, 0.40, mg_tex2idl('a^{b^c}'), /normal, $
         charsize=2.0, alignment=0.5
 
 ; an example from the online help
 partialSol = '_{Lower_{Index}^{Exponent}}Normal' $
                + '!S!EExp!R!IInd!N!S!U Up!R!D Down!N!S!A Above!R!B Below'
-xyouts, 0.5, 0.30, vis_tex2idl(partialSol), /normal, $
+xyouts, 0.5, 0.30, mg_tex2idl(partialSol), /normal, $
         charsize=2.0, alignment=0.5
 
 ; "complex equation" from online help about formatting codes translated to 
 ; TeX code
-xyouts, 0.5, 0.20, vis_tex2idl('\int_p^x \rho_iU_i^2dx'), /normal, $
+xyouts, 0.5, 0.20, mg_tex2idl('\int_p^x \rho_iU_i^2dx'), /normal, $
         charsize=2.0, alignment=0.5
 
 equation = '\nablax\arcsec \propto \frac{-b \pm \sqrt b^2 - 4ac}{         2a}'
-xyouts, 0.5, 0.10, vis_tex2idl(equation), /normal, $
+xyouts, 0.5, 0.10, mg_tex2idl(equation), /normal, $
         charsize=2.0, alignment=0.5                
 
 if (keyword_set(ps)) then begin                
-  vis_psend
-  vis_convert, 'tex', /from_ps, /to_png, max_dim=[700, 700], output=im                            
+  mg_psend
+  mg_convert, 'tex', /from_ps, /to_png, max_dim=[700, 700], output=im                            
   file_delete, 'tex.ps'
   file_delete, 'tex.png'
   window, xsize=700, ysize=500
