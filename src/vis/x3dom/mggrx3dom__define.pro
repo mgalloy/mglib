@@ -29,7 +29,7 @@
 ;    full_html : in, optional, type=boolean
 ;       set to write an entire HTML file instead of just the w3dom content
 ;-
-pro visgrx3dom::draw, tree, full_html=full_html
+pro mggrx3dom::draw, tree, full_html=full_html
   compile_opt strictarr
   on_error, 2
   
@@ -68,7 +68,7 @@ end
 ;
 ; :Private:
 ;-
-pro visgrx3dom::_writeHTMLHeader
+pro mggrx3dom::_writeHTMLHeader
   compile_opt strictarr
 
   printf, self.lun, '<html>'
@@ -89,7 +89,7 @@ end
 ;
 ; :Private:
 ;-
-pro visgrx3dom::_writeHTMLFooter
+pro mggrx3dom::_writeHTMLFooter
   compile_opt strictarr
 
   printf, self.lun, '  </body>'
@@ -111,7 +111,7 @@ end
 ;    indent : in, optional, type=string, default=''
 ;       indent string
 ;-
-pro visgrx3dom::_traverse, tree, indent=indent
+pro mggrx3dom::_traverse, tree, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -142,7 +142,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro visgrx3dom::_writeView, tree, indent=indent
+pro mggrx3dom::_writeView, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, color=color, viewplane_rect=vpr, eye=eye
@@ -178,7 +178,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro visgrx3dom::_writeModel, tree, indent=indent
+pro mggrx3dom::_writeModel, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, transform=transform
@@ -208,7 +208,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro visgrx3dom::_writePolygon, tree, indent=indent
+pro mggrx3dom::_writePolygon, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, data=pts, polygons=polygons, color=color
@@ -261,7 +261,7 @@ end
 ;    rgb : in, required, type=bytarr(3)
 ;       connectivity list specified in IDL's scheme 
 ;-
-function visgrx3dom::_convertColor, rgb
+function mggrx3dom::_convertColor, rgb
   compile_opt strictarr
   
   return, strjoin(strtrim(float(rgb) / 255., 2), ' ')
@@ -281,7 +281,7 @@ end
 ;    conn : in, required, type=lonarr(n)
 ;       connectivity list specified in IDL's scheme 
 ;-
-function visgrx3dom::_convertPolygons, conn
+function mggrx3dom::_convertPolygons, conn
   compile_opt strictarr
   
   n = n_elements(conn)
@@ -302,7 +302,7 @@ end
 ;+
 ; Retrieve properties.
 ;-
-pro visgrx3dom::getProperty, dimensions=dimensions, $
+pro mggrx3dom::getProperty, dimensions=dimensions, $
                              filename=filename, $
                              graphics_tree=graphics_tree, $
                              indent=indent
@@ -317,7 +317,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrx3dom::setProperty, dimensions=dimensions, $
+pro mggrx3dom::setProperty, dimensions=dimensions, $
                              filename=filename, $
                              graphics_tree=graphics_tree, $
                              indent=indent
@@ -333,7 +333,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrx3dom::cleanup
+pro mggrx3dom::cleanup
   compile_opt strictarr
   
   if (obj_valid(self.graphics_tree)) then obj_destroy, self.graphics_tree
@@ -350,7 +350,7 @@ end
 ;    _extra : in, optional, type=keywords
 ;       properties
 ;-
-function visgrx3dom::init, _extra=e
+function mggrx3dom::init, _extra=e
   compile_opt strictarr
 
   ; set default properties
@@ -379,10 +379,10 @@ end
 ;    lun
 ;       logical unit number to write to
 ;-
-pro visgrx3dom__define
+pro mggrx3dom__define
   compile_opt strictarr
   
-  define = { VISgrX3DOM, $
+  define = { MGgrX3DOM, $
              dimensions: lonarr(2), $
              filename: '', $
              graphics_tree: obj_new(), $
@@ -427,7 +427,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Cow')
 win->setProperty, graphics_tree=view
 win->draw
 
-x3d = obj_new('VISgrX3DOM', filename='cow.html', dimensions=dims)
+x3d = obj_new('MGgrX3DOM', filename='cow.html', dimensions=dims)
 x3d->draw, view, /full_html
 
 obj_destroy, x3d

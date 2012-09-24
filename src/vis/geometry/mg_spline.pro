@@ -10,7 +10,7 @@
 ; :Examples:
 ;    A spline curve through some points can easily be computed::
 ; 
-;       IDL> pts = vis_spline([1, 3, 5], [1, 5, 3])
+;       IDL> pts = mg_spline([1, 3, 5], [1, 5, 3])
 ;
 ;    To display this curve::
 ;
@@ -20,7 +20,7 @@
 ;    See the main-level program at the end of this file for a more involved
 ;    example::
 ;
-;       IDL> .run vis_spline
+;       IDL> .run mg_spline
 ;-
 
 ;+
@@ -41,14 +41,14 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to SPLINE_P
 ;-
-function vis_spline, x, y, n_points=npoints, _extra=e
+function mg_spline, x, y, n_points=npoints, _extra=e
   compile_opt strictarr
 
   _npoints = n_elements(npoints) eq 0L ? 20L : npoints
   _x = reform(x)
   _y = reform(y)
   
-  d = vis_arclength(_x, _y)
+  d = mg_arclength(_x, _y)
   _interval = d / (_npoints - 1L)
   spline_p, _x, _y, x2, y2, interval=_interval, _extra=e
   
@@ -58,7 +58,7 @@ end
 
 ; main-level example program
 
-vis_window, xsize=5, ysize=5, /inches, /free
+mg_window, xsize=5, ysize=5, /inches, /free
 plot, findgen(11), /nodata, xstyle=5, ystyle=5, xmargin=[0, 0], ymargin=[0, 0]
 
 r = 4L
@@ -72,8 +72,8 @@ plots, [x, x[0]], [y, y[0]]
 
 ; spokes
 for i = 0L, n - 1L do begin
-  plots, vis_spline([x[i], 0.5 * (x[(i + 1) mod n] - 5.) + 5., 5.], $
-                    [y[i], 0.5 * (y[(i + 1) mod n] - 5.) + 5., 5.])
+  plots, mg_spline([x[i], 0.5 * (x[(i + 1) mod n] - 5.) + 5., 5.], $
+                   [y[i], 0.5 * (y[(i + 1) mod n] - 5.) + 5., 5.])
 endfor
 
 end

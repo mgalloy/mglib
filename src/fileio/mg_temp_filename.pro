@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ; 
-;       IDL> .run vis_temp_filename
+;       IDL> .run mg_temp_filename
 ; 
 ; :Returns:
 ;    string
@@ -24,7 +24,7 @@
 ;       number of decimal places to include in the time stamp, default is 3 
 ;       i.e. milliseconds
 ;-
-function vis_temp_filename, format, length=length, n_decimals=ndecimals
+function mg_temp_filename, format, length=length, n_decimals=ndecimals
   compile_opt strictarr
   
   _length = n_elements(length) eq 0L ? 15L : length
@@ -42,6 +42,6 @@ end
 
 ; main-level example
 
-print, vis_temp_filename('vis_temp_filename-%s.txt')
+print, mg_temp_filename('mg_temp_filename-%s.txt')
 
 end

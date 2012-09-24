@@ -41,7 +41,7 @@
 ; :Examples:
 ;    Try the main-level program at the end of this file::
 ;
-;       IDL> .run vis_convert
+;       IDL> .run mg_convert
 ; 
 ; :Categories:
 ;    system utility
@@ -58,7 +58,7 @@
 ;    filename : in, required, type=string
 ;       filename of file to read
 ;-
-function vis_convert_read_image, filename
+function mg_convert_read_image, filename
   compile_opt strictarr
   
   catch, error
@@ -108,21 +108,21 @@ end
 ;    convert_location : in, optional, type=string
 ;       location of the convert command
 ;-
-pro vis_convert, basename, $
-                 density=density, $
-                 max_dimensions=maxDimensions, $
-                 scale=scale, $
-                 from_extension=fromExtension, $
-                 from_eps=fromEps, $
-                 from_png=fromPng, $
-                 from_ps=fromPs, $
-                 to_extension=toExtension, $
-                 to_eps=toEps, $
-                 to_png=toPng, $
-                 to_ps=toPs, $                 
-                 command=cmd, $
-                 output=output, $
-                 convert_location=convertLocation
+pro mg_convert, basename, $
+                density=density, $
+                max_dimensions=maxDimensions, $
+                scale=scale, $
+                from_extension=fromExtension, $
+                from_eps=fromEps, $
+                from_png=fromPng, $
+                from_ps=fromPs, $
+                to_extension=toExtension, $
+                to_eps=toEps, $
+                to_png=toPng, $
+                to_ps=toPs, $                 
+                command=cmd, $
+                output=output, $
+                convert_location=convertLocation
   compile_opt strictarr
   on_error, 2
   
@@ -175,7 +175,7 @@ pro vis_convert, basename, $
   
   ; send output back if requested
   if (arg_present(output)) then begin
-    output = vis_convert_read_image(basename + '.' + outputExtension)
+    output = mg_convert_read_image(basename + '.' + outputExtension)
   endif  
 end
 
@@ -188,16 +188,16 @@ openr, lun, filename, /get_lun
 readf, lun, data
 free_lun, lun
 
-vis_psbegin, filename='sine-waves.ps', /image, xsize=5, ysize=2, /inches
-vis_decomposed, 1
+mg_psbegin, filename='sine-waves.ps', /image, xsize=5, ysize=2, /inches
+mg_decomposed, 1
 
 plot, data[0, *], xstyle=9, ystyle=8, charsize=0.7
 oplot, data[1, *], color='0000ff'x
 
-vis_psend
+mg_psend
 
-vis_convert, 'sine-waves', max_dimensions=[500, 500], output=im
-vis_image, im, /new_window
+mg_convert, 'sine-waves', max_dimensions=[500, 500], output=im
+mg_image, im, /new_window
 file_delete, 'sine-waves.' + ['png', 'ps']
 
 end

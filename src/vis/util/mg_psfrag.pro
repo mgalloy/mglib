@@ -27,7 +27,7 @@
 ; :Examples:
 ;    See the main-level program at the end of this file. To run it::
 ;
-;       IDL> .run vis_psfrag
+;       IDL> .run mg_psfrag
 ;
 ;    Produce a `.ps` or `.eps` file with text output inside a `\tex{}`. This 
 ;    text will be translated by LaTeX::
@@ -45,7 +45,7 @@
 ;
 ;    Then run `VIS_PSFRAG` on the output::
 ;
-;       vis_psfrag, 'figure.eps', 'figure-subs.eps'
+;       mg_psfrag, 'figure.eps', 'figure-subs.eps'
 ;
 ;    This should produce output like:
 ;
@@ -65,7 +65,7 @@
 ;    inches : in, optional, type=boolean
 ;       set to specify sizes in inches instead of centimeters
 ;-
-pro vis_psfrag, filename, output_filename, $
+pro mg_psfrag, filename, output_filename, $
                 xsize=xsize, ysize=ysize, inches=inches
   compile_opt strictarr
   on_error, 2
@@ -100,7 +100,7 @@ pro vis_psfrag, filename, output_filename, $
   file_mkdir, tmpdir
   
   ; replace sizes and filename in LaTeX template with actual values
-  template_filename = filepath('figure.tex.sed', root=vis_src_root())
+  template_filename = filepath('figure.tex.sed', root=mg_src_root())
   sedCmdF = '(%"sed -e\"s/paper_xsize/%fcm/\" -e\"s/paper_ysize/%fcm/\" -e\"s/xsize/%fcm/\" -e\"s/ysize/%fcm/\" -e\"s@filename@%s@\" %s > %s")'
   tex_filename = filepath('figure.tex', root=tmpdir)
   sedCmd = string(_xsize, _ysize, _xsize - 0.2, _ysize - 0.2, $
@@ -154,14 +154,14 @@ plot, findgen(10), /nodata
 xyouts, 3., 5., '\tex[bl][bl][3.0]{Sun symbol: $M_\odot$}', font=0
 device, /close
 
-vis_psfrag, 'figure.eps', 'figure-subs.eps'
+mg_psfrag, 'figure.eps', 'figure-subs.eps'
 
 ; retrieve Postscript info from the generated file
-vis_psinfo, 'figure-subs.eps', bounding_box=bb, hires_bounding_box=hires_bb
+mg_psinfo, 'figure-subs.eps', bounding_box=bb, hires_bounding_box=hires_bb
 
 ; adjust bounding box
 adj = [-35, -25, 15, 20]
-vis_psinfo, 'figure-subs.eps', $
+mg_psinfo, 'figure-subs.eps', $
             bounding_box=bb + adj, $
             hires_bounding_box=hires_bb + adj
 

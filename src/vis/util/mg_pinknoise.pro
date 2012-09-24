@@ -6,7 +6,7 @@
 ; :Examples:
 ;    This generates pink noise::
 ;
-;       tvscl, vis_pinknoise(512, 256)
+;       tvscl, mg_pinknoise(512, 256)
 ;
 ;    Pink noise looks like:
 ; 
@@ -14,7 +14,7 @@
 ;
 ;    Other 1/f^a noise can be generated using the POWER keyword::
 ;
-;       tvscl, vis_pinknoise(512, 256, power=1.8)
+;       tvscl, mg_pinknoise(512, 256, power=1.8)
 ;
 ;    This noise looks like:
 ;
@@ -37,7 +37,7 @@
 ;    power : in, optional, type=double, default=1.0
 ;       the a in 1/f^a noise
 ;-
-function vis_pinknoise, m, n, power=p
+function mg_pinknoise, m, n, power=p
   compile_opt strictarr
 
   ; default power is 1.0 i.e. pink noise
@@ -60,8 +60,8 @@ end
 
 window, /free, xsize=512, ysize=256*3, title='1/f^a noise'
 
-tvscl, vis_pinknoise(512, 256), 0
-tvscl, vis_pinknoise(512, 256, power=1.8), 1
-tvscl, vis_pinknoise(512, 256, power=2.4), 2
+tvscl, mg_pinknoise(512, 256), 0
+tvscl, mg_pinknoise(512, 256, power=1.8), 1
+tvscl, mg_pinknoise(512, 256, power=2.4), 2
 
 end

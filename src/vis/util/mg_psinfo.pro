@@ -17,7 +17,7 @@
 ;       if passed an undefined name variable, returns the hires bounding box 
 ;       for the file; if defined, sets the bounding box to the value
 ;-
-pro vis_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
+pro mg_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
   compile_opt strictarr
   
   header = strarr(10)
@@ -26,7 +26,7 @@ pro vis_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
   free_lun, lun
   
   if (n_elements(bb) eq 4L) then begin
-    temp_filename = vis_temp_filename('psfile-%s')
+    temp_filename = mg_temp_filename('psfile-%s')
     sedCmdF = '(%"sed -e\"s/%%BoundingBox: .*/%%BoundingBox: %d %d %d %d/\" %s > %s")'
     sedCmd = string(bb, filename, temp_filename, format=sedCmdF)
     spawn, sedCmd, sedOutput, sedErrorOutput, exit_status=status
@@ -46,7 +46,7 @@ pro vis_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
   endelse
 
   if (n_elements(hires_bb) eq 4L) then begin
-    temp_filename = vis_temp_filename('psfile-%s')
+    temp_filename = mg_temp_filename('psfile-%s')
     sedCmdF = '(%"sed -e\"s/%%HiResBoundingBox: .*/%%HiResBoundingBox: %f %f %f %f/\" %s > %s")'
     sedCmd = string(hires_bb, filename, temp_filename, format=sedCmdF)
     spawn, sedCmd, sedOutput, sedErrorOutput, exit_status=status

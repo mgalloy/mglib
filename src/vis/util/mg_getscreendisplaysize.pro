@@ -11,7 +11,7 @@
 ;    monitor_index : in, optional, type=long, default=primary monitor index
 ;       index of monitor to return size of
 ;-
-function vis_getscreendisplaysize, monitor_index
+function mg_getscreendisplaysize, monitor_index
   compile_opt strictarr
 
   monitor_info = obj_new('IDLsysMonitorInfo')

@@ -32,7 +32,7 @@ if (nPathDirs gt 0) then mg_set_path, pathDirs[pathDirInds], /dlm
 ; quietly load vis constnants
 oldQuiet = !quiet
 !quiet = 1
-vis_constants
+mg_constants
 !quiet = oldQuiet
 
 ; remove temporary variables

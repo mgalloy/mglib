@@ -26,7 +26,7 @@
 ;    n_rounds : in, optional, type=long, default=20L
 ;       number of times to run algorithm
 ;-
-function vis_force, data, min_distance=minDistance, n_rounds=nrounds
+function mg_force, data, min_distance=minDistance, n_rounds=nrounds
   compile_opt strictarr
   
   ndata = n_elements(data)
