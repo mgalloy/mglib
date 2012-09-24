@@ -14,7 +14,7 @@
 ;    param : in, optional, type=string
 ;       parameter name
 ;-
-function vis_gc_base_processstr, s, param
+function mg_gc_base_processstr, s, param
   compile_opt strictarr
 
   if (n_elements(s) ne 0L) then begin
@@ -43,7 +43,7 @@ end
 ;    An example of using the routine is given in a main-level program at the
 ;    end of this file. Run it using::
 ; 
-;       IDL> .run vis_gc_base
+;       IDL> .run mg_gc_base
 ;
 ;    It produces:
 ;
@@ -84,20 +84,20 @@ end
 ;    url : out, optional, type=string
 ;       URL used by Google Charts API
 ;-
-function vis_gc_base, type=type, $
-                      data=data, $
-                      range=range, $
-                      dimensions=dimensions, $
-                      title=title, $
-                      label=label, $
-                      legend_labels=legendLabels, $
-                      legend_position=legendPosition, $
-                      color=color, $
-                      background=background, $
-                      alpha_channel=alphaChannel, $
-                      axis_labels=axisLabels, $
-                      bar_sizes=barSizes, $
-                      url=url, just_url=justUrl
+function mg_gc_base, type=type, $
+                     data=data, $
+                     range=range, $
+                     dimensions=dimensions, $
+                     title=title, $
+                     label=label, $
+                     legend_labels=legendLabels, $
+                     legend_position=legendPosition, $
+                     color=color, $
+                     background=background, $
+                     alpha_channel=alphaChannel, $
+                     axis_labels=axisLabels, $
+                     bar_sizes=barSizes, $
+                     url=url, just_url=justUrl
   compile_opt strictarr
   
   ; construct the URL
@@ -114,11 +114,11 @@ function vis_gc_base, type=type, $
              : ('&chds=' + strjoin(strtrim(range, 2), ',')) 
              
   _label = n_elements(label) eq 0L ? '' : ('&chl=' + strjoin(label, '|'))
-  _legendLabels = vis_gc_base_processstr(legendLabels, 'chdl')
+  _legendLabels = mg_gc_base_processstr(legendLabels, 'chdl')
   _legendPosition = n_elements(legendPosition) eq 0L $
                       ? '' $
                       : ('&chdlp=' + strjoin(legendPosition, '|'))
-  _title = vis_gc_base_processstr(title, 'chtt')                      
+  _title = mg_gc_base_processstr(title, 'chtt')                      
   
   _barSizes = n_elements(barSizes) eq 0L $
                 ? '' $
@@ -130,13 +130,13 @@ function vis_gc_base, type=type, $
     ; BBGGRR
     if (dec eq 0L) then begin
       tvlct, r, g, b, /get      
-      _color = vis_rgb2index([[b[color]], [g[color]], [r[color]]])
+      _color = mg_rgb2index([[b[color]], [g[color]], [r[color]]])
     endif else begin
-      rgb = vis_index2rgb(color)
+      rgb = mg_index2rgb(color)
       if (size(rgb, /n_dimensions) eq 1L) then rgb = reform(rgb, 1, 3)
-      _color = vis_rgb2index([[reform(rgb[*, 2])], $
-                              [reform(rgb[*, 1])], $
-                              [reform(rgb[*, 0])]])
+      _color = mg_rgb2index([[reform(rgb[*, 2])], $
+                             [reform(rgb[*, 1])], $
+                             [reform(rgb[*, 0])]])
     endelse
     
     _color = '&chco=' + strjoin(strtrim(string(_color, format='(z06)'), 2), ',')
@@ -145,10 +145,10 @@ function vis_gc_base, type=type, $
   if (n_elements(background) gt 0L) then begin
     if (dec eq 0L) then begin
       tvlct, r, g, b, /get
-      _fill = vis_rgb2index([b[background], g[background], r[background]])
+      _fill = mg_rgb2index([b[background], g[background], r[background]])
     endif else begin
-      rgb = vis_index2rgb(background)
-      _fill = vis_rgb2index(reverse(rgb))
+      rgb = mg_index2rgb(background)
+      _fill = mg_rgb2index(reverse(rgb))
     endelse
     _fill = strtrim(string(_fill, format='(z06)'), 2)
   endif else begin
@@ -192,11 +192,11 @@ end
 
 dims = [300, 125]
 
-im = vis_gc_base(type='p3', $
-                 data=[70, 30], $
-                 dimensions=dims, $
-                 label=['A', 'B'], $
-                 url=url)
+im = mg_gc_base(type='p3', $
+                data=[70, 30], $
+                dimensions=dims, $
+                label=['A', 'B'], $
+                url=url)
                  
 window, xsize=dims[0], ysize=dims[1], title=url                 
 tv, im, true=1

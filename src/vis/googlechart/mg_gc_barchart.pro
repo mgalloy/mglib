@@ -9,7 +9,7 @@
 ; :Examples:
 ;    Running the main-level example at the end of this file::
 ;
-;       IDL> .run vis_gc_barchart
+;       IDL> .run mg_gc_barchart
 ;
 ;    produces:
 ;
@@ -38,12 +38,12 @@
 ;    url : out, optional, type=string
 ;       URL used by Google Charts API
 ;-
-function vis_gc_barchart, data, dimensions=dimensions, title=title, $
-                          horizontal=horizontal, vertical=vertical, $
-                          label=label, color=color, $
-                          bar_width=barWidth, bar_spacing=barSpacing, $
-                          group_spacing=groupSpacing, $
-                          url=url
+function mg_gc_barchart, data, dimensions=dimensions, title=title, $
+                         horizontal=horizontal, vertical=vertical, $
+                         label=label, color=color, $
+                         bar_width=barWidth, bar_spacing=barSpacing, $
+                         group_spacing=groupSpacing, $
+                         url=url
   compile_opt strictarr
   
   ; TODO: should calculate default values based on number of bars and 
@@ -52,23 +52,23 @@ function vis_gc_barchart, data, dimensions=dimensions, title=title, $
            n_elements(barSpacing) eq 0L ? 5L : barSpacing, $
            n_elements(groupSpacing) eq 0L ? 10L : groupSpacing]
            
-  return, vis_gc_base(data=data, $
-                      type=keyword_set(horizontal) ? 'bhs' : 'bvs', $
-                      dimensions=dimensions, $
-                      title=title, label=label, $
-                      color=color, $
-                      bar_sizes=sizes, $
-                      url=url)
+  return, mg_gc_base(data=data, $
+                     type=keyword_set(horizontal) ? 'bhs' : 'bvs', $
+                     dimensions=dimensions, $
+                     title=title, label=label, $
+                     color=color, $
+                     bar_sizes=sizes, $
+                     url=url)
 end
 
 ; main-level example of VIS_GC_PIECHART
 
 data = fix(randomu(seed, 20) * 100)
-im = vis_gc_barchart(data, $
-                     bar_width=15, bar_spacing=4, $
-                     dimensions=[395, 175], label=strtrim(data, 2), $
-                     color=vis_color('slateblue', /index), $
-                     url=url, /vertical, title='A nice bar chart')
+im = mg_gc_barchart(data, $
+                    bar_width=15, bar_spacing=4, $
+                    dimensions=[395, 175], label=strtrim(data, 2), $
+                    color=vis_color('slateblue', /index), $
+                    url=url, /vertical, title='A nice bar chart')
 window, /free, xsize=395, ysize=175, title=url
 tv, im, true=1
 

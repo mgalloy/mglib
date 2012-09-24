@@ -9,7 +9,7 @@
 ; :Examples:
 ;    Run the main-level example program::
 ;
-;       IDL> .run vis_gc_scatter
+;       IDL> .run mg_gc_scatter
 ;
 ;    It should generate:
 ; 
@@ -36,11 +36,11 @@
 ;    url : out, optional, type=string
 ;       URL used by Google Charts API
 ;-
-function vis_gc_scatter, x, y, $
-                         xrange=xrange, yrange=yrange, $
-                         sym_size=symSize, $
-                         dimensions=dimensions, $
-                         url=url
+function mg_gc_scatter, x, y, $
+                        xrange=xrange, yrange=yrange, $
+                        sym_size=symSize, $
+                        dimensions=dimensions, $
+                        url=url
   compile_opt strictarr
   
   _xrange = n_elements(xrange) eq 0L ? [min(x, max=xmax), xmax] : xrange
@@ -52,14 +52,14 @@ function vis_gc_scatter, x, y, $
     data = [[data], [fltarr(n_elements(x)) + symSize]]
   endif
   
-  return, vis_gc_base(data=data, $
-                      range=range, $
-                      type='s', $
-                      dimensions=dimensions, $
-                      title=title, label=label, $
-                      color=color, $
-                      axis_labels='xy', $
-                      url=url)
+  return, mg_gc_base(data=data, $
+                     range=range, $
+                     type='s', $
+                     dimensions=dimensions, $
+                     title=title, label=label, $
+                     color=color, $
+                     axis_labels='xy', $
+                     url=url)
 end
 
 
@@ -70,7 +70,7 @@ x = randomu(seed, n)
 y = randomu(seed, n)
 s = randomu(seed, n)
 
-im = vis_gc_scatter(x, y, sym_size=s, dimensions=[400, 400], url=url)
+im = mg_gc_scatter(x, y, sym_size=s, dimensions=[400, 400], url=url)
 window, xsize=400, ysize=400, title=url
 tv, im, true=1
 

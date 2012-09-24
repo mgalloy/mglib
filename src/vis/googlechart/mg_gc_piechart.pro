@@ -9,7 +9,7 @@
 ; :Examples:
 ;    Running the main-level example at the end of this file::
 ;
-;       IDL> .run vis_gc_piechart
+;       IDL> .run mg_gc_piechart
 ;
 ;    produces:
 ;
@@ -36,17 +36,17 @@
 ;    url : out, optional, type=string
 ;       URL used by Google Charts API
 ;-
-function vis_gc_piechart, slices, dimensions=dimensions, threed=threed, $
-                          title=title, label=label, color=color, $
-                          url=url
+function mg_gc_piechart, slices, dimensions=dimensions, threed=threed, $
+                         title=title, label=label, color=color, $
+                         url=url
   compile_opt strictarr
   
-  return, vis_gc_base(data=slices, $
-                      type=keyword_set(threed) ? 'p3' : 'p', $
-                      dimensions=dimensions, $
-                      title=title, label=label, $
-                      color=color, $
-                      url=url)
+  return, mg_gc_base(data=slices, $
+                     type=keyword_set(threed) ? 'p3' : 'p', $
+                     dimensions=dimensions, $
+                     title=title, label=label, $
+                     color=color, $
+                     url=url)
 end
 
 ; main-level example of VIS_GC_PIECHART
@@ -69,12 +69,12 @@ if (count gt 0) then begin
 endif
 
 ; use a Brewer qualitative color table to colors
-vis_loadct, 27, /brewer
+mg_loadct, 27, /brewer
 tvlct, r, g, b, /get
-color = vis_rgb2index([[b[0:11]], [g[0:11]], [r[0:11]]])
+color = mg_rgb2index([[b[0:11]], [g[0:11]], [r[0:11]]])
 
 dirs = strmid(dirs, strlen(lib))
-im = vis_gc_piechart(nfiles, label=dirs, dimensions=[425, 175], color=color, $
+im = mg_gc_piechart(nfiles, label=dirs, dimensions=[425, 175], color=color, $
                      url=url)
 window, /free, xsize=425, ysize=175, title=url
 tv, im, true=1
