@@ -66,7 +66,7 @@
 ; :Returns:
 ;    long
 ;-
-function vis_loadct_termcolumns
+function mg_loadct_termcolumns
   compile_opt strictarr
 
   catch, error
@@ -88,7 +88,7 @@ end
 ;    ctnames : in, required, type=strarr
 ;       names of the color tables
 ;-
-pro vis_loadct_showtables, ctnames
+pro mg_loadct_showtables, ctnames
   compile_opt strictarr
 
   if (n_elements(ctnames) eq 1L) then begin
@@ -101,7 +101,7 @@ pro vis_loadct_showtables, ctnames
   indices = string(indgen(n_elements(ctnames)), format=indexFormat)
   entries = indices + ctnames
   
-  ntermcols = vis_loadct_termcolumns()
+  ntermcols = mg_loadct_termcolumns()
   width = max(strlen(entries) + 3L)
   ncols = ntermcols / width
   widthFormat = string(width, format='(%"\%-%ds")')
@@ -135,8 +135,8 @@ end
 ;       set to use the Gist/Yorick color tables
 ;    chaco : in, optional, type=boolean
 ;       set to use the Chaco color tables
-;    vis : in, optional, type=boolean
-;       set to use the VIS library color tables
+;    mg : in, optional, type=boolean
+;       set to use the MG library color tables
 ;    rgb_table : out, optional, type="lonarr(ncolors, 2)"
 ;       set to a named variable to retrieve the color table
 ;    reverse : in, optional, type=boolean
@@ -152,13 +152,13 @@ end
 ;    _ref_extra : in, out, optional, type=keyword
 ;       keywords to `LOADCT`
 ;-
-pro vis_loadct, table, file=file, $
-                brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, vis=vis, $
-                rgb_table=rgbTable, $
-                reverse=reverse, $
-                show_tables=showtables, $
-                cpt_filename=cptFilename, $
-                _ref_extra=e
+pro mg_loadct, table, file=file, $
+               brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, mg=mg, $
+               rgb_table=rgbTable, $
+               reverse=reverse, $
+               show_tables=showtables, $
+               cpt_filename=cptFilename, $
+               _ref_extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -170,17 +170,17 @@ pro vis_loadct, table, file=file, $
     if (~file_test(_cptFilename)) then begin
       _cptFilename = filepath(_cptFilename, $
                               subdir=['cpt-city'], $
-                              root=vis_src_root())
+                              root=mg_src_root())
     endif
     
     if (~file_test(_cptFilename)) then begin
       message, '.cpt file not found, ' + cptFilename
     endif
     
-    rgb = vis_cpt2ct(_cptFilename, name=ctnames)
+    rgb = mg_cpt2ct(_cptFilename, name=ctnames)
     
     if (keyword_set(showTables)) then begin
-      vis_loadct_showtables, ctnames
+      mg_loadct_showtables, ctnames
       
       return
     endif
@@ -197,19 +197,19 @@ pro vis_loadct, table, file=file, $
   endif
   
   case 1 of
-    keyword_set(brewer): ctfilename = filepath('brewer.tbl', root=vis_src_root())
-    keyword_set(gmt): ctfilename = filepath('gmt.tbl', root=vis_src_root())
-    keyword_set(mpl): ctfilename = filepath('mpl.tbl', root=vis_src_root())
-    keyword_set(gist): ctfilename = filepath('gist.tbl', root=vis_src_root())
-    keyword_set(chaco): ctfilename = filepath('chaco.tbl', root=vis_src_root())
-    keyword_set(vis): ctfilename = filepath('vis.tbl', root=vis_src_root())
+    keyword_set(brewer): ctfilename = filepath('brewer.tbl', root=mg_src_root())
+    keyword_set(gmt): ctfilename = filepath('gmt.tbl', root=mg_src_root())
+    keyword_set(mpl): ctfilename = filepath('mpl.tbl', root=mg_src_root())
+    keyword_set(gist): ctfilename = filepath('gist.tbl', root=mg_src_root())
+    keyword_set(chaco): ctfilename = filepath('chaco.tbl', root=mg_src_root())
+    keyword_set(mg): ctfilename = filepath('mg.tbl', root=mg_src_root())
     n_elements(file) gt 0L: ctfilename = file
     else:
   endcase
   
   if (keyword_set(showTables)) then begin
     loadct, get_names=ctnames, file=ctfilename
-    vis_loadct_showtables, ctnames
+    mg_loadct_showtables, ctnames
     return
   endif
   
@@ -249,10 +249,10 @@ window, xsize=256, ysize=nColorTables * colorTableHeight
 
 im = bindgen(256) # (bytarr(colorTableHeight) + 1B)
 device, decomposed=0
-vis_loadct, get_names=names, /brewer
+mg_loadct, get_names=names, /brewer
 
 for ct = 0L, nColorTables - 1L do begin
-  vis_loadct, ct, /brewer
+  mg_loadct, ct, /brewer
   if (ct gt 26) then begin
     ncolors = ([12, 9, 9, 8, 8, 8, 12, 8])[ct - 27]
     tvlct, r, g, b, /get

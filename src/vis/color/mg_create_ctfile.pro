@@ -5,10 +5,10 @@
 ; `XLOADCT`, and `IDLgrPalette::loadCT`.
 ;
 ; :Examples:
-;    To create a new color table file, use `VIS_CREATE_CTFILE` to create the 
+;    To create a new color table file, use `MG_CREATE_CTFILE` to create the 
 ;    new file and `MODIFYCT` to add color tables to it. For example::
 ;
-;       IDL> vis_create_ctfile, 'test.tbl'
+;       IDL> mg_create_ctfile, 'test.tbl'
 ;       IDL> modifyct, 0, 'CT 0', r0, g0, b0, file='test.tbl'
 ;       IDL> modifyct, 1, 'CT 1', r1, g1, b1, file='test.tbl'
 ;       ...etc...
@@ -17,7 +17,7 @@
 ;    filename : in, required, type=string
 ;       filename for new color table file
 ;-
-pro vis_create_ctfile, filename
+pro mg_create_ctfile, filename
   compile_opt strictarr
 
   openw, lun, filename, /get_lun

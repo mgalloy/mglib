@@ -13,20 +13,20 @@
 ; :Examples:
 ;    For example::
 ;
-;       IDL> print, vis_rgb2index([255, 255, 255]), format='(Z06)'   ; white
+;       IDL> print, mg_rgb2index([255, 255, 255]), format='(Z06)'   ; white
 ;       FFFFFF
-;       IDL> print, vis_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
+;       IDL> print, mg_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
 ;       00FFFF
-;       IDL> print, vis_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
+;       IDL> print, mg_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
 ;       FF0000
 ;
-;    Multiple RGB triplets can also be passed to `VIS_RGB2INDEX` in an `n` by 
+;    Multiple RGB triplets can also be passed to `MG_RGB2INDEX` in an `n` by 
 ;    3 byte array::
 ;
-;       IDL> vis_loadct, 5, /brewer
+;       IDL> mg_loadct, 5, /brewer
 ;       % LOADCT: Loading table PuBu (Sequential)
 ;       IDL> tvlct, rgb, /get
-;       IDL> print, vis_rgb2index(rgb), format='(8Z)'
+;       IDL> print, mg_rgb2index(rgb), format='(8Z)'
 ;
 ; :Returns:
 ;    long or lonarr(n)
@@ -36,7 +36,7 @@
 ;       either `bytarr(3)` or `bytarr(n, 3)` array of RGB coordinates of 
 ;       colors
 ;-
-function vis_rgb2index, rgb
+function mg_rgb2index, rgb
   compile_opt strictarr
   on_error, 2
   
@@ -54,12 +54,12 @@ end
 
 ; main-level example program
 
-print, vis_rgb2index([255, 255, 255]), format='(Z06)'   ; white
-print, vis_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
-print, vis_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
+print, mg_rgb2index([255, 255, 255]), format='(Z06)'   ; white
+print, mg_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
+print, mg_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
 
-vis_loadct, 5, /brewer
+mg_loadct, 5, /brewer
 tvlct, rgb, /get
-print, vis_rgb2index(rgb), format='(8Z)'
+print, mg_rgb2index(rgb), format='(8Z)'
 
 end

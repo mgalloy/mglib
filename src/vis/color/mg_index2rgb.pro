@@ -12,13 +12,13 @@
 ; :Examples:
 ;    For example::
 ;
-;       IDL> print, vis_index2rgb('ffff00'x)
+;       IDL> print, mg_index2rgb('ffff00'x)
 ;          0 255 255
 ;
 ;    Multiple colors can be converted at once::
 ;
 ;       IDL> colors = ['ffff00'x, 'ffffff'x, '0000ff'x, 'ff00ff'x]
-;       IDL> rgbColors = vis_index2rgb(colors)
+;       IDL> rgbColors = mg_index2rgb(colors)
 ;       IDL> print, rgbColors
 ;          0 255 255 255
 ;        255 255   0   0
@@ -37,7 +37,7 @@
 ;       set to return a string instead of a `bytarr(3)`; string formatted 
 ;       according to HTML/CSS conventions: `#RRGGBB`
 ;-
-function vis_index2rgb, indices, hex=hex
+function mg_index2rgb, indices, hex=hex
   compile_opt strictarr
   
   r = indices and 255B
@@ -54,9 +54,9 @@ end
 
 ; main-level example program
 
-print, vis_index2rgb('ffff00'x)
+print, mg_index2rgb('ffff00'x)
 colors = ['ffff00'x, 'ffffff'x, '0000ff'x, 'ff00ff'x]
-rgbColors = vis_index2rgb(colors)
+rgbColors = mg_index2rgb(colors)
 print, rgbColors
 tvlct, rgbColors
 

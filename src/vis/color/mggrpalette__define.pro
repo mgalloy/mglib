@@ -33,7 +33,7 @@
 ;    object graphics
 ;
 ; :Copyright:
-;    Color tables accessed with `VIS_LOADCT` and `VIS_XLOADCT` are provided 
+;    Color tables accessed with `MG_LOADCT` and `MG_XLOADCT` are provided 
 ;    courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org, 
 ;    accessed 20 October 2007.
 ;
@@ -67,7 +67,7 @@
 ;
 ; :Keywords:
 ;    file : in, optional, type=string, default=colors.tbl
-;       filename of color table file; this is present to make `VISgrPalette` 
+;       filename of color table file; this is present to make `MGgrPalette` 
 ;       completely implement `IDLgrPalette`'s interface, it would normally not 
 ;       be used
 ;    brewer : in, optional, type=boolean
@@ -80,19 +80,19 @@
 ;       set to use the Gist/Yorick color tables
 ;    chaco : in, optional, type=boolean
 ;       set to use the Chaco color tables
-;    vis : in, optional, type=boolean
-;       set to use the VIS library color tables
+;    mg : in, optional, type=boolean
+;       set to use the MG library color tables
 ;    reverse : in, optional, type=boolean
 ;       set to reverse color table
 ;    cpt_filename : in, optional, type=string
 ;       filename of `.cpt` file to load a color table from; the `.cpt` filename
 ;       extension is optional; the filename given can be absolute, relative 
 ;       from the current working directory, or relative from the `cpt-city`
-;       directory in the VIS library
+;       directory in the MG library
 ;-
-pro visgrpalette::loadCT, tableNum, file=file, cpt_filename=cptFilename, $
-                          brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, $
-                          vis=vis, reverse=reverse
+pro mggrpalette::loadCT, tableNum, file=file, cpt_filename=cptFilename, $
+                         brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, $
+                         mg=mg, reverse=reverse
   compile_opt strictarr
 
   if (n_elements(cptFilename) gt 0L) then begin
@@ -103,14 +103,14 @@ pro visgrpalette::loadCT, tableNum, file=file, cpt_filename=cptFilename, $
     if (~file_test(_cptFilename)) then begin
       _cptFilename = filepath(_cptFilename, $
                               subdir=['cpt-city'], $
-                              root=vis_src_root())
+                              root=mg_src_root())
     endif
     
     if (~file_test(_cptFilename)) then begin
       message, '.cpt file not found, ' + cptFilename
     endif
     
-    rgb = vis_cpt2ct(_cptFilename, name=ctnames)
+    rgb = mg_cpt2ct(_cptFilename, name=ctnames)
     
     if (keyword_set(reverse)) then rgb = reverse(rgb, 1)
     
@@ -122,12 +122,12 @@ pro visgrpalette::loadCT, tableNum, file=file, cpt_filename=cptFilename, $
   endif
   
   case 1 of
-    keyword_set(brewer): ctfilename = filepath('brewer.tbl', root=vis_src_root())
-    keyword_set(gmt): ctfilename = filepath('gmt.tbl', root=vis_src_root())
-    keyword_set(mpl): ctfilename = filepath('mpl.tbl', root=vis_src_root())
-    keyword_set(gist): ctfilename = filepath('gist.tbl', root=vis_src_root())
-    keyword_set(chaco): ctfilename = filepath('chaco.tbl', root=vis_src_root())
-    keyword_set(vis): ctfilename = filepath('vis.tbl', root=vis_src_root())        
+    keyword_set(brewer): ctfilename = filepath('brewer.tbl', root=mg_src_root())
+    keyword_set(gmt): ctfilename = filepath('gmt.tbl', root=mg_src_root())
+    keyword_set(mpl): ctfilename = filepath('mpl.tbl', root=mg_src_root())
+    keyword_set(gist): ctfilename = filepath('gist.tbl', root=mg_src_root())
+    keyword_set(chaco): ctfilename = filepath('chaco.tbl', root=mg_src_root())
+    keyword_set(mg): ctfilename = filepath('mg.tbl', root=mg_src_root())        
     n_elements(file) gt 0L: ctfilename = file
     else:
   endcase
@@ -146,8 +146,8 @@ end
 ;+
 ; Define instance variables.
 ;-
-pro visgrpalette__define
+pro mggrpalette__define
   compile_opt strictarr
   
-  define = { VISgrPalette, inherits IDLgrPalette }
+  define = { MGgrPalette, inherits IDLgrPalette }
 end

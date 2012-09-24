@@ -4,31 +4,31 @@
 ; Get an RGB color value for the specified color name. The available colors
 ; are:
 ;
-; .. image:: vis_colors.png
+; .. image:: mg_colors.png
 ;
 ; :Examples:
 ;    For example::
 ;
-;       IDL> print, vis_color('black')
+;       IDL> print, mg_color('black')
 ;          0   0   0
-;       IDL> print, vis_color('slateblue')
+;       IDL> print, mg_color('slateblue')
 ;        106  90 205
-;       IDL> c = vis_color('slateblue', /index) 
+;       IDL> c = mg_color('slateblue', /index) 
 ;       IDL> print, c, c, format='(I, Z)'
 ;           13458026      CD5A6A
-;       IDL> print, vis_color(['blue', 'red', 'yellow'])
+;       IDL> print, mg_color(['blue', 'red', 'yellow'])
 ;          0 255 255
 ;          0   0 255
 ;        255   0   0
-;       IDL> print, vis_color(/names)
+;       IDL> print, mg_color(/names)
 ;       aliceblue antiquewhite aqua aquamarine azure beige ...
 ;
 ;    These commands are in the main-level example program::
 ;
-;       IDL> .run vis_color
+;       IDL> .run mg_color
 ;
 ; :Uses:
-;    vis_src_root, vis_index2rgb
+;    mg_src_root, mg_index2rgb
 ;
 ; :Returns:
 ;    Returns a triple as a bytarr(3) or bytarr(3, n) by default if a single
@@ -54,8 +54,8 @@
 ;       set to use crayon color names instead of the HTML color
 ;       names
 ;-
-function vis_color, colorname, names=names, index=index, $
-                    xkcd=xkcd, crayons=crayons
+function mg_color, colorname, names=names, index=index, $
+                   xkcd=xkcd, crayons=crayons
   compile_opt strictarr
   on_error, 2
   
@@ -67,7 +67,7 @@ function vis_color, colorname, names=names, index=index, $
     message, 'color name must be a scalar or vector'
   endif
   
-  define = { vis_color, name: '', rgb:0L }
+  define = { mg_color, name: '', rgb:0L }
   
   case 1 of
     keyword_set(xkcd): basename = 'xkcdcolors.dat'
@@ -75,7 +75,7 @@ function vis_color, colorname, names=names, index=index, $
     else: basename = 'htmlcolors.dat'
   endcase
   
-  colorFilename = filepath(basename, root=vis_src_root())
+  colorFilename = filepath(basename, root=mg_src_root())
   ncolors = file_lines(colorFilename)
 
   rawColors = strarr(ncolors)
@@ -83,13 +83,13 @@ function vis_color, colorname, names=names, index=index, $
   readf, lun, rawColors
   free_lun, lun
   
-  colors = replicate({ vis_color }, ncolors)
+  colors = replicate({ mg_color }, ncolors)
 
   for c = 0L, ncolors - 1L do begin
     space = strpos(rawColors[c], ' ')
     color = long(strmid(rawColors[c], 0L, space))
     name = strmid(rawColors[c], space + 1L)
-    colors[c] = { vis_color, name: name, rgb: color }
+    colors[c] = { mg_color, name: name, rgb: color }
   endfor
   
   if (keyword_set(names)) then return, colors.name
@@ -108,7 +108,7 @@ function vis_color, colorname, names=names, index=index, $
     if (keyword_set(index)) then begin
       result[i] = colors[ind[0]].rgb
     endif else begin
-      result[i, *] = vis_index2rgb(colors[ind[0]].rgb)
+      result[i, *] = mg_index2rgb(colors[ind[0]].rgb)
     endelse  
   endfor
 
@@ -118,11 +118,11 @@ end
 
 ; main-level example program
 
-print, vis_color('black')
-print, vis_color('slateblue')
-c = vis_color('slateblue', /index) 
+print, mg_color('black')
+print, mg_color('slateblue')
+c = mg_color('slateblue', /index) 
 print, c, c, format='(I, Z)'
-print, vis_color(['blue', 'red', 'yellow'])
-print, vis_color(/names)
+print, mg_color(['blue', 'red', 'yellow'])
+print, mg_color(/names)
 
 end

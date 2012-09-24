@@ -7,7 +7,7 @@
 ;    For example, if the GMT color tables files were stored in the `cpt` 
 ;    directory::
 ;
-;       IDL> tvlct, vis_cpt2ct('gmt/GMT_relief')
+;       IDL> tvlct, mg_cpt2ct('gmt/GMT_relief')
 ; 
 ; :Returns:
 ;    bytarr(256, 3)
@@ -21,13 +21,13 @@
 ;    name : out, optional, type=string
 ;       color table name
 ;-
-function vis_cpt2ct, filename, name=name
+function mg_cpt2ct, filename, name=name
   compile_opt strictarr
   on_error, 2
   
   _filename = file_test(filename) $
                 ? filename $
-                : filepath(filename, subdir=['cpt-city'], root=vis_src_root())
+                : filepath(filename, subdir=['cpt-city'], root=mg_src_root())
   
   if (~file_test(_filename)) then begin
     message, string(filename, format='(%"cpt file %s not found")')
@@ -97,9 +97,9 @@ end
 
 ; cd, 'cpt-city', current=wd
 ; files = file_search('.', '*.cpt', count=nfiles)
-; vis_create_ctfile, '../gmt.tbl'
+; mg_create_ctfile, '../gmt.tbl'
 ; for f = 0B, nfiles - 1L do begin
-;   rgb = vis_cpt2ct(files[f], name=ctname)
+;   rgb = mg_cpt2ct(files[f], name=ctname)
 ;   print, ctname, format='(%"adding %s")'
 ;   modifyct, f, ctname, reform(rgb[*, 0]), reform(rgb[*, 1]), reform(rgb[*, 2]), file='../gmt.tbl'
 ; endfor
@@ -108,13 +108,13 @@ end
 elev = read_binary(file_which('elevbin.dat'), data_dims=[64, 64], data_type=1)
 elev = rebin(elev, 64 * 8, 64 * 8)
 
-tvlct, vis_cpt2ct('ngdc/ETOPO1.cpt')
-vis_decomposed, 0, old_decomposed=odec
+tvlct, mg_cpt2ct('ngdc/ETOPO1.cpt')
+mg_decomposed, 0, old_decomposed=odec
 
-vis_image, read_image(file_which('elev_t.jpg')), /new_window
-vis_image, vis_scaleimage(elev, dividers=[0, 1, 256], outputs=[0, 144, 256]), $
-           /new_window
+mg_image, read_image(file_which('elev_t.jpg')), /new_window
+mg_image, mg_scaleimage(elev, dividers=[0, 1, 256], outputs=[0, 144, 256]), $
+          /new_window
 
-vis_decomposed, odec
+mg_decomposed, odec
 
 end

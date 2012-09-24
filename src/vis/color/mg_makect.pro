@@ -7,7 +7,7 @@
 ; :Examples:
 ;    See the main-level example program::
 ;
-;       IDL> .run vis_makect
+;       IDL> .run mg_makect
 ;
 ;    It produces:
 ;
@@ -35,7 +35,7 @@
 ;       cutoff values between 0.0 and 1.0 (or 0 and 255); there must be one 
 ;       more color than cutoff value provided
 ;-
-function vis_makect, c1, c2, c3, ncolors=ncolors, partition=partition
+function mg_makect, c1, c2, c3, ncolors=ncolors, partition=partition
   compile_opt strictarr
   on_error, 2
   
@@ -83,27 +83,27 @@ end
 ; main-level example program
 
 tvlct, oldRGB, /get
-vis_decomposed, 0, old_decomposed=odec
+mg_decomposed, 0, old_decomposed=odec
 
 xsize = 256
 ysize = 20
 
 window, /free, xsize=xsize, ysize=5 * ysize, title='Example color tables'
 
-tvlct, vis_makect(vis_color('yellow'), vis_color('blue'))
+tvlct, mg_makect(mg_color('yellow'), mg_color('blue'))
 tv, bindgen(xsize) # (bytarr(ysize) + 1B), 0
 
-tvlct, vis_makect(vis_color('yellow'), vis_color('blue'), ncolors=16)
+tvlct, mg_makect(mg_color('yellow'), mg_color('blue'), ncolors=16)
 tv, bytscl(bindgen(xsize), top=15) # (bytarr(ysize) + 1B), 1
 
-tvlct, vis_makect([255, 255, 255], [255, 0, 0])
+tvlct, mg_makect([255, 255, 255], [255, 0, 0])
 tv, bindgen(xsize) # (bytarr(ysize) + 1B), 2
 
-tvlct, vis_makect(vis_color('red'), vis_color('white'), vis_color('green'), $
+tvlct, mg_makect(mg_color('red'), mg_color('white'), mg_color('green'), $
                   ncolors=32)
 tv, bytscl(bindgen(xsize), top=31) # (bytarr(ysize) + 1B), 3
 
-tvlct, vis_makect(vis_color('powderblue'), vis_color('ivory'), vis_color('sienna'), $
+tvlct, mg_makect(mg_color('powderblue'), mg_color('ivory'), mg_color('sienna'), $
                   ncolors=16)
 tv, bytscl(bindgen(xsize), top=15) # (bytarr(ysize) + 1B), 4
 
@@ -112,8 +112,8 @@ convec = bytarr(248, 248)
 openr, lun, filename, /get
 readu, lun, convec
 free_lun, lun
-tvlct, vis_makect(vis_color(['white','green','yellow','blue','red']), partition=[0.2, 0.3, 0.5, 0.8])
-vis_image, convec, /new_window
+tvlct, mg_makect(mg_color(['white','green','yellow','blue','red']), partition=[0.2, 0.3, 0.5, 0.8])
+mg_image, convec, /new_window
 
 vis_decomposed, odec
 tvlct, oldRGB

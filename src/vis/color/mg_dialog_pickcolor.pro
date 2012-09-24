@@ -5,7 +5,7 @@
 ; color names
 ;-
 
-function vis_dialog_pickcolor
+function mg_dialog_pickcolor
   compile_opt strictarr
   
 end
