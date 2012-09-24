@@ -23,7 +23,7 @@
 ;    picture : in, optional, type=object
 ;       scene, view group, or view to draw
 ;-
-pro visgrimagedestination::draw, picture
+pro mggrimagedestination::draw, picture
   compile_opt strictarr
   
   self->idlgrbuffer::draw, picture
@@ -39,11 +39,11 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrimagedestination::getProperty, basename=basename, $
-                                        format=format, $
-                                        show_frame=showFrame, $
-                                        frame_format=frameFormat, $
-                                        _ref_extra=e
+pro mggrimagedestination::getProperty, basename=basename, $
+                                       format=format, $
+                                       show_frame=showFrame, $
+                                       frame_format=frameFormat, $
+                                       _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(basename)) then basename = self.basename
@@ -58,11 +58,11 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrimagedestination::setProperty, basename=basename, $
-                                        format=format, $
-                                        show_frame=showFrame, $
-                                        frame_format=frameFormat, $
-                                        _extra=e
+pro mggrimagedestination::setProperty, basename=basename, $
+                                       format=format, $
+                                       show_frame=showFrame, $
+                                       frame_format=frameFormat, $
+                                       _extra=e
   compile_opt strictarr
   
   if (n_elements(basename) gt 0L) then self.basename = basename
@@ -77,7 +77,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrimagedestination::cleanup
+pro mggrimagedestination::cleanup
   compile_opt strictarr
 
   self->idlgrbuffer::cleanup
@@ -90,11 +90,11 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrimagedestination::init, basename=basename, $
-                                      format=format, $
-                                      show_frame=showFrame, $
-                                      frame_format=frameFormat, $
-                                      _extra=e
+function mggrimagedestination::init, basename=basename, $
+                                     format=format, $
+                                     show_frame=showFrame, $
+                                     frame_format=frameFormat, $
+                                     _extra=e
   compile_opt strictarr
   
   if (~self->idlgrbuffer::init(_extra=e)) then return, 0
@@ -125,10 +125,10 @@ end
 ;    currentFrame
 ;       current frame number in the animation
 ;-
-pro visgrimagedestination__define
+pro mggrimagedestination__define
   compile_opt strictarr
   
-  define = { VISgrImageDestination, inherits IDLgrBuffer, $
+  define = { MGgrImageDestination, inherits IDLgrBuffer, $
              basename: '', $
              format: '', $
              frameFormat: '', $

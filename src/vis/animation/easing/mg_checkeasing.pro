@@ -6,9 +6,9 @@
 ;
 ; :Params:
 ;    easing : in, optional, type=string
-;       classname of VISgrEasing subclass to check
+;       classname of `MGgrEasing` subclass to check
 ;-
-pro vis_checkeasing, easing
+pro mg_checkeasing, easing
   compile_opt strictarr
 
   n = 1000L

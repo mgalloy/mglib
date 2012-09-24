@@ -15,7 +15,7 @@
 ;    progress : in, required, type=float
 ;       progress of the transition, 0 to 1
 ;-
-pro visgrtranslateanimator::animate, progress
+pro mggrtranslateanimator::animate, progress
   compile_opt strictarr
   
   _progress = self.easing->ease(progress)
@@ -30,7 +30,7 @@ end
 ;+
 ; Reset the animator.
 ;-
-pro visgrtranslateanimator::reset
+pro mggrtranslateanimator::reset
   compile_opt strictarr
   
   self.currentProgress = 0.0
@@ -47,12 +47,12 @@ end
 ;    translation : in, optional, type=fltarr(3)
 ;       amount to translate each dimension
 ;    _extra : in, optional, type=keywords
-;       keyword to VISgrAnimator::init
+;       keyword to `MGgrAnimator::init`
 ;-
-function visgrtranslateanimator::init, translation=translation, _extra=e
+function mggrtranslateanimator::init, translation=translation, _extra=e
   compile_opt strictarr
 
-  if (~self->visgranimator::init(_extra=e)) then return, 0
+  if (~self->mggranimator::init(_extra=e)) then return, 0
   
   self.translation = n_elements(translation) eq 0L ? fltarr(3) + 1.0 : translation
   self.currentProgress = 0.0
@@ -70,10 +70,10 @@ end
 ;    currentProgress
 ;       amount of progress in the animation
 ;-
-pro visgrtranslateanimator__define
+pro mggrtranslateanimator__define
   compile_opt strictarr
 
-  define = { VISgrTranslateAnimator, inherits VISgrAnimator, $
+  define = { MGgrTranslateAnimator, inherits MGgrAnimator, $
              translation: fltarr(3), $  
              currentProgress: 0.0 $
            }

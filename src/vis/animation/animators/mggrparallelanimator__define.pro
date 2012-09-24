@@ -7,13 +7,13 @@
 ;    duration
 ;       duration of the animator
 ;    _ref_extra
-;       properties of the VISgrAnimation or IDL_Container
+;       properties of the `MGgrAnimation` or `IDL_Container`
 ;-
 
 ;+
 ; Get properties.
 ;-
-pro visgrparallelanimator::getProperty, duration=duration, _ref_extra=e
+pro mggrparallelanimator::getProperty, duration=duration, _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(duration)) then begin
@@ -26,7 +26,7 @@ pro visgrparallelanimator::getProperty, duration=duration, _ref_extra=e
   endif
   
   if (n_elements(e) gt 0L) then begin
-    self->visgranimator::getProperty, _extra=e
+    self->mggranimator::getProperty, _extra=e
     self->idl_container::getProperty, _extra=e
   endif
 end
@@ -39,7 +39,7 @@ end
 ;    progress : in, required, type=float
 ;       progress of the transition, 0 to 1
 ;-
-pro visgrparallelanimator::animate, progress
+pro mggrparallelanimator::animate, progress
   compile_opt strictarr
 
   _progress = self.easing->ease(progress)
@@ -55,7 +55,7 @@ end
 ;+
 ; Reset the animator.
 ;-
-pro visgrparallelanimator::reset
+pro mggrparallelanimator::reset
   compile_opt strictarr
   
   for i =  0L, self->count() - 1L do begin
@@ -72,11 +72,11 @@ end
 ;    container
 ;       container object to hold parallel animators
 ;-
-pro visgrparallelanimator__define
+pro mggrparallelanimator__define
   compile_opt strictarr
   
-  define = { VISgrParallelAnimator, $
-             inherits VISgrAnimator, $
+  define = { MGgrParallelAnimator, $
+             inherits MGgrAnimator, $
              inherits IDL_Container, $
              container: obj_new() $
            }

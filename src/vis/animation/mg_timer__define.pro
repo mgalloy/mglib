@@ -6,12 +6,12 @@
 ; :Examples:
 ;    See the main-level example program::
 ;
-;       IDL> .run vis_timer__define
+;       IDL> .run mg_timer__define
 ;
 ;    The following creates a timer which will go off 5 times with 1.0 seconds
 ;    between alarms, and then starts it::
 ;
-;       IDL> timer = obj_new('VIS_Timer', duration=1.0, nframes=5, $
+;       IDL> timer = obj_new('MG_Timer', duration=1.0, nframes=5, $
 ;                            callback='print', $
 ;                            uvalue='Callback routine called')
 ;       IDL> timer->start
@@ -56,7 +56,7 @@
 ;    event : in, required, type=structure
 ;       timer event
 ;-
-pro vis_timer_event, event
+pro mg_timer_event, event
   compile_opt strictarr
 
   ; retrieve timer object
@@ -70,7 +70,7 @@ end
 ;
 ; :private:
 ;-
-pro vis_timer::_execute
+pro mg_timer::_execute
   compile_opt strictarr
 
   ; don't call callback if timer stopped
@@ -87,10 +87,10 @@ end
 ;+
 ; Get properties.
 ;-
-pro vis_timer::getProperty, active=active, $
-                            duration=duration, repeating=repeating, $
-                            current_frame=currentFrame, nframes=nframes, $
-                            callback=callback, uvalue=uvalue
+pro mg_timer::getProperty, active=active, $
+                           duration=duration, repeating=repeating, $
+                           current_frame=currentFrame, nframes=nframes, $
+                           callback=callback, uvalue=uvalue
   compile_opt strictarr
 
   if (arg_present(active)) then active = self.active  
@@ -107,7 +107,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro vis_timer::setProperty, duration=duration, repeating=repeating, $
+pro mg_timer::setProperty, duration=duration, repeating=repeating, $
                             current_frame=currentFrame, nframes=nframes, $
                             callback=callback, uvalue=uvalue 
 
@@ -125,7 +125,7 @@ end
 ;+
 ; Start the timer.
 ;-
-pro vis_timer::start
+pro mg_timer::start
   compile_opt strictarr
 
   self.active = 1B
@@ -141,7 +141,7 @@ end
 ;+
 ; Stop the timer.
 ;-
-pro vis_timer::stop
+pro mg_timer::stop
   compile_opt strictarr
   
   self.active = 0B
@@ -151,7 +151,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro vis_timer::cleanup
+pro mg_timer::cleanup
   compile_opt strictarr
 
   ptr_free, self.uvalue
@@ -164,9 +164,9 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function vis_timer::init, duration=duration, $
-                          repeating=repeating, nframes=nframes, $
-                          callback=callback, uvalue=uvalue
+function mg_timer::init, duration=duration, $
+                         repeating=repeating, nframes=nframes, $
+                         callback=callback, uvalue=uvalue
   compile_opt strictarr
   
   self.tlb = widget_base(uvalue=self, map=0)
@@ -180,7 +180,7 @@ function vis_timer::init, duration=duration, $
   self.callback = n_elements(callback) eq 0L ? '' : callback
   self.uvalue = ptr_new(uvalue)
   
-  xmanager, 'vis_timer', self.tlb, /no_block
+  xmanager, 'mg_timer', self.tlb, /no_block
   
   return, 1
 end
@@ -207,10 +207,10 @@ end
 ;    uvalue
 ;       user-defined value passed to callback routine
 ;-
-pro vis_timer__define
+pro mg_timer__define
   compile_opt strictarr
   
-  define = { VIS_Timer, $
+  define = { MG_Timer, $
              tlb: 0L, $
              active: 0B, $
              duration: 0.0, $
@@ -225,7 +225,7 @@ end
 
 ; main-level example program
 
-timer = obj_new('VIS_Timer', duration=1.0, nframes=5, $
+timer = obj_new('MG_Timer', duration=1.0, nframes=5, $
                 callback='print', uvalue='Callback routine called')
 
 timer->start

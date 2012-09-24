@@ -16,13 +16,13 @@
 
 
 ;+
-; Do one frame of animation. VISgrAnimator has a null animation.
+; Do one frame of animation. MGgrAnimator has a null animation.
 ;
 ; :Params:
 ;    progress : in, required, type=float
 ;       progress from 0.0 to 1.0
 ;-
-pro visgranimator::animate, progress
+pro mggranimator::animate, progress
   compile_opt strictarr
   
 end
@@ -31,7 +31,7 @@ end
 ;+
 ; Reset the animator.
 ;-
-pro visgranimator::reset
+pro mggranimator::reset
   compile_opt strictarr
 
 end
@@ -40,8 +40,8 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgranimator::getProperty, target=target, duration=duration, $
-                                nframes=nframes, easing=easing
+pro mggranimator::getProperty, target=target, duration=duration, $
+                               nframes=nframes, easing=easing
   compile_opt strictarr
 
   if (arg_present(target)) then target = self.target
@@ -54,8 +54,8 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgranimator::setProperty, target=target, duration=duration, $
-                                nframes=nframes, easing=easing
+pro mggranimator::setProperty, target=target, duration=duration, $
+                               nframes=nframes, easing=easing
   compile_opt strictarr
   
   if (n_elements(target) gt 0L) then self.target = target  
@@ -71,7 +71,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgranimator::cleanup
+pro mggranimator::cleanup
   compile_opt strictarr
   
   obj_destroy, self.easing
@@ -84,16 +84,16 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgranimator::init, target=target, duration=duration, $
-                              nframes=nframes, easing=easing
+function mggranimator::init, target=target, duration=duration, $
+                             nframes=nframes, easing=easing
   compile_opt strictarr
   
   self.target = n_elements(target) gt 0L ? target : obj_new()  
   self.duration = n_elements(duration) gt 0L ? duration : 1.0
   self.nframes = n_elements(nframes) gt 0L ? nframes : 100L
-  self.easing = (obj_valid(easing) && obj_isa(easing, 'VISgrEasing')) $
+  self.easing = (obj_valid(easing) && obj_isa(easing, 'MGgrEasing')) $
                   ? easing $
-                  : obj_new('VISgrEasing')
+                  : obj_new('MGgrEasing')
   
   return, 1L
 end
@@ -112,10 +112,10 @@ end
 ;    easing
 ;       easing object to use for transitions; defaults to a linear easing
 ;-
-pro visgranimator__define
+pro mggranimator__define
   compile_opt strictarr
   
-  define = { VISgrAnimator, $
+  define = { MGgrAnimator, $
              target: obj_new(), $
              duration: 0.0, $
              nframes: 0L, $

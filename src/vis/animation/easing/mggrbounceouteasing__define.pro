@@ -15,7 +15,7 @@
 ;    t : in, required, type=float
 ;      animation progress, 0 to 1.
 ;-
-function visgrbounceouteasing::ease, t
+function mggrbounceouteasing::ease, t
   compile_opt strictarr
   
   return, 1. - (1. - sqrt(t > 0)) ^ 2 * abs(sin(4. * t * !pi + !pi / 2.))
@@ -25,8 +25,8 @@ end
 ;+
 ; Define instance variables.
 ;-
-pro visgrbounceouteasing__define
+pro mggrbounceouteasing__define
   compile_opt strictarr
   
-  define = { VISgrBounceOutEasing, inherits VISgrEasing }
+  define = { MGgrBounceOutEasing, inherits MGgrEasing }
 end

@@ -15,7 +15,7 @@
 ;    progress : in, required, type=float
 ;       progress of the transition, 0 to 1
 ;-
-pro visgrscaleanimator::animate, progress
+pro mggrscaleanimator::animate, progress
   compile_opt strictarr
   
   _progress = self.easing->ease(progress)
@@ -30,7 +30,7 @@ end
 ;+
 ; Reset the animator.
 ;-
-pro visgrscaleanimator::reset
+pro mggrscaleanimator::reset
   compile_opt strictarr
   
   self.currentProgress = 0.0
@@ -47,12 +47,12 @@ end
 ;    size : in, optional, type=fltarr(3)
 ;       amount to scale each dimension
 ;    _extra : in, optional, type=keywords
-;       keyword to VISgrAnimator::init
+;       keyword to `MGgrAnimator::init`
 ;-
-function visgrscaleanimator::init, size=size, _extra=e
+function mggrscaleanimator::init, size=size, _extra=e
   compile_opt strictarr
 
-  if (~self->visgranimator::init(_extra=e)) then return, 0
+  if (~self->mggranimator::init(_extra=e)) then return, 0
   
   self.size = n_elements(size) eq 0L ? fltarr(3) + 1.0 : size
   
@@ -67,10 +67,10 @@ end
 ;    size
 ;       amount to scale each dimension
 ;-
-pro visgrscaleanimator__define
+pro mggrscaleanimator__define
   compile_opt strictarr
   
-  define = { VISgrScaleAnimator, inherits VISgrAnimator, $
+  define = { MGgrScaleAnimator, inherits MGgrAnimator, $
              size: fltarr(3), $
              currentProgress: 0.0 $
            }

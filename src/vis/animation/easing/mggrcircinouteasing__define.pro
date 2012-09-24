@@ -15,7 +15,7 @@
 ;    t : in, required, type=float
 ;      animation progress, 0 to 1.
 ;-
-function visgrcircinouteasing::ease, t
+function mggrcircinouteasing::ease, t
   compile_opt strictarr
   
 
@@ -26,8 +26,8 @@ end
 ;+
 ; Define instance variables.
 ;-
-pro visgrcircinouteasing__define
+pro mggrcircinouteasing__define
   compile_opt strictarr
   
-  define = { VISgrCircInOutEasing, inherits VISgrEasing }
+  define = { MGgrCircInOutEasing, inherits MGgrEasing }
 end
