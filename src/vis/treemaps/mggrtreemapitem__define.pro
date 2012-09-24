@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
-pro visgrtreemapitem::getProperty, size=size, bounds=bounds, depth=depth, $
-                                   order=order
+pro mggrtreemapitem::getProperty, size=size, bounds=bounds, depth=depth, $
+                                  order=order
   compile_opt strictarr
 
   if (arg_present(size)) then size = self.size
@@ -11,7 +11,7 @@ pro visgrtreemapitem::getProperty, size=size, bounds=bounds, depth=depth, $
 end
 
 
-pro visgrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
+pro mggrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
                                    order=order
   compile_opt strictarr
   
@@ -22,25 +22,25 @@ pro visgrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
 end
 
 
-pro visgrtreemapitem::cleanup
+pro mggrtreemapitem::cleanup
   compile_opt strictarr
 
   obj_destroy, self.bounds
 end
 
 
-function visgrtreemapitem::init, size=size, bounds=bounds, $
-                                 depth=depth, order=order
+function mggrtreemapitem::init, size=size, bounds=bounds, $
+                                depth=depth, order=order
   compile_opt strictarr
   
   return, 1
 end
 
 
-pro visgrtreemapitem__define
+pro mggrtreemapitem__define
   compile_opt strictarr
 
-  define = { VISgrTreemapItem, $
+  define = { MGgrTreemapItem, $
              size: 0.0, $
              bounds: obj_new(), $
              depth: 0L, $

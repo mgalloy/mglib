@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-function visgrabstracttreemaplayout__totalSize, items, startPos, endPos
+function mggrabstracttreemaplayout__totalSize, items, startPos, endPos
   compile_opt strictarr
   
   totalSize = 0.0
@@ -13,10 +13,10 @@ function visgrabstracttreemaplayout__totalSize, items, startPos, endPos
 end
 
 
-pro visgrabstracttreemaplayout__sliceLayout, items, startPos, endPos, bounds, vertical=vertical, ascending=ascending
+pro mggrabstracttreemaplayout__sliceLayout, items, startPos, endPos, bounds, vertical=vertical, ascending=ascending
   compile_opt strictarr
 
-  totalSize = visgrabstracttreemaplayout__totalSize(items, startPos, endPos)
+  totalSize = mggrabstracttreemaplayout__totalSize(items, startPos, endPos)
   a = 0.0
   
   for i = startPos, endPos do begin
@@ -43,7 +43,7 @@ pro visgrabstracttreemaplayout__sliceLayout, items, startPos, endPos, bounds, ve
 end
 
     
-function visgrabstracttreemaplayout::sortDescending, items
+function mggrabstracttreemaplayout::sortDescending, items
   compile_opt strictarr
 
   count = items->count()
@@ -71,10 +71,10 @@ end
 ; :Abstract:
 ;
 ; :Params:
-;    model : in, required, type=VISgrTreemapModel
-;    bounds : in, required, type=VISgrRect
+;    model : in, required, type=MGgrTreemapModel
+;    bounds : in, required, type=MGgrRect
 ;-
-pro visgrabstracttreemaplayout::layout, model, bounds
+pro mggrabstracttreemaplayout::layout, model, bounds
   compile_opt strictarr
   
 end
@@ -82,8 +82,8 @@ end
 
 ; TODO: implement rest of methods
 
-pro visgrabstracttreemaplayout__define
+pro mggrabstracttreemaplayout__define
   compile_opt strictarr
 
-  define = { VISgrAbstractTreemapLayout, inherits VISgrTreemapLayout }
+  define = { MGgrAbstractTreemapLayout, inherits MGgrTreemapLayout }
 end

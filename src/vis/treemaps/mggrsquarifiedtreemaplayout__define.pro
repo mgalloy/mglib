@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-pro visgrsquarifiedtreemaplayout::getProperty, name=name, description=description
+pro mggrsquarifiedtreemaplayout::getProperty, name=name, description=description
   compile_opt strictarr
   
   if (arg_present(name)) then name = 'Squarified'
@@ -8,13 +8,13 @@ pro visgrsquarifiedtreemaplayout::getProperty, name=name, description=descriptio
 end
 
 
-pro visgrsquarifiedtreemaplayout::setProperty
+pro mggrsquarifiedtreemaplayout::setProperty
   compile_opt strictarr
   
 end
 
 
-pro visgrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
+pro mggrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
   compile_opt strictarr
   
   ; done
@@ -22,7 +22,7 @@ pro visgrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
   
   ; use slice layout if only 2 or fewer items
   if (endPos - startPos lt 2L) then begin
-    visgrslicetreemaplayout__layoutBest, items, startPos, endPos, bounds
+    mggrslicetreemaplayout__layoutBest, items, startPos, endPos, bounds
     return
   endif
   
@@ -43,10 +43,10 @@ pro visgrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
       b += q
     endwhile
 
-    visgrslicetreemaplayout__layoutBest, items, startPos, midPos, $
-                                         obj_new('VISgrRect', x=x, y=y, width=w, height=h * b)
+    mggrslicetreemaplayout__layoutBest, items, startPos, midPos, $
+                                        obj_new('MGgrRect', x=x, y=y, width=w, height=h * b)
     self->layout, items, midPos + 1L, endPos, $
-                  obj_new('VISgrRect', x=x, y=y + h * b, width=w, height=h * (1 - b))
+                  obj_new('MGgrRect', x=x, y=y + h * b, width=w, height=h * (1 - b))
   endif else begin
     while (midPos le endPos) do begin
       aspect = self->normAspect(h, w, a, b)
@@ -57,22 +57,22 @@ pro visgrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
       b += q
     endwhile    
 
-    visgrslicetreemaplayout__layoutBest, items, startPos, midPos, $
-                                         obj_new('VISgrRect', x=x, y=y, width=w * b, height=h)
+    mggrslicetreemaplayout__layoutBest, items, startPos, midPos, $
+                                        obj_new('MGgrRect', x=x, y=y, width=w * b, height=h)
     self->layout, items, midPos + 1L, endPos, $
-                  obj_new('VISgrRect', x=x + w * b, y=y, width=w * (1 - b), height=h)
+                  obj_new('MGgrRect', x=x + w * b, y=y, width=w * (1 - b), height=h)
   endelse
 end
 
 
-function visgrsquarifiedtreemaplayout::aspect, big, small, a, b
+function mggrsquarifiedtreemaplayout::aspect, big, small, a, b
   compile_opt strictarr
   
   return, (big * b) / (small * a / b)
 end
 
 
-function visgrsquarifiedtreemaplayout::normAspect, big, small, a, b
+function mggrsquarifiedtreemaplayout::normAspect, big, small, a, b
   compile_opt strictarr
 
   x = self->aspect(big, small, a, b)
@@ -80,7 +80,7 @@ function visgrsquarifiedtreemaplayout::normAspect, big, small, a, b
 end
 
 
-function visgrsquarifiedtreemaplayout::sum, items, startPos, endPos
+function mggrsquarifiedtreemaplayout::sum, items, startPos, endPos
   compile_opt strictarr
 
   totalSize = 0.0
@@ -93,24 +93,24 @@ function visgrsquarifiedtreemaplayout::sum, items, startPos, endPos
 end
 
 
-pro visgrsquarifiedtreemaplayout::cleanup
+pro mggrsquarifiedtreemaplayout::cleanup
   compile_opt strictarr
   
-  self->visgrabstracttreemaplayout::cleanup
+  self->mggrabstracttreemaplayout::cleanup
 end
 
 
-function visgrsquarifiedtreemaplayout::init
+function mggrsquarifiedtreemaplayout::init
   compile_opt strictarr
   
   return, 1
 end
 
 
-pro visgrsquarifiedtreemaplayout__define
+pro mggrsquarifiedtreemaplayout__define
   compile_opt strictarr
   
-  define = { visgrsquarifiedtreemaplayout, $
-             inherits VISgrAbstractTreemapLayout $
+  define = { MGgrSquarifiedTreemapLayout, $
+             inherits MGgrAbstractTreemapLayout $
            }
 end

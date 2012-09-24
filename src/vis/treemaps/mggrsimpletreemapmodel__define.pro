@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-pro visgrsimpletreemapmodel::getProperty, items=items, bounds=bounds
+pro mggrsimpletreemapmodel::getProperty, items=items, bounds=bounds
   compile_opt strictarr
 
   if (arg_present(items)) then items = self.items
@@ -8,7 +8,7 @@ pro visgrsimpletreemapmodel::getProperty, items=items, bounds=bounds
 end
 
 
-pro visgrsimpletreemapmodel::setProperty, items=items, bounds=bounds
+pro mggrsimpletreemapmodel::setProperty, items=items, bounds=bounds
   compile_opt strictarr
   
   if (n_elements(items) gt 0L) then self.items = items
@@ -16,14 +16,14 @@ pro visgrsimpletreemapmodel::setProperty, items=items, bounds=bounds
 end
 
 
-pro visgrsimpletreemapmodel::cleanup
+pro mggrsimpletreemapmodel::cleanup
   compile_opt strictarr
   
   obj_destroy, [self.items, self.bounds]
 end
 
 
-function visgrsimpletreemapmodel::init, items=items, bounds=bounds
+function mggrsimpletreemapmodel::init, items=items, bounds=bounds
   compile_opt strictarr
 
   self.items = n_elements(items) eq 0L ? obj_new() : items
@@ -42,10 +42,10 @@ end
 ;    bounds
 ;       Rect of bounds
 ;-
-pro visgrsimpletreemapmodel__define
+pro mggrsimpletreemapmodel__define
   compile_opt strictarr
   
-  define = { VISgrSimpleTreemapModel, $
+  define = { MGgrSimpleTreemapModel, $
              items: obj_new(), $
              bounds: obj_new() $
            }
