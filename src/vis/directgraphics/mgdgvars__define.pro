@@ -4,20 +4,20 @@
 ; Object to save/restore direct graphics system variables. This is needed when
 ; using multiple graphics windows and it is necessary to use the coordinate
 ; system of a window which does not contain the last item plotted. For 
-; example, this happens when using WSET to change to a graphics window 
+; example, this happens when using `WSET` to change to a graphics window 
 ; containing a plot (but not the most recently plotted) and overplotting or 
 ; using CONVERT_COORD with the coordinate system of that window.
 ;
 ; :Examples:
 ;    See the main-level example program at the end of the file::
 ;
-;       IDL> .run visdgvars__define
+;       IDL> .run mgdgvars__define
 ;-
 
 ;+
 ; Save direct graphics system variables.
 ;-
-pro visdgvars::save
+pro mgdgvars::save
     compile_opt strictarr
 
     self.p = !p
@@ -31,7 +31,7 @@ end
 ;+
 ; Restore direct graphics system variables.
 ;-
-pro visdgvars::restore
+pro mgdgvars::restore
     compile_opt strictarr
 
     !p = self.p
@@ -45,19 +45,19 @@ end
 ;+
 ; Free resources.
 ;-
-pro visdgvars::cleanup
+pro mgdgvars::cleanup
     compile_opt strictarr
 
 end
 
 
 ;+
-; Create an visdgvars object.
+; Create an mgdgvars object.
 ;
 ; :Returns:
 ;    1B for success, 0B otherwise
 ;-
-function visdgvars::init
+function mgdgvars::init
     compile_opt strictarr
 
     return, 1B
@@ -79,10 +79,10 @@ end
 ;    map 
 ;       saved !map system variable
 ;-
-pro visdgvars__define
+pro mgdgvars__define
     compile_opt strictarr
 
-    define = { visdgvars, $
+    define = { mgdgvars, $
                p: !p, $
                x: !x, $
                y: !y, $
@@ -94,7 +94,7 @@ end
 
 ; main-level example program
 
-; do it incorrectly without VISdgVars
+; do it incorrectly without `MGdgVars`
 window, 0
 plot, findgen(10)
 
@@ -106,8 +106,8 @@ coords = convert_coord([5], [5], /data, /to_normal)
 plots, coords[0], coords[1], /normal, psym=7
 
 
-; do it correctly with MGdgVars
-vars = obj_new('VISdgVars')
+; do it correctly with `MGdgVars`
+vars = obj_new('MGdgVars')
 
 window, 2
 plot, findgen(10)

@@ -22,7 +22,7 @@
 ;    type2 : in, required, type=long
 ;       type code of the second variable
 ;-
-function vis_blend_type, type1, type2
+function mg_blend_type, type1, type2
   compile_opt strictarr
   
   types = [[intarr(16) - 1], $ ; undefined
@@ -62,7 +62,7 @@ end
 ;    true2 : in, required, type=long
 ;       interleave of second image
 ;-
-function vis_blend_perm, true1, true2
+function mg_blend_perm, true1, true2
   compile_opt strictarr
 
   allPerms = [[[0, 1, 2], [1, 0, 2], [1, 2, 0]], $
@@ -85,7 +85,7 @@ end
 ; :Examples:
 ;    Run the main-level program at the end of this file with::
 ;
-;       IDL> .run vis_blend
+;       IDL> .run mg_blend
 ;
 ;    This should produce:
 ;
@@ -106,7 +106,7 @@ end
 ;       value in 0.0 - 1.0; 1.0 is all im1 and 0.0 is all im2; can be a scalar
 ;       or a 2-dimensional image the same size as the combined images 
 ;-
-function vis_blend, im1, im2, alpha_channel=alphaChannel
+function mg_blend, im1, im2, alpha_channel=alphaChannel
   compile_opt strictarr
   on_error, 2
   
@@ -131,15 +131,15 @@ function vis_blend, im1, im2, alpha_channel=alphaChannel
     message, 'ALPHA_CHANNEL must be a scalar or 2-dimensional'
   endif
   
-  dims1 = vis_image_getsize(_im1, true=true1)
-  dims2 = vis_image_getsize(_im2, true=true2)
+  dims1 = mg_image_getsize(_im1, true=true1)
+  dims2 = mg_image_getsize(_im2, true=true2)
   
   if (~array_equal(dims1, dims2)) then begin
     message, 'images must have matching sizes'
   endif
 
   if (n_elements(_alphaChannel) gt 1L) then begin
-    dimsAlpha  = vis_image_getsize(_alphaChannel, true=trueAlpha)  
+    dimsAlpha  = mg_image_getsize(_alphaChannel, true=trueAlpha)  
   
     if (~array_equal(dims1, dimsAlpha)) then begin
       message, 'ALPHA_CHANNEL size must match image sizes if not a scalar'
@@ -150,14 +150,14 @@ function vis_blend, im1, im2, alpha_channel=alphaChannel
   if (sz1.n_dimensions ne sz2.n_dimensions) then begin
     ; one 2D image, one 3D image
     case 1 of
-      sz1.n_dimensions eq 2L: _im1 = vis_maketrue(_im1, true=true2)
-      sz2.n_dimensions eq 2L: _im2 = vis_maketrue(_im2, true=true1)
+      sz1.n_dimensions eq 2L: _im1 = mg_maketrue(_im1, true=true2)
+      sz2.n_dimensions eq 2L: _im2 = mg_maketrue(_im2, true=true1)
       else: message, 'invalid number of dimensions'
     endcase
   endif else begin
     ; both 2D images or both 3D images (but possibly different interleaves)
     if (sz1.n_dimensions eq 3L) then begin  
-      _im2 = transpose(_im2, vis_blend_perm(true1, true2))
+      _im2 = transpose(_im2, mg_blend_perm(true1, true2))
     endif
   endelse
   
@@ -179,7 +179,7 @@ function vis_blend, im1, im2, alpha_channel=alphaChannel
   ; make result image the correct type (higher precision of the types of
   ; the two input images)  
   return, fix(_alphaChannel * _im1 + (1.0 - _alphaChannel) * _im2, $
-              type=vis_blend_type(sz1.type, sz2.type))
+              type=mg_blend_type(sz1.type, sz2.type))
 end
 
 
@@ -194,14 +194,14 @@ v = rebin(v, 128L * scale, 64L * scale)
 x = rebin(x, 128L * scale)
 y = rebin(y, 64L * scale)
 
-im = vis_lic(u, v)
+im = mg_lic(u, v)
 
 earth = read_image(filepath('earth.jpg', subdir=['examples', 'demo', 'demodata']))
-earth = vis_image_flip(earth)
+earth = mg_image_flip(earth)
 
-blendedImage = vis_blend(vis_image_resize(earth, 512, 256), im)
+blendedImage = mg_blend(mg_image_resize(earth, 512, 256), im)
 lon = 180.0 * findgen(512) / 511.0 - 90.0
 lat = 360.0 * findgen(256) / 255.0 - 180.0
-vis_image, blendedImage, lon, lat, xticks=4, yticks=4, /interp
+mg_image, blendedImage, lon, lat, xticks=4, yticks=4, /interp
 
 end

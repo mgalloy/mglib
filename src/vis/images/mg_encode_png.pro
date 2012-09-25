@@ -20,11 +20,11 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to WRITE_PNG
 ;-
-function vis_encode_png, im, r, g, b, _extra=e
+function mg_encode_png, im, r, g, b, _extra=e
   compile_opt strictarr
 
   ; get a unique filename
-  filename = vis_temp_filename('vis_encode_png-%s.png')
+  filename = mg_temp_filename('mg_encode_png-%s.png')
 
   ; write a PNG file
   write_png, filename, im, r, g, b, _extra=e

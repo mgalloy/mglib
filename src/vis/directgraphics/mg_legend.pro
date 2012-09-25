@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Try the main-level program at the end of this file::
 ;
-;       IDL> .run vis_legend
+;       IDL> .run mg_legend
 ;
 ;    This should look like:
 ;
@@ -48,14 +48,14 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, XYOUTS
 ;-
-pro vis_legend, background=background, $
-                item_color=itemColor, item_linestyle=itemLinestyle, $
-                item_name=itemName, $
-                item_psym=itemPsym, item_symsize=itemSymsize, $
-                item_thick=itemThick, $
-                color=color, line_length=lineLength, gap=gap, $
-                frame=frame, line_height=lineHeight, $
-                _extra=e
+pro mg_legend, background=background, $
+               item_color=itemColor, item_linestyle=itemLinestyle, $
+               item_name=itemName, $
+               item_psym=itemPsym, item_symsize=itemSymsize, $
+               item_thick=itemThick, $
+               color=color, line_length=lineLength, gap=gap, $
+               frame=frame, line_height=lineHeight, $
+               _extra=e
   compile_opt strictarr
   
   _lineLength = n_elements(lineLength) eq 0L ? 0.4 : lineLength
@@ -126,14 +126,14 @@ end
 
 
 ; main-level example program
-vis_decomposed, 0
-vis_loadct, 0
+mg_decomposed, 0
+mg_loadct, 0
 
-square = vis_usersym(/square, /fill, rotation=45)
+square = mg_usersym(/square, /fill, rotation=45)
 
-colors = vis_color(['orange', 'slateblue', 'yellow', 'red'], /index)
+colors = mg_color(['orange', 'slateblue', 'yellow', 'red'], /index)
 for c = 0L, n_elements(colors) - 1L do begin
-  rgb = vis_index2rgb(colors[c])
+  rgb = mg_index2rgb(colors[c])
   tvlct, rgb[0], rgb[1], rgb[2], c + 1
 endfor
 colors = bindgen(4) + 1B
@@ -157,16 +157,16 @@ for i = 0, 4 do begin
          linestyle=linestyles[i mod n_elements(linestyles)]
 endfor
 
-vis_legend, item_color=colors, $
-            item_linestyle=linestyles, $
-            item_thick=2, $
-            item_name='Set ' + strtrim(indgen(5) + 1, 2), $
-            item_psym=psyms, $
-            item_symsize=symsizes, $
-            frame=1, $
-            gap=0.15, $
-            line_length=0.25, $
-            line_height=0.25, $
-            position=[0.775, 0.60, 0.97, 0.95]
+mg_legend, item_color=colors, $
+           item_linestyle=linestyles, $
+           item_thick=2, $
+           item_name='Set ' + strtrim(indgen(5) + 1, 2), $
+           item_psym=psyms, $
+           item_symsize=symsizes, $
+           frame=1, $
+           gap=0.15, $
+           line_length=0.25, $
+           line_height=0.25, $
+           position=[0.775, 0.60, 0.97, 0.95]
 
 end

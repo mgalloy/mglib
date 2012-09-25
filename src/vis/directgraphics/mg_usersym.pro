@@ -2,8 +2,8 @@
 
 ;+
 ; Creates a user-defined symbol for use in plotting in direct graphics via 
-; routines that accept the PSYM graphics keyword. All user symbols are scaled 
-; to fill the -1 to 1 range (use SYMSIZE of the graphics routine to change
+; routines that accept the `PSYM` graphics keyword. All user symbols are scaled 
+; to fill the -1 to 1 range (use `SYMSIZE` of the graphics routine to change
 ; the size of the symbol).
 ;
 ; :Categories:
@@ -12,20 +12,20 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_usersym
+;       IDL> .run mg_usersym
 ;
 ;    The core lines of code to produce the plot are::
 ;
 ;       plot, [0, 1], [0, 1], /nodata, xrange=[0, 1], yrange=[0, 1], $
 ;             xstyle=9, ystyle=9
 ;       oplot, randomu(seed, 10), randomu(seed, 10), $
-;              psym=vis_usersym(/circle, /fill, color=128B)
+;              psym=mg_usersym(/circle, /fill, color=128B)
 ;       oplot, randomu(seed, 10), randomu(seed, 10), $
-;              psym=vis_usersym(/triangle, rotation=90, /fill)
+;              psym=mg_usersym(/triangle, rotation=90, /fill)
 ;       oplot, randomu(seed, 10), randomu(seed, 10), $
-;              psym=vis_usersym(/triangle, rotation=-90, color=64B)
+;              psym=mg_usersym(/triangle, rotation=-90, color=64B)
 ;       oplot, randomu(seed, 10), randomu(seed, 10), $
-;              psym=vis_usersym(/hexagon)
+;              psym=mg_usersym(/hexagon)
 ;
 ;    It should look something like:
 ;
@@ -89,21 +89,21 @@
 ;       angle in degrees to rotate the symbol; 0 degrees places the first 
 ;       vertex at (1, 0) in user symbol coordinate space
 ;-
-function vis_usersym, x, y, $
-                      color=color, fill=fill, thick=thick, $
-                      with_line=withLine, $                  
-                      none=none, $
-                      plus_sign=plusSign, asterisk=asterisk, dot=dot, $
-                      diamond=diamond, $
-                      x=xSymbol, $
-                      user_defined=userDefined, $
-                      histogram=histogram, $
-                      horizontal_line=horizontalLine, $
-                      vertical_line=verticalLine, $
-                      triangle=triangle, square=square, $
-                      hexagon=hexagon, circle=circle, $
-                      n_vertices=nVertices, $
-                      rotation=rotation
+function mg_usersym, x, y, $
+                     color=color, fill=fill, thick=thick, $
+                     with_line=withLine, $                  
+                     none=none, $
+                     plus_sign=plusSign, asterisk=asterisk, dot=dot, $
+                     diamond=diamond, $
+                     x=xSymbol, $
+                     user_defined=userDefined, $
+                     histogram=histogram, $
+                     horizontal_line=horizontalLine, $
+                     vertical_line=verticalLine, $
+                     triangle=triangle, square=square, $
+                     hexagon=hexagon, circle=circle, $
+                     n_vertices=nVertices, $
+                     rotation=rotation
   compile_opt strictarr
   on_error, 2
   
@@ -167,24 +167,24 @@ end
 ; main-level example program
 
 device, get_decomposed=dec, decomposed=0
-vis_loadct, 5
+mg_loadct, 5
 
-vis_psbegin, filename='usersym.ps', /image, xsize=6, ysize=4, /inches
+mg_psbegin, filename='usersym.ps', /image, xsize=6, ysize=4, /inches
 plot, [0, 1], [0, 1], /nodata, xrange=[0, 1], yrange=[0, 1], $
       xstyle=9, ystyle=9
 oplot, randomu(seed, 10), randomu(seed, 10), $
-       psym=vis_usersym(/circle, /fill, color=128B)
+       psym=mg_usersym(/circle, /fill, color=128B)
 oplot, randomu(seed, 10), randomu(seed, 10), $
-       psym=vis_usersym(/triangle, rotation=90, /fill)
+       psym=mg_usersym(/triangle, rotation=90, /fill)
 oplot, randomu(seed, 10), randomu(seed, 10), $
-       psym=vis_usersym(/triangle, rotation=-90, color=64B)
+       psym=mg_usersym(/triangle, rotation=-90, color=64B)
 oplot, randomu(seed, 10), randomu(seed, 10), $
-       psym=vis_usersym(/hexagon)
-vis_psend
+       psym=mg_usersym(/hexagon)
+mg_psend
 
 device, decomposed=dec
 
-vis_convert, 'usersym', max_dimensions=[400, 400], output=im
-vis_image, im, /new_window
+mg_convert, 'usersym', max_dimensions=[400, 400], output=im
+mg_image, im, /new_window
 
 end

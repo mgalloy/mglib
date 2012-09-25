@@ -10,10 +10,10 @@
 ;    im : in, required, type=image
 ;       2D or 3D image of any interleave
 ;-
-function vis_image_flip, im
+function mg_image_flip, im
   compile_opt strictarr
   
-  dims = vis_image_getsize(im, true=true)
+  dims = mg_image_getsize(im, true=true)
   
   case true of
     0: return, rotate(im, 7)

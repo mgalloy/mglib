@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Resize an image similarly to CONGRID. Advantage over CONGRID is that 
+; Resize an image similarly to `CONGRID`. Advantage over `CONGRID` is that 
 ; nearest neighbor interpolation is used even for multiple band images.
 ;
 ; :Returns:
@@ -18,19 +18,19 @@
 ;
 ; :Keywords:
 ;    true : in, optional, type=long
-;       set to specify which dimensions contains the channels; TRUE=0 is for 
-;       m by n images, TRUE=1 is for 3 by m by n images, TRUE=2 is for
-;       m by 3 by n images, TRUE=3 is for m by n by 3 images; default is to
+;       set to specify which dimensions contains the channels; `TRUE=0` is for 
+;       m by n images, `TRUE=1` is for 3 by m by n images, `TRUE=2` is for
+;       m by 3 by n images, `TRUE=3` is for m by n by 3 images; default is to
 ;       guess that the first dimension of size 3 is the number of channels
 ;    _extra : in, optional, type=keywords
-;       keywords to CONGRID
+;       keywords to `CONGRID`
 ;-
-function vis_image_resize, im, xsize, ysize, true=true, _extra=e
+function mg_image_resize, im, xsize, ysize, true=true, _extra=e
   compile_opt strictarr
   on_error, 2
   
   if (n_elements(true) eq 0L) then begin
-    dims = vis_image_getsize(im, true=_true)
+    dims = mg_image_getsize(im, true=_true)
   endif else _true = true
   
   if (n_params() ne 3L) then message, 'incorrect number of parameters'

@@ -67,22 +67,22 @@
 ;    ticklen : in, optional, type=float
 ;       length of tick marks on colorbar
 ;    _extra : in, optional, type=keywords
-;       keywords to VIS_IMAGE
+;       keywords to `MG_IMAGE`
 ;-
-pro vis_colorbar, range=range, $
-                  colors=colors, bottom=bottom, ncolors=ncolors, $
-                  vertical=vertical, horizontal=horizontal, $
-                  axis_color=axisColor, $
-                  labels_on_right=labelsOnRight, $
-                  labels_on_top=labelsOnTop, $                  
-                  red=red, green=green, blue=blue, $
-                  divisions=divisions, $
-                  xticklen=xticklen, yticklen=yticklen, ticklen=ticklen, $
-                  _extra=e
+pro mg_colorbar, range=range, $
+                 colors=colors, bottom=bottom, ncolors=ncolors, $
+                 vertical=vertical, horizontal=horizontal, $
+                 axis_color=axisColor, $
+                 labels_on_right=labelsOnRight, $
+                 labels_on_top=labelsOnTop, $                  
+                 red=red, green=green, blue=blue, $
+                 divisions=divisions, $
+                 xticklen=xticklen, yticklen=yticklen, ticklen=ticklen, $
+                 _extra=e
   compile_opt strictarr
   on_error, 2
   
-  _divisions = n_elements(divisions) eq 0L ? 6L : divisions
+  _divisions = n_elements(dimgions) eq 0L ? 6L : dimgions
   _range = n_elements(range) eq 0L ? [0, 255] : range
   
   if (n_elements(colors) gt 0L) then begin
@@ -97,7 +97,7 @@ pro vis_colorbar, range=range, $
     keyword_set(vertical): begin
         _im = (bytarr(2) + 1B) # _colors
 
-        vis_decomposed, 0, old_decomposed=oldDecomposed
+        mg_decomposed, 0, old_decomposed=oldDecomposed
                   
         if (n_elements(red) gt 0L $
               && n_elements(green) gt 0L $
@@ -119,10 +119,10 @@ pro vis_colorbar, range=range, $
                       color=_colors[c]
           endfor
         endif else begin        
-          vis_image, _im, [0, 1], _range, /axes, /noerase, $
-                     xticks=1, xtickname=strarr(2) + ' ', $
-                     yticks=1, ytickname=strarr(2) + ' ', $
-                     ticklen=0., /no_scale, _extra=e
+          mg_image, _im, [0, 1], _range, /axes, /noerase, $
+                    xticks=1, xtickname=strarr(2) + ' ', $
+                    yticks=1, ytickname=strarr(2) + ' ', $
+                    ticklen=0., /no_scale, _extra=e
         endelse
               
         if (n_elements(red) gt 0L $
@@ -131,7 +131,7 @@ pro vis_colorbar, range=range, $
           tvlct, origRed, origGreen, origBlue
         endif        
 
-        vis_decomposed, oldDecomposed
+        mg_decomposed, oldDecomposed
 
         axis, yaxis=keyword_set(labelsOnRight), $
               yticks=_divisions, yrange=_range, ystyle=1, $
@@ -141,7 +141,7 @@ pro vis_colorbar, range=range, $
     keyword_set(horizontal): begin
         _im = _colors # (bytarr(2) + 1B)
 
-        vis_decomposed, 0, old_decomposed=oldDecomposed
+        mg_decomposed, 0, old_decomposed=oldDecomposed
 
         if (n_elements(red) gt 0L $
               && n_elements(green) gt 0L $
@@ -163,10 +163,10 @@ pro vis_colorbar, range=range, $
                       color=_colors[c]
           endfor                       
         endif else begin
-          vis_image, _im, _range, [0, 1], /axes, /noerase, $
-                     xticks=1, xtickname=strarr(2) + ' ', $
-                     yticks=1, ytickname=strarr(2) + ' ', $
-                     ticklen=0., /no_scale, _extra=e
+          mg_image, _im, _range, [0, 1], /axes, /noerase, $
+                    xticks=1, xtickname=strarr(2) + ' ', $
+                    yticks=1, ytickname=strarr(2) + ' ', $
+                    ticklen=0., /no_scale, _extra=e
         endelse
         
         if (n_elements(red) gt 0L $
@@ -175,7 +175,7 @@ pro vis_colorbar, range=range, $
           tvlct, origRed, origGreen, origBlue
         endif                                 
           
-        vis_decomposed, oldDecomposed
+        mg_decomposed, oldDecomposed
 
         axis, xaxis=keyword_set(labelsOnTop), $
               xticks=_divisions, xrange=_range, xstyle=1, $
@@ -190,7 +190,7 @@ end
 ; main-level example program
 
 nlevels = 8
-vis_loadct, 3, ncolors=nlevels + 2
+mg_loadct, 3, ncolors=nlevels + 2
 
 h = hanning(20, 20)
 
@@ -199,56 +199,56 @@ ps = 1
 
 ; example using indexed color mode
 
-if (keyword_set(ps)) then vis_psbegin, filename='colorbar-vertical.ps'
+if (keyword_set(ps)) then mg_psbegin, filename='colorbar-vertical.ps'
 
-vis_decomposed, 0, old_decomposed=dec
-vis_window, /free, title='Vertical colorbar', xsize=3, ysize=2.25, /inches
+mg_decomposed, 0, old_decomposed=dec
+mg_window, /free, title='Vertical colorbar', xsize=3, ysize=2.25, /inches
 
-vis_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.8, 0.95], $
-             xstyle=1, ystyle=1, /fill, c_colors=bindgen(nlevels) + 1B, charsize=charsize            
-vis_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.8, 0.95], /overplot
+mg_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.8, 0.95], $
+            xstyle=1, ystyle=1, /fill, c_colors=bindgen(nlevels) + 1B, charsize=charsize            
+mg_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.8, 0.95], /overplot
 
-vis_colorbar, /vertical, position=[0.83, 0.1, 0.86, 0.95], yticklen=-0.05, $
-              divisions=nlevels, range=[min(h, max=maxh), maxh], /labels_on_right, $
-              colors=bindgen(nlevels) + 1B, charsize=charsize
+mg_colorbar, /vertical, position=[0.83, 0.1, 0.86, 0.95], yticklen=-0.05, $
+             divisions=nlevels, range=[min(h, max=maxh), maxh], /labels_on_right, $
+             colors=bindgen(nlevels) + 1B, charsize=charsize
 
-vis_decomposed, dec
-if (keyword_set(ps)) then vis_psend
+mg_decomposed, dec
+if (keyword_set(ps)) then mg_psend
 
 if (keyword_set(ps)) then begin
-  vis_convert, 'colorbar-vertical', max_dimensions=[300, 300], output=im
-  vis_image, im, /new_window, title='PS vertical colorbar'
+  mg_convert, 'colorbar-vertical', max_dimensions=[300, 300], output=im
+  mg_image, im, /new_window, title='PS vertical colorbar'
 endif
 
 
 ; example using decomposed color
 
-vis_loadct, 3
+mg_loadct, 3
 tvlct, r, g, b, /get
 
-if (keyword_set(ps)) then vis_psbegin, filename='colorbar-horizontal.ps'
+if (keyword_set(ps)) then mg_psbegin, filename='colorbar-horizontal.ps'
 
-vis_decomposed, 1, old_decomposed=dec
-vis_window, /free, title='Horizontal colorbar', xsize=2.5, ysize=2.75, /inches
+mg_decomposed, 1, old_decomposed=dec
+mg_window, /free, title='Horizontal colorbar', xsize=2.5, ysize=2.75, /inches
 
-vis_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.95, 0.85], /fill, $
-             xstyle=1, ystyle=1, charsize=charsize
-vis_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.95, 0.85], /overplot
+mg_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.95, 0.85], /fill, $
+            xstyle=1, ystyle=1, charsize=charsize
+mg_contour, h, nlevels=nlevels, position=[0.1, 0.1, 0.95, 0.85], /overplot
 
-vis_colorbar, /horizontal, position=[0.1, 0.89, 0.95, 0.92], $
-              xticklen=-0.05, $
-              divisions=4, range=[min(h, max=maxh), maxh], $
-              /labels_on_top, $
-              charsize=charsize, $
-              red=r, green=g, blue=b, $
-              axis_color=keyword_set(ps) ? '000000'x : 'ffffff'x
+mg_colorbar, /horizontal, position=[0.1, 0.89, 0.95, 0.92], $
+             xticklen=-0.05, $
+             divisions=4, range=[min(h, max=maxh), maxh], $
+             /labels_on_top, $
+             charsize=charsize, $
+             red=r, green=g, blue=b, $
+             axis_color=keyword_set(ps) ? '000000'x : 'ffffff'x
 
-vis_decomposed, dec
-if (keyword_set(ps)) then vis_psend
+mg_decomposed, dec
+if (keyword_set(ps)) then mg_psend
 
 if (keyword_set(ps)) then begin
-  vis_convert, 'colorbar-horizontal', max_dimensions=[300, 300], output=im
-  vis_image, im, /new_window, title='PS horizontal window'
+  mg_convert, 'colorbar-horizontal', max_dimensions=[300, 300], output=im
+  mg_image, im, /new_window, title='PS horizontal window'
 endif
 
 end

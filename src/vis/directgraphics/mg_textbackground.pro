@@ -9,17 +9,17 @@
 ;    this routine to make a box over an image suitable as a background for 
 ;    text. To run the example, do::
 ;
-;       IDL> .run vis_textbackground
+;       IDL> .run mg_textbackground
 ;
 ;    This should produce the following graphic:
 ; 
-;    .. image:: vis_textbackground.png
+;    .. image:: mg_textbackground.png
 ;
 ;    The program displays an image, creates the text background, and then uses
 ;    `XYOUTS` to place text over the image::
 ;
-;       IDL> vis_image, read_image(file_which('people.jpg')), /new_window
-;       IDL> vis_textbackground, dimensions=[256, 40], alpha=0.75, /device
+;       IDL> mg_image, read_image(file_which('people.jpg')), /new_window
+;       IDL> mg_textbackground, dimensions=[256, 40], alpha=0.75, /device
 ;       IDL> xyouts, 10, 23, 'Ali Bahrami!CRSI first employee', $
 ;       IDL>     /device, charsize=1.25, font=0
 ; 
@@ -43,11 +43,11 @@
 ;    normal : in, optional, type=boolean
 ;       set to use normal coordinates for `LOCATION` and `DIMENSIONS`
 ;-
-pro vis_textbackground, color=color, $
-                        alpha=alpha, $
-                        location=location, $
-                        dimensions=dimensions, $
-                        data=data, device=device, normal=normal
+pro mg_textbackground, color=color, $
+                       alpha=alpha, $
+                       location=location, $
+                       dimensions=dimensions, $
+                       data=data, device=device, normal=normal
   compile_opt strictarr
   on_error, 2
   
@@ -91,7 +91,7 @@ pro vis_textbackground, color=color, $
 
   device, get_decomposed=dec
   if (dec) then begin
-    _color = n_elements(_color) gt 1L ? _color : vis_index2rgb(_color)
+    _color = n_elements(_color) gt 1L ? _color : mg_index2rgb(_color)
   endif else begin
     tvlct, r, g, b, /get
     _color = [r[_color], g[_color], b[_color]]
@@ -102,7 +102,7 @@ pro vis_textbackground, color=color, $
   background[1, *, *] = _color[1]
   background[2, *, *] = _color[2]
   
-  blend = vis_blend(background, im, alpha=_alpha)
+  blend = mg_blend(background, im, alpha=_alpha)
 
   tv, blend, _location[0], _location[1], true=1
 end
@@ -110,8 +110,8 @@ end
 
 ; main-level example program
 
-vis_image, read_image(file_which('people.jpg')), /new_window
-vis_textbackground, dimensions=[256, 40], alpha=0.75, /device
+mg_image, read_image(file_which('people.jpg')), /new_window
+mg_textbackground, dimensions=[256, 40], alpha=0.75, /device
 xyouts, 10, 23, 'Ali Bahrami!CRSI first employee', $
         /device, charsize=1.25, font=0
 

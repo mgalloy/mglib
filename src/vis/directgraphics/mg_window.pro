@@ -34,12 +34,12 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to the WINDOW routine
 ;-
-pro vis_window, index, $
-                xsize=xsize, ysize=ysize, dimensions=dimensions, $
-                xpos=xpos, ypos=ypos, location=location, $
-                inches=inches, pixels=pixels, $
-                identifier=identifier, $
-                _extra=e
+pro mg_window, index, $
+               xsize=xsize, ysize=ysize, dimensions=dimensions, $
+               xpos=xpos, ypos=ypos, location=location, $
+               inches=inches, pixels=pixels, $
+               identifier=identifier, $
+               _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -133,25 +133,25 @@ free_lun, lun
 
 device, decomposed=0
 
-if (keyword_set(ps)) then vis_psbegin, filename='window.ps', /image
+if (keyword_set(ps)) then mg_psbegin, filename='window.ps', /image
 
-vis_window, xsize=4, ysize=4, /inches, title='VIS_CONTOUR example'
+mg_window, xsize=4, ysize=4, /inches, title='MG_CONTOUR example'
 
-vis_loadct, 0
-vis_contour, data, nlevels=15, xstyle=1, ystyle=1, $
-             position=[0.15, 0.15, 0.9, 0.9], $
-             title='vis_contour example'
+mg_loadct, 0
+mg_contour, data, nlevels=15, xstyle=1, ystyle=1, $
+            position=[0.15, 0.15, 0.9, 0.9], $
+            title='mg_contour example'
 
-vis_loadct, 5, /brewer
-vis_contour, data, /fill, nlevels=15, /overplot
+mg_loadct, 5, /brewer
+mg_contour, data, /fill, nlevels=15, /overplot
 
-vis_loadct, 0
-vis_contour, data, /overplot, nlevels=15, /follow, /downhill
+mg_loadct, 0
+mg_contour, data, /overplot, nlevels=15, /follow, /downhill
 
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'window', max_dimensions=[406, 406], output=im
-  vis_image, im, /new_window
+  mg_psend
+  mg_convert, 'window', max_dimensions=[406, 406], output=im
+  mg_image, im, /new_window
 endif
 
 end

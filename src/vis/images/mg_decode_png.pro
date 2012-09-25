@@ -23,11 +23,11 @@
 ;    _ref_extra : in, out, optional, type=keywords
 ;       keywords to READ_PNG
 ;-
-function vis_decode_png, stream, r, g, b, _ref_extra=e
+function mg_decode_png, stream, r, g, b, _ref_extra=e
   compile_opt strictarr
   
   ; get a unique filename
-  filename = vis_temp_filename('vis_decode_png-%s.png')
+  filename = mg_temp_filename('mg_decode_png-%s.png')
   
   ; write im as a stream of bytes
   openw, lun, filename, /get_lun

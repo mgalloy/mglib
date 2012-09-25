@@ -6,10 +6,10 @@
 ; :Examples:
 ;    Run the main-level example program with::
 ; 
-;       IDL> .run vis_maketrue
+;       IDL> .run mg_maketrue
 ; 
 ; :Returns:
-;    image of the TRUE format specified
+;    image of the `TRUE` format specified
 ;
 ; :Params:
 ;    im : in, required, type=image
@@ -34,17 +34,17 @@
 ;    true : in, optional, type=long, default=1
 ;       desired interleave of output image: 0, 1, 2, or 3
 ;    input_true : in, out, optional, type=long
-;       interleave of input image: 0, 1, 2, or 3; VIS_MAKETRUE will guess
+;       interleave of input image: 0, 1, 2, or 3; `MG_MAKETRUE` will guess
 ;       depending on dimensions and location of first dimension of size 3
 ;       in the input image; returns the value it guessed
 ;-
-function vis_maketrue, im, red=red, green=green, blue=blue, $
-                       rgb_table=rgbTable, $
-                       true=true, input_true=inputTrue
+function mg_maketrue, im, red=red, green=green, blue=blue, $
+                      rgb_table=rgbTable, $
+                      true=true, input_true=inputTrue
   compile_opt strictarr
 
   _true = n_elements(true) gt 0L ? true : 1L
-  dims = vis_image_getsize(im, true=inputTrue)
+  dims = mg_image_getsize(im, true=inputTrue)
 
   if (_true eq inputTrue) then return, im
   
@@ -101,14 +101,14 @@ tvlct, rgb, /get
 
 f = filepath('endocell.jpg', subdir=['examples', 'data'])
 read_jpeg, f, im
-vis_loadct, 9, /brewer
+mg_loadct, 9, /brewer
 
 window, xsize=2*615, ysize=416, /free
 
 device, decomposed=0
 tv, im, 0
 
-im1 = vis_maketrue(im)
+im1 = mg_maketrue(im)
 
 device, decomposed=1
 tv, im1, 1, true=1

@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Running the main-level program attached to this program::
 ;
-;       IDL> .run vis_psbegin
+;       IDL> .run mg_psbegin
 ;
 ;    Should produce the following image:
 ; 
@@ -25,11 +25,11 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to DEVICE to configure the PostScript device
 ;-
-pro vis_psbegin, image=image, $
-                 charsize=charsize, thick=thick, symsize=symsize, $
-                 _extra=e
+pro mg_psbegin, image=image, $
+                charsize=charsize, thick=thick, symsize=symsize, $
+                _extra=e
   compile_opt strictarr
-  common _$vis_ps, origdev, _image, psconfig
+  common _$mg_ps, origdev, _image, psconfig
   
   if (!d.name ne 'PS') then origdev = !d.name
   _image = keyword_set(image)
@@ -61,7 +61,7 @@ pro vis_psbegin, image=image, $
 end
 
 
-; main-level example of using VIS_PSBEGIN, in this case to ultimately create a 
+; main-level example of using `MG_PSBEGIN`, in this case to ultimately create a 
 ; PNG file
 
 ; read in example data
@@ -74,23 +74,23 @@ free_lun, lun
 nlevels = 10
 basename = 'maroonbells'
 
-vis_psbegin, /image, filename=basename + '.ps', xsize=6, ysize=4, /inches
+mg_psbegin, /image, filename=basename + '.ps', xsize=6, ysize=4, /inches
 
-vis_decomposed, 0, old_decomposed=olddec
+mg_decomposed, 0, old_decomposed=olddec
 loadct, 0
-vis_contour, bells, /nodata, xstyle=1, ystyle=1, title='Maroon Bells'
+mg_contour, bells, /nodata, xstyle=1, ystyle=1, title='Maroon Bells'
 
-vis_loadct, 10, /brewer
-vis_contour, bells, /fill, nlevels=nlevels, /overplot
+mg_loadct, 10, /brewer
+mg_contour, bells, /fill, nlevels=nlevels, /overplot
 
 loadct, 0
-vis_contour, bells, nlevels=nlevels, /overplot, color=0
+mg_contour, bells, nlevels=nlevels, /overplot, color=0
 
-vis_decomposed, olddec
+mg_decomposed, olddec
 
-vis_psend
-vis_convert, basename, max_dimensions=[500, 500], output=im
+mg_psend
+mg_convert, basename, max_dimensions=[500, 500], output=im
 
-vis_image, im, /new_window
+mg_image, im, /new_window
 
 end

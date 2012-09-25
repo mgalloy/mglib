@@ -13,7 +13,7 @@
 ;    direct graphics
 ;
 ; :Examples:
-;    For example, create an example image using VIS_LIC and display with
+;    For example, create an example image using `MG_LIC` and display with
 ;    appropriate axes scale labels::
 ;
 ;       scale = 4L
@@ -24,12 +24,12 @@
 ;       x = rebin(x, 128L * scale)
 ;       y = rebin(y, 64L * scale)
 ;
-;      im = vis_lic(u, v)
-;      vis_image, im, x, y, xticks=4, yticks=4, /interp, /axes, /new_window
+;      im = mg_lic(u, v)
+;      mg_image, im, x, y, xticks=4, yticks=4, /interp, /axes, /new_window
 ;
 ;    This should produce output like:
 ;
-;    .. image:: vis_image.png
+;    .. image:: mg_image.png
 ;-
 
 
@@ -56,8 +56,8 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to TV or TVSCL
 ;-
-pro vis_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
-                  _extra=e
+pro mg_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
+                 _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -94,7 +94,7 @@ end
 ;
 ; :Private:
 ;-
-pro vis_image_setdims
+pro mg_image_setdims
   compile_opt strictarr
 
   ; other devices besides a graphics window
@@ -124,7 +124,7 @@ end
 ;       Set to 0 for (m, n) array images, 1 for (3, m, n),  2 for (m, 3, n),
 ;       and 3 for (m, n, 3).
 ;
-;       If TRUE is not present, VIS_IMAGE_GETSIZE will attempt to guess the
+;       If TRUE is not present, `MG_IMAGE_GETSIZE` will attempt to guess the
 ;       size. 2D images will automatically be set to TRUE=0; 3D images' 
 ;       dimensions will be searched for a size 3 dimension.
 ;    stretch : in, optional, type=float
@@ -153,12 +153,12 @@ end
 ;    _extra : in, optional, type=keywords    
 ;       keywords to PLOT, CONGRID, or WINDOW routines
 ;-
-pro vis_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
-               new_window=newWindow, no_scale=noScale, no_data=noData, $
-               position=position, xmargin=xmargin, ymargin=ymargin, $
-               charsize=charsize, $
-               ticklen=ticklen, $
-               _extra=e
+pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
+              new_window=newWindow, no_scale=noScale, no_data=noData, $
+              position=position, xmargin=xmargin, ymargin=ymargin, $
+              charsize=charsize, $
+              ticklen=ticklen, $
+              _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -166,7 +166,7 @@ pro vis_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
   _ticklen = n_elements(ticklen) eq 0L ? -0.02 : ticklen
   
   if (n_elements(true) gt 0L) then _true = true
-  dims = vis_image_getsize(im, true=_true, n_channels=nchannels)
+  dims = mg_image_getsize(im, true=_true, n_channels=nchannels)
   
   _scale = n_elements(scale) eq 0L ? 1.0 : scale
   dims *= _scale
@@ -190,7 +190,7 @@ pro vis_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
         wdims = dims / normalDims + 1
       endif else begin
         ; need to make sure !d is setup
-        vis_image_setdims
+        mg_image_setdims
       
         _xmargin = n_elements(xmargin) gt 0L ? xmargin : !x.margin
         _ymargin = n_elements(ymargin) gt 0L ? ymargin : !y.margin
@@ -261,24 +261,24 @@ pro vis_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
   if (~keyword_set(noData)) then begin
     if (!d.name eq 'PS') then begin
       if (keyword_set(noScale)) then begin      
-        vis_image_tv, _im, !x.window[0], !y.window[0], /normal, $
-                      xsize=!x.window[1] - !x.window[0], $
-                      ysize=!y.window[1] - !y.window[0], $
-                      true=_true, n_channels=nchannels      
+        mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
+                     xsize=!x.window[1] - !x.window[0], $
+                     ysize=!y.window[1] - !y.window[0], $
+                     true=_true, n_channels=nchannels      
       endif else begin
-        vis_image_tv, _im, !x.window[0], !y.window[0], /normal, $
-                      xsize=!x.window[1] - !x.window[0], $
-                      ysize=!y.window[1] - !y.window[0], $
-                      true=_true, /scale, n_channels=nchannels
+        mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
+                     xsize=!x.window[1] - !x.window[0], $
+                     ysize=!y.window[1] - !y.window[0], $
+                     true=_true, /scale, n_channels=nchannels
       endelse
     endif else begin
-      displayIm = vis_image_resize(_im, displaySize[0], displaySize[1], $
+      displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
                                    true=_true, _extra=e)  
       if (keyword_set(noScale)) then begin
-        vis_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
+        mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
                       true=_true, n_channels=nchannels 
       endif else begin
-        vis_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
+        mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
                       true=_true, /scale, n_channels=nchannels  
       endelse
     endelse
@@ -309,7 +309,7 @@ v = rebin(v, 128L * scale, 64L * scale)
 x = rebin(x, 128L * scale)
 y = rebin(y, 64L * scale)
 
-im = vis_lic(u, v)
-vis_image, im, x, y, xticks=4, yticks=4, /interp
+im = mg_lic(u, v)
+mg_image, im, x, y, xticks=4, yticks=4, /interp
 
 end

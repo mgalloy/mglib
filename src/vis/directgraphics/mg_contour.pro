@@ -12,7 +12,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ; 
-;       IDL> .run vis_contour
+;       IDL> .run mg_contour
 ;
 ;    This should produce something like:
 ;
@@ -20,11 +20,11 @@
 ;
 ;    After reading in the elevbin.dat dataset, the pertinent commands are::
 ;
-;       IDL> vis_contour, data, /fill, nlevels=15, xstyle=1, ystyle=1, $
-;            title='VIS_CONTOUR'
-;       IDL> vis_contour, data, /overplot, nlevels=15, levels=levels, $
+;       IDL> mg_contour, data, /fill, nlevels=15, xstyle=1, ystyle=1, $
+;            title='MG_CONTOUR'
+;       IDL> mg_contour, data, /overplot, nlevels=15, levels=levels, $
 ;            /follow, /downhill
-;       IDL> print, 'Levels used in VIS_CONTOUR: ' $
+;       IDL> print, 'Levels used in MG_CONTOUR: ' $
 ;              + strjoin(strtrim(levels, 2), ', ')
 ;-
 
@@ -48,7 +48,7 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to CONTOUR
 ;-
-pro vis_contour, z, x, y, nlevels=nlevels, levels=levels, _extra=e
+pro mg_contour, z, x, y, nlevels=nlevels, levels=levels, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -77,19 +77,19 @@ readu, lun, data
 free_lun, lun
 
 device, decomposed=0
-vis_loadct, 5, /brewer
+mg_loadct, 5, /brewer
 
-window, /free, title='VIS_CONTOUR example', xsize=800, ysize=400
+window, /free, title='MG_CONTOUR example', xsize=800, ysize=400
 
 !p.multi = [0, 2, 1]
 
 contour, data, /fill, nlevels=15, xstyle=1, ystyle=1, title='CONTOUR'
 contour, data, /overplot, nlevels=15, /follow, /downhill
 
-vis_contour, data, /fill, nlevels=15, xstyle=1, ystyle=1, title='VIS_CONTOUR'
-vis_contour, data, /overplot, nlevels=15, levels=levels, /follow, /downhill
+mg_contour, data, /fill, nlevels=15, xstyle=1, ystyle=1, title='MG_CONTOUR'
+mg_contour, data, /overplot, nlevels=15, levels=levels, /follow, /downhill
 
-print, 'Levels used in VIS_CONTOUR: ' + strjoin(strtrim(levels, 2), ', ')
+print, 'Levels used in MG_CONTOUR: ' + strjoin(strtrim(levels, 2), ', ')
 
 !p.multi = 0
 

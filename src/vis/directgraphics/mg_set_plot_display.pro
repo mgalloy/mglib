@@ -8,7 +8,7 @@
 ;    original_device : out, optional, type=string
 ;       device name of original device
 ;-
-pro vis_set_plot_display, original_device=original_device
+pro mg_set_plot_display, original_device=original_device
   compile_opt strictarr
   
   original_device = !d.name

@@ -11,7 +11,7 @@
 ; :Examples:
 ;    See the main-level program at the end of this file::
 ;
-;       IDL> .run vis_read
+;       IDL> .run mg_read
 ;
 ; :Returns:
 ;    image byte array
@@ -44,8 +44,8 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to TVRD
 ;-
-function vis_read, xstart, ystart, nx, ny, channel, true=true, $
-                   red=red, green=green, blue=blue, _extra=e
+function mg_read, xstart, ystart, nx, ny, channel, true=true, $
+                  red=red, green=green, blue=blue, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -102,15 +102,15 @@ function vis_read, xstart, ystart, nx, ny, channel, true=true, $
   
   ; convert the image if it is not in the user's desired TRUE format
   if (_neededTrue ne _desiredTrue) then begin
-    im = vis_maketrue(im, true=_desiredTrue, input_true=_neededTrue, $
-                      red=red, green=green, blue=blue)
+    im = mg_maketrue(im, true=_desiredTrue, input_true=_neededTrue, $
+                     red=red, green=green, blue=blue)
   endif
   
   ; fix lower right corner if on a Mac
   if (!version.os eq 'darwin' && !d.name eq 'X') then begin
     ; Mac OS X puts a 15 x 15 pixel resizing indicator in the lower right of 
     ; it's graphics windows
-    dims = vis_image_getsize(im)
+    dims = mg_image_getsize(im)
     if (total(dims gt 15) ge 2) then begin
       case _desiredTrue of
         0: im[dims[0] - 15:dims[0] - 1, 0:14] = im[dims[0] - 16, 0]
@@ -130,20 +130,20 @@ end
 
 ; main-level example program
 
-vis_decomposed, 1, old_decomposed=dec
+mg_decomposed, 1, old_decomposed=dec
 
-vis_window, xsize=4, ysize=3, /inches, /free, title='Original image'
+mg_window, xsize=4, ysize=3, /inches, /free, title='Original image'
 plot, findgen(11), color='000030'x, background='ffffff'x
-imTrue = vis_read(true=1)
-imIndexed = vis_read(true=0, red=r, green=g, blue=b)
+imTrue = mg_read(true=1)
+imIndexed = mg_read(true=0, red=r, green=g, blue=b)
 
-vis_window, xsize=8, ysize=3, /inches, /free, $
-            title='TrueColor image - indexed color image'
+mg_window, xsize=8, ysize=3, /inches, /free, $
+           title='TrueColor image - indexed color image'
 tv, imTrue, 0, true=1
-vis_decomposed, 0
+mg_decomposed, 0
 tvlct, r, g, b
 tv, imIndexed, 1
 
-vis_decomposed, dec
+mg_decomposed, dec
 
 end

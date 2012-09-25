@@ -21,7 +21,7 @@
 ;       Set to 0 for (m, n) array images, 1 for (3, m, n),  2 for (m, 3, n),
 ;       and 3 for (m, n, 3).
 ;
-;       If TRUE is not present, VIS_IMAGE_GETSIZE will attempt to guess the
+;       If TRUE is not present, `MG_IMAGE_GETSIZE` will attempt to guess the
 ;       size. 2D images will automatically be set to TRUE=0; 3D images' 
 ;       dimensions will be searched for a size 3 dimension.
 ; 
@@ -32,7 +32,7 @@
 ;       set to a named variable to get the number of channels (or bands) for 
 ;       the image; will be 1, 2, 3, or 4
 ;-
-function vis_image_getsize, im, true=true, n_channels=nchannels
+function mg_image_getsize, im, true=true, n_channels=nchannels
   compile_opt strictarr
   on_error, 2
   
@@ -89,7 +89,7 @@ end
 
 filename = file_which('people.jpg')
 ali = read_image(filename)
-sz = vis_image_getsize(ali, true=true, n_channels=nchannels)
+sz = mg_image_getsize(ali, true=true, n_channels=nchannels)
 print, filename, format='(%"File: %s")'
 print, sz, true, nchannels, $
        format='(%"Size: %d by %d, TRUE: %d, number of channels: %d")'

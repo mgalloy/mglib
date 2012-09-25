@@ -1,11 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Used in conjunction with VIS_PSBEGIN to end PostScript output.
+; Used in conjunction with `MG_PSBEGIN` to end PostScript output.
 ;-
-pro vis_psend
+pro mg_psend
   compile_opt strictarr
-  common _$vis_ps, origdev, _image, psconfig
+  common _$mg_ps, origdev, _image, psconfig
   
   if (!d.name eq 'PS') then device, /close_file
 

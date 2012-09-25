@@ -25,7 +25,7 @@
 ;       decomposed mode before mode is changed (only available in X and WIN
 ;       graphics devices)
 ;-
-pro vis_decomposed, dec, old_decomposed=oldDec
+pro mg_decomposed, dec, old_decomposed=oldDec
   compile_opt strictarr
   on_error, 2
   
@@ -44,7 +44,7 @@ pro vis_decomposed, dec, old_decomposed=oldDec
       end
       
     'Z': begin
-        if (vis_idlversion(require='6.4')) then begin
+        if (mg_idlversion(require='6.4')) then begin
           device, get_pixel_depth=oldDec
           if (n_elements(dec) gt 0L) then device, set_pixel_depth=keyword_set(dec) ? 24 : 8
         endif else begin
@@ -60,7 +60,7 @@ pro vis_decomposed, dec, old_decomposed=oldDec
       end
     
     'PS': begin
-        if (vis_idlversion(require='7.1')) then begin
+        if (mg_idlversion(require='7.1')) then begin
           help, /device, output=deviceOutput
           pos = stregex(deviceOutput, $
                         '[[:space:]]*Input Color Mode:[[:space:]]*', $

@@ -9,7 +9,7 @@
 ;    Try the main-level program at the end of this file to show an example of
 ;    parallel coordinates::
 ; 
-;       IDL> .run vis_parallel_coords
+;       IDL> .run mg_parallel_coords
 ;
 ;    This should produce something like:
 ;
@@ -46,15 +46,15 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, AXIS, XYOUTS, and OPLOT
 ;-
-pro vis_parallel_coords, data, $
-                         dimension_titles=dimensionTitles, data_title=dataTitle, $
-                         axes_color=axesColor, $
-                         color=color, psym=psym, linestyle=linestyle, $
-                         overplot=overplot, nodata=nodata, _extra=e
+pro mg_parallel_coords, data, $
+                        dimension_titles=dimensionTitles, data_title=dataTitle, $
+                        axes_color=axesColor, $
+                        color=color, psym=psym, linestyle=linestyle, $
+                        overplot=overplot, nodata=nodata, _extra=e
   compile_opt strictarr
   
   dims = size(data, /dimensions)
-  range = vis_range(data)
+  range = mg_range(data)
   
   _color = n_elements(color) eq 0L ? 255B : color
   ncolors = n_elements(_color)
@@ -101,7 +101,7 @@ end
 ; main-level example
 
 lines = strarr(9)
-openr, lun, filepath('obesity-rates-decades.csv', root=vis_src_root()), /get_lun
+openr, lun, filepath('obesity-rates-decades.csv', root=mg_src_root()), /get_lun
 readf, lun, lines
 free_lun, lun
 
@@ -120,47 +120,47 @@ endfor
 
 data = transpose(data)
 
-vis_psbegin, filename='obesity.ps', xsize=6, ysize=4, /inches, /image
-vis_decomposed, 1, old_decomposed=old_decomposed
+mg_psbegin, filename='obesity.ps', xsize=6, ysize=4, /inches, /image
+mg_decomposed, 1, old_decomposed=old_decomposed
 device, set_font='Helvetica', /tt_font
 
-vis_parallel_coords, data, /nodata, $
-                     position=[0.1, 0.1, 0.9, 0.85], $
-                     thick=0.5, ticklen=0, charsize=0.9, $
-                     axes_color=vis_rgb2index([200, 200, 200]), $                     
-                     dimension_titles=ages, data_title='% obese'
+mg_parallel_coords, data, /nodata, $
+                    position=[0.1, 0.1, 0.9, 0.85], $
+                    thick=0.5, ticklen=0, charsize=0.9, $
+                    axes_color=mg_rgb2index([200, 200, 200]), $                     
+                    dimension_titles=ages, data_title='% obese'
 
 xyouts, 0.5, 0.925, '% obese by age cohort', /normal, alignment=0.5
 
-vis_decomposed, 0
-vis_loadct, cpt_filename='cw/2/cw2-066.cpt'
+mg_decomposed, 0
+mg_loadct, cpt_filename='cw/2/cw2-066.cpt'
 
 colors = bytscl(bindgen(8))
-vis_parallel_coords, data, /overplot, $
-                     thick=10, $
-                     color=colors, $
-                     psym=[1, 0, 0, 0, 0, 0, 0, 0]
+mg_parallel_coords, data, /overplot, $
+                    thick=10, $
+                    color=colors, $
+                    psym=[1, 0, 0, 0, 0, 0, 0, 0]
                      
 cohorts = ['1996-2005', '1986-1995', '1976-1985', '1966-1975', '1956-1965', $
            '1946-1955', '1936-1945', '1926-1935']
 tvlct, r, g, b, /get
-colors = vis_rgb2index([[r[colors]], [g[colors]], [b[colors]]])
-vis_decomposed, 1
+colors = mg_rgb2index([[r[colors]], [g[colors]], [b[colors]]])
+mg_decomposed, 1
 
-vis_legend, position=[0.685, 0.2, 0.885, 0.6], $
-            item_name=cohorts, $
-            item_thick=lonarr(8) + 10., $
-            line_height=0.4, $
-            line_length=0.15, $
-            item_color=colors, $
-            gap=0.2, $
-            background='f0f0f0'x
+mg_legend, position=[0.685, 0.2, 0.885, 0.6], $
+           item_name=cohorts, $
+           item_thick=lonarr(8) + 10., $
+           line_height=0.4, $
+           line_length=0.15, $
+           item_color=colors, $
+           gap=0.2, $
+           background='f0f0f0'x
 
-vis_decomposed, old_decomposed
-vis_psend
+mg_decomposed, old_decomposed
+mg_psend
 
-vis_convert, 'obesity', max_dimensions=[800, 600], output=im
-vis_image, im, /new_window
+mg_convert, 'obesity', max_dimensions=[800, 600], output=im
+mg_image, im, /new_window
 
 end
                          
