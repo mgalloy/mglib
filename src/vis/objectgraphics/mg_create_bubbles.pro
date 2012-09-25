@@ -23,11 +23,11 @@
 ;       array of indices or 2-dimensional (i.e., m x 3) array of RGB color 
 ;       values
 ;    _extra : in, optional, type=keywords
-;       keywords to VISgrBubble::init
+;       keywords to `MGgrBubble`::init
 ;-
-function vis_create_bubbles, x, y, sizes=sizes, area=area, $
-                             colors=colors, border_colors=borderColors, $
-                             _extra=e
+function mg_create_bubbles, x, y, sizes=sizes, area=area, $
+                            colors=colors, border_colors=borderColors, $
+                            _extra=e
   compile_opt strictarr
 
   n = n_elements(x)
@@ -54,7 +54,7 @@ function vis_create_bubbles, x, y, sizes=sizes, area=area, $
     border_color = border_colors_ndims eq 2L $
                      ? reform(_borderColors[b mod ncolors, *]) $
                      : _borderColors[b mod nbordercolors]
-    arr[b] = obj_new('VISgrBubble', x[b], y[b], b / (n - 1.), $
+    arr[b] = obj_new('MGgrBubble', x[b], y[b], b / (n - 1.), $
                      size=_sizes[b mod nsizes], area=keyword_set(area), $
                      color=bubble_color, border_color=border_color, _extra=e)
   endfor

@@ -9,7 +9,7 @@
 ; :Examples:
 ;    Try the main-level program at the end of this file::
 ; 
-;       IDL> .run visgrimagefile__define
+;       IDL> .run mggrimagefile__define
 ;
 ;    This should produce:
 ;
@@ -27,7 +27,7 @@
 ;+
 ; Get properties of the image file destination.
 ;-
-pro visgrimagefile::getProperty, filename=filename, vector=vector, _ref_extra=e
+pro mggrimagefile::getProperty, filename=filename, vector=vector, _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(filename)) then filename = self.filename
@@ -43,7 +43,7 @@ end
 ;+
 ; Set properties of the image file destination.
 ;-
-pro visgrimagefile::setProperty, filename=filename, vector=vector, _extra=e
+pro mggrimagefile::setProperty, filename=filename, vector=vector, _extra=e
   compile_opt strictarr
   
   if (n_elements(filename) gt 0L) then self.filename = filename
@@ -63,7 +63,7 @@ end
 ;    picture : in, optional, type=objref
 ;       scene, viewgroup, or view to draw
 ;-
-pro visgrimagefile::draw, picture
+pro mggrimagefile::draw, picture
   compile_opt strictarr
   on_error, 2
 
@@ -82,7 +82,7 @@ pro visgrimagefile::draw, picture
     self.clipboard->draw, _picture, /vector, /postscript, $
                           filename=basename + '.ps'
     self.clipboard->getProperty, dimensions=dims
-    vis_convert, basename, /from_ps, to_extension=format, max_dimensions=dims       
+    mg_convert, basename, /from_ps, to_extension=format, max_dimensions=dims       
     file_delete, basename + '.ps'
   endif else begin
     self.buffer->draw, _picture
@@ -103,7 +103,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrimagefile::cleanup
+pro mggrimagefile::cleanup
   compile_opt strictarr
   
   obj_destroy, [self.buffer, self.clipboard]
@@ -116,7 +116,7 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrimagefile::init, filename=filename, vector=vector, _extra=e
+function mggrimagefile::init, filename=filename, vector=vector, _extra=e
   compile_opt strictarr
 
   self.filename = n_elements(filename) eq 0L ? '' : filename
@@ -136,10 +136,10 @@ end
 ;    filename
 ;       filename of output file
 ;-
-pro visgrimagefile__define
+pro mggrimagefile__define
   compile_opt strictarr
   
-  define = { VISgrImageFile, $
+  define = { MGgrImageFile, $
              filename: '',  $
              vector: 0B, $
              buffer: obj_new(), $
@@ -167,9 +167,9 @@ light = obj_new('IDLgrLight', type=2, location=[-0.5, -1., 1.])
 lightmodel->add, light
 
 surf->getProperty, xrange=xr, yrange=yr, zrange=zr
-xc = vis_linear_function(xr, [-0.55, 0.55])
-yc = vis_linear_function(yr, [-0.55, 0.55])
-zc = vis_linear_function(zr, [-0.4, 0.4])
+xc = mg_linear_function(xr, [-0.55, 0.55])
+yc = mg_linear_function(yr, [-0.55, 0.55])
+zc = mg_linear_function(zr, [-0.4, 0.4])
 surf->setProperty, xcoord_conv=xc, ycoord_conv=yc, zcoord_conv=zc
 
 xaxis = obj_new('IDLgrAxis', 0, range=xr, /exact, $
@@ -188,7 +188,7 @@ model->rotate, [1, 0, 0], -90
 model->rotate, [0, 1, 0], 45
 model->rotate, [1, 0, 0], 20
 
-imagefile = obj_new('VISgrImageFile', filename='surface.png', /vector, $
+imagefile = obj_new('MGgrImageFile', filename='surface.png', /vector, $
                     dimensions=[400, 400])
 imagefile->draw, view
 

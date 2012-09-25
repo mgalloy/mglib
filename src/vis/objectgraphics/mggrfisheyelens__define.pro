@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-pro visgrfisheyelens::update
+pro mggrfisheyelens::update
   compile_opt strictarr
   on_error, 2
   
@@ -34,7 +34,7 @@ pro visgrfisheyelens::update
 end
 
 
-pro visgrfisheyelens::setProperty, center=center, radius=radius, _extra=e
+pro mggrfisheyelens::setProperty, center=center, radius=radius, _extra=e
   compile_opt strictarr
   
   if (n_elements(center) gt 0L) then self.center = center
@@ -44,7 +44,7 @@ pro visgrfisheyelens::setProperty, center=center, radius=radius, _extra=e
 end
 
 
-pro visgrfisheyelens::getProperty, center=center, radius=radius, _ref_extra=e
+pro mggrfisheyelens::getProperty, center=center, radius=radius, _ref_extra=e
   compile_opt strictarr
   
   center = self.center
@@ -54,14 +54,14 @@ pro visgrfisheyelens::getProperty, center=center, radius=radius, _ref_extra=e
 end
 
 
-pro visgrfisheyelens::cleanup
+pro mggrfisheyelens::cleanup
   compile_opt strictarr
   
   self->IDLgrView::cleanup
 end
 
 
-function visgrfisheyelens::init, _extra=e
+function mggrfisheyelens::init, _extra=e
   compile_opt strictarr
   
   if (~self->IDLgrView::init(_extra=e)) then return, 0
@@ -75,10 +75,10 @@ function visgrfisheyelens::init, _extra=e
 end
 
 
-pro visgrfisheyelens__define
+pro mggrfisheyelens__define
   compile_opt strictarr
   
-  define = { VISgrFishEyeLens, inherits IDLgrView,$
+  define = { MGgrFishEyeLens, inherits IDLgrView,$
              center: fltarr(2), $
              radius: 0. $
            }
@@ -92,7 +92,7 @@ scene = obj_new('IDLgrScene')
 view = obj_new('IDLgrView', viewplane_rect=[0, 0, 256, 256])
 scene->add, view
 
-fisheye = obj_new('VISgrFishEyeLens', center=[128, 128], radius=10.)
+fisheye = obj_new('MGgrFishEyeLens', center=[128, 128], radius=10.)
 scene->add, fisheye
 fisheye->update
 

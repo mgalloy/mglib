@@ -1,14 +1,14 @@
 ; docformat = 'rst'
 
 ;+
-; Subclass of IDLgrModel intended to be passed to IDLgrSymbol to be used as a 
-; plot symbol.
+; Subclass of `IDLgrModel` intended to be passed to `IDLgrSymbol` to be used as
+; a plot symbol.
 
 
 ;+
 ; Free resources.
 ;-
-pro visgrchernoffface::cleanup
+pro mggrchernoffface::cleanup
     compile_opt strictarr
 
     self->IDLgrModel::cleanup
@@ -44,16 +44,16 @@ end
 ;    _ref_extra : in, optional, type=keywords
 ;       keywords to IDLgrModel::init or IDLgrPolygon::init
 ;-
-function visgrchernoffface::init, head_eccentricity=head_eccentricity, $
-                                  nose_length=nose_length, $
-                                  mouth_size=mouth_size, $
-                                  mouth_shape=mouth_shape, $
-                                  eye_size=eye_size, $ 
-                                  eye_eccentricity=eye_eccentricity, $
-                                  eye_spacing=eye_spacing, $
-                                  pupil_size=pupil_size, $
-                                  eyebrow_slant=eyebrow_slant, $
-                                  _ref_extra=e
+function mggrchernoffface::init, head_eccentricity=head_eccentricity, $
+                                 nose_length=nose_length, $
+                                 mouth_size=mouth_size, $
+                                 mouth_shape=mouth_shape, $
+                                 eye_size=eye_size, $ 
+                                 eye_eccentricity=eye_eccentricity, $
+                                 eye_spacing=eye_spacing, $
+                                 pupil_size=pupil_size, $
+                                 eyebrow_slant=eyebrow_slant, $
+                                 _ref_extra=e
   compile_opt strictarr
   
   if (~self->IDLgrModel::init(_extra=e)) then return, 0
@@ -165,10 +165,10 @@ end
 ;    headEccentricity 
 ;       shape of head, range: 0 (round) - 1 (oval)
 ;-
-pro visgrchernoffface__define
+pro mggrchernoffface__define
     compile_opt strictarr
     
-    define = { VISgrChernoffFace, inherits IDLgrModel, $
+    define = { MGgrChernoffFace, inherits IDLgrModel, $
                noseLength : 0.0, $
                mouthSize : 0.0, $
                mouthShape : 0.0, $

@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
 ;+
-; VISgrWindow3D is an object graphics destination for displaying a scene
-; as an anaglyph in an IDLgrWindow.
+; `MGgrWindow3D` is an object graphics destination for displaying a scene
+; as an anaglyph in an `IDLgrWindow`.
 ; 
 ; :Categories:
 ;    object graphics
@@ -11,7 +11,7 @@
 ;    The main-level program at the end of this file contains example code
 ;    using this class. Run it with::
 ;
-;       IDL> .run visgrwindow3d__define
+;       IDL> .run mggrwindow3d__define
 ;
 ;    It should display:
 ;
@@ -30,10 +30,10 @@
 ;-
 
 ;+
-; Get properties of the VISgrWindow3D.
+; Get properties of the `MGgrWindow3D`.
 ;-
-pro visgrwindow3d::getProperty, eye_separation=eyeSeparation, color=color, $
-                                _ref_extra=e
+pro mggrwindow3d::getProperty, eye_separation=eyeSeparation, color=color, $
+                               _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(color)) then begin
@@ -51,13 +51,13 @@ end
 
 
 ;+
-; Set properties of the VISgrWindow3D. Must intercept DIMENSIONS property to 
+; Set properties of the `MGgrWindow3D`. Must intercept `DIMENSIONS` property to 
 ; set the converter's buffer size correctly; otherwise, just pass along stuff 
-; to IDLgrWindow's setProperty method.
+; to `IDLgrWindow`'s setProperty method.
 ;-
-pro visgrwindow3d::setProperty, dimensions=dimensions, $
-                                eye_separation=eyeSeparation, color=color, $
-                                _extra=e
+pro mggrwindow3d::setProperty, dimensions=dimensions, $
+                               eye_separation=eyeSeparation, color=color, $
+                               _extra=e
   compile_opt strictarr
 
   self->IDLgrWindow::setProperty, _extra=e
@@ -86,7 +86,7 @@ end
 ;       property is set to a valid picture, then this argument must *not*
 ;       be given
 ;-
-pro visgrwindow3d::draw, picture
+pro mggrwindow3d::draw, picture
   compile_opt strictarr
   on_error, 2
 
@@ -102,7 +102,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrwindow3d::cleanup
+pro mggrwindow3d::cleanup
   compile_opt strictarr
 
   self->idlgrwindow::cleanup
@@ -116,9 +116,9 @@ end
 ; :Returns: 
 ;    1 for success, o/w for failure
 ;-
-function visgrwindow3d::init, eye_separation=eyeSeparation, $
-                              dimensions=dimensions, color=color, $
-                              _extra=e
+function mggrwindow3d::init, eye_separation=eyeSeparation, $
+                             dimensions=dimensions, color=color, $
+                             _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -136,7 +136,7 @@ function visgrwindow3d::init, eye_separation=eyeSeparation, $
     
   if (~self->IDLgrWindow::init(dimensions=dims, _extra=e)) then return, 0
 
-  self.converter = obj_new('VISgr3dConverter', $
+  self.converter = obj_new('MGgr3dConverter', $
                            eye_separation=eyeSeparation, $
                            color=keyword_set(color), $
                            dimensions=dims, _extra=e)
@@ -153,10 +153,10 @@ end
 ;    converter 
 ;       object which takes a view and converts to a 3D anaglyph
 ;-
-pro visgrwindow3d__define
+pro mggrwindow3d__define
   compile_opt strictarr
 
-  define = { VISgrWindow3d, inherits IDLgrWindow, $
+  define = { MGgrWindow3d, inherits IDLgrWindow, $
              converter: obj_new() $
            }
 end
@@ -202,7 +202,7 @@ model->add, light
 alight = obj_new('IDLgrLight', type=0, intensity=1.0)
 model->add, alight
 
-window3d = obj_new('VISgrWindow3d', dimensions=[640, 512], /color)
+window3d = obj_new('MGgrWindow3d', dimensions=[640, 512], /color)
 window3d->draw, view
 
 end

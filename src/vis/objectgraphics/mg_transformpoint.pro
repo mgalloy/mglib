@@ -15,13 +15,13 @@
 ;
 ;    Next, use the model created to transform [0, 1, 0]::
 ;
-;       IDL> print, vis_transformpoint([0, 1, 0], model)
+;       IDL> print, mg_transformpoint([0, 1, 0], model)
 ;              0.0000000  -3.8285687e-16       1.0000000
 ;
 ;    This example is included as a main-level program at the end of this file
 ;    and can be run by typing::
 ;
-;       IDL> .run vis_transformpoint
+;       IDL> .run mg_transformpoint
 ;-
 
 ;+
@@ -36,7 +36,7 @@
 ;    ctm : in, required, type="object or fltarr(4, 4)"
 ;       either a transformation matrix or an object with a getCTM method
 ;-
-function vis_transformpoint, point, ctm
+function mg_transformpoint, point, ctm
   compile_opt strictarr
   
   _ctm = size(ctm, /type) eq 11 ? ctm->getCTM() : ctm
@@ -50,7 +50,7 @@ end
 
 model = obj_new('IDLgrModel')
 model->rotate, [1, 0, 0], 90
-print, vis_transformpoint([0, 1, 0], model)
+print, mg_transformpoint([0, 1, 0], model)
 obj_destroy, model
        
 end

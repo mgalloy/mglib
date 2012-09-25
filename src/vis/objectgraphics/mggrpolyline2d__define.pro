@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-pro visgrpolyline2d::_create, x, y
+pro mggrpolyline2d::_create, x, y
   compile_opt strictarr
   
   densityDims = [400, 400]
@@ -13,7 +13,7 @@ pro visgrpolyline2d::_create, x, y
 end
 
 
-function visgrpolyline2d::init, x, y, _extra=e
+function mggrpolyline2d::init, x, y, _extra=e
   compile_opt strictarr
 
   if (~self->IDLgrSurface::init(_extra=e)) then return, 0
@@ -24,10 +24,10 @@ function visgrpolyline2d::init, x, y, _extra=e
 end
 
 
-pro visgrpolyline2d__define
+pro mggrpolyline2d__define
   compile_opt strictarr
   
-  define = { VISgrPolyline2d, inherits IDLgrSurface }
+  define = { MGgrPolyline2d, inherits IDLgrSurface }
 end
 
 

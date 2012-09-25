@@ -4,7 +4,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run visgrbubble__define
+;       IDL> .run mggrbubble__define
 ;
 ;    This should produce:
 ;
@@ -38,7 +38,7 @@
 ;    y : out, optional, type=fltarr
 ;       y-coordinates of bubble border
 ;-
-pro visgrbubble::_calculate, x=_x, y=_y
+pro mggrbubble::_calculate, x=_x, y=_y
   compile_opt strictarr
   
   t = findgen(self.n) / (self.n - 1.) * 360. * !dtor
@@ -52,9 +52,9 @@ end
 ;+
 ; Get bubble properties.
 ;-
-pro visgrbubble::getProperty, size=size, area=area, $
-                              color=color, border_color=borderColor, $
-                              _ref_extra=e
+pro mggrbubble::getProperty, size=size, area=area, $
+                             color=color, border_color=borderColor, $
+                             _ref_extra=e
   compile_opt strictarr
   
   polygon = self->getByName('polygon')
@@ -82,9 +82,9 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrbubble::setProperty, size=size, area=area, $
-                              color=color, border_color=borderColor, $
-                              _extra=e
+pro mggrbubble::setProperty, size=size, area=area, $
+                             color=color, border_color=borderColor, $
+                             _extra=e
   compile_opt strictarr
   
   polygon = self->getByName('polygon')
@@ -145,8 +145,8 @@ end
 ;    border_color : in, optional, type=color, default=0B
 ;       color of bubble edge
 ;-
-function visgrbubble::init, x, y, z, size=size, area=area, $
-                            color=color, border_color=borderColor, _extra=e
+function mggrbubble::init, x, y, z, size=size, area=area, $
+                           color=color, border_color=borderColor, _extra=e
   compile_opt strictarr
 
   if (~self->IDLgrModel::init(_extra=e)) then return, 0
@@ -192,10 +192,10 @@ end
 ;    area
 ;       flag indicating whether size is a radius or the area of the bubble
 ;-
-pro visgrbubble__define
+pro mggrbubble__define
   compile_opt strictarr
   
-  define = { VISgrBubble, inherits IDLgrModel, $
+  define = { MGgrBubble, inherits IDLgrModel, $
              n: 0L, $
              x: 0.0, $
              y: 0.0, $
@@ -217,7 +217,7 @@ x = 2. * randomu(seed, n) - 1.
 y = 2. * randomu(seed, n) - 1.
 size = 0.1 * randomu(seed, n)
 color = byte(255. * randomu(seed, n, 3))
-bubbles = vis_create_bubbles(x, y, size=size, /area, $
+bubbles = mg_create_bubbles(x, y, size=size, /area, $
                             color=color, border_color=color / 2B, $
                             alpha_channel=0.5)
 model->add, bubbles

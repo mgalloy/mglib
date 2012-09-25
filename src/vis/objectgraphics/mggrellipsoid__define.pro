@@ -9,7 +9,7 @@
 ; :Examples:
 ;    See the main-level example program at the end of this file::
 ;
-;       IDL> .run visgrellipsoid__define
+;       IDL> .run mggrellipsoid__define
 ;
 ;    This should produce:
 ;
@@ -39,8 +39,8 @@
 ;+
 ; Set properties of the ellipsoid.
 ;-
-pro visgrellipsoid::setProperty, pos=pos, radius=radius, density=density, $
-                                 parent=parent, _extra=e
+pro mggrellipsoid::setProperty, pos=pos, radius=radius, density=density, $
+                                parent=parent, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -68,7 +68,7 @@ end
 ;+
 ; Get properties of the ellipsoid.
 ;-
-pro visgrellipsoid::getProperty, pos=pos, radius=radius, density=density, $
+pro mggrellipsoid::getProperty, pos=pos, radius=radius, density=density, $
                                  pobj=pobj, _ref_extra=re
   compile_opt strictarr
 
@@ -88,7 +88,7 @@ end
 ; Prints position, radius, and density of the ellipsoid for debugging 
 ; purposes.
 ;-
-pro visgrellipsoid::print
+pro mggrellipsoid::print
   compile_opt strictarr
 
   print, self.pos 
@@ -101,7 +101,7 @@ end
 ; Sets the vertex and connectivity arrays for the polygon used to
 ; represent the orb.
 ;-
-pro visgrellipsoid::_buildPoly
+pro mggrellipsoid::_buildPoly
   compile_opt strictarr
 
   ; number of rows and columns of vertices is based upon the density property
@@ -216,7 +216,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrellipsoid::cleanup
+pro mggrellipsoid::cleanup
   compile_opt strictarr
 
   ; cleanup the polygon object used to represent the orb
@@ -233,8 +233,8 @@ end
 ; :Returns: 
 ;    1 for success, 0 for failure
 ;-
-function visgrellipsoid::init, pos=pos, radius=radius, density=density, $
-                               tex_coords=texCoords, _extra=e
+function mggrellipsoid::init, pos=pos, radius=radius, density=density, $
+                              tex_coords=texCoords, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -282,8 +282,8 @@ end
 ;    polygon 
 ;       IDLgrPolygon object containing verts and conn of the ellipsoid
 ;-
-pro visgrellipsoid__define
-    struct = { VISgrEllipsoid, $
+pro mggrellipsoid__define
+    struct = { MGgrEllipsoid, $
                inherits IDLgrModel, $
                pos: [0.0, 0.0, 0.0], $
                radius: fltarr(3), $
@@ -301,7 +301,7 @@ view = obj_new('IDLgrView', color=[0, 0, 0])
 model = obj_new('IDLgrModel')
 view->add, model
 
-ellipsoid = obj_new('VISgrEllipsoid', radius=[0.3, 0.3, 0.6], $
+ellipsoid = obj_new('MGgrEllipsoid', radius=[0.3, 0.3, 0.6], $
                     color=[200, 200, 0], shading=0)
 model->add, ellipsoid
 

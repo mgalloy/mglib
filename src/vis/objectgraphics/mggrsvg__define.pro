@@ -22,7 +22,7 @@
 ; :Examples:
 ;    Run the main-level program at the end of this file to see an example::
 ;
-;       IDL> .run visgrsvg__define
+;       IDL> .run mggrsvg__define
 ;
 ;    This should produce the following:
 ;
@@ -51,7 +51,7 @@
 ;    color : in, required, type=bytarr(3)
 ;       color to convert
 ;-
-function visgrsvg::_getRgb, color
+function mggrsvg::_getRgb, color
   compile_opt strictarr
   
   return, string(color, '(%"rgb(%d, %d, %d)")')
@@ -68,7 +68,7 @@ end
 ;    tree : in, required, type=object
 ;       object in the object graphics hierarchy
 ;-
-function visgrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
+function mggrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
   compile_opt strictarr
 
   case 1 of
@@ -100,7 +100,7 @@ function visgrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
 end
 
 
-function visgrsvg::_convertUnits, x, xUnits, outUnits
+function mggrsvg::_convertUnits, x, xUnits, outUnits
   compile_opt strictarr
   on_error, 2
   
@@ -134,7 +134,7 @@ function visgrsvg::_convertUnits, x, xUnits, outUnits
 end
 
 
-function visgrsvg::_transformCoords, data, tree=tree
+function mggrsvg::_transformCoords, data, tree=tree
   compile_opt strictarr
   
   vpr = self->_getVpr(tree)
@@ -170,7 +170,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleScene, scene, lun=lun, indent=indent
+pro mggrsvg::_handleScene, scene, lun=lun, indent=indent
   compile_opt strictarr
   
   ; TODO: implement
@@ -190,7 +190,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleViewgroup, viewgroup, lun=lun, indent=indent
+pro mggrsvg::_handleViewgroup, viewgroup, lun=lun, indent=indent
   compile_opt strictarr
 
   ; TODO: implement
@@ -210,7 +210,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleView, view, lun=lun, indent=indent
+pro mggrsvg::_handleView, view, lun=lun, indent=indent
   compile_opt strictarr
 
   view->getProperty, viewplane_rect=vpr
@@ -251,7 +251,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleModel, model, lun=lun, indent=indent
+pro mggrsvg::_handleModel, model, lun=lun, indent=indent
   compile_opt strictarr
 
   vpr = self->_getVpr(model)
@@ -290,7 +290,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handlePolyline, polyline, lun=lun, indent=indent
+pro mggrsvg::_handlePolyline, polyline, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -328,7 +328,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handlePolygon, polygon, lun=lun, indent=indent
+pro mggrsvg::_handlePolygon, polygon, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -361,7 +361,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleText, text, lun=lun, indent=indent
+pro mggrsvg::_handleText, text, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -398,7 +398,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleImage, image, lun=lun, indent=indent
+pro mggrsvg::_handleImage, image, lun=lun, indent=indent
   compile_opt strictarr
 
   image->getProperty, data=data, location=loc, dimensions=dims, name=name
@@ -441,7 +441,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handlePlot, plot, lun=lun, indent=indent
+pro mggrsvg::_handlePlot, plot, lun=lun, indent=indent
   compile_opt strictarr
 
   self->_handlePolyline, plot, lun=lun, indent=indent
@@ -461,7 +461,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_handleAxis, axis, lun=lun, indent=indent
+pro mggrsvg::_handleAxis, axis, lun=lun, indent=indent
   compile_opt strictarr
 
   ; TODO: implement
@@ -482,7 +482,7 @@ end
 ;    indent : in, required, type=string
 ;       string to prefix each line of output by
 ;-
-pro visgrsvg::_traverse, tree, lun=lun, indent=indent
+pro mggrsvg::_traverse, tree, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -513,7 +513,7 @@ end
 ;    tree : in, optional, type=object
 ;       scene or view object
 ;-
-pro visgrsvg::draw, tree
+pro mggrsvg::draw, tree
   compile_opt strictarr
   on_error, 2
   
@@ -537,10 +537,10 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrsvg::setProperty, filename=filename, graphics_tree=graphicsTree, $
-                           dimensions=dimensions, $
-                           em=em, ex=ex, px=px, pt=pt, pc=pc, cm=cm, mm=mm, $
-                           inches=inches, percentage=percentage
+pro mggrsvg::setProperty, filename=filename, graphics_tree=graphicsTree, $
+                          dimensions=dimensions, $
+                          em=em, ex=ex, px=px, pt=pt, pc=pc, cm=cm, mm=mm, $
+                          inches=inches, percentage=percentage
   compile_opt strictarr
 
   if (n_elements(filename) gt 0L) then self.filename = filename
@@ -566,9 +566,9 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrsvg::getProperty, filename=filename, graphics_tree=graphicsTree, $
-                           text_multipler=textMultiplier, $
-                           dimensions=dimensions, dimension_units=dimensionUnits
+pro mggrsvg::getProperty, filename=filename, graphics_tree=graphicsTree, $
+                          text_multipler=textMultiplier, $
+                          dimensions=dimensions, dimension_units=dimensionUnits
   compile_opt strictarr
   
   if (arg_present(filename)) then filename = self.filename
@@ -582,7 +582,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrsvg::cleanup
+pro mggrsvg::cleanup
   compile_opt strictarr
   
   if (obj_valid(self.graphicsTree)) then obj_destroy, self.graphicsTree
@@ -599,7 +599,7 @@ end
 ;    _extra : in, optional, type=keywords
 ;       any properties of the class
 ;-
-function visgrsvg::init, _extra=e
+function mggrsvg::init, _extra=e
   compile_opt strictarr
 
   self.textMultiplier = 1.0
@@ -617,10 +617,10 @@ end
 ;    graphicsTree
 ;       graphics tree to tree if none is provided to draw method
 ;-
-pro visgrsvg__define
+pro mggrsvg__define
   compile_opt strictarr
   
-  define = { VISgrSVG, $
+  define = { MGgrSVG, $
              filename: '', $
              graphicsTree: obj_new(), $
              dimensions: fltarr(2), $
@@ -654,16 +654,16 @@ model->add, t
 
 x = findgen(360 * 4) * !dtor
 y = sin(x)
-xc = vis_linear_function([0., 8.*!pi], [1.1, 1.9])
-yc = vis_linear_function([-1., 1.], [1.2, 1.3])
+xc = mg_linear_function([0., 8.*!pi], [1.1, 1.9])
+yc = mg_linear_function([-1., 1.], [1.2, 1.3])
 plot = obj_new('IDLgrPlot', x, y, $
                xcoord_conv=xc, ycoord_conv=yc, $
                thick=2, color=[255, 0, 0])
 model->add, plot
 
 ali = read_image(file_which('people.jpg'))
-xc = vis_linear_function([0, 255], [2., 3.])
-yc = vis_linear_function([0, 255], [2., 3.])
+xc = mg_linear_function([0, 255], [2., 3.])
+yc = mg_linear_function([0, 255], [2., 3.])
 im = obj_new('IDLgrImage', ali, xcoord_conv=xc, ycoord_conv=yc, $
              transform_mode=1, name='ali')
 model->add, im
@@ -674,7 +674,7 @@ model->translate, 4., 0., 0.
 win = obj_new('IDLgrWindow', dimensions=[4, 4], units=1)
 win->draw, view
 
-svg = obj_new('VISgrSVG', filename='triangle.svg', dimensions=[4, 4], /inches)
+svg = obj_new('MGgrSVG', filename='triangle.svg', dimensions=[4, 4], /inches)
 svg->draw, view
 mg_open_url, 'triangle.svg'
 

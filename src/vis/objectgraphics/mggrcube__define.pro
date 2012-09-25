@@ -9,7 +9,7 @@
 ; :Examples:
 ;    See the main-level program at the end of this file::
 ;
-;       IDL> .run visgrcube__define 
+;       IDL> .run mggrcube__define 
 ;
 ;    This should produce an image of 100 cubes of random size, location, 
 ;    color, style, and shading:
@@ -39,7 +39,7 @@
 ;    z : out, optional, type=fltarr(8)
 ;       z-coordinates of vertices
 ;-
-pro visgrcube::_computeVertices, x, y, z
+pro mggrcube::_computeVertices, x, y, z
   compile_opt strictarr
   
   x = self.scale[0] * self.x + self.translate[0]
@@ -51,7 +51,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrcube::setProperty, scale=scale, translate=translate, _extra=e
+pro mggrcube::setProperty, scale=scale, translate=translate, _extra=e
   compile_opt strictarr
 
   if (n_elements(scale) gt 0L) then self.scale = scale
@@ -69,7 +69,7 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrcube::getProperty, scale=scale, translate=translate, _ref_extra=e
+pro mggrcube::getProperty, scale=scale, translate=translate, _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(scale)) then scale = self.scale
@@ -84,7 +84,7 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrcube::init, scale=scale, translate=translate, _extra=e
+function mggrcube::init, scale=scale, translate=translate, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -124,10 +124,10 @@ end
 ;+
 ; Define instance variables.
 ;-
-pro visgrcube__define
+pro mggrcube__define
   compile_opt strictarr
   
-  define = { VISgrCube, inherits IDLgrPolygon, $
+  define = { MGgrCube, inherits IDLgrPolygon, $
              x: fltarr(8), $
              y: fltarr(8), $
              z: fltarr(8), $
@@ -146,7 +146,7 @@ view->add, model
 
 ncubes = 100
 for c = 0L, ncubes - 1L do begin
-  cube = obj_new('VISgrCube', $
+  cube = obj_new('MGgrCube', $
                  scale=0.1 * randomu(seed, 3), $
                  translate=randomu(seed, 3) - 0.5, $
                  color=255. * randomu(seed, 3), $

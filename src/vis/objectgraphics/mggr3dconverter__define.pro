@@ -42,7 +42,7 @@
 ;    rightImage : in, optional, type="bytarr(3, xsize, ysize)" 
 ;       image from right eye
 ;-
-function visgr3dconverter::_combineImages, leftImage, rightImage
+function mggr3dconverter::_combineImages, leftImage, rightImage
   compile_opt strictarr
 
   ; define combined_image to the correct size
@@ -78,7 +78,7 @@ end
 ;    degrees : in, required, type=float
 ;       number of degrees to rotate "top-level" models
 ;-
-pro visgr3dconverter::_rotateModels, picture, degrees
+pro mggr3dconverter::_rotateModels, picture, degrees
   compile_opt strictarr
   
   ; if picture is a model then rotate it, but don't rotate models inside it
@@ -108,7 +108,7 @@ end
 ;       property is set to a valid picture, then this argument must *not* be 
 ;       given
 ;-
-function visgr3dconverter::convert, picture
+function mggr3dconverter::convert, picture
   compile_opt strictarr
   
   ; rotate "top-level" models for left eye
@@ -147,9 +147,9 @@ end
 ;+
 ; Get properties of the converter.
 ;-
-pro visgr3dconverter::getProperty, eye_separation=eyeSeparation, $
-                                   dimensions=dimensions, color=color, $
-                                   _ref_extra=e
+pro mggr3dconverter::getProperty, eye_separation=eyeSeparation, $
+                                  dimensions=dimensions, color=color, $
+                                  _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(color)) then begin
@@ -173,9 +173,9 @@ end
 ;+
 ; Set properties of the converter.
 ;-
-pro visgr3dconverter::setProperty, eye_separation=eyeSeparation, $
-                                   dimensions=dimensions, color=color, $
-                                   _extra=e
+pro mggr3dconverter::setProperty, eye_separation=eyeSeparation, $
+                                  dimensions=dimensions, color=color, $
+                                  _extra=e
   compile_opt strictarr
 
   if (n_elements(color) gt 0L) then begin
@@ -200,7 +200,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgr3dconverter::cleanup
+pro mggr3dconverter::cleanup
   compile_opt strictarr
 
   obj_destroy, [self.view, self.buffer]
@@ -217,9 +217,9 @@ end
 ;    _extra : in, optional, type=keywords
 ;       keywords to IDLgrBuffer::init method are accepted
 ;-
-function visgr3dconverter::init, eye_separation=eyeSeparation, $
-                                 dimensions=dimensions, color=color, $
-                                 _extra=e
+function mggr3dconverter::init, eye_separation=eyeSeparation, $
+                                dimensions=dimensions, color=color, $
+                                _extra=e
   compile_opt strictarr
 
   self.color = keyword_set(color)
@@ -255,10 +255,10 @@ end
 ;    image 
 ;       IDLgrImage actually being displayed
 ;-
-pro visgr3dconverter__define
+pro mggr3dconverter__define
   compile_opt strictarr
 
-  define = { VISgr3dConverter, $
+  define = { MGgr3dConverter, $
              eyeSeparation: 0.0, $
              color: 0B, $
              buffer: obj_new(), $
