@@ -3,7 +3,7 @@
 ;+
 ; Defines constants for values of LINESTYLE, PSYM, and [XYZ]STYLE keywords.
 ;
-; This routine defines a system variable !vis which contains constants for the 
+; This routine defines a system variable !mg which contains constants for the 
 ; LINESTYLE keyword to direct graphics routines or the LINESTYLE property of 
 ; object graphics classes::
 ;
@@ -45,7 +45,7 @@
 ;       SUPPRESSBOX     INT              8
 ;       INHIBITYZERO    INT             16
 ;-
-pro vis_constants
+pro mg_constants
   compile_opt strictarr
   
   defsysv, '!mg', { linestyle: { solid: 0, $
