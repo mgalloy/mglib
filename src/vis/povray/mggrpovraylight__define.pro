@@ -9,7 +9,7 @@
 ; :Examples:
 ;    To create an area light::
 ;      
-;       light = obj_new('VISgrPOVRayLight', type=2, location=[0, 5, 5], $
+;       light = obj_new('MGgrPOVRayLight', type=2, location=[0, 5, 5], $
 ;                       intensity=2.0, $
 ;                       /arealight, $
 ;                       width_axis=[0.3, 0, 0], height_axis=[0, 0.3, 0], $
@@ -23,7 +23,7 @@
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ;       
-;       IDL> .run visgrpovraylight__define
+;       IDL> .run mggrpovraylight__define
 ;        
 ;    This should produce output with an area light (which makes a fuzzy 
 ;    shadow):
@@ -51,12 +51,12 @@
 ;+
 ; Get properties.
 ;-
-pro visgrpovraylight::getProperty, arealight=arealight, $
-                                   width_axis=widthAxis, $
-                                   height_axis=heightAxis, $
-                                   n_width_lights=nWidthLights, $
-                                   n_height_lights=nHeightLights, $
-                                   adaptive=adaptive, jitter=jitter, $
+pro mggrpovraylight::getProperty, arealight=arealight, $
+                                  width_axis=widthAxis, $
+                                  height_axis=heightAxis, $
+                                  n_width_lights=nWidthLights, $
+                                  n_height_lights=nHeightLights, $
+                                  adaptive=adaptive, jitter=jitter, $
                                   _ref_extra=e
   compile_opt strictarr
   
@@ -77,13 +77,13 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovraylight::setProperty, arealight=arealight, $
-                                   width_axis=widthAxis, $
-                                   height_axis=heightAxis, $
-                                   n_width_lights=nWidthLights, $
-                                   n_height_lights=nHeightLights, $
-                                   adaptive=adaptive, jitter=jitter, $
-                                   _extra=e
+pro mggrpovraylight::setProperty, arealight=arealight, $
+                                  width_axis=widthAxis, $
+                                  height_axis=heightAxis, $
+                                  n_width_lights=nWidthLights, $
+                                  n_height_lights=nHeightLights, $
+                                  adaptive=adaptive, jitter=jitter, $
+                                  _extra=e
   compile_opt strictarr
   
   if (n_elements(arealight) gt 0L) then self.arealight = arealight       
@@ -109,7 +109,7 @@ end
 ;    lun : in, required, type=long
 ;       logical unit number to write to
 ;-
-pro visgrpovraylight::_writeArealight, lun
+pro mggrpovraylight::_writeArealight, lun
   compile_opt strictarr
 
   if (self.arealight) then begin
@@ -133,7 +133,7 @@ end
 ;    lun : in, required, type=long
 ;       logical unit number to write to
 ;-
-pro visgrpovraylight::write, lun
+pro mggrpovraylight::write, lun
   compile_opt strictarr
 
   self->getProperty, type=type, intensity=intensity, color=color, $ 
@@ -167,17 +167,17 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovraylight::init, arealight=arealight, $
-                                 width_axis=widthAxis, $
-                                 height_axis=heightAxis, $
-                                 n_width_lights=nWidthLights, $
-                                 n_height_lights=nHeightLights, $
-                                 adaptive=adaptive, jitter=jitter, $
-                                 _extra=e
+function mggrpovraylight::init, arealight=arealight, $
+                                width_axis=widthAxis, $
+                                height_axis=heightAxis, $
+                                n_width_lights=nWidthLights, $
+                                n_height_lights=nHeightLights, $
+                                adaptive=adaptive, jitter=jitter, $
+                                _extra=e
   compile_opt strictarr
 
   if (~self->idlgrlight::init(_extra=e)) then return, 0
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
 
   ; set default values
   self.arealight = keyword_set(arealight)
@@ -211,11 +211,11 @@ end
 ;    jitter
 ;       set to jitter lights
 ;-
-pro visgrpovraylight__define
+pro mggrpovraylight__define
   compile_opt strictarr
   
-  define = { VISgrPOVRayLight, $
-             inherits IDLgrLight, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRayLight, $
+             inherits IDLgrLight, inherits MGgrPOVRayObject, $
              arealight: 0B, $
              widthAxis: fltarr(3), $
              heightAxis: fltarr(3), $
@@ -227,7 +227,7 @@ pro visgrpovraylight__define
 end
 
 
-; example of using the VISgrPOVRay class
+; example of using the `MGgrPOVRay` class
 
 view = obj_new('IDLgrView', name='view', color=[200, 200, 255])
 
@@ -262,7 +262,7 @@ model->add, plane
 model->rotate, [0, 1, 0], -45
 model->rotate, [1, 0, 0], 30
 
-light = obj_new('VISgrPOVRayLight', type=2, location=[0, 5, 5], intensity=1.0, $
+light = obj_new('MGgrPOVRayLight', type=2, location=[0, 5, 5], intensity=1.0, $
                 /arealight, width_axis=[0.3, 0, 0], height_axis=[0, 0.3, 0], $
                 n_width_light=5, n_height_lights=5, $
                 adaptive=1.0, /jitter)
@@ -276,7 +276,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Arealight')
 win->setProperty, graphics_tree=view
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='arealight-output/arealight', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='arealight-output/arealight', dimensions=dims)
 file_mkdir, 'arealight-output'
 pov->draw, view
 
@@ -287,7 +287,7 @@ obj_destroy, pov
 ;    $ povray +P +A arealight.ini
 
 window, xsize=dims[0], ysize=dims[1], title='POV-Ray Arealight'
-arealightImage = vis_povray('arealight-output/arealight')
+arealightImage = mg_povray('arealight-output/arealight')
 tv, arealightImage, true=1
 
 end

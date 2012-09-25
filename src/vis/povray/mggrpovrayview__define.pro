@@ -10,19 +10,19 @@
 ;    Focal blur can be set up by setting the APERTURE and BLUR_SAMPLES 
 ;    keywords when creating the view::
 ;    
-;       view = obj_new('VISgrPOVRayView', name='view', color=[200, 200, 255], $
+;       view = obj_new('MGgrPOVRayView', name='view', color=[200, 200, 255], $
 ;                      aperture=0.4, blur_samples=20L) 
 ;               
 ;    The FOCAL_POINT can be set later when the coordinate transformations are
 ;    known since the coordinates of the FOCAL_POINT are in view coordinates,
 ;    not data coordinates:: 
 ;               
-;       view->setProperty, focal_point=vis_transformpoint([0.52, 0.317, 0.0], cow)
+;       view->setProperty, focal_point=mg_transformpoint([0.52, 0.317, 0.0], cow)
 ;                
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ;       
-;       IDL> .run visgrpovrayview__define
+;       IDL> .run mggrpovrayview__define
 ;        
 ;    This should produce output with a focal blur (focus is on the cow's 
 ;    head):
@@ -43,10 +43,10 @@
 ;+
 ; Get properties.
 ;-
-pro visgrpovrayview::getProperty, focal_point=focalPoint, $
-                                  aperture=aperture, $
-                                  blur_samples=blurSamples, $
-                                  _ref_extra=e
+pro mggrpovrayview::getProperty, focal_point=focalPoint, $
+                                 aperture=aperture, $
+                                 blur_samples=blurSamples, $
+                                 _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(focalPoint)) then focalPoint = self.focalPoint
@@ -62,10 +62,10 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovrayview::setProperty, focal_point=focalPoint, $
-                                  aperture=aperture, $
-                                  blur_samples=blurSamples, $
-                                  _extra=e
+pro mggrpovrayview::setProperty, focal_point=focalPoint, $
+                                 aperture=aperture, $
+                                 blur_samples=blurSamples, $
+                                 _extra=e
   compile_opt strictarr
   
   if (n_elements(focalPoint) gt 0L) then self.focalPoint = focalPoint
@@ -84,10 +84,10 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovrayview::init, focal_point=focalPoint, $
-                                aperture=aperture, $
-                                blur_samples=blurSamples, $
-                                _extra=e 
+function mggrpovrayview::init, focal_point=focalPoint, $
+                               aperture=aperture, $
+                               blur_samples=blurSamples, $
+                               _extra=e 
                                   
   if (~self->idlgrview::init(_extra=e)) then return, 0
                                   
@@ -102,10 +102,10 @@ end
 ;+
 ; Define instance variables.
 ;-                                  
-pro visgrpovrayview__define
+pro mggrpovrayview__define
   compile_opt strictarr
   
-  define = { VISgrPOVRayView, inherits IDLgrView, $
+  define = { MGgrPOVRayView, inherits IDLgrView, $
              focalPoint: fltarr(3), $
              aperture: 0.0, $
              blurSamples: 0L $
@@ -113,10 +113,10 @@ pro visgrpovrayview__define
 end
 
 
-; main-level example program of using the VISgrPOVRay class
+; main-level example program of using the `MGgrPOVRay` class
 
-; the FOCAL_POINT can't be set until the transforms of the scene are defined
-view = obj_new('VISgrPOVRayView', name='view', color=[200, 200, 255], $
+; the `FOCAL_POINT` can't be set until the transforms of the scene are defined
+view = obj_new('MGgrPOVRayView', name='view', color=[200, 200, 255], $
                aperture=0.4, blur_samples=20L)               
 
 model = obj_new('IDLgrModel', name='model')
@@ -160,8 +160,8 @@ model->add, alight
 ;   print, cow->getCTM() ## [0.52, 0.317, 0.0, 0.0]
 ; 
 ; where [0.52, 0.317, 0.0] are the data coords of the cow's head. Here
-; VIS_TRANSFORMPOINT does this calculation for us.
-view->setProperty, focal_point=vis_transformpoint([0.52, 0.317, 0.0], cow)
+; `MG_TRANSFORMPOINT` does this calculation for us.
+view->setProperty, focal_point=mg_transformpoint([0.52, 0.317, 0.0], cow)
 
 dims = [640, 480]
 
@@ -169,7 +169,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics View')
 win->setProperty, graphics_tree=view
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='view-output/view', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='view-output/view', dimensions=dims)
 file_mkdir, 'view-output'
 pov->draw, view
 
@@ -180,7 +180,7 @@ obj_destroy, pov
 ;    $ povray +P +A view.ini
 
 window, xsize=dims[0], ysize=dims[1], title='POV-Ray View'
-viewImage = vis_povray('view-output/view')
+viewImage = mg_povray('view-output/view')
 tv, viewImage, true=1
 
 end

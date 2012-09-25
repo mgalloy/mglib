@@ -1,25 +1,25 @@
 ; docformat = 'rst'
 
 ;+
-; Destination class graphics window like IDLgrWindow that uses POVRay to 
+; Destination class graphics window like `IDLgrWindow` that uses POVRay to 
 ; render the graphics.
 ;
 ; :Properties:
 ;    _ref_extra : type=keywords
-;       keywords to VISgrPOVRay and IDLgrWindow
+;       keywords to `MGgrPOVRay` and `IDLgrWindow`
 ;    _extra : type=keywords
-;       keywords to VISgrPOVRay and IDLgrWindow
+;       keywords to `MGgrPOVRay` and `IDLgrWindow`
 ;-
 
 ;+
-; Draws graphics hierarchy to the window using VISgrPOVRay.s
+; Draws graphics hierarchy to the window using `MGgrPOVRay`.
 ;
 ; :Params:
 ;    picture : in, optional, type=object
-;       IDLgrScene, IDLgrViewGroup, or IDLgrView rooting object graphics
-;       hierarchy to draw; required if GRAPHICS_TREE property is not set
+;       `IDLgrScene`, `IDLgrViewGroup`, or `IDLgrView` rooting object graphics
+;       hierarchy to draw; required if `GRAPHICS_TREE` property is not set
 ;-
-pro visgrpovraywindow::draw, picture
+pro mggrpovraywindow::draw, picture
   compile_opt strictarr
   
   if (n_elements(picture) gt 0L) then begin
@@ -31,7 +31,7 @@ pro visgrpovraywindow::draw, picture
   self.povray->draw, _picture
   
   self.povray->getProperty, file_prefix=filePrefix
-  im = vis_povray(filePrefix)
+  im = mg_povray(filePrefix)
   
   image = self.view->getByName('model/image')
   image->setProperty, data=im  
@@ -43,7 +43,7 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovraywindow::getProperty, _ref_extra=e
+pro mggrpovraywindow::getProperty, _ref_extra=e
   compile_opt strictarr
   
   if (n_elements(e) gt 0L) then begin
@@ -56,7 +56,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovraywindow::setProperty, _extra=e
+pro mggrpovraywindow::setProperty, _extra=e
   compile_opt strictarr
   
   if (n_elements(e) gt 0L) then begin
@@ -69,7 +69,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrpovraywindow::cleanup
+pro mggrpovraywindow::cleanup
   compile_opt strictarr
   
   if (~self.keepFiles) then begin
@@ -84,26 +84,26 @@ end
 
 
 ;+
-; Create a VISgrPOVRayWindow instance.
+; Create a `MGgrPOVRayWindow` instance.
 ;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovraywindow::init, file_prefix=filePrefix, $
-                                  keep_files=keepFiles, $
-                                  _extra=e
+function mggrpovraywindow::init, file_prefix=filePrefix, $
+                                 keep_files=keepFiles, $
+                                 _extra=e
   compile_opt strictarr
   
   if (~self->IDLgrWindow::init(_extra=e)) then return, 0
 
   self.keepFiles = keyword_set(keepFiles)
   _filePrefix = n_elements(filePrefix) eq 0L $
-                  ? filepath('visgrpovray', $
+                  ? filepath('mggrpovray', $
                              subdir=string(systime(/seconds), $
-                                           format='(%"visgrpovray-%d")'), $
+                                           format='(%"mggrpovray-%d")'), $
                              root=filepath('', /tmp)) $
                   : filePrefix
-  self.povray = obj_new('VISgrPovray', file_prefix=_filePrefix, _extra=e)
+  self.povray = obj_new('MGgrPovray', file_prefix=_filePrefix, _extra=e)
   self.povray->getProperty, dimensions=dimensions
   
   self.view = obj_new('IDLgrView', viewplane_rect=[0, 0, dimensions])
@@ -123,16 +123,16 @@ end
 ;
 ; :Fields:
 ;    view
-;       object graphics hierarchy rooted at an IDLgrView
+;       object graphics hierarchy rooted at an `IDLgrView`
 ;    povray
-;       VISgrPOVRay destination class
+;       `MGgrPOVRay` destination class
 ;    keepFiles
 ;       keeps output files if set
 ;-
-pro visgrpovraywindow__define
+pro mggrpovraywindow__define
   compile_opt strictarr
 
-  define = { VISgrPOVRayWindow, inherits IDLgrWindow, $
+  define = { MGgrPOVRayWindow, inherits IDLgrWindow, $
              view: obj_new(), $
              povray: obj_new(), $
              keepFiles: 0B $
@@ -181,7 +181,7 @@ model->add, light
 alight = obj_new('IDLgrLight', type=0, intensity=2.0)
 model->add, alight
 
-win = obj_new('VISgrPOVRayWindow', $
+win = obj_new('MGgrPOVRayWindow', $
               dimensions=[640, 480], $
               title='Object graphics Cow')
 win->setProperty, graphics_tree=view

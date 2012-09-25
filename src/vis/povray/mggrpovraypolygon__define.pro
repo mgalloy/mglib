@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; A VISgrPOVRayPolygon represents a polygon with POV-Ray specific attributes 
+; A `MGgrPOVRayPolygon` represents a polygon with POV-Ray specific attributes 
 ; like the finish attribute class.
 ;
 ; :Categories:
@@ -9,11 +9,11 @@
 ;
 ; :Properties:
 ;    finish
-;       IDLgrPOVRayFinish attribute object for the polygon
+;       `IDLgrPOVRayFinish` attribute object for the polygon
 ;    _extra
-;       properties of IDLgrPolygon
+;       properties of `IDLgrPolygon`
 ;    _ref_extra
-;       properties of IDLgrPolygon
+;       properties of `IDLgrPolygon`
 ;-
 
 
@@ -26,7 +26,7 @@
 ;    lun : in, required, type=long
 ;       logical unit number to write to
 ;-
-pro visgrpovraypolygon::write, lun
+pro mggrpovraypolygon::write, lun
   compile_opt strictarr
 
   self->getProperty, data=vertices, normals=normals, polygons=polygons, $
@@ -154,8 +154,8 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovraypolygon::getProperty, finish=finish, no_shadow=noShadow, $
-                                     _ref_extra=e
+pro mggrpovraypolygon::getProperty, finish=finish, no_shadow=noShadow, $
+                                    _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(finish)) then finish = self.finish
@@ -170,8 +170,8 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovraypolygon::setProperty, finish=finish, no_shadow=noShadow, $
-                                     _ref_extra=e
+pro mggrpovraypolygon::setProperty, finish=finish, no_shadow=noShadow, $
+                                    _ref_extra=e
   compile_opt strictarr
   
   if (n_elements(finish) gt 0L) then self.finish = finish
@@ -186,7 +186,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrpovraypolygon::cleanup
+pro mggrpovraypolygon::cleanup
   compile_opt strictarr
   
   self->idlgrpolygon::cleanup
@@ -194,7 +194,7 @@ end
 
 
 ;+
-; Create visgrpovraypolygon object.
+; Create `MGgrPOVRayPolygon` object.
 ;
 ; :Returns: 
 ;    1 for success, 0 for failure
@@ -207,13 +207,13 @@ end
 ;    z : in, optional, type=fltarr(n)
 ;       z-coordinates of vertices of the polygon
 ;-
-function visgrpovraypolygon::init, x, y, z, $
-                                   finish=finish, no_shadow=noShadow, $
-                                   _extra=e
+function mggrpovraypolygon::init, x, y, z, $
+                                  finish=finish, no_shadow=noShadow, $
+                                  _extra=e
   compile_opt strictarr
   
   if (~self->idlgrpolygon::init(x, y, z, _extra=e)) then return, 0
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
   
   if (obj_valid(finish)) then self.finish = finish
   self.noShadow = keyword_set(noShadow)
@@ -229,11 +229,11 @@ end
 ;    finish
 ;       finish attribute object
 ;-
-pro visgrpovraypolygon__define
+pro mggrpovraypolygon__define
   compile_opt strictarr
   
-  define = { VISgrPOVRayPolygon, $
-             inherits IDLgrPolygon, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRayPolygon, $
+             inherits IDLgrPolygon, inherits MGgrPOVRayObject, $
              finish: obj_new(), $
              noShadow: 0B $
            }

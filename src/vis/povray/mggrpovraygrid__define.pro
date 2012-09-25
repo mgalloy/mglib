@@ -19,7 +19,7 @@
 ;    The following creates a light blue plane with while grid lines at 
 ;    y = ymin with grid lines every 0.25 data units::
 ; 
-;       plane = obj_new('VISgrPOVRayGrid', $
+;       plane = obj_new('MGgrPOVRayGrid', $
 ;                       gridline_thick=0.05, $
 ;                       color=[200, 200, 255], $
 ;                       gridline_color=[255, 255, 255], $
@@ -29,7 +29,7 @@
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ;
-;       IDL> .run visgrpovraygrid__define
+;       IDL> .run mggrpovraygrid__define
 ;
 ;    This should produce:
 ;
@@ -67,7 +67,7 @@
 ;    v : in, required, type=fltarr(3)
 ;       vector to find a normal to
 ;-
-function visgrpovraygrid::_findNormal, v
+function mggrpovraygrid::_findNormal, v
   compile_opt strictarr
   
   z = [0, 0, 1]
@@ -90,7 +90,7 @@ end
 ;    lun : in, required, type=long
 ;       logical unit number of file to write to
 ;-
-pro visgrpovraygrid::write, lun
+pro mggrpovraygrid::write, lun
   compile_opt strictarr
   
   self->getProperty, color=color
@@ -123,7 +123,7 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovraygrid::getProperty, plane=plane, bottom=bottom, $
+pro mggrpovraygrid::getProperty, plane=plane, bottom=bottom, $
                                   gridline_color=gridLineColor, $
                                   gridline_thick=gridLineThick, $
                                   gridline_shift=gridLineShift, $                                
@@ -147,7 +147,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovraygrid::setProperty, plane=plane, bottom=bottom, $
+pro mggrpovraygrid::setProperty, plane=plane, bottom=bottom, $
                                   gridline_color=gridLineColor, $
                                   gridline_thick=gridLineThick, $
                                   gridline_shift=gridLineShift, $                                
@@ -171,7 +171,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrpovraygrid::cleanup
+pro mggrpovraygrid::cleanup
   compile_opt strictarr
   
   self->idlgrpolygon::cleanup
@@ -184,15 +184,15 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovraygrid::init, plane=plane, bottom=bottom, $
-                                gridline_color=gridLineColor, $
-                                gridline_thick=gridLineThick, $
-                                gridline_shift=gridLineShift, $                                
-                                grid_size=gridSize, $
-                                _extra=e 
+function mggrpovraygrid::init, plane=plane, bottom=bottom, $
+                               gridline_color=gridLineColor, $
+                               gridline_thick=gridLineThick, $
+                               gridline_shift=gridLineShift, $                                
+                               grid_size=gridSize, $
+                               _extra=e 
                                   
   if (~self->idlgrpolygon::init(_extra=e)) then return, 0
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
   
   self.gridLineColor = n_elements(gridLineColor) eq 0L ? bytarr(3) + 255B : gridLineColor
   self.gridLineShift = n_elements(gridLineShift) eq 0L ? fltarr(3) : gridLineShift  
@@ -222,11 +222,11 @@ end
 ;    gridSize
 ;       size of grid spacing
 ;-
-pro visgrpovraygrid__define
+pro mggrpovraygrid__define
   compile_opt strictarr
 
-  define = { VISgrPOVRayGrid, $
-             inherits IDLgrPolygon, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRayGrid, $
+             inherits IDLgrPolygon, inherits MGgrPOVRayObject, $
              plane: fltarr(4), $
              bottom: 0B, $
              gridLineShift: fltarr(3), $             
@@ -238,7 +238,7 @@ end
 
 
 
-; main-level example program of using the VISgrPOVRay class
+; main-level example program of using the `MGgrPOVRay` class
 
 view = obj_new('IDLgrView', name='view', color=[200, 200, 255])
 
@@ -262,7 +262,7 @@ yrange = ymax - ymin
 zmin = min(z, max=zmax)
 zrange = zmax - zmin
 
-plane = obj_new('VISgrPOVRayGrid', $
+plane = obj_new('MGgrPOVRayGrid', $
                 gridline_thick=0.05, $
                 color=[200, 200, 255], $
                 gridline_color=[255, 255, 255], $
@@ -270,7 +270,7 @@ plane = obj_new('VISgrPOVRayGrid', $
                 plane=[0, 1, 0, -ymin])
 model->add, plane
 
-plane = obj_new('VISgrPOVRayGrid', $
+plane = obj_new('MGgrPOVRayGrid', $
                 gridline_thick=0.05, $
                 gridline_shift=[0, ymin, 0], $
                 color=[255, 200, 200], $
@@ -279,7 +279,7 @@ plane = obj_new('VISgrPOVRayGrid', $
                 plane=[0, 0, 1, 1], /bottom)
 model->add, plane
 
-plane = obj_new('VISgrPOVRayGrid', $
+plane = obj_new('MGgrPOVRayGrid', $
                 gridline_thick=0.05, $
                 gridline_shift=[0, ymin, 0], $
                 color=[200, 255, 200], $
@@ -307,7 +307,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Grid')
 win->setProperty, graphics_tree=view
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='grid-output/grid', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='grid-output/grid', dimensions=dims)
 file_mkdir, 'grid-output'
 pov->draw, view
 
@@ -318,7 +318,7 @@ obj_destroy, pov
 ;    $ povray +P +A grid.ini
 
 window, xsize=dims[0], ysize=dims[1], title='POV-Ray Grid', /free
-cowImage = vis_povray('grid-output/grid')
+cowImage = mg_povray('grid-output/grid')
 tv, cowImage, true=1
 
 end

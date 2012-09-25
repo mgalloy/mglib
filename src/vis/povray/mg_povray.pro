@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Run POV-Ray on an .ini file and return an image of the result.
+; Run POV-Ray on an `.ini` file and return an image of the result.
 ;
 ; :Categories:
 ;    system utility
@@ -9,7 +9,7 @@
 
 
 ;+
-; Run POV-Ray on an .ini file and return an image of the result.
+; Run POV-Ray on an `.ini` file and return an image of the result.
 ;
 ; :Returns:
 ;    bytarr(3, m, n)
@@ -50,12 +50,12 @@
 ;    n_procs : in, optional, type=long, default=1L
 ;       number of processors to use when DISTRIBUTED is set
 ;-
-function vis_povray, basename, output, subset=subset, format=format, $
-                     cmd=cmd, output=povrayErrors, $
-                     convert_location=convertLocation, $
-                     povray_location=povrayLocation, $
-                     distributed=distributed, $
-                     tile_size=tileSize, full_size=fullSize, n_procs=nprocs
+function mg_povray, basename, output, subset=subset, format=format, $
+                    cmd=cmd, output=povrayErrors, $
+                    convert_location=convertLocation, $
+                    povray_location=povrayLocation, $
+                    distributed=distributed, $
+                    tile_size=tileSize, full_size=fullSize, n_procs=nprocs
   compile_opt strictarr
   on_error, 2
   
@@ -76,28 +76,28 @@ function vis_povray, basename, output, subset=subset, format=format, $
       _fullSize = fullSize
     endelse
     
-    templateFilename = filepath('vis_povray_mpidl.tt', root=vis_src_root())
+    templateFilename = filepath('mg_povray_mpidl.tt', root=mg_src_root())
     template = obj_new('MGffTemplate', templateFilename)
     vars = { basename:basename, tile_size:_tileSize, full_size:_fullSize }
     templateOutput = string(file_dirname(basename), $
                             path_sep(), $
-                            format='(%"%s%svis_povray_mpidl.pro")')
+                            format='(%"%s%smg_povray_mpidl.pro")')
     template->process, vars, templateOutput
     obj_destroy, template
     
     cd, current=origDir
     cd, file_dirname(basename)
     
-    resolve_routine, 'vis_povray_mpidl'
+    resolve_routine, 'mg_povray_mpidl'
     
     cd, origDir
     
-    save, /routines, filename='vis_povray_mpidl.sav'
+    save, /routines, filename='mg_povray_mpidl.sav'
     
     runmpidlCmd = string(_nprocs, $
                          file_expand_path(file_dirname(basename)), $
                          path_sep(), $
-                         'vis_povray_mpidl.sav', $
+                         'mg_povray_mpidl.sav', $
                          format='(%"runmpidl -n %d %s%s%")')
     spawn, runmpidlCmd, runmpidlOutput, runmpidlErrors
   endif

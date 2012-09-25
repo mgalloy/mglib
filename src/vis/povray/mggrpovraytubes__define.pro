@@ -9,14 +9,14 @@
 ; :Examples:
 ;    To create some tubes to visualize streamlines of a vector field::
 ;    
-;       streamlines = obj_new('VISgrPOVRayTubes', data=verts, polylines=conn, $
+;       streamlines = obj_new('MGgrPOVRayTubes', data=verts, polylines=conn, $
 ;                             /open, radius=0.5 - 0.5 / (findgen(nverts) + 1.1), $
 ;                             color=[r[mag], g[mag], b[mag]])
 ;                          
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ;
-;       IDL> .run visgrpovraytubes__define
+;       IDL> .run mggrpovraytubes__define
 ;
 ;    This should produce:
 ;
@@ -40,7 +40,7 @@
 ;    lun : in, required, type=long
 ;       logical unit number of file to write to
 ;-
-pro visgrpovraytubes::write, lun
+pro mggrpovraytubes::write, lun
   compile_opt strictarr
 
   self->getProperty, data=verts, polylines=polylines, color=color, $
@@ -100,9 +100,9 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovraytubes::getProperty, open=open, radius=radius, finish=finish, $
-                                   no_shadow=noShadow, $
-                                   _ref_extra=e
+pro mggrpovraytubes::getProperty, open=open, radius=radius, finish=finish, $
+                                  no_shadow=noShadow, $
+                                  _ref_extra=e
   compile_opt strictarr
   
   if (arg_present(open)) then open = self.open
@@ -119,9 +119,9 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovraytubes::setProperty, open=open, radius=radius, finish=finish, $
-                                   no_shadow=noShadow, $
-                                   _extra=e
+pro mggrpovraytubes::setProperty, open=open, radius=radius, finish=finish, $
+                                  no_shadow=noShadow, $
+                                  _extra=e
   compile_opt strictarr
   
   if (n_elements(open) gt 0L) then self.open = open
@@ -138,7 +138,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrpovraytubes::cleanup
+pro mggrpovraytubes::cleanup
   compile_opt strictarr
   
   self->idlgrpolyline::cleanup
@@ -152,12 +152,12 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovraytubes::init, open=open, radius=radius, finish=finish, $
-                                 no_shadow=noShadow, $
-                                 _extra=e 
+function mggrpovraytubes::init, open=open, radius=radius, finish=finish, $
+                                no_shadow=noShadow, $
+                                _extra=e 
                                   
   if (~self->idlgrpolyline::init(_extra=e)) then return, 0
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
                                   
   if (n_elements(open) gt 0L) then self.open = open
   if (n_elements(finish) gt 0L) then self.finish = finish
@@ -177,11 +177,11 @@ end
 ;    radius
 ;       radius of the cylinders
 ;-
-pro visgrpovraytubes__define
+pro mggrpovraytubes__define
   compile_opt strictarr
 
-  define = { VISgrPOVRayTubes, $
-             inherits IDLgrPolyline, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRayTubes, $
+             inherits IDLgrPolyline, inherits MGgrPOVRayObject, $
              open: 0B, $
              radius: ptr_new(), $ 
              finish: obj_new(), $
@@ -212,16 +212,16 @@ lightmodel->add, light
 model = obj_new('IDLgrModel')
 view->add, model
 
-xc = vis_linear_function([0, 127], [-0.8, 0.8])
-yc = vis_linear_function([0, 63], [-0.4, 0.4])
-zc = vis_linear_function([0, 9], [-0.05, 0.05])
+xc = mg_linear_function([0, 127], [-0.8, 0.8])
+yc = mg_linear_function([0, 63], [-0.4, 0.4])
+zc = mg_linear_function([0, 9], [-0.05, 0.05])
 
 m = sqrt(f[0, *, *, *] ^ 2 + f[1, *, *, *] ^ 2 + f[2, *, *, *] ^ 2)
 m = bytscl(reform(m))
-vis_loadct, /brewer, 16
+mg_loadct, /brewer, 16
 tvlct, r, g, b, /get
 
-finish = obj_new('VISgrPOVRayFinish', finish_name='F_MetalB')
+finish = obj_new('MGgrPOVRayFinish', finish_name='F_MetalB')
 
 for x = 0, 127, 4 do begin
   for y = 0, 63, 4 do begin
@@ -232,7 +232,7 @@ for x = 0, 127, 4 do begin
     
     mag = m[x, y, 5]
     
-    streamlines = obj_new('VISgrPOVRayTubes', data=verts, polylines=conn, $
+    streamlines = obj_new('MGgrPOVRayTubes', data=verts, polylines=conn, $
                           /open, radius=0.5 - 0.5 / (findgen(nverts) + 1.1), $
                           color=[r[mag], g[mag], b[mag]], finish=finish)
     model->add, streamlines
@@ -250,7 +250,7 @@ dims = [800, 800]
 win = obj_new('IDLgrWindow', dimensions=dims, graphics_tree=view)
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='tubes-output/tubes', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='tubes-output/tubes', dimensions=dims)
 file_mkdir, 'tubes-output'
 pov->draw, view
 
@@ -261,7 +261,7 @@ obj_destroy, pov
 ;    $ povray +P +A tubes.ini
 
 window, xsize=dims[0], ysize=dims[1], title='POV-Ray tubes'
-tubesImage = vis_povray('tubes-output/tubes')
+tubesImage = mg_povray('tubes-output/tubes')
 tv, tubesImage, true=1
 
 end

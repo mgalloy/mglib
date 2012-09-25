@@ -12,7 +12,7 @@
 
 ;+
 ; Convert an RGB 3-element byte array to a POV-Ray string specifying the 
-; color, like [255, 0, 0] to '<1.0, 0.0, 0.0>'.
+; color, like `[255, 0, 0]` to `<1.0, 0.0, 0.0>`.
 ; 
 ; :Private:
 ; 
@@ -30,8 +30,8 @@
 ;        set to use filter transparency instead of transmittance or 
 ;        non-filtering transparency
 ;-
-function visgrpovrayobject::_getRgb, color, alpha_channel=alphaChannel, $
-                                     filter=filter
+function mggrpovrayobject::_getRgb, color, alpha_channel=alphaChannel, $
+                                    filter=filter
   compile_opt strictarr
 
   if (n_elements(alphaChannel) gt 0L) then begin
@@ -59,7 +59,7 @@ end
 ;    transform : in, required, type="fltarr(4, 4)"
 ;       object graphics transformation matrix
 ;-
-pro visgrpovrayobject::_writeTransform, lun, transform
+pro mggrpovrayobject::_writeTransform, lun, transform
   compile_opt strictarr
 
   ; transformation in POV-Ray eliminates the bottom row since it doesn't give
@@ -89,7 +89,7 @@ end
 ;    name : in, required, type=string
 ;       name of section
 ;-
-pro visgrpovrayobject::_writeVertices, lun, vertices, name=name
+pro mggrpovrayobject::_writeVertices, lun, vertices, name=name
   compile_opt strictarr
 
   nVertices = (size(vertices, /dimensions))[1]
@@ -108,9 +108,9 @@ end
 
 
 ;+
-; Initialize VISgrPOVRayObject.
+; Initialize `MGgrPOVRayObject`.
 ;-
-function visgrpovrayobject::init
+function mggrpovrayobject::init
   compile_opt strictarr
 
   self.lightIntensityMultiplier = 1.75
@@ -127,10 +127,10 @@ end
 ;       conversion factor to convert IDL light intensity to a POV-Ray light
 ;       intensity
 ;-
-pro visgrpovrayobject__define
+pro mggrpovrayobject__define
   compile_opt strictarr
   
-  define = { VISgrPOVRayObject, $
+  define = { MGgrPOVRayObject, $
              lightIntensityMultiplier: 0.0 $
            }
 end

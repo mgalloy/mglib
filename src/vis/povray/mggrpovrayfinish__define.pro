@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Attribute class for VISgrPOVRayPolygons representing the surface properties
+; Attribute class for `MGgrPOVRayPolygons` representing the surface properties
 ; of objects.
 ; 
 ; :Categories:
@@ -11,11 +11,11 @@
 ;    To create a finish object using one of the finishes named in finish.inc,
 ;    use::
 ;    
-;       finish = obj_new('VISgrPOVRayFinish', finish_name='F_MetalB')
+;       finish = obj_new('MGgrPOVRayFinish', finish_name='F_MetalB')
 ;
-;    This can then be used in one of the VISgrPOVRay classes like::
+;    This can then be used in one of the `MGgrPOVRay` classes like::
 ;
-;       cow = obj_new('VISgrPOVRayPolygon', x, y, z, polygons=polylist, $
+;       cow = obj_new('MGgrPOVRayPolygon', x, y, z, polygons=polylist, $
 ;                      color=[150, 100, 20], shading=1, $
 ;                      shininess=25.0, ambient=[150, 100, 20], diffuse=[150, 100, 20], $
 ;                      finish=finish)
@@ -23,7 +23,7 @@
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ;
-;       IDL> .run visgrpovraygrid__define
+;       IDL> .run mggrpovraygrid__define
 ;
 ;    This should produce:
 ;
@@ -81,7 +81,7 @@
 ; :Returns:
 ;    1 if finish_name is used, 0 if not
 ;-
-function visgrpovrayfinish::hasName
+function mggrpovrayfinish::hasName
   compile_opt strictarr
 
   return, self.finishName ne ''
@@ -97,7 +97,7 @@ end
 ;    lun : in, required, type=long
 ;       logical unit number to write to
 ;-
-pro visgrpovrayfinish::write, lun
+pro mggrpovrayfinish::write, lun
   compile_opt strictarr
   
   if (self.finishName ne '') then begin
@@ -128,14 +128,14 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovrayfinish::getProperty, finish_name=finishName, $
-                                    ambient=ambient, brilliance=brilliance, $
-                                    diffuse=diffuse, metallic=metallic, $
-                                    specular=specular, roughness=roughness, $
-                                    reflection=reflection, $
-                                    irid_amount=iridAmount, $
-                                    irid_thickness=iridThickness, $
-                                    irid_turbulence=iridTurbulence                                    
+pro mggrpovrayfinish::getProperty, finish_name=finishName, $
+                                   ambient=ambient, brilliance=brilliance, $
+                                   diffuse=diffuse, metallic=metallic, $
+                                   specular=specular, roughness=roughness, $
+                                   reflection=reflection, $
+                                   irid_amount=iridAmount, $
+                                   irid_thickness=iridThickness, $
+                                   irid_turbulence=iridTurbulence                                    
   compile_opt strictarr
   
   if (arg_present(finishName)) then finishName = self.finishName
@@ -156,14 +156,14 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovrayfinish::setProperty, finish_name=finishName, $
-                                    ambient=ambient, brilliance=brilliance, $
-                                    diffuse=diffuse, metallic=metallic, $
-                                    specular=specular, roughness=roughness, $
-                                    reflection=reflection, $
-                                    irid_amount=iridAmount, $
-                                    irid_thickness=iridThickness, $
-                                    irid_turbulence=iridTurbulence
+pro mggrpovrayfinish::setProperty, finish_name=finishName, $
+                                   ambient=ambient, brilliance=brilliance, $
+                                   diffuse=diffuse, metallic=metallic, $
+                                   specular=specular, roughness=roughness, $
+                                   reflection=reflection, $
+                                   irid_amount=iridAmount, $
+                                   irid_thickness=iridThickness, $
+                                   irid_turbulence=iridTurbulence
   compile_opt strictarr
   
   if (n_elements(finishName) gt 0L) then self.finishName = finishName
@@ -191,17 +191,17 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function visgrpovrayfinish::init, finish_name=finishName, $
-                                  ambient=ambient, brilliance=brilliance, $
-                                  diffuse=diffuse, metallic=metallic, $
-                                  specular=specular, roughness=roughness, $
-                                  reflection=reflection, $
-                                  irid_amount=iridAmount, $
-                                  irid_thickness=iridThickness, $
-                                  irid_turbulence=iridTurbulence
+function mggrpovrayfinish::init, finish_name=finishName, $
+                                 ambient=ambient, brilliance=brilliance, $
+                                 diffuse=diffuse, metallic=metallic, $
+                                 specular=specular, roughness=roughness, $
+                                 reflection=reflection, $
+                                 irid_amount=iridAmount, $
+                                 irid_thickness=iridThickness, $
+                                 irid_turbulence=iridTurbulence
   compile_opt strictarr
   
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
   
   self.finishName = n_elements(finishName) eq 0L ? '' : finishName
 
@@ -253,10 +253,10 @@ end
 ;    iridTurbulence
 ;       another way to affect thicness of iridescense
 ;-
-pro visgrpovrayfinish__define
+pro mggrpovrayfinish__define
   compile_opt strictarr
   
-  define = { VISgrPOVRayFinish, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRayFinish, inherits MGgrPOVRayObject, $
              finishName: '', $
              ambient: 0.0, $
              brilliance: 0.0, $
@@ -273,7 +273,7 @@ pro visgrpovrayfinish__define
 end
 
 
-; main-level example program of using the VISgrPOVRay class
+; main-level example program of using the `MGgrPOVRay` class
 
 view = obj_new('IDLgrView', name='view', color=[200, 200, 255])
 
@@ -285,9 +285,9 @@ restore, cowFilename
 colors = randomu(seed, n_elements(x))
 vertcolors = rebin(reform(255 * round(colors), 1, n_elements(x)), 3, n_elements(x))
 
-finish = obj_new('VISgrPOVRayFinish', finish_name='F_MetalB')
+finish = obj_new('MGgrPOVRayFinish', finish_name='F_MetalB')
 
-cow = obj_new('VISgrPOVRayPolygon', x, y, z, polygons=polylist, $
+cow = obj_new('MGgrPOVRayPolygon', x, y, z, polygons=polylist, $
               color=[150, 100, 20], shading=1, $
               ;vert_colors=vertcolors, clip_planes=[0, 0, 1, 0], $
               shininess=25.0, ambient=[150, 100, 20], diffuse=[150, 100, 20], $
@@ -301,7 +301,7 @@ yrange = ymax - ymin
 zmin = min(z, max=zmax)
 zrange = zmax - zmin
 
-plane = obj_new('VISgrPOVRayGrid', $
+plane = obj_new('MGgrPOVRayGrid', $
                 gridline_thick=0.05, $
                 color=[200, 200, 255], $
                 gridline_color=[255, 255, 255], $
@@ -323,7 +323,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Metal Cow')
 win->setProperty, graphics_tree=view
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='metal-output/metal', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='metal-output/metal', dimensions=dims)
 file_mkdir, 'metal-output'
 pov->draw, view
 
@@ -334,7 +334,7 @@ obj_destroy, pov
 ;    $ povray +P +A metal.ini
 
 window, xsize=dims[0], ysize=dims[1], title='POV-Ray Metal Cow', /free
-cowImage = vis_povray('metal-output/metal')
+cowImage = mg_povray('metal-output/metal')
 tv, cowImage, true=1
 
 end

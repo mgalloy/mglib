@@ -3,7 +3,7 @@
 ;+
 ; This class is a POV-Ray object graphics destination. Drawing to this 
 ; destination will create one .inc file for every atom in the object graphics 
-; hierarchy, a .pov file with the scene setup, and a .ini file with some 
+; hierarchy, a `.pov` file with the scene setup, and a `.ini` file with some 
 ; parameters like output dimensions.
 ;
 ; :Categories:
@@ -13,13 +13,13 @@
 ;    To create a POV-Ray destination and drawing to it after creating an object
 ;    graphics hierarchy, view, just do the following::
 ;    
-;       pov = obj_new('VISgrPOVRay', file_prefix='cow-output/cow', dimensions=dims)
+;       pov = obj_new('MGgrPOVRay', file_prefix='cow-output/cow', dimensions=dims)
 ;       pov->draw, view
 ;       
 ;    See the example attached to the end of this file as a main-level program 
 ;    (only available if you have the source code version of this routine)::
 ; 
-;       IDL> .run visgrpovray__define
+;       IDL> .run mggrpovray__define
 ;
 ;    The example should produce a png file, cow.png::
 ;
@@ -53,7 +53,7 @@
 ;    prefix : in, required, type=string
 ;       string prefix for the name
 ;-
-function visgrpovray::_getFilename, object, prefix
+function mggrpovray::_getFilename, object, prefix
   compile_opt strictarr
 
   object->getProperty, name=name
@@ -73,13 +73,13 @@ end
 
 
 ;+
-; Helper method to write the output for any of the VISgrPOVRayXXXX classes.
+; Helper method to write the output for any of the `MGgrPOVRayXXXX` classes.
 ; 
 ; :Private:
 ; 
 ; :Params:
 ;    povObject : in, required, type=object
-;       VISgrPOVRayXXXX object with a write method
+;       `MGgrPOVRayXXXX` object with a write method
 ;    prefix : in, required, type=string
 ;       prefix (i.e. filename without the .inc extension) to write to
 ;       
@@ -88,7 +88,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writePOVObject, povObject, prefix, includes=includes
+pro mggrpovray::_writePOVObject, povObject, prefix, includes=includes
   compile_opt strictarr
   
   ; get a filename and add it to the includes list for the .pov file
@@ -118,7 +118,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writeSurface, surface, prefix, includes=includes
+pro mggrpovray::_writeSurface, surface, prefix, includes=includes
   compile_opt strictarr
   
   surface->getProperty, data=data, color=color, style=style, $
@@ -164,7 +164,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writePolygon, polygon, prefix, includes=includes
+pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
   
@@ -263,7 +263,7 @@ pro visgrpovray::_writePolygon, polygon, prefix, includes=includes
                              greyscale=greyscale
     if (obj_valid(palette) && size(im, /n_dimensions) eq 2L && ~greyscale) then begin
       palette->getProperty, red_values=r, green_values=g, blue_values=b
-      _im = vis_maketrue(im, red=r, green=g, blue=b, true=interleave + 1L)
+      _im = mg_maketrue(im, red=r, green=g, blue=b, true=interleave + 1L)
     endif else begin
       _im = im
     endelse
@@ -305,7 +305,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writePolyline, polyline, prefix, includes=includes
+pro mggrpovray::_writePolyline, polyline, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
   
@@ -323,7 +323,7 @@ pro visgrpovray::_writePolyline, polyline, prefix, includes=includes
   
   ; produce a warning if LINESTYLE not "no line"
   if (linestyle ne 6L) then begin
-    message, 'ignoring IDLgrPolyline LINESTYLE, use VISgrPOVRayTubes instead', $
+    message, 'ignoring IDLgrPolyline LINESTYLE, use MGgrPOVRayTubes instead', $
              /informational
   endif
   
@@ -378,7 +378,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writeLight, light, prefix, includes=includes
+pro mggrpovray::_writeLight, light, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
   
@@ -435,7 +435,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writeText, text, prefix, includes=includes
+pro mggrpovray::_writeText, text, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
 
@@ -488,7 +488,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_writePov, tree, includes=includes
+pro mggrpovray::_writePov, tree, includes=includes
   compile_opt strictarr
 
   filename = self.filePrefix + '.pov'
@@ -531,7 +531,7 @@ end
 ; 
 ; :Private:
 ;-
-pro visgrpovray::_writeIni
+pro mggrpovray::_writeIni
   compile_opt strictarr
   
   filename = self.filePrefix + '.ini'
@@ -561,7 +561,7 @@ end
 ;       list of files to include in the .pov file; undefined to represent the
 ;       empty list
 ;-
-pro visgrpovray::_traverse, tree, prefix, includes=includes
+pro mggrpovray::_traverse, tree, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
   
@@ -570,10 +570,10 @@ pro visgrpovray::_traverse, tree, prefix, includes=includes
   
   switch 1 of 
     ;obj_isa(tree, 'Orb'):
-    obj_isa(tree, 'VISgrPOVRayGrid'):    
-    obj_isa(tree, 'VISgrPOVRayLight'):
-    obj_isa(tree, 'VISgrPOVRayPolygon'): 
-    obj_isa(tree, 'VISgrPOVRayTubes'): begin
+    obj_isa(tree, 'MGgrPOVRayGrid'):    
+    obj_isa(tree, 'MGgrPOVRayLight'):
+    obj_isa(tree, 'MGgrPOVRayPolygon'): 
+    obj_isa(tree, 'MGgrPOVRayTubes'): begin
         self->_writePOVObject, tree, prefix, includes=includes
         break
       end
@@ -603,7 +603,7 @@ pro visgrpovray::_traverse, tree, prefix, includes=includes
           self.angle = 2.0 * atan(vpr[2] / 2.0 / eye) * !radeg
         endif
         
-        if (obj_isa(tree, 'VISgrPOVRayView')) then begin
+        if (obj_isa(tree, 'MGgrPOVRayView')) then begin
           tree->getProperty, focal_point=focalPoint, aperture=aperture, $
                              blur_sample=blurSamples
           self.focalPoint = focalPoint
@@ -657,7 +657,7 @@ end
 ;    tree : in, optional, type=object
 ;       scene or view object
 ;-
-pro visgrpovray::draw, tree
+pro mggrpovray::draw, tree
   compile_opt strictarr
   on_error, 2
   
@@ -687,7 +687,7 @@ end
 ;+
 ; Set properties.
 ;-
-pro visgrpovray::setProperty, file_prefix=filePrefix, dimensions=dimensions
+pro mggrpovray::setProperty, file_prefix=filePrefix, dimensions=dimensions
   compile_opt strictarr
   
   if (n_elements(filePrefix) gt 0) then self.filePrefix = filePrefix
@@ -698,7 +698,7 @@ end
 ;+
 ; Get properties.
 ;-
-pro visgrpovray::getProperty, file_prefix=filePrefix, dimensions=dimensions
+pro mggrpovray::getProperty, file_prefix=filePrefix, dimensions=dimensions
   compile_opt strictarr
 
   if (arg_present(filePrefix)) then filePrefix = self.filePrefix
@@ -709,7 +709,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro visgrpovray::cleanup
+pro mggrpovray::cleanup
   compile_opt strictarr
 
   obj_destroy, self.graphicsTree
@@ -733,16 +733,16 @@ end
 ;    graphics_tree : in, optional, type=object
 ;       graphics tree to tree if none is provided to draw method
 ;-
-function visgrpovray::init, file_prefix=filePrefix, dimensions=dimensions, $
+function mggrpovray::init, file_prefix=filePrefix, dimensions=dimensions, $
                             graphics_tree=graphicsTree
   compile_opt strictarr
   
-  if (~self->VISgrPOVRayObject::init()) then return, 0
+  if (~self->MGgrPOVRayObject::init()) then return, 0
   
   self.hasLight = 0B
   self.ambientIntensity = 0.0
   
-  self.filePrefix = n_elements(filePrefix) eq 0 ? 'visgrpovray' : filePrefix
+  self.filePrefix = n_elements(filePrefix) eq 0 ? 'mggrpovray' : filePrefix
   self.dimensions = n_elements(dimensions) eq 0 ? [400, 400] : dimensions 
   self.graphicsTree = n_elements(graphicsTree) eq 0 ? obj_new() : graphicsTree
   
@@ -786,10 +786,10 @@ end
 ;    blurSamples
 ;       the number of rays to use to render a scene using focal blur
 ;-
-pro visgrpovray__define
+pro mggrpovray__define
   compile_opt strictarr
 
-  define = { VISgrPOVRay, inherits VISgrPOVRayObject, $
+  define = { MGgrPOVRay, inherits MGgrPOVRayObject, $
   
              ; properties of the destination
              filePrefix: '', $
@@ -813,7 +813,7 @@ pro visgrpovray__define
 end
 
 
-; main-level example program of using the VISgrPOVRay class
+; main-level example program of using the `MGgrPOVRay` class
 
 view = obj_new('IDLgrView', name='view', color=[200, 200, 255])
 
@@ -868,7 +868,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Cow')
 win->setProperty, graphics_tree=view
 win->draw
 
-pov = obj_new('VISgrPOVRay', file_prefix='cow-output/cow', dimensions=dims)
+pov = obj_new('MGgrPOVRay', file_prefix='cow-output/cow', dimensions=dims)
 pov->draw, view
 
 obj_destroy, [pov, font]
@@ -877,7 +877,7 @@ obj_destroy, [pov, font]
 ;
 ;    $ povray +P +A cow.ini
 
-cowImage = vis_povray('cow-output/cow')
-vis_image, cowImage, /new_window, title='POV-Ray cow image'
+cowImage = mg_povray('cow-output/cow')
+mg_image, cowImage, /new_window, title='POV-Ray cow image'
 
 end
