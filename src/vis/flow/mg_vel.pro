@@ -12,18 +12,18 @@
 ;   something like::
 ;
 ;      IDL> restore, filepath('globalwinds.dat', subdir=['examples','data'])
-;      IDL> vis_vel, u, v, nvecs=800
+;      IDL> mg_vel, u, v, nvecs=800
 ;
 ;   This produces the following (although the following has been enhanced by
-;   creating PostScript output and converted to an image with VIS_CONVERT):
+;   creating PostScript output and converted to an image with `MG_CONVERT`):
 ; 
 ;   .. image:: vel-random.png
 ;
 ;   To use a grid of slightly jittered starting points use something like::
 ;
-;      IDL> vis_vel, u, v, /grid, stride=3, jitter=0.5
+;      IDL> mg_vel, u, v, /grid, stride=3, jitter=0.5
 ;
-;   This produces the following (again enhanced with VIS_CONVERT):
+;   This produces the following (again enhanced with `MG_CONVERT`):
 ;
 ;   .. image:: vel-jittergrid.png
 ;-
@@ -42,7 +42,7 @@
 ;    y : in, required, type=fltarr(m * n)
 ;       y coords
 ;-
-function vis_vel_interpolate, a, x, y
+function mg_vel_interpolate, a, x, y
   compile_opt idl2, hidden
   on_error, 2   
 
@@ -73,7 +73,7 @@ end
 ;    s : in, out, required, type=fltarr
 ;       array of streamlines
 ;-
-pro vis_vel_arrowhead, s
+pro mg_vel_arrowhead, s
   compile_opt idl2, hidden
   on_error, 2
 
@@ -156,9 +156,9 @@ end
 ;       amount to jitter elements in the grid; as a fraction of the distance
 ;       between grid elements
 ;-
-function vis_vel_streamlines, u, v, $
-                              nvecs=nvecs, length=length, nsteps=nsteps, $
-                              grid=grid, stride=stride, jitter=jitter
+function mg_vel_streamlines, u, v, $
+                             nvecs=nvecs, length=length, nsteps=nsteps, $
+                             grid=grid, stride=stride, jitter=jitter
   compile_opt idl2, hidden
   on_error, 2
 
@@ -203,8 +203,8 @@ function vis_vel_streamlines, u, v, $
     xt[0] = (nx - 1L) * s[*, i - 1L, 0L]
     yt[0] = (ny - 1L) * s[*, i - 1L, 1L]
     
-    ut = vis_vel_interpolate(u, xt, yt)
-    vt = vis_vel_interpolate(v, xt, yt)
+    ut = mg_vel_interpolate(u, xt, yt)
+    vt = mg_vel_interpolate(v, xt, yt)
     
     ; go from last step
     s[0L, i, 0L] = s[*, i - 1L, 0L] + ut * dt
@@ -212,7 +212,7 @@ function vis_vel_streamlines, u, v, $
   end
   
   ; add the arrowheads
-  vis_vel_arrowhead, s
+  mg_vel_arrowhead, s
   
   return, s < 1.0 > 0.0   ; must between 0.0 and 1.0
 end
@@ -278,13 +278,13 @@ end
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT and PLOTS routines that plot the streamlines
 ;-
-pro vis_vel, u, v, x, y, $
-             overplot=overplot, $
-             nvecs=nvecs, length=length, nsteps=nsteps, xmax=xmax, $
-             grid=grid, stride=stride, jitter=jitter, thick=thick, $
-             max_thick=maxThick, color=color, axes_color=axesColor, $
-             streamlines=s, $
-             _extra=e
+pro mg_vel, u, v, x, y, $
+            overplot=overplot, $
+            nvecs=nvecs, length=length, nsteps=nsteps, xmax=xmax, $
+            grid=grid, stride=stride, jitter=jitter, thick=thick, $
+            max_thick=maxThick, color=color, axes_color=axesColor, $
+            streamlines=s, $
+            _extra=e
   compile_opt idl2
   on_error, 2
 
@@ -312,9 +312,9 @@ pro vis_vel, u, v, x, y, $
 
   ; compute streamlines
   if (_nvecs gt 0) then begin
-    s = vis_vel_streamlines(_u, _v, $
-                            nvecs=_nvecs, length=_length, nsteps=_nsteps, $
-                            grid=grid, stride=_stride, jitter=_jitter)
+    s = mg_vel_streamlines(_u, _v, $
+                           nvecs=_nvecs, length=_length, nsteps=_nsteps, $
+                           grid=grid, stride=_stride, jitter=_jitter)
   endif
   
   if (arg_present(s)) then return
@@ -348,7 +348,7 @@ pro vis_vel, u, v, x, y, $
     _color = n_elements(color) eq 0L $
                ? (!d.name eq 'PS' $
                     ? byte(255 * smag) $
-                    : vis_rgb2index(bytarr(3) + byte(255 * smag))) $
+                    : mg_rgb2index(bytarr(3) + byte(255 * smag))) $
                : color
     plots, (xmax - xmin) * s[i, *, 0] + xmin, $
            (ymax - ymin) * s[i, *, 1] + ymin, $
@@ -368,7 +368,7 @@ restore, filepath('globalwinds.dat', subdir=['examples','data'])
 device, get_decomposed=odec
 device, decomposed=0
 
-vis_loadct, 11, /brewer
+mg_loadct, 11, /brewer
 tvlct, r, g, b, /get
 r[0] = 255
 g[0] = 255
@@ -379,13 +379,13 @@ b[255] = 0
 tvlct, r, g, b
 
 window, /free, title='Global winds - random vectors', xsize=500, ysize=300
-vis_vel, u, v, x, y, nvecs=800, $
-         max_thick=2.0, $
-         xstyle=1, ystyle=1, $
-         xticks=4, xtickv=[-180, -90, 0, 90, 180], $
-         yticks=4, ytickv=[-90, -45, 0, 45, 90]
+mg_vel, u, v, x, y, nvecs=800, $
+        max_thick=2.0, $
+        xstyle=1, ystyle=1, $
+        xticks=4, xtickv=[-180, -90, 0, 90, 180], $
+        yticks=4, ytickv=[-90, -45, 0, 45, 90]
 
-vis_loadct, 17, /brewer
+mg_loadct, 17, /brewer
 tvlct, r, g, b, /get
 r[0] = 255
 g[0] = 255
@@ -396,12 +396,12 @@ b[255] = 0
 tvlct, r, g, b
 
 window, /free, title='Global winds - jittered grid', xsize=500, ysize=300
-vis_vel, u, v, x, y, $
-         /grid, stride=3, jitter=0.75, $
-         max_thick=2.1, $         
-         xstyle=1, ystyle=1, $
-         xticks=4, xtickv=[-180, -90, 0, 90, 180], $
-         yticks=4, ytickv=[-90, -45, 0, 45, 90]
+mg_vel, u, v, x, y, $
+        /grid, stride=3, jitter=0.75, $
+        max_thick=2.1, $         
+        xstyle=1, ystyle=1, $
+        xticks=4, xtickv=[-180, -90, 0, 90, 180], $
+        yticks=4, ytickv=[-90, -45, 0, 45, 90]
 
 device, decomposed=odec
 

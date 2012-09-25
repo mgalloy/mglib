@@ -5,7 +5,7 @@
 ;    Run the main-level program at the end of this file for an example of the
 ;    usage::
 ;
-;       IDL> .run visgrflow__define
+;       IDL> .run mggrflow__define
 ;
 ;    This should display:
 ;
@@ -27,9 +27,9 @@
 ;
 ; :Keywords:
 ;    _extra : in, optional, type=keywords
-;       keywords to IDLgrPolyline::init or VIS_VEL
+;       keywords to `IDLgrPolyline::init` or `MG_VEL`
 ;-
-function visgrflow::init, u, v, x, y, _extra=e
+function mggrflow::init, u, v, x, y, _extra=e
   compile_opt strictarr
     
   if (~self->IDLgrPolyline::init(_extra=e)) then return, 0
@@ -41,7 +41,7 @@ function visgrflow::init, u, v, x, y, _extra=e
   xmin = min(_x, max=xmax)
   ymin = min(_y, max=ymax)
     
-  vis_vel, u, v, _x, _y, streamlines=s, _extra=e
+  mg_vel, u, v, _x, _y, streamlines=s, _extra=e
   
   dims = size(s, /dimensions)
   
@@ -61,10 +61,10 @@ end
 ;+
 ; Define inheritance and instance variables.
 ;-
-pro visgrflow__define
+pro mggrflow__define
   compile_opt strictarr
   
-  define = { VISgrFlow, inherits IDLgrPolyline }
+  define = { MGgrFlow, inherits IDLgrPolyline }
 end
 
 
@@ -77,12 +77,12 @@ view = obj_new('IDLgrView')
 model = obj_new('IDLgrModel')
 view->add, model
 
-flow = obj_new('VISgrFlow', u, v, x, y, /grid, stride=3, color=[50, 150, 50])
+flow = obj_new('MGgrFlow', u, v, x, y, /grid, stride=3, color=[50, 150, 50])
 model->add, flow
 
 flow->getProperty, xrange=xr, yrange=yr
-xc = vis_linear_function(xr, [-0.75, 0.75])
-yc = vis_linear_function(yr, [-0.75, 0.75])
+xc = mg_linear_function(xr, [-0.75, 0.75])
+yc = mg_linear_function(yr, [-0.75, 0.75])
 flow->setProperty, xcoord_conv=xc, ycoord_conv=yc
 
 xaxis = obj_new('IDLgrAxis', $

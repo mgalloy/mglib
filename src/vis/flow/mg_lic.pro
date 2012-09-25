@@ -1,22 +1,22 @@
 ; docformat = 'rst'
 
 ;+
-; Example program demonstrating the use of VIS_LIC. Run the main-level example 
+; Example program demonstrating the use of `MG_LIC`. Run the main-level example 
 ; program with::
 ;
-;    IDL> .run vis_lic
+;    IDL> .run mg_lic
 ;
-; The first image is the direct output of VIS_LIC:
+; The first image is the direct output of `MG_LIC`:
 ;
 ; .. image:: lic_example1.png
 ;
 ; The next image introduces color by using HSV color coordinates with
 ; hue equal to red, saturation equal to the vector field magnitude, and 
-; value equal to VIS_LIC output:
+; value equal to `MG_LIC` output:
 ;
 ; .. image:: lic_example3.png
 ;
-; The third image uses a color table to display the magnitude over the VIS_LIC
+; The third image uses a color table to display the magnitude over the `MG_LIC`
 ; output:
 ;
 ; .. image:: lic_example3.png
@@ -48,14 +48,14 @@
 ;       random texture map; it is useful to use the same texture map for 
 ;       generating frames of a movie
 ;-
-pro vis_lic, u, v, texture=texture
+pro mg_lic, u, v, texture=texture
   compile_opt strictarr
   on_error, 2
 
-  ; empty because VIS_LIC is implemented in vis_flow.c as a DLM; this header
+  ; empty because `MG_LIC` is implemented in `mg_flow.c` as a DLM; this header
   ; is for documenting the routine
     
-  message, 'VIS_FLOW DLM not found'
+  message, 'MG_FLOW DLM not found'
 end
 
 
@@ -71,15 +71,15 @@ x = rebin(x, 128L * scale)
 y = rebin(y, 64L * scale)
 
 startTime = systime(/seconds)
-im = vis_lic(u, v)
+im = mg_lic(u, v)
 endTime = systime(/seconds)
 
 im = bytscl(im)
 
 t = bytscl(smooth(randomu(seed, 128L * scale, 64L * scale), 3, /edge_truncate))
-smoothIm = vis_lic(u, v, texture=t)
+smoothIm = mg_lic(u, v, texture=t)
 smoothIm = bytscl(smoothIm)
-pinkIm = bytscl(vis_lic(u, v, texture=bytscl(vis_pinknoise(128L * scale, 64L * scale))))
+pinkIm = bytscl(mg_lic(u, v, texture=bytscl(mg_pinknoise(128L * scale, 64L * scale))))
 
 window, xsize=128L * scale * 3, ysize=64L * scale * 3, $
         /free, title='LIC for globalwinds.dat'
@@ -100,7 +100,7 @@ im2[2, *, *] = b
 
 tv, im2, 1, true=1
 
-vis_loadct, 9, /brewer
+mg_loadct, 9, /brewer
 
 tvlct, ctr, ctg, ctb, /get
 

@@ -1,4 +1,4 @@
-MODULE VIS_FLOW
+MODULE MG_FLOW
 DESCRIPTION Flow visualization
 VERSION 1.0
 SOURCE mgalloy
@@ -21,4 +21,4 @@ BUILD_DATE Apr 7 2008
 #       random texture map; it is useful to use the same texture map for 
 #       generating frames of a movie
 #-
-FUNCTION VIS_LIC 2 2 KEYWORDS
+FUNCTION MG_LIC 2 2 KEYWORDS

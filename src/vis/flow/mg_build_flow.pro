@@ -3,8 +3,8 @@
 ;+
 ; Build the flow DLM.
 ;-
-pro vis_build_flow
+pro mg_build_flow
   compile_opt strictarr
   
-  vis_make_dll, filepath('vis_flow.c', root=vis_src_root())
+  mg_make_dll, filepath('mg_flow.c', root=mg_src_root())
 end
