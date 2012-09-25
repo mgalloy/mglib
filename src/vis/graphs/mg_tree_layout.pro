@@ -3,7 +3,7 @@
 ;+
 ; Create a tree.
 ;-
-pro vis_tree_layout
+pro mg_tree_layout
   compile_opt strictarr
   
 end

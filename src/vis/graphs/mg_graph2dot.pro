@@ -15,7 +15,7 @@
 ;    attrname : in, required, type=string
 ;       name of attribute (property) to retrieve
 ;-
-function vis_graph2dot_getattr, node, attrname
+function mg_graph2dot_getattr, node, attrname
   compile_opt strictarr
   
   catch, error
@@ -48,7 +48,7 @@ end
 ;    graph : in, required, type=IDL_Container
 ;       `IDL_Container` of objects with `CHILDREN` and `NAME` properties
 ;-
-pro vis_graph2dot, filename, graph
+pro mg_graph2dot, filename, graph
   compile_opt strictarr
 
   catch, error
@@ -60,7 +60,7 @@ pro vis_graph2dot, filename, graph
   
   openw, lun, filename, /get_lun
   
-  graph_name = vis_graph2dot_getattr(graph, 'name')
+  graph_name = mg_graph2dot_getattr(graph, 'name')
   printf, lun, n_elements(graph_name) eq 0L ? '' : (graph_name + ' '), $
           format='(%"strict digraph %s{")'
 
@@ -72,7 +72,7 @@ pro vis_graph2dot, filename, graph
     
     ; we only check for COLOR, but there are actually a lot of possible 
     ; attributes: http://www.graphviz.org/doc/info/attrs.html
-    color = vis_graph2dot_getattr(node, 'color')
+    color = mg_graph2dot_getattr(node, 'color')
     if (n_elements(color) gt 0L) then begin
       if (size(color, /type) eq 7L) then begin
         if (color ne '') then begin
@@ -113,13 +113,13 @@ end
 ; }
 
 ; create nodes
-weightInPlanetNode = obj_new('VIS_Graph_Democlass', $
+weightInPlanetNode = obj_new('MG_Graph_Democlass', $
                              name='WeightInPlanet', color='red')
-planetpropNode = obj_new('VIS_Graph_Democlass', $
+planetpropNode = obj_new('MG_Graph_Democlass', $
                          name='planetprop', color='green')
-calculate_gNode = obj_new('VIS_Graph_Democlass', $
+calculate_gNode = obj_new('MG_Graph_Democlass', $
                           name='calculate_g', color='green')
-isstructNode = obj_new('VIS_Graph_Democlass', $
+isstructNode = obj_new('MG_Graph_Democlass', $
                        name='isstruct', color='green')
 
 ; create edges
@@ -134,7 +134,7 @@ graph->add, [weightInPlanetNode, planetpropNode, $
              calculate_gNode, isstructNode]
 
 
-vis_graph2dot, 'dependencies.dot', graph
+mg_graph2dot, 'dependencies.dot', graph
 
 end
 

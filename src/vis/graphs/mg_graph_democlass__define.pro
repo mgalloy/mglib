@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
-pro vis_graph_democlass::getProperty, name=name, $
-                                      children=children, $
-                                      color=color
+pro mg_graph_democlass::getProperty, name=name, $
+                                     children=children, $
+                                     color=color
   compile_opt strictarr
 
   if (arg_present(name)) then name = self.name
@@ -15,7 +15,7 @@ pro vis_graph_democlass::getProperty, name=name, $
 end
 
 
-pro vis_graph_democlass::setProperty, name=name, color=color
+pro mg_graph_democlass::setProperty, name=name, color=color
   compile_opt strictarr
   
   if (n_elements(name) gt 0L) then self.name = name
@@ -23,21 +23,21 @@ pro vis_graph_democlass::setProperty, name=name, color=color
 end
 
 
-pro vis_graph_democlass::addChild, node
+pro mg_graph_democlass::addChild, node
   compile_opt strictarr
   
   self.children->add, node
 end
 
 
-pro vis_graph_democlass::cleanup
+pro mg_graph_democlass::cleanup
   compile_opt strictarr
 
   obj_destroy, self.children
 end
 
 
-function vis_graph_democlass::init, _extra=e
+function mg_graph_democlass::init, _extra=e
   compile_opt strictarr
 
   self.children = obj_new('IDL_Container')
@@ -48,10 +48,10 @@ function vis_graph_democlass::init, _extra=e
 end
 
 
-pro vis_graph_democlass__define
+pro mg_graph_democlass__define
   compile_opt strictarr
 
-  define = { VIS_Graph_DemoClass, $
+  define = { MG_Graph_DemoClass, $
              inherits IDL_Object, $
              children: obj_new(), $
              name: '', $

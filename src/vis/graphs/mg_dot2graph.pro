@@ -13,7 +13,7 @@
 ;    attrvalue : in, required, type=any
 ;       value of attribute (property) to set
 ;-
-pro vis_graph2dot_getattr, node, attrname, attrvalue
+pro mg_graph2dot_getattr, node, attrname, attrvalue
   compile_opt strictarr
   
   catch, error
@@ -52,9 +52,9 @@ end
 ;    node_class : in, required, type=string
 ;       classname for nodes
 ;-
-function vis_dot2graph, filename, $
-                        graph_class=graph_class, $
-                        node_class=node_class
+function mg_dot2graph, filename, $
+                       graph_class=graph_class, $
+                       node_class=node_class
   compile_opt strictarr
   
   ; TODO: implement
@@ -64,10 +64,10 @@ end
 ; main-level example program
 
 if (~file_test('dependencies.dot')) then begin
-  message, 'run vis_graph2dot first', /informational
+  message, 'run mg_graph2dot first', /informational
 endif else begin
-  graph = vis_dot2graph('dependencies.dot', graph_class='IDL_Container', $
-                        node_class='VIS_Graph_Democlass')
+  graph = mg_dot2graph('dependencies.dot', graph_class='IDL_Container', $
+                       node_class='MG_Graph_Democlass')
 endelse
 
 end
