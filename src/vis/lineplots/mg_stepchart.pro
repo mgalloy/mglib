@@ -10,13 +10,13 @@
 ; :Examples:
 ;    Main-level program is at the end of this file::
 ;
-;       IDL> .run vis_stepchart
+;       IDL> .run mg_stepchart
 ;
 ;    This should produce output similar to
 ;
 ;    .. image:: step.png
 ;
-;    If the RISER_THICK is set to 0.0, no risers are shown:
+;    If the `RISER_THICK` is set to `0.0`, no risers are shown:
 ;
 ;    .. image:: step-noriser.png
 ;
@@ -41,9 +41,9 @@
 ;    color : in, optional, type=color
 ;       color of steps 
 ;    _extra : in, optional, type=keywords
-;       keywords to PLOTS
+;       keywords to `PLOTS`
 ;-
-pro vis_stepchart_plotflats, x, y, thick=thick, fill=fill, color=color, _extra=e
+pro mg_stepchart_plotflats, x, y, thick=thick, fill=fill, color=color, _extra=e
   compile_opt strictarr
   
   for s = 0L, n_elements(x) / 2 - 1L do begin
@@ -83,10 +83,10 @@ end
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, OPLOT, or PLOTS
 ;-
-pro vis_stepchart, x, y, overplot=overplot, $
-                   thick=thick, riser_thick=riserThick, $
-                   fill=fill, color=color, axis_color=axisColor, $
-                   _extra=e
+pro mg_stepchart, x, y, overplot=overplot, $
+                  thick=thick, riser_thick=riserThick, $
+                  fill=fill, color=color, axis_color=axisColor, $
+                  _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -123,7 +123,7 @@ pro vis_stepchart, x, y, overplot=overplot, $
           /nodata, color=_axisColor, _extra=e
   endelse
   
-  vis_stepchart_plotflats, _x, _y, thick=_thick, fill=fill, color=color, _extra=e  
+  mg_stepchart_plotflats, _x, _y, thick=_thick, fill=fill, color=color, _extra=e  
   
   if (~keyword_set(overplot) && _riserThick gt 0.) then begin
     oplot, _x, _y, thick=_riserThick, color=color, _extra=e
@@ -143,7 +143,7 @@ d = randomu(seed, n)
 for i = 0, 2 do d = smooth(d, 3, /edge_truncate)
 
 if (keyword_set(ps)) then begin
-  vis_psbegin, /image, filename='step.ps', xsize=8, ysize=3, /inches
+  mg_psbegin, /image, filename='step.ps', xsize=8, ysize=3, /inches
 endif else begin
   device, get_decomposed=dec
   device, decomposed=1
@@ -152,11 +152,11 @@ endelse
 plot, x, d, /nodata, xrange=[0, max(x)], yticks=4, yrange=[0., 1.], ystyle=9, xstyle=9
 
 if (keyword_set(ps)) then tvlct, 255, 0, 0, 255
-vis_stepchart, x, d, thick=6, riser_thick=1, /overplot, color='0000ff'x
+mg_stepchart, x, d, thick=6, riser_thick=1, /overplot, color='0000ff'x
 
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'step', max_dimensions=[400, 400], output=im
+  mg_psend
+  mg_convert, 'step', max_dimensions=[400, 400], output=im
   im = bytscl(im)
   tv, im, true=1
 endif else device, decomposed=dec

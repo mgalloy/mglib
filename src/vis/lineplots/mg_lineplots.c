@@ -85,7 +85,7 @@
 //}
 
 
-static IDL_VPTR IDL_vis_rasterpolyline_(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_mg_rasterpolyline_(int argc, IDL_VPTR *argv) {
   IDL_VPTR x, y, polylines, dims, xrange, yrange, result;
   int *result_data;
   
@@ -112,14 +112,14 @@ static IDL_VPTR IDL_vis_rasterpolyline_(int argc, IDL_VPTR *argv) {
 
 /*
   Register the routines available for IDL; they must be specified exactly as 
-  in vis_lineplots.dlm.
+  in mg_lineplots.dlm.
 */
 
 int IDL_Load(void) {
   
   // functions to register
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { IDL_vis_rasterpolyline_,     "VIS_RASTERPOLYLINE_",     6, 6, 0, 0 },
+    { IDL_mg_rasterpolyline_,     "MG_RASTERPOLYLINE_",     6, 6, 0, 0 },
   };
   
   return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));  

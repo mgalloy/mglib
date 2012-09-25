@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_bubblechart
+;       IDL> .run mg_bubblechart
 ;
 ;    This should produce the following:
 ;
@@ -29,7 +29,7 @@
 ;    _extra : in, optional, type=keywords
 ;       POLYFILL keywords
 ;-
-pro vis_bubblechart_overplot, x, y, size=size, color=color, _extra=e
+pro mg_bubblechart_overplot, x, y, size=size, color=color, _extra=e
   compile_opt strictarr
   
   n = 20
@@ -49,10 +49,10 @@ end
 
 ;+
 ;-
-pro vis_bubblechart, x, y, size=size, area=area, $
-                     color=color, axes_color=axesColor, $
-                     overplot=overplot, $
-                     _extra=e
+pro mg_bubblechart, x, y, size=size, area=area, $
+                    color=color, axes_color=axesColor, $
+                    overplot=overplot, $
+                    _extra=e
   compile_opt strictarr
   
   if (~keyword_set(overplot)) then begin
@@ -72,7 +72,7 @@ pro vis_bubblechart, x, y, size=size, area=area, $
   
   _color = n_elements(color) eq 0L ? 'ffffff'x : color
   
-  vis_bubblechart_overplot, x, y, size=_size, color=_color, _extra=e
+  mg_bubblechart_overplot, x, y, size=_size, color=_color, _extra=e
 end
 
 
@@ -87,22 +87,22 @@ color = fix(randomu(seed, n) * 12)
 ps = 1
 if (keyword_set(ps)) then begin
   orig_device = !d.name
-  vis_psbegin, filename='bubblechart.ps'
+  mg_psbegin, filename='bubblechart.ps'
 endif
 
-vis_decomposed, 0, old_decomposed=old_dec
-vis_loadct, 27, /brewer
+mg_decomposed, 0, old_decomposed=old_dec
+mg_loadct, 27, /brewer
 tvlct, 0, 0, 0, 12
 tvlct, 255, 255, 255, 13
 
-vis_window, xsize=3, ysize=3, /inches
-vis_bubblechart, x, y, axes_color=12, background=13, size=size, color=color, $
-                 position=[0.1, 0.1, 0.95, 0.95], charsize=0.7
+mg_window, xsize=3, ysize=3, /inches
+mg_bubblechart, x, y, axes_color=12, background=13, size=size, color=color, $
+                position=[0.1, 0.1, 0.95, 0.95], charsize=0.7
 
-vis_decomposed, old_dec
+mg_decomposed, old_dec
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'bubblechart', max_dimension=[400, 400], output=im
-  vis_image, im, /new_window
+  mg_psend
+  mg_convert, 'bubblechart', max_dimension=[400, 400], output=im
+  mg_image, im, /new_window
 endif
 end

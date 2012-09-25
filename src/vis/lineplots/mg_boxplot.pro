@@ -18,7 +18,7 @@
 ; :Examples:
 ;    Run the main-level program at the end of this file::
 ; 
-;       IDL> .run vis_boxplot
+;       IDL> .run mg_boxplot
 ;
 ;    This should produce something like:
 ;
@@ -51,11 +51,11 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT and PLOTS
 ;-
-pro vis_boxplot, data, x, $
-                 color=color, $
-                 line_color=lineColor, $
-                 symbol_color=symbolColor, $
-                 psym=psym, _extra=e
+pro mg_boxplot, data, x, $
+                color=color, $
+                line_color=lineColor, $
+                symbol_color=symbolColor, $
+                psym=psym, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -113,8 +113,8 @@ r = randomu(seed, 20)
 y = sin(findgen(360) * !dtor)
 d = r # y + randomu(seed, 20) * 0.5 # (fltarr(360) + 1.0)
 
-vis_boxplot, d, xstyle=9, ystyle=9, yrange=[-1, 2], ticklen=0.01, $
-             psym=vis_usersym(/horizontal_line, thick=2), symsize=0.75, $
-             symbol_color='0000ff'x, line_color='aaaaaa'x, thick=2
+mg_boxplot, d, xstyle=9, ystyle=9, yrange=[-1, 2], ticklen=0.01, $
+            psym=mg_usersym(/horizontal_line, thick=2), symsize=0.75, $
+            symbol_color='0000ff'x, line_color='aaaaaa'x, thick=2
 
 end

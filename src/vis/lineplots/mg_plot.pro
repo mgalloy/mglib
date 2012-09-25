@@ -1,16 +1,16 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper for PLOT with better defaults.
+; Wrapper for `PLOT` with better defaults.
 ; 
 ; :Categories:
 ;    direct graphics
 ;-
 
 ;+
-; Make sure that !d is set correctly.
+; Make sure that `!d` is set correctly.
 ;-
-pro vis_plot_setdims
+pro mg_plot_setdims
   compile_opt strictarr
 
   ; other devices besides a graphics window
@@ -27,7 +27,7 @@ end
 ;+
 ; Wrapper for PLOT routine which has several differences:
 ;   1. removes top and right axis frames by default, but may be changed 
-;      through the XSTYLE or YSTYLE keywords
+;      through the `XSTYLE` or `YSTYLE` keywords
 ;   2. contracts limits of plot to exact x range
 ;
 ; :Params:
@@ -40,13 +40,13 @@ end
 ;    slope_aspect : in, optional, type=boolean
 ;       set to make the average slope of line segments (on display) +/- 1
 ;    xstyle : in, optional, type=integer, default=9
-;       XSTYLE keyword from PLOT
+;       `XSTYLE` keyword from `PLOT`
 ;    ystyle : in, optional, type=integer, default=9
-;       YSTYLE keyword from PLOT
+;       `YSTYLE` keyword from `PLOT`
 ;    _extra : in, optional, type=keywords
-;       keywords to PLOT
+;       keywords to `PLOT`
 ;-
-pro vis_plot, x, y, slope_aspect=slopeAspect, xstyle=xstyle, ystyle=ystyle, _extra=e
+pro mg_plot, x, y, slope_aspect=slopeAspect, xstyle=xstyle, ystyle=ystyle, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -55,7 +55,7 @@ pro vis_plot, x, y, slope_aspect=slopeAspect, xstyle=xstyle, ystyle=ystyle, _ext
   
   if (n_params() eq 0L) then message, 'at least one parameter is required'
 
-  vis_plot_setdims
+  mg_plot_setdims
   position = [!d.x_ch_size * !x.margin[0] / !d.x_size, $
               !d.y_ch_size * !y.margin[0] / !d.y_size, $
               (!d.x_size - !d.x_ch_size * !x.margin[1]) / !d.x_size, $

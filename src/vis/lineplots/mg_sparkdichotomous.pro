@@ -27,8 +27,8 @@
 ;    background : in, optional, type=bytarr(3) or index, default="[255, 255, 255] or 255" 
 ;       background color for the plot
 ;-
-pro vis_sparkdichotomous, filename, data, ysize=ysize, $
-                          color=color, background=background
+pro mg_sparkdichotomous, filename, data, ysize=ysize, $
+                         color=color, background=background
   compile_opt strictarr
 
   ndata = n_elements(data)

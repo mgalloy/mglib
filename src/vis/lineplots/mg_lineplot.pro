@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Run the main-level program at the end of this file::
 ;
-;       IDL> .run vis_lineplot 
+;       IDL> .run mg_lineplot 
 ;
 ; :Categories:
 ;    direct graphics
@@ -28,7 +28,7 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT and PLOTS
 ;-
-pro vis_lineplot, x, y, thick=thick, color=color, _extra=e
+pro mg_lineplot, x, y, thick=thick, color=color, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -61,18 +61,18 @@ end
 
 ; main-level example program
 
-vis_psbegin, filename='lineplot.ps', xsize=5, ysize=3, /inches, /image
-vis_decomposed, 0, old_decomposed=dec
+mg_psbegin, filename='lineplot.ps', xsize=5, ysize=3, /inches, /image
+mg_decomposed, 0, old_decomposed=dec
 
-vis_loadct, 0
+mg_loadct, 0
 y = sin(findgen(360) * !dtor)
-vis_lineplot, y, color=congrid(bindgen(256), 360), thick=10 * abs(y), xstyle=1
+mg_lineplot, y, color=congrid(bindgen(256), 360), thick=10 * abs(y), xstyle=1
 
-vis_decomposed, dec
-vis_psend
+mg_decomposed, dec
+mg_psend
 
-vis_convert, 'lineplot', max_dimensions=[500, 500], output=im
-vis_image, im, /new_window
+mg_convert, 'lineplot', max_dimensions=[500, 500], output=im
+mg_image, im, /new_window
 file_delete, 'lineplot.' + ['ps', 'png']
 
 end

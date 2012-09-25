@@ -13,7 +13,7 @@
 ;    colors : in, optional, type=bytarr(2), default="[0B, 255B]"
 ;       alternating colors for the two types of squares in the checkerboard
 ;-
-function vis_checkerboard, block_size=blockSize, colors=colors
+function mg_checkerboard, block_size=blockSize, colors=colors
   compile_opt strictarr
 
   _blockSize = n_elements(blockSize) eq 0L ? 1L : blockSize

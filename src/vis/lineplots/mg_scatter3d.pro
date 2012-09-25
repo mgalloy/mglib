@@ -23,7 +23,7 @@
 ;    _extra : in, optional, type=keywords
 ;       graphics keywords to SURFACE and PLOTS
 ;-
-pro vis_scatter3d, x, y, z, _extra=e
+pro mg_scatter3d, x, y, z, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -57,6 +57,6 @@ z = replicate(5., 10)
 z1 = sin(findgen(36) * 10. * !dtor) * 2. + 5.  
 z = [z, z1, z]
 
-vis_scatter3d, x, y, z, charsize=2.0
+mg_scatter3d, x, y, z, charsize=2.0
 
 end

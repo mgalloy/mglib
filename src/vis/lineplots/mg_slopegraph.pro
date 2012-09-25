@@ -6,7 +6,7 @@
 ; :Examples:
 ;    See the main-level example program::
 ;  
-;       IDL> .run vis_slopegraph
+;       IDL> .run mg_slopegraph
 ;
 ;    It should produce output like:
 ;
@@ -37,7 +37,7 @@
 ;    this should probably be an iterative process because fixing up the values
 ;    could actually cause more problems in certain cases
 ;-
-function vis_slopegraph_spread, values, charHeight, lineHeight
+function mg_slopegraph_spread, values, charHeight, lineHeight
   compile_opt strictarr
   
   sind = sort(values)
@@ -94,14 +94,14 @@ end
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, PLOTS, and XYOUTS
 ;-
-pro vis_slopegraph, names, startValues, endValues, $
-                    start_title=startTitle, end_title=endTitle, $
-                    title=title, $
-                    line_color=lineColor, $
-                    value_format=valueFormat, $
-                    text_color=textColor, $
-                    delimiter=delimiter, $
-                    _extra=e
+pro mg_slopegraph, names, startValues, endValues, $
+                   start_title=startTitle, end_title=endTitle, $
+                   title=title, $
+                   line_color=lineColor, $
+                   value_format=valueFormat, $
+                   text_color=textColor, $
+                   delimiter=delimiter, $
+                   _extra=e
   compile_opt strictarr
 
   _delimiter = n_elements(delimiter) eq 0L ? '  ' : delimiter
@@ -121,12 +121,12 @@ pro vis_slopegraph, names, startValues, endValues, $
   
   gap = 0.05
   
-  _startValues = vis_slopegraph_spread(startValues, charHeight, lineHeight)
-  _endValues = vis_slopegraph_spread(endValues, charHeight, lineHeight)
+  _startValues = mg_slopegraph_spread(startValues, charHeight, lineHeight)
+  _endValues = mg_slopegraph_spread(endValues, charHeight, lineHeight)
   
   ; TODO: should use a force directed layout when it is more tuned
-  ;_startValues = vis_force(startValues, min_distance=lineHeight) - 0.3 * charHeight  
-  ;_endValues = vis_force(endValues, min_distance=lineHeight) - 0.3 * charHeight  
+  ;_startValues = mg_force(startValues, min_distance=lineHeight) - 0.3 * charHeight  
+  ;_endValues = mg_force(endValues, min_distance=lineHeight) - 0.3 * charHeight  
   
   for v = 0L, n_elements(names) - 1L do begin
     plots, [0., 1.], [startValues[v], endValues[v]], color=lineColor, _extra=e
@@ -184,7 +184,7 @@ endValues = reform(receipts[1, *])
 title = strjoin(vis_strwrap(title, 200), '!C')
 
 if (keyword_set(png)) then begin
-  vis_psbegin, /image, filename='receipts.ps', xsize=4.5, ysize=8, /inches
+  mg_psbegin, /image, filename='receipts.ps', xsize=4.5, ysize=8, /inches
   device, set_font='Times', /tt_font
   font = 1
   delimiter = '    '
@@ -194,13 +194,13 @@ endif else begin
   delimiter = '  '    
 endelse
 
-vis_slopegraph, countries, startValues, endValues, title=title, $
-              start_title='1970', end_title='1979', $;, line_color='00ffff'x, $
-              value_format='(F5.2)', delimiter=delimiter, font=font
+mg_slopegraph, countries, startValues, endValues, title=title, $
+               start_title='1970', end_title='1979', $;, line_color='00ffff'x, $
+               value_format='(F5.2)', delimiter=delimiter, font=font
 
 if (keyword_set(png)) then begin              
-  vis_psend
-  vis_convert, 'receipts', /from_ps, /to_png, scale=25, output=im
+  mg_psend
+  mg_convert, 'receipts', /from_ps, /to_png, scale=25, output=im
   file_delete, 'receipts.ps'
   file_delete, 'receipts.png'
   window, /free, xsize=338, ysize=600, title='Slopegraph'

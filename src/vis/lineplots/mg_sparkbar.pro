@@ -4,7 +4,7 @@
 ; :Todo:
 ;    not implemented
 ;-
-function vis_sparkbar, data
+function mg_sparkbar, data
     compile_opt strictarr
 
 end

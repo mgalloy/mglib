@@ -41,11 +41,11 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT
 ;-
-pro vis_horizon, x, data, titles=titles, $
-                 nbands=nbands, minimum=minimum, maximum=maximum, $
-                 ystyle=ystyle, $
-                 colors=colors, $
-                 _extra=e
+pro mg_horizon, x, data, titles=titles, $
+                nbands=nbands, minimum=minimum, maximum=maximum, $
+                ystyle=ystyle, $
+                colors=colors, $
+                _extra=e
   compile_opt strictarr
 
   _ystyle = n_elements(ystyle) eq 0L ? 0B : ystyle
@@ -154,7 +154,7 @@ nseries = 10
 npoints = 100
 
 device, decomposed=0
-vis_loadct, 22, /brewer
+mg_loadct, 22, /brewer
 tvlct, 0, 0, 0, 0
 tvlct, 255, 255, 255, 255
 
@@ -177,8 +177,8 @@ endfor
 
 !p.multi = 0
 window, /free, xsize=600, ysize=nseries * 50 + 30
-vis_horizon, findgen(npoints), d, nbands=nbands, $
-             titles='Series ' + strtrim(lindgen(nseries) + 1, 2), $
-             xstyle=9, ystyle=8, min=0., max=1., colors=[1, 85, 170, 254]
+mg_horizon, findgen(npoints), d, nbands=nbands, $
+            titles='Series ' + strtrim(lindgen(nseries) + 1, 2), $
+            xstyle=9, ystyle=8, min=0., max=1., colors=[1, 85, 170, 254]
 
 end

@@ -21,7 +21,7 @@
 ;    y : in, optional, type=fltarr
 ;       y-values of plot
 ;-
-function vis_plotaspect, x, y
+function mg_plotaspect, x, y
   compile_opt strictarr
 
   meanAbsSlope = mean(abs(n_params() eq 1L ? deriv(x) : deriv(x, y)))

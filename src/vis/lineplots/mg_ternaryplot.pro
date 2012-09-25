@@ -6,16 +6,16 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_ternaryplot
+;       IDL> .run mg_ternaryplot
 ;
 ;    The first example does::
 ;
-;       d = read_csv(filepath('ternary_data.txt', root=vis_src_root()))
-;       vis_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
-;                        color='000000'x, background='ffffff'x, $
-;                        atitle='aerosol single scattering albedo', $
-;                        btitle='Angstrom exponent', $
-;                        ctitle='back-scattering fraction'
+;       d = read_csv(filepath('ternary_data.txt', root=mg_src_root()))
+;       mg_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
+;                       color='000000'x, background='ffffff'x, $
+;                       atitle='aerosol single scattering albedo', $
+;                       btitle='Angstrom exponent', $
+;                       ctitle='back-scattering fraction'
 ; 
 ;    This should produce the following:
 ; 
@@ -27,14 +27,14 @@
 ;       a = randomu(seed, n)
 ;       b = randomu(seed, n)
 ;       c = randomu(seed, n)
-;       vis_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
-;                        atitle='A', btitle='B', ctitle='C'
-;       vis_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
-;       vis_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
-;       vis_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
-;       vis_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
-;       vis_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
-;       vis_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
+;       mg_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
+;                       atitle='A', btitle='B', ctitle='C'
+;       mg_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
+;       mg_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
+;       mg_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
+;       mg_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
+;       mg_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
+;       mg_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
 ; 
 ;    It should produce the following:
 ;
@@ -71,7 +71,7 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords for `PLOT`, `PLOTS`, and `XYOUTS`
 ;-
-pro vis_ternaryplot, a, b, c, $
+pro mg_ternaryplot, a, b, c, $
                      atitle=atitle, btitle=btitle, ctitle=ctitle, $
                      xmargin=xmargin, ymargin=ymargin, $
                      overplot=overplot, nodata=nodata, $
@@ -150,25 +150,25 @@ end
 
 ; main-level program
 
-d = read_csv(filepath('ternary_data.txt', root=vis_src_root()))
+d = read_csv(filepath('ternary_data.txt', root=mg_src_root()))
 
-if (keyword_set(ps)) then vis_psbegin, filename='ternary_data.ps', /image
+if (keyword_set(ps)) then mg_psbegin, filename='ternary_data.ps', /image
 
-vis_decomposed, 1, old_decomposed=old_dec
+mg_decomposed, 1, old_decomposed=old_dec
 
-vis_window, xsize=14, ysize=14, /free
-vis_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
-                 color='000000'x, background='ffffff'x, $
-                 atitle='aerosol single scattering albedo', $
-                 btitle='Angstrom exponent', $
-                 ctitle='back-scattering fraction'
+mg_window, xsize=14, ysize=14, /free
+mg_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
+                color='000000'x, background='ffffff'x, $
+                atitle='aerosol single scattering albedo', $
+                btitle='Angstrom exponent', $
+                ctitle='back-scattering fraction'
 
-vis_decomposed, old_dec
+mg_decomposed, old_dec
 
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'ternary_data', max_dimensions=[400, 400], output=im
-  vis_image, im, /new_window
+  mg_psend
+  mg_convert, 'ternary_data', max_dimensions=[400, 400], output=im
+  mg_image, im, /new_window
 endif
 
 n = 1000L
@@ -176,29 +176,29 @@ a = randomu(seed, n)
 b = randomu(seed, n)
 c = randomu(seed, n)
 
-if (keyword_set(ps)) then vis_psbegin, filename='ternary_sample.ps', /image
+if (keyword_set(ps)) then mg_psbegin, filename='ternary_sample.ps', /image
 
-vis_loadct, 32, /brewer, rgb_table=rgb
-rgb = vis_rgb2index(rgb)
+mg_loadct, 32, /brewer, rgb_table=rgb
+rgb = mg_rgb2index(rgb)
 
-vis_decomposed, 1, old_decomposed=old_dec
+mg_decomposed, 1, old_decomposed=old_dec
 
-vis_window, xsize=14, ysize=14, /free
-vis_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
-                 atitle='A', btitle='B', ctitle='C'
-vis_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
-vis_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
-vis_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
-vis_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
-vis_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
-vis_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
+mg_window, xsize=14, ysize=14, /free
+mg_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
+                atitle='A', btitle='B', ctitle='C'
+mg_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
+mg_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
+mg_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
+mg_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
+mg_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
+mg_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
 
-vis_decomposed, old_dec
+mg_decomposed, old_dec
 
 if (keyword_set(ps)) then begin
-  vis_psend
-  vis_convert, 'ternary_sample', max_dimensions=[400, 400], output=im
-  vis_image, im, /new_window
+  mg_psend
+  mg_convert, 'ternary_sample', max_dimensions=[400, 400], output=im
+  mg_image, im, /new_window
 endif
 
 end

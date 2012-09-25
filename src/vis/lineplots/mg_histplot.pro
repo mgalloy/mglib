@@ -6,7 +6,7 @@
 ; :Examples:
 ;    See the main-level example program at the end of this file. Run it with::
 ;
-;       IDL> .run vis_histplot
+;       IDL> .run mg_histplot
 ;
 ;    This should result in::
 ; 
@@ -27,9 +27,9 @@
 ;
 ; :Keywords:
 ;    _extra : in, optional, type=keywords
-;       keywords to VIS_STEPCHART
+;       keywords to `MG_STEPCHART`
 ;-
-pro vis_histplot, x, y, _extra=e
+pro mg_histplot, x, y, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -45,7 +45,7 @@ pro vis_histplot, x, y, _extra=e
       end
   endcase
   
-  vis_stepchart, _x, _y, _extra=e
+  mg_stepchart, _x, _y, _extra=e
 end
 
 
@@ -55,11 +55,11 @@ marsFilename = file_which('marsglobe.jpg')
 mars = read_image(marsFilename)
 
 binsize = 2
-vis_decomposed, 0, old_decomposed=odec
+mg_decomposed, 0, old_decomposed=odec
 
-vis_loadct, 39
+mg_loadct, 39
 
-pattern = vis_checkerboard(block_size=2, colors=[0, 150])
+pattern = mg_checkerboard(block_size=2, colors=[0, 150])
 
 redH = histogram(mars[0, *, *], binsize=binsize, min=0, max=255)
 greenH = histogram(mars[1, *, *], binsize=binsize, min=0, max=255)
@@ -69,16 +69,16 @@ redH[0] = 0
 greenH[0] = 0
 blueH[0] = 0
 
-vis_histplot, findgen(256 / binsize) * binsize, redH, $
-              xstyle=9, ystyle=9, yrange=[0, 10000], $
-              /fill, color=250, axis_color=255
-vis_histplot, findgen(256 / binsize) * binsize, greenH, $
-              /fill, /overplot, $
-              color=150, pattern=pattern
-vis_histplot, findgen(256 / binsize) * binsize, blueH, $
-              /fill, /overplot, $
-              color=75, /line_fill, orientation=45, spacing=0.1
-              
-vis_decomposed, odec
+mg_histplot, findgen(256 / binsize) * binsize, redH, $
+             xstyle=9, ystyle=9, yrange=[0, 10000], $
+             /fill, color=250, axis_color=255
+mg_histplot, findgen(256 / binsize) * binsize, greenH, $
+             /fill, /overplot, $
+             color=150, pattern=pattern
+mg_histplot, findgen(256 / binsize) * binsize, blueH, $
+             /fill, /overplot, $
+             color=75, /line_fill, orientation=45, spacing=0.1
+
+mg_decomposed, odec
 
 end

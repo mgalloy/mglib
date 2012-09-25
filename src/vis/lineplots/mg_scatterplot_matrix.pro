@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
-;       IDL> .run vis_scatterplot_matrix
+;       IDL> .run mg_scatterplot_matrix
 ;
 ;    This should produce:
 ;
@@ -20,7 +20,7 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT routine
 ;-
-pro vis_scatterplot_matrix, data, _extra=e
+pro mg_scatterplot_matrix, data, _extra=e
   compile_opt strictarr
   
   dims = size(data, /dimensions)
@@ -47,15 +47,15 @@ end
 m = 4
 n = 20
 
-vis_psbegin, filename='scatterplot_matrix.ps'
-vis_window, xsize=4, ysize=4, /inches
+mg_psbegin, filename='scatterplot_matrix.ps'
+mg_window, xsize=4, ysize=4, /inches
 
 data = randomu(seed, m, n)
 
-vis_scatterplot_matrix, data, psym=4, charsize=0.6, symsize=0.5
+mg_scatterplot_matrix, data, psym=4, charsize=0.6, symsize=0.5
 
-vis_psend
-vis_convert, 'scatterplot_matrix', max_dimension=[500, 500], output=im
-vis_image, im, /new_window
+mg_psend
+mg_convert, 'scatterplot_matrix', max_dimension=[500, 500], output=im
+mg_image, im, /new_window
 
 end

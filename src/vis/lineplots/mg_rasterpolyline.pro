@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
-function vis_rasterpolyline, x, y, polylines=polylines, $
-                             dimensions=dimensions, $
-                             xrange=xrange, yrange=yrange
+function mg_rasterpolyline, x, y, polylines=polylines, $
+                            dimensions=dimensions, $
+                            xrange=xrange, yrange=yrange
   compile_opt strictarr
   
   if (n_elements(xrange) gt 0L) then begin
@@ -24,7 +24,7 @@ function vis_rasterpolyline, x, y, polylines=polylines, $
   _dimensions = n_elements(dimensions) eq 0L ? [400L, 400L] : long(dimensions)
   _polylines = n_elements(polylines) eq 0L ? [nx, lindgen(nx)] : polylines
 
-  result = vis_rasterpolyline_(x, y, _polylines, _dimensions, _xrange, _yrange)
+  result = mg_rasterpolyline_(x, y, _polylines, _dimensions, _xrange, _yrange)
   
   return, result
 end

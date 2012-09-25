@@ -27,7 +27,7 @@
 ;    band_color : in, optional, type=bytarr(3) 
 ;       color of band
 ;-
-pro vis_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
+pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
                   color=color, background=background, $
                   endpoint_color=endpoint_color, $
                   band_range=band_range, band_color=band_color

@@ -1,12 +1,12 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper to PLOTS to specify COLOR and THICK on a per point basis.
+; Wrapper to `PLOTS` to specify `COLOR` and `THICK` on a per point basis.
 ;
 ; :Examples:
 ;    Run the main-level program at the end of this file::
 ;
-;       IDL> .run vis_plots
+;       IDL> .run mg_plots
 ;
 ;    This should output something like:
 ;
@@ -35,9 +35,9 @@
 ;    color : in, optional, type=color
 ;       color of the line
 ;    _extra : in, optional, type=keywords
-;       keywords to PLOT and PLOTS
+;       keywords to `PLOT` and `PLOTS`
 ;-
-pro vis_plots, x, y, z, thick=thick, color=color, _extra=e
+pro mg_plots, x, y, z, thick=thick, color=color, _extra=e
   compile_opt strictarr
   on_error, 2
   
@@ -52,10 +52,10 @@ pro vis_plots, x, y, z, thick=thick, color=color, _extra=e
     1: begin
         dims = size(x, /dimensions)
         case dims[0] of
-          2: vis_plots, reform(x[0, *]), reform(x[1, *]), $
-                        thick=thick, color=color, _extra=e
-          3: vis_plots, reform(x[0, *]), reform(x[1, *]), reform(x[2, *]), $
-                        thick=thick, color=color, _extra=e
+          2: mg_plots, reform(x[0, *]), reform(x[1, *]), $
+                       thick=thick, color=color, _extra=e
+          3: mg_plots, reform(x[0, *]), reform(x[1, *]), reform(x[2, *]), $
+                       thick=thick, color=color, _extra=e
           else: message, 'invalid dimensions of X array'
         endcase
       end
@@ -77,23 +77,23 @@ end
 
 ; main-level example program
 
-vis_psbegin, filename='plots.ps', /image
-vis_window, /free, xsize=4, ysize=4, /inches
-vis_decomposed, 1
+mg_psbegin, filename='plots.ps', /image
+mg_window, /free, xsize=4, ysize=4, /inches
+mg_decomposed, 1
 
 pts = [[0, 0], [0.25, 0.1], [0.2, 0.5], [0.6, 0.5], [1.0, 1.0]]
-pts = vis_spline(pts[0, *], pts[1, *], n_points=100)
+pts = mg_spline(pts[0, *], pts[1, *], n_points=100)
 
 dims = size(pts, /dimensions)
 thick = randomu(seed, dims[1])
 for s = 0, 2 do thick = smooth(thick, 5, /edge_truncate)
 
 plot, [0, 1], [0, 1], /nodata, position=[0.1, 0.1, 0.95, 0.95]
-vis_plots, pts, color='000000'x, thick=10. * reform(pts[0, *])
+mg_plots, pts, color='000000'x, thick=10. * reform(pts[0, *])
 
-vis_psend
-vis_convert, 'plots', max_dimensions=[300, 300], output=im
-vis_image, im, /new_window
+mg_psend
+mg_convert, 'plots', max_dimensions=[300, 300], output=im
+mg_image, im, /new_window
 file_delete, 'plots.' + ['ps', 'png']
 
 end

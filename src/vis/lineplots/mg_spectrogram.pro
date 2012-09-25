@@ -19,7 +19,7 @@
 ;    windowSize : in, required, type=long
 ;       size of the window
 ;-
-function vis_spectrogram, s, windowSize
+function mg_spectrogram, s, windowSize
   compile_opt strictarr
 
   result = fltarr(n_elements(s) - windowSize + 1L, windowSize)
@@ -41,10 +41,10 @@ free_lun, lun
 
 device, get_decomposed=dec
 device, decomposed=0
-vis_loadct, 39
+mg_loadct, 39
 
 ws = 5
-vis_image, alog10(congrid(vis_spectrogram(damp1, ws), 512 - ws + 1, 100)), /new_window
+mg_image, alog10(congrid(mg_spectrogram(damp1, ws), 512 - ws + 1, 100)), /new_window
 
 device, decomposed=dec
 

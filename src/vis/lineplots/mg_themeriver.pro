@@ -6,7 +6,7 @@
 ; :Examples:
 ;    See the main-level program at the end of this file::
 ; 
-;       IDL> .run vis_themeriver
+;       IDL> .run mg_themeriver
 ; 
 ;    The first example is similar to an error plot:
 ;
@@ -41,8 +41,8 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to plot (for axis) and oplot (for dataset lines overplotted)
 ;-
-pro vis_themeriver, x, data, colors, show_lines=showlines, $
-                    axis_color=axiscolor, color=color, _extra=e
+pro mg_themeriver, x, data, colors, show_lines=showlines, $
+                   axis_color=axiscolor, color=color, _extra=e
   compile_opt strictarr
 
   _x = reform(x)
@@ -99,10 +99,10 @@ data[4, *] = y + r + 0.1
 data[5, *] = y + 2 * r + 0.1
 data[6, *] = y + 3 * r + 0.1
 
-vis_loadct, 16, /brewer
+mg_loadct, 16, /brewer
 tvlct, rgb, /get
 rgb = rgb[[50, 90, 130], *]
-colors = vis_rgb2index(rgb)
+colors = mg_rgb2index(rgb)
 colors = [colors, reverse(colors)]
 
 window, title='Theme river example (error plot)', /free, xsize=600, ysize=300
@@ -110,7 +110,7 @@ window, title='Theme river example (error plot)', /free, xsize=600, ysize=300
 device, get_decomposed=odec
 device, decomposed=1
 
-vis_themeriver, x, data, colors, show_lines=3, $
+mg_themeriver, x, data, colors, show_lines=3, $
                color='000000'x, thick=2, linestyle=2, $
                ticklen=0.01, background='FFFFFF'x, axis_color='000000'x
 
@@ -132,8 +132,9 @@ window, title='Theme river example (stacked bar plot)', /free, xsize=600, ysize=
 device, decomposed=0
 loadct, 5
 
-vis_themeriver, findgen(n), y, 100 * bindgen(nsets + 1) / nsets + 100, background=255, axis_color=0
-               
+mg_themeriver, findgen(n), y, 100 * bindgen(nsets + 1) / nsets + 100, $
+               background=255, axis_color=0
+
 device, decomposed=odec
 
 end
