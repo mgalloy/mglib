@@ -28,7 +28,7 @@ IDL_VPTR u, v;
   
   Uses the u and v file variables to lookup vector field values.
 */
-static int vis_lic_rk(float x, float y, float step, float seg[]) {
+static int mg_lic_rk(float x, float y, float step, float seg[]) {
   float *udata = u->value.arr->data, *vdata = v->value.arr->data;
   float k[2][4], coef[] = { 0.0, 0.5, 0.5, 1.0 };
   int c;
@@ -67,7 +67,7 @@ static int vis_lic_rk(float x, float y, float step, float seg[]) {
   Compute streamline forward and backward for the element at the given row
   and column.
 */
-static void vis_lic_streamline(float row, float col, int nrows, int ncols) {
+static void mg_lic_streamline(float row, float col, int nrows, int ncols) {
   int fwdValid = 1;
   int bwdValid = 1;
   int k;
@@ -76,14 +76,14 @@ static void vis_lic_streamline(float row, float col, int nrows, int ncols) {
   nfwd = 0;
   nbwd = 0;  
 
-  fwdValid = vis_lic_rk(col + 0.5, row + 0.5, STEP_SIZE, seg);
+  fwdValid = mg_lic_rk(col + 0.5, row + 0.5, STEP_SIZE, seg);
   if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0;
   if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0;      
   fwd[0][0] = seg[0];
   fwd[1][0] = seg[1];
   if (fwdValid) nfwd++;
 
-  bwdValid = vis_lic_rk(col + 0.5, row + 0.5, - STEP_SIZE, seg);
+  bwdValid = mg_lic_rk(col + 0.5, row + 0.5, - STEP_SIZE, seg);
   if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0; 
   if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0;                   
   bwd[0][0] = seg[0];
@@ -92,7 +92,7 @@ static void vis_lic_streamline(float row, float col, int nrows, int ncols) {
       
   for (k = 1; k < N_SEGMENTS; k++) {
     if (fwdValid) {
-      fwdValid = vis_lic_rk(fwd[0][k-1], fwd[1][k-1], STEP_SIZE, seg);
+      fwdValid = mg_lic_rk(fwd[0][k-1], fwd[1][k-1], STEP_SIZE, seg);
       if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0;
       if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0;      
       fwd[0][k] = seg[0];
@@ -101,7 +101,7 @@ static void vis_lic_streamline(float row, float col, int nrows, int ncols) {
     }
           
     if (bwdValid) {    
-      bwdValid = vis_lic_rk(bwd[0][k-1], bwd[1][k-1], - STEP_SIZE, seg);
+      bwdValid = mg_lic_rk(bwd[0][k-1], bwd[1][k-1], - STEP_SIZE, seg);
       if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0;
       if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0;                   
       bwd[0][k] = seg[0];
@@ -129,7 +129,7 @@ static void vis_lic_streamline(float row, float col, int nrows, int ncols) {
      texture : in, optional, type=bytarr(m, n)
         texture map i.e. random noise
 */
-static IDL_VPTR IDL_vis_lic(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_mg_lic(int argc, IDL_VPTR *argv, char *argk) {
   IDL_VPTR result, tex, integral, hits, plain_args[2];
   int nargs;
   unsigned char *result_data, *tex_data;
@@ -212,7 +212,7 @@ static IDL_VPTR IDL_vis_lic(int argc, IDL_VPTR *argv, char *argk) {
   for (row = 0; row < nrows; row++) {
     for (col = 0; col < ncols; col++) { 
       // compute streamline
-      vis_lic_streamline((float) row, (float) col, nrows, ncols);
+      mg_lic_streamline((float) row, (float) col, nrows, ncols);
       
       // compute I: average of texture at fwd/bwd indices
       sum = (int) *(tex_data + col + row * ncols);
@@ -255,12 +255,12 @@ static IDL_VPTR IDL_vis_lic(int argc, IDL_VPTR *argv, char *argk) {
 
 /*
   Register the routines available for IDL; they must be specified exactly as 
-  in vis_flow.dlm.
+  in mg_flow.dlm.
 */
 
 // functions to register
 static IDL_SYSFUN_DEF2 function_addr[] = {
-  { IDL_vis_lic,     "VIS_LIC",     2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+  { IDL_mg_lic,     "MG_LIC",     2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 };
 
 int IDL_Load(void) {
