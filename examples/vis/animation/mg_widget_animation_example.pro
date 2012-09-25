@@ -1,7 +1,13 @@
+; docformat = 'rst'
+
+;+
+; Example of using animation in a widget program.
+;-
+
 ;+
 ; Event handler for all events.
 ;-
-pro widget_animation_event, event
+pro mg_widget_animation_example_event, event
   compile_opt strictarr
 
   widget_control, event.top, get_uvalue=pstate
@@ -16,7 +22,7 @@ end
 ;+
 ; Cleanup code when widget hierarchy dies.
 ;-
-pro widget_animation_cleanup, tlb
+pro mg_widget_animation_example_cleanup, tlb
   compile_opt strictarr
 
   widget_control, tlb, get_uvalue=pstate
@@ -27,10 +33,8 @@ end
 
 ;+
 ; Widget creation/setup.
-;
-; @file_comments Example of using animation in a widget program.
 ;-
-pro widget_animation
+pro mg_widget_animation_example
   compile_opt strictarr
 
   oview = obj_new('IDLgrView')
@@ -76,8 +80,8 @@ pro widget_animation
   pstate = ptr_new(state, /no_copy)
   widget_control, tlb, set_uvalue=pstate
 
-  xmanager, 'widget_animation', tlb, $
-            event_handler='widget_animation_event', $
-            cleanup='widget_animation_cleanup', $
+  xmanager, 'mg_widget_animation_example', tlb, $
+            event_handler='mg_widget_animation_example_event', $
+            cleanup='mgwidget_animation_example_cleanup', $
             /no_block
 end

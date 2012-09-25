@@ -20,7 +20,14 @@ IDL library of Michael Galloy.
   cula/
     CULAtools bindings.
   dist_tools/
-    Routines useful when distributing code to others.
+    This directory contains the main `dist_tools` package routines for
+    logging, preferences, and other miscellaneous routines useful in
+    distributing applications.
+  dist_tools/bindings/
+    The `bindings` directory provides a method for wrapping C routines with
+    a DLM in a quick and nearly automatic manner using the `MG_DLM` class.
+  dist_tools/cidl
+    Routines for creating hybrid C/IDL routines
   envi/ 
     ENVI user routines.
   fileio/
