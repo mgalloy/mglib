@@ -8,6 +8,8 @@
 ;       transform to apply
 ;-
 
+
+
 ;+
 ; Do the transition.
 ;
@@ -20,9 +22,9 @@ pro mggrtransformanimator::animate, progress
   
   _progress = self.easing->ease(progress)
   
-  ; TODO: apply self.transform a `_progress - self.currentProgress` amount
-  ;s = exp((_progress - self.currentProgress) * alog(self.size))
-  ;self.target->scale, s[0], s[1], s[2]
+  t = mg_expm((_progress - self.currentProgress) * mg_alogm(self.transform))
+  self.target->getProperty, transform=orig_t
+  self.target->setProperty, transform=orig_t # t
   
   self.currentProgress = _progress
 end
