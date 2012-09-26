@@ -13,7 +13,7 @@
 ;    frame_format
 ;       format code used for including frame number in output filenames
 ;    _extra
-;       properties of IDLgrBuffer
+;       properties of `IDLgrBuffer`
 ;-
 
 ;+

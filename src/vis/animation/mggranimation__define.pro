@@ -174,7 +174,7 @@ translateUp = obj_new('MGgrTranslateAnimator', $
                        translation=[0., 1.5, 0.], $
                        ;duration=2.0, $
                        easing=obj_new('MGgrCircOutEasing'))
-                       
+
 translateLeft = obj_new('MGgrTranslateAnimator', $
                         target=model, $
                         translation=[-1.5, 0., 0.], $
@@ -187,7 +187,10 @@ translateDown = obj_new('MGgrTranslateAnimator', $
 sequence = obj_new('MGgrSequenceAnimator')
 sequence->add, [grow, parallel, translateUp, translateLeft, translateDown]
 
-;win = obj_new('MGgrImageDestination', basename='im/test', dimensions=[600, 600], /show_frame)
+;win = obj_new('MGgrImageDestination', $
+;              basename='im/test', $
+;              dimensions=[600, 600], $
+;              /show_frame)
 win = obj_new('IDLgrWindow', dimensions=[600, 600])
 animation = obj_new('MGgrAnimation', destination=win, animator=sequence)
 

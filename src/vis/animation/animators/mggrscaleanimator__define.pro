@@ -20,7 +20,7 @@ pro mggrscaleanimator::animate, progress
   
   _progress = self.easing->ease(progress)
   
-  s = (1. + _progress) / (1. + self.currentProgress) * self.size / 2.0
+  s = exp((_progress - self.currentProgress) * alog(self.size))
   self.target->scale, s[0], s[1], s[2]
   
   self.currentProgress = _progress

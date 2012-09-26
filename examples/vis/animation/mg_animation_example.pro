@@ -71,41 +71,57 @@
 ;    Michael Galloy, 2011
 ;-
 
-oview = obj_new('IDLgrView')
+view = obj_new('IDLgrView')
 
-omodel = obj_new('IDLgrModel')
-oview->add, omodel
+model = obj_new('IDLgrModel')
+view->add, model
 
-oorb = obj_new('orb', radius=0.9, color=[0, 0, 255])
-omodel->add, oorb
+cowFilename = filepath('cow10.sav', subdir=['examples', 'data'])
+restore, cowFilename
+colors = randomu(seed, n_elements(x))
+vertcolors = rebin(reform(255 * round(colors), 1, n_elements(x)), 3, n_elements(x))
 
-olightmodel = obj_new('IDLgrModel')
-oview->add, olightmodel
+cow = obj_new('IDLgrPolygon', x, y, z, polygons=polylist, $
+              color=[150, 100, 20], shading=1)
+model->add, cow
 
-olight = obj_new('IDLgrLight', type=2, location=[1, 1, 1])
-olightmodel->add, olight
+lightmodel = obj_new('IDLgrModel')
+view->add, lightmodel
 
-;oanimation = obj_new('MGgrImageSequenceAnimation', base_filename='anim_', $
-;                     dimension=[400, 400])
-oanimation = obj_new('MGgrWindowAnimation', dimension=[400, 400])
+light = obj_new('IDLgrLight', type=2, location=[1, 1, 1])
+lightmodel->add, light
 
-oanimator1 = obj_new('MGgrTransformAnimator', target=omodel)
-for i = 0, 20 do begin
-  oanimator1->addScale, 0.97, 0.97, 0.97
-endfor
-oanimation->addAnimator, oanimator1
+parallel_animator = obj_new('MGgrParallelAnimator')
 
-for i = 0, 20 do begin
-  oanimator1->addScale, 1.02, 1.02, 1.02
-endfor
+seq1_animator = obj_new('MGgrSequenceAnimator')
+shrink_animator = obj_new('MGgrScaleAnimator', $
+                          target=model, $
+                          duration=1.0, $
+                          size=[2.0, 2.0, 2.0])
+grow_animator = obj_new('MGgrScaleAnimator', $
+                        target=model, $
+                        duration=1.0, $
+                        size=[0.5, 0.5, 0.5])
+seq1_animator->add, [shrink_animator, grow_animator]
 
-oanimator2 = obj_new('MGgrTransformAnimator', target=olightmodel)
-for i = 0, 44 do begin
-  oanimator2->addRotate, [0, 1, 0], 8
-endfor
-oanimation->addAnimator, oanimator2
+seq2_animator = obj_new('MGgrSequenceAnimator')
+spin1_animator = obj_new('MGgrRotateAnimator', $
+                         target=model, $
+                         duration=1.0, $
+                         angle=360., $
+                         axis=[0., 1., 0.])
+spin2_animator = obj_new('MGgrRotateAnimator', $
+                         target=model, $
+                         duration=1.0, $
+                         angle=360., $
+                         axis=[1., 0., 0.])
+seq2_animator->add, [spin1_animator, spin2_animator]
 
+parallel_animator->add, [seq1_animator, seq2_animator]
 
-oanimation->draw, oview
+win = obj_new('IDLgrWindow', dimensions=[400, 400])
+animation = obj_new('MGgrAnimation', destination=win, animator=parallel_animator)
+
+animation->draw, view
 
 end
