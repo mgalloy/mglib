@@ -29,7 +29,7 @@ IDL_VPTR u, v;
   Uses the u and v file variables to lookup vector field values.
 */
 static int mg_lic_rk(float x, float y, float step, float seg[]) {
-  float *udata = u->value.arr->data, *vdata = v->value.arr->data;
+  float *udata = (float *)u->value.arr->data, *vdata = (float *)v->value.arr->data;
   float k[2][4], coef[] = { 0.0, 0.5, 0.5, 1.0 };
   int c;
   float mag;
@@ -189,7 +189,7 @@ static IDL_VPTR IDL_mg_lic(int argc, IDL_VPTR *argv, char *argk) {
 
   // random texture
   if (kw.texture_present) {
-    tex_data = &kw.texture->value.arr->data;
+    tex_data = (unsigned char *) &kw.texture->value.arr->data;
   } else {                                  
     tex_data = (unsigned char *) IDL_MakeTempArray(IDL_TYP_BYTE, 
                                                    u->value.arr->n_dim, 
