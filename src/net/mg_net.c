@@ -32,12 +32,12 @@
 #include <netdb.h>
 #include <sys/ioctl.h>
 #define SOCKET int
-#define IOCTL	ioctl
-#define CLOSE	close
+#define IOCTL ioctl
+#define CLOSE close
 #else
 #include <winsock2.h>
-#define IOCTL	ioctlsocket
-#define CLOSE	closesocket
+#define IOCTL ioctlsocket
+#define CLOSE closesocket
 #endif
 
 typedef struct _sock {
