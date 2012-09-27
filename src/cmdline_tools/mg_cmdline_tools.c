@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "idl_export.h"
+
 
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_MG_WRONG_TYPE       0  

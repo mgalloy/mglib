@@ -10,5 +10,5 @@
 pro mg_build_cmdline_tools, _extra=e
   compile_opt strictarr
   
-  mg_make_dll, filepath('cmdline_tools.c', root=mg_src_root(), _extra=e)
+  mg_make_dll, filepath('mg_cmdline_tools.c', root=mg_src_root(), _extra=e)
 end

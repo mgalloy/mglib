@@ -1,5 +1,5 @@
 add_subdirectory(analysis)
-#add_subdirectory(cmdline_tools)
+add_subdirectory(cmdline_tools)
 #add_subdirectory(cula)
 add_subdirectory(dist_tools)
 #add_subdirectory(gsl)
