@@ -3,6 +3,12 @@
 #include "idl_export.h"
 #include "mkdio.h"
 
+/*
+  The markdown DLM uses David Parsons' DISCOUNT implementation of John
+  Gruber's Markdown markup language. Is is released under a BSD-style
+  license.
+*/
+
 static IDL_VPTR IDL_mg_markdown(int argc, IDL_VPTR *argv) {
 	char *doc;
 	

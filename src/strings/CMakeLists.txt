@@ -1,4 +1,5 @@
-set(DLM_NAME mg_strings)
+get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
+set(DLM_NAME mg_${DIRNAME})
 
 if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   include_directories(${TRE_INCLUDE_DIR})
@@ -14,4 +15,9 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   endif ()
 
   target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY} ${TRE_LIBRARY})
+  
+  install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
+
+file(GLOB PRO_FILES "*.pro")
+install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
