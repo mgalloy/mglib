@@ -1,4 +1,4 @@
-MODULE MG_MARKDOWN
+MODULE mg_markdown
 DESCRIPTION IDL bindings for markdown
 VERSION 1.0
 SOURCE Michael Galloy

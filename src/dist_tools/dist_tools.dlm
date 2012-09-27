@@ -1,4 +1,4 @@
-MODULE DIST_TOOLS
+MODULE mg_dist_tools
 DESCRIPTION Tools for the distributing IDL packages
 VERSION 1.0
 SOURCE mgalloy

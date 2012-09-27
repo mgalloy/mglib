@@ -1,4 +1,4 @@
-MODULE MG_STRINGS
+MODULE mg_strings
 DESCRIPTION IDL bindings for string routines
 VERSION 1.0
 SOURCE Michael Galloy

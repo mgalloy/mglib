@@ -1,4 +1,4 @@
-MODULE MG_FLOW
+MODULE mg_flow
 DESCRIPTION Flow visualization
 VERSION 1.0
 SOURCE mgalloy

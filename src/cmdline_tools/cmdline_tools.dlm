@@ -1,4 +1,4 @@
-MODULE CMDLINE_TOOLS
+MODULE mg_cmdline_tools
 DESCRIPTION Tools for the command line
 VERSION 1.2
 SOURCE mgalloy

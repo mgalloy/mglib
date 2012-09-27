@@ -1,4 +1,4 @@
-MODULE MG_LINEPLOTS
+MODULE mg_lineplots
 DESCRIPTION Line plot visualization
 VERSION 1.0
 SOURCE mgalloy
