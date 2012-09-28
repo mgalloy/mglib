@@ -31,15 +31,16 @@ add_custom_command(
   DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
 )   
 add_custom_target(doc DEPENDS api-docs/index.html)
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES api-docs)
 
 add_custom_command(
   OUTPUT api-userdocs/index.html
-  COMMAND idl -e mg_doc_userlibrary
+  COMMAND idl -e mg_userdoc_library
   DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
 )   
 add_custom_target(userdoc DEPENDS api-userdocs/index.html)
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES api-userdocs)
+
+set_directory_properties(PROPERTIES 
+  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs")
 
 install(FILES COPYING INSTALL README DESTINATION .)
 install(FILES mg_doc_library.pro mg_doc_userlibrary.pro DESTINATION .)
