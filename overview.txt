@@ -64,7 +64,50 @@ IDL library of Michael Galloy.
     Start of an automatic updater library.
   vis/
     Visualization routines.
-  vtk/ 
-    VTK file reader routines.
+  vis/animation/
+    routines and classes for creating animations
+  vis/animation/animators/
+    animator classes that perform some animation action
+  vis/animation/easing/
+    classes representing easing functions i.e. functions that control the
+    rate of an animator
+  vis/color/
+    routines for dealing with specifying colors and color tables
+  vis/directgraphics/
+    helper routines for direct graphics
+  vis/flow/
+    routines for visualization of vector fields
+  vis/geometry/
+    routines for manipulating polygons and other geometric structures
+  vis/googlechart/
+    IDL interface to Google Charts API
+  vis/graphs/
+    routines for visualization of trees and graphs
+  vis/images/
+    routines for display of images
+  vis/lineplots/
+    routines for creating various types of line plots
+  vis/misc/
+    more in-depth examples of using vis library routines
+  vis/objectgraphics/
+    helper routines and classes for the object graphics systems
+  vis/povray/
+    routines to create POV-Ray renderings of data in IDL
+  vis/surfaces/
+    routines to visualize surface/elevation data
+  vis/svg/
+    routines for creating SVG (Scalable Vector Graphics) output
+  vis/tables/
+    routines for creating tables containing text and graphics
+  vis/text/
+    routines for handling text in graphics
+  vis/treemaps/
+    routines for creating treemaps, visual displays of weighted trees
+  vis/util/
+    utility routines for other routines
+  vis/vtk/
+    VTK file access library
+  vis/x3dom/
+    x3dom output from IDL object graphics
   widgets/
     Routines and objects for doing widget programming.

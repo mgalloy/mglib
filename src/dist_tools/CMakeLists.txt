@@ -13,8 +13,12 @@ endif ()
 
 target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY})
 
+add_subdirectory(bindings)
+add_subdirectory(cidl)
+
 install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 
 file(GLOB PRO_FILES "*.pro")
 install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
 install(PROGRAMS mg_use DESTINATION bin)
+install(FILES .idldoc DESTINATION lib/${DIRNAME})

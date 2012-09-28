@@ -1,3 +1,5 @@
+get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
+
 add_subdirectory(animation)
 add_subdirectory(color)
 add_subdirectory(flow)
@@ -16,3 +18,6 @@ add_subdirectory(treemaps)
 add_subdirectory(util)
 add_subdirectory(vtk)
 add_subdirectory(x3dom)
+
+install(FILES .idldoc DESTINATION lib/${DIRNAME})
+
