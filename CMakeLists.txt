@@ -20,4 +20,26 @@ include_directories(${Idl_INCLUDE_DIR})
 
 add_subdirectory(src)
 
+file(GLOB_RECURSE PRO_FILES "src/*.pro")
+file(GLOB_RECURSE DLM_FILES "src/*.dlm")
+file(GLOB_RECURSE SAV_FILES "src/*.sav")
+file(GLOB_RECURSE IDLDOC_FILES "src/*.idldoc")
+
+add_custom_command(
+  OUTPUT api-docs/index.html
+  COMMAND idl -e mg_doc_library
+  DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
+)   
+add_custom_target(doc DEPENDS api-docs/index.html)
+
+add_custom_command(
+  OUTPUT api-userdocs/index.html
+  COMMAND idl -e mg_doc_userlibrary
+  DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
+)   
+add_custom_target(userdoc DEPENDS api-userdocs/index.html)
+
 install(FILES COPYING INSTALL README DESTINATION .)
+install(FILES mg_doc_library.pro mg_doc_userlibrary.pro DESTINATION .)
+install(DIRECTORY api-docs DESTINATION api-docs)
+install(DIRECTORY api-userdocs DESTINATION api-userdocs)

@@ -1,3 +1,7 @@
 .project
 api-docs
 api-userdocs
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
