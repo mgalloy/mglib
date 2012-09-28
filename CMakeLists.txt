@@ -19,3 +19,5 @@ find_package(IDL REQUIRED)
 include_directories(${Idl_INCLUDE_DIR})
 
 add_subdirectory(src)
+
+install(FILES COPYING INSTALL README DESTINATION .)
