@@ -7,7 +7,6 @@
 ;    Try::
 ;
 ;       IDL> arr = ['a', 'b', 'd', 'f', 'g']
-;       % Compiled module: MG_IN.
 ;          1
 ;       IDL> print, mg_in(arr, 'c')
 ;          0
