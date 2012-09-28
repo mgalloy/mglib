@@ -15,7 +15,11 @@ if (MARKDOWN_INCLUDE_DIR AND MARKDOWN_LIBRARY)
   endif ()
 
   target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY} ${MARKDOWN_LIBRARY})
-  
+
+  install(TARGETS ${DLM_NAME}
+    RUNTIME DESTINATION lib/${DIRNAME}
+    LIBRARY DESTINATION lib/${DIRNAME}
+  )  
   install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
 

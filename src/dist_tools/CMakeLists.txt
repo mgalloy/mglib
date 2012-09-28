@@ -16,6 +16,10 @@ target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY})
 add_subdirectory(bindings)
 add_subdirectory(cidl)
 
+install(TARGETS ${DLM_NAME}
+  RUNTIME DESTINATION lib/${DIRNAME}
+  LIBRARY DESTINATION lib/${DIRNAME}
+)
 install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 
 file(GLOB PRO_FILES "*.pro")
