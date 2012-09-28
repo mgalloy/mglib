@@ -17,22 +17,22 @@
 ;-
 function mgtmhtml::markup_listing, lines
   compile_opt strictarr
-  
+
   _lines = n_elements(lines) eq 1 ? '' : strarr(n_elements(lines))
 
   for l = 0L, n_elements(lines) - 1L do begin
-    pos = stregex(lines[l], '^([[:space:]]*)IDL&gt;[ ]*', length=len, /subexpr)
+    pos = stregex(lines[l], '^([[:space:]]*)IDL&gt;', length=len, /subexpr)
     if (pos[0] eq 0L) then begin
       _lines[l] = string(strmid(lines[l], pos[1], len[1]), $
-                         '<span class="code-prompt">IDL&gt; </span>', $
+                         '<span class="code-prompt">IDL&gt;</span>', $
                          strmid(lines[l], pos[0] + len[0]), $                       
-                         format='(%"%s%s%s")')                                  
+                         format='(%"%s%s%s")')
     endif else begin
       _lines[l] = string('<span class="code-output">', lines[l], '</span>', $
                          format='(%"%s%s%s")')
     endelse
   endfor
-  
+
   return, _lines
 end
 
