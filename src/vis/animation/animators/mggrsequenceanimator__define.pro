@@ -60,6 +60,7 @@ end
 pro mggrsequenceanimator::reset
   compile_opt strictarr
   
+  self->MGgrAnimator::reset
   for i =  0L, self->count() - 1L do begin
     animator = self->get(position=i)
     animator->reset

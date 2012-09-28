@@ -30,16 +30,6 @@ end
 
 
 ;+
-; Reset the animator.
-;-
-pro mggrrotateanimator::reset
-  compile_opt strictarr
-  
-  self.currentProgress = 0.0
-end
-
-
-;+
 ; Create a rotate animator.
 ;
 ; :Returns:
@@ -79,7 +69,6 @@ pro mggrrotateanimator__define
   
   define = { MGgrRotateAnimator, inherits MGgrAnimator, $
              angle: 0.0, $
-             axis: fltarr(3), $
-             currentProgress: 0.0 $
+             axis: fltarr(3) $
            }
 end

@@ -28,16 +28,6 @@ end
 
 
 ;+
-; Reset the animator.
-;-
-pro mggrscaleanimator::reset
-  compile_opt strictarr
-  
-  self.currentProgress = 0.0
-end
-
-
-;+
 ; Create a scale animator.
 ;
 ; :Returns:
@@ -71,7 +61,6 @@ pro mggrscaleanimator__define
   compile_opt strictarr
   
   define = { MGgrScaleAnimator, inherits MGgrAnimator, $
-             size: fltarr(3), $
-             currentProgress: 0.0 $
+             size: fltarr(3) $
            }
 end

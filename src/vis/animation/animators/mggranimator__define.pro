@@ -33,7 +33,8 @@ end
 ;-
 pro mggranimator::reset
   compile_opt strictarr
-
+  
+  self.currentProgress = 0.0
 end
 
 
@@ -111,6 +112,8 @@ end
 ;       the number of frames produces by the animator; defaults to 100 frames
 ;    easing
 ;       easing object to use for transitions; defaults to a linear easing
+;    currentProgress
+;       current progress 0. to 1. of the animator
 ;-
 pro mggranimator__define
   compile_opt strictarr
@@ -119,6 +122,7 @@ pro mggranimator__define
              target: obj_new(), $
              duration: 0.0, $
              nframes: 0L, $
-             easing: obj_new() $
+             easing: obj_new(), $
+             currentProgress: 0.0 $
            }
 end

@@ -28,16 +28,6 @@ end
 
 
 ;+
-; Reset the animator.
-;-
-pro mggrtranslateanimator::reset
-  compile_opt strictarr
-  
-  self.currentProgress = 0.0
-end
-
-
-;+
 ; Create a translate animator.
 ;
 ; :Returns:
@@ -67,14 +57,11 @@ end
 ; :Fields:
 ;    translation
 ;       direction to translate
-;    currentProgress
-;       amount of progress in the animation
 ;-
 pro mggrtranslateanimator__define
   compile_opt strictarr
 
   define = { MGgrTranslateAnimator, inherits MGgrAnimator, $
-             translation: fltarr(3), $  
-             currentProgress: 0.0 $
+             translation: fltarr(3) $
            }
 end

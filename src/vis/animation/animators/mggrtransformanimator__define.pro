@@ -9,7 +9,6 @@
 ;-
 
 
-
 ;+
 ; Do the transition.
 ;
@@ -27,16 +26,6 @@ pro mggrtransformanimator::animate, progress
   self.target->setProperty, transform=orig_t # t
   
   self.currentProgress = _progress
-end
-
-
-;+
-; Reset the animator.
-;-
-pro mggrtransformanimator::reset
-  compile_opt strictarr
-  
-  self.currentProgress = 0.0
 end
 
 
@@ -67,14 +56,13 @@ end
 ; Define instance variables.
 ; 
 ; :Fields:
-;    size
+;    transform
 ;       amount to scale each dimension
 ;-
 pro mggrtransformanimator__define
   compile_opt strictarr
   
   define = { MGgrTransformAnimator, inherits MGgrAnimator, $
-             transform: fltarr(4, 4), $
-             currentProgress: 0.0 $
+             transform: fltarr(4, 4) $
            }
 end
