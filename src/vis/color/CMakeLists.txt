@@ -10,4 +10,6 @@ install(FILES ${TBL_FILES} DESTINATION lib/vis/${DIRNAME})
 install(FILES ${PNG_FILES} DESTINATION lib/vis/${DIRNAME})
 install(FILES ${DAT_FILES} DESTINATION lib/vis/${DIRNAME})
 
+install(FILES cptcity_catalog.idldoc DESTINATION lib/vis/${DIRNAME})
+
 install(DIRECTORY cpt-city DESTINATION lib/vis/${DIRNAME})

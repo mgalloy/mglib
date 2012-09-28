@@ -5,3 +5,4 @@ file(GLOB DOT_FILES "*.dot")
 
 install(FILES ${PRO_FILES} DESTINATION lib/vis/${DIRNAME})
 install(FILES ${DOT_FILES} DESTINATION lib/vis/${DIRNAME})
+install(FILES graphs.idldoc DESTINATION lib/vis/${DIRNAME})
