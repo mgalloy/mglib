@@ -1,6 +1,7 @@
 .project
 api-docs
 api-userdocs
+api-dcdocs
 CMakeCache.txt
 CMakeFiles
 Makefile

@@ -39,10 +39,22 @@ add_custom_command(
 )   
 add_custom_target(userdoc DEPENDS api-userdocs/index.html)
 
+add_custom_command(
+  OUTPUT api-dcdocs/index.html
+  COMMAND idl -e mg_dcdoc_library
+  DEPENDS ${PRO_FILES} ${DLM_FILES}
+)   
+add_custom_target(dcdoc DEPENDS api-dcdocs/index.html)
+
 set_directory_properties(PROPERTIES 
-  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs")
+  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs")
 
 install(FILES COPYING INSTALL README DESTINATION .)
-install(FILES mg_doc_library.pro mg_doc_userlibrary.pro DESTINATION .)
+install(
+  FILES
+    mg_doc_library.pro
+    mg_doc_userlibrary.pro
+  DESTINATION .
+)
 install(DIRECTORY api-docs DESTINATION api-docs)
 install(DIRECTORY api-userdocs DESTINATION api-userdocs)
