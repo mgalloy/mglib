@@ -21,6 +21,7 @@ include_directories(${Idl_INCLUDE_DIR})
 add_subdirectory(src)
 
 file(GLOB_RECURSE PRO_FILES "src/*.pro")
+file(GLOB_RECURSE C_FILES "src/*.c")
 file(GLOB_RECURSE DLM_FILES "src/*.dlm")
 file(GLOB_RECURSE SAV_FILES "src/*.sav")
 file(GLOB_RECURSE IDLDOC_FILES "src/*.idldoc")
@@ -47,7 +48,14 @@ add_custom_command(
 add_custom_target(dcdoc DEPENDS api-dcdocs/index.html)
 
 set_directory_properties(PROPERTIES 
-  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs")
+  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
+
+add_custom_command(
+ OUTPUT mglib-test-results.html
+ COMMAND idl -quiet -IDL_QUIET 1 -e mg_run_unittests 2> /dev/null
+ DEPENDS ${PRO_FILES} ${C_FILES} ${DLM_FILES}
+)   
+add_custom_target(unit DEPENDS mglib-test-results.html)
 
 install(FILES COPYING INSTALL README DESTINATION .)
 install(
