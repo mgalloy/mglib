@@ -1,3 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
+mg_strings.so
+mg_strings.dll
