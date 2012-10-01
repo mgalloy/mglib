@@ -1,30 +1,37 @@
-To install the cmdline_tools package::
+Building
+--------
 
-  1. Place the src/ directory in the `!path` and `!dlm_path` with your 
-     preferred method, i.e., on UNIX platforms the `IDL_PATH` and 
-     `IDL_DLM_PATH` environment variables can be appended to.
-     
-  2. Build the cmdline_tools DLM. On UNIX platforms, you should be able to
-     simply use the Makefile in the top-level directory, i.e., type::
-     
-        $ make
-        
-     On Windows systems, use `mg_build_cmdline_tools_docs.pro` from within IDL 
-     to build::
-     
-        IDL> mg_build_cmdline_tools_docs
-        
-     A correctly configured `!make_dll` system variable (using a compiler that 
-     is installed on the system) and the cmdline_tools package are required to
-     build.
-     
-  3. To test the cmdline_tools package, the mgunit package is required. On 
-     UNIX platforms, use the `unit` makefile target::
-     
-        $ make unit
-        
-     On Windows systems, use mgunit directly::
-     
-        IDL> mgunit, 'cmdline_tools_uts'
-        
-     from the `unittests` directory.
+Use CMake (see http://www.cmake.org for download and more information) to configure mglib. For example, for a basic install, you would do the following from the root directory of mglib::
+
+  cmake -DCMAKE_INSTALL_PREFIX=/path/to/install .
+
+There is a more complete configuration in `example_configure.sh` which specifies some optional libraries that are linked to if present.
+
+After configuration, build mglib with::
+
+  make
+  
+And install with::
+
+  make install
+
+
+Testing
+-------
+
+To run the unit tests, use the `unit` Makefile target::
+
+  make unit
+
+The results will be in `mglib-test-results.html` in the root directory of the project.
+
+
+Generating documentation
+------------------------
+
+To generate documentation, use the `doc` or `userdoc` Makefile targets::
+
+  make doc
+  make userdoc
+
+The `doc` target generates documentation appropriate for developers/contributors to mglib, while `userdoc` generates documentation appropriate for users of mglib.

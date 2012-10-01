@@ -47,15 +47,15 @@ add_custom_command(
 )   
 add_custom_target(dcdoc DEPENDS api-dcdocs/index.html)
 
-set_directory_properties(PROPERTIES 
-  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
-
 add_custom_command(
  OUTPUT mglib-test-results.html
  COMMAND idl -quiet -IDL_QUIET 1 -e mg_run_unittests 2> /dev/null
  DEPENDS ${PRO_FILES} ${C_FILES} ${DLM_FILES}
 )   
 add_custom_target(unit DEPENDS mglib-test-results.html)
+
+set_directory_properties(PROPERTIES 
+  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
 
 install(FILES COPYING INSTALL README DESTINATION .)
 install(
