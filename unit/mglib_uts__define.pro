@@ -8,7 +8,7 @@
 ;
 ; :Keywords: 
 ;    _extra : in, optional, type=keywords
-;       keywords to MGutTestSuite::init
+;       keywords to `MGutTestSuite::init`
 ;-
 function mglib_uts::init, _extra=e
   compile_opt strictarr
