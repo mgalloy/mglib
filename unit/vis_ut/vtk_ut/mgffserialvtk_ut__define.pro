@@ -275,7 +275,6 @@ function mgffserialvtk_ut::init, _extra=e
   compile_opt strictarr
 
   if (~self->mgutlibtestcase::init(_extra=e)) then return, 0
-  print, self.root
   self.vtkDataPath = filepath('', $
                               subdir=['vis_ut', 'vtk_ut', 'vtkdata'], $
                               root=self.root)
