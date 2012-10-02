@@ -141,6 +141,8 @@ end
 ;       set to a named variable to retrieve the color table
 ;    reverse : in, optional, type=boolean
 ;       set to reverse color table
+;    get_names : out, optional, type=strarr
+;       set to a named variables to return the name of the color tables
 ;    show_tables : in, optional, type=boolean
 ;       set to print a listing of the available color tables
 ;    cpt_filename : in, optional, type=string
@@ -156,7 +158,7 @@ pro mg_loadct, table, file=file, $
                brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, mg=mg, $
                rgb_table=rgbTable, $
                reverse=reverse, $
-               show_tables=showtables, $
+               get_names=get_names, show_tables=showtables, $
                cpt_filename=cptFilename, $
                _ref_extra=e
   compile_opt strictarr
@@ -206,6 +208,12 @@ pro mg_loadct, table, file=file, $
     n_elements(file) gt 0L: ctfilename = file
     else:
   endcase
+  
+  if (arg_present(get_names)) then begin
+    loadct, get_names=get_names, file=ctfilename
+    
+    return
+  endif
   
   if (keyword_set(showTables)) then begin
     loadct, get_names=ctnames, file=ctfilename
