@@ -19,5 +19,5 @@ end
 pro mg_platform_extension_ut__define
 	compile_opt strictarr
 	
-	define = { mg_platform_extension_ut, inherits MGutTestCase }
+	define = { mg_platform_extension_ut, inherits MGutLibTestCase }
 end

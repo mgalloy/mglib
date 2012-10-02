@@ -36,7 +36,9 @@
 
 function mg_stregex_ut::test_basic
   compile_opt strictarr
-  
+
+  assert, self->have_dlm('mg_strings'), 'MG_STRINGS DLM not found', /skip
+
   urlRe = '(([[:alnum:]_-]+://?|www[.])[^[:space:]()<>]+(\([[:alnum:]_[:digit:]]+\)|([^[:punct:][:space:]]|/)))'
 
   urlsFilename = filepath('urls.txt', root=mg_src_root())
@@ -53,13 +55,13 @@ function mg_stregex_ut::test_basic
     assert, array_equal(position, correctPositions[i]), 'incorrect positions'
     assert, array_equal(length, correctLength[i]), 'incorrect length'
   endfor  
-  
+
   return, 1
 end
 
 
 pro mg_stregex_ut__define
   compile_opt strictarr
-  
+
   define = { mg_stregex_ut, inherits MGutLibTestCase }
 end

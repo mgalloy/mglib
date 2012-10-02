@@ -4,6 +4,21 @@
 ; Base test class that all unit tests should inherit from.
 ;-
 
+function mgutlibtestcase::have_dlm, dlm_name
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0) then begin
+    catch, /cancel
+    return, 0
+  endif
+
+  dlm_load, dlm_name
+
+  return, 1
+end
+
+
 pro mgutlibtestcase::setup
   compile_opt strictarr
   

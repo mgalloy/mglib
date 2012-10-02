@@ -42,5 +42,5 @@ end
 pro mg_cmp_version_ut__define
 	compile_opt strictarr
 	
-	define = { mg_cmp_version_ut, inherits MGutTestCase }
+	define = { mg_cmp_version_ut, inherits MGutLibTestCase }
 end

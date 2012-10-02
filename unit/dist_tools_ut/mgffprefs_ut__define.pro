@@ -182,7 +182,7 @@ end
 function mgffprefs_ut::init, _extra=e
   compile_opt strictarr
   
-  if (~self->MGutTestCase::init(_extra=e)) then return, 0
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
 
   self.author = 'mgffprefs_ut'
   self.application = 'mgffprefs_ut'
@@ -202,7 +202,7 @@ end
 pro mgffprefs_ut__define
   compile_opt strictarr
   
-  define = { mgffprefs_ut, inherits MGutTestCase, $
+  define = { mgffprefs_ut, inherits MGutLibTestCase, $
              author: '', $
              application: '', $
              configdir: '' }

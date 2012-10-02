@@ -47,5 +47,5 @@ end
 pro mg_options_ut__define
   compile_opt strictarr
   
-  define = { mg_options_ut, inherits MGutTestCase }
+  define = { mg_options_ut, inherits MGutLibTestCase }
 end

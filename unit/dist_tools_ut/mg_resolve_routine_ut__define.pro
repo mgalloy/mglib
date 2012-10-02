@@ -37,5 +37,5 @@ end
 pro mg_resolve_routine_ut__define
 	compile_opt strictarr
 	
-	define = { mg_resolve_routine_ut, inherits MGutTestCase }
+	define = { mg_resolve_routine_ut, inherits MGutLibTestCase }
 end

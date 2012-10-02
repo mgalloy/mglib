@@ -20,5 +20,5 @@ end
 pro mg_src_root_ut__define
 	compile_opt strictarr
 	
-	define = { mg_src_root_ut, inherits MGutTestCase }
+	define = { mg_src_root_ut, inherits MGutLibTestCase }
 end
