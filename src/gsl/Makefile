@@ -142,6 +142,20 @@ depend:
 	cd /Users/mgalloy/projects/mglib && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+# Convenience name for target.
+src/gsl/CMakeFiles/mg_gsl.dir/rule:
+	cd /Users/mgalloy/projects/mglib && $(MAKE) -f CMakeFiles/Makefile2 src/gsl/CMakeFiles/mg_gsl.dir/rule
+.PHONY : src/gsl/CMakeFiles/mg_gsl.dir/rule
+
+# Convenience name for target.
+mg_gsl: src/gsl/CMakeFiles/mg_gsl.dir/rule
+.PHONY : mg_gsl
+
+# fast build rule for target.
+mg_gsl/fast:
+	cd /Users/mgalloy/projects/mglib && $(MAKE) -f src/gsl/CMakeFiles/mg_gsl.dir/build.make src/gsl/CMakeFiles/mg_gsl.dir/build
+.PHONY : mg_gsl/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -153,6 +167,7 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
+	@echo "... mg_gsl"
 	@echo "... rebuild_cache"
 .PHONY : help
 

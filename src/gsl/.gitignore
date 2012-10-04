@@ -1,3 +1,7 @@
 CMakefiles
 Makefile
 cmake_install.cmake
+mg_gsl.c
+mg_gsl.*.so
+mg_gsl.*.dll
+mg_gsl.dlm
