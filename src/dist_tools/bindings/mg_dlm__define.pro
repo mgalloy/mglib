@@ -75,29 +75,32 @@
 ;                  0
 ;
 ; :Properties:
+;    prefix
+;      string to prefix routine names with
 ;    basename
-;       basename (including possible path) for `.c` and `.dlm` files
+;      basename (including possible path) for `.c` and `.dlm` files
 ;    name
-;       name in DLM header
+;      name in DLM header
 ;    description
-;       description in DLM header
+;      description in DLM header
 ;    version
-;       version in DLM header
+;      version in DLM header
 ;    source
-;       source in DLM header
+;      source in DLM header
 ;    build_date
-;       date in DLM header
+;      date in DLM header
 ;-
 
 
 ;+
 ; Set properties.
 ;-
-pro mg_dlm::setProperty, basename=basename, $
+pro mg_dlm::setProperty, prefix=prefix, basename=basename, $
                          name=name, description=description, version=version, $
                          source=source, build_date=build_date
   compile_opt strictarr
   
+  if (n_elements(prefix) gt 0L) then self.prefix = prefix
   if (n_elements(basename) gt 0L) then self.basename = basename
   if (n_elements(name) gt 0L) then self.name = name
   if (n_elements(description) gt 0L) then self.description = description
@@ -110,10 +113,11 @@ end
 ;+
 ; Get properties.
 ;-
-pro mg_dlm::getProperty, name=name
+pro mg_dlm::getProperty, name=name, prefix=prefix
   compile_opt strictarr
-  
-  if (arg_present(name)) then name = self.name
+
+  if (arg_present(name)) then name = self.name  
+  if (arg_present(prefix)) then prefix = self.prefix
 end
 
 
@@ -488,7 +492,10 @@ pro mg_dlm::addRoutineFromPrototype, proto
   
   name = mg_parse_cprototype(proto, params=params, return_type=return_type)
 
-  r = mg_routinebinding(name=name, return_type=return_type, prototype=proto)
+  r = mg_routinebinding(name=name, $
+                        prefix=self.prefix, $
+                        return_type=return_type, $
+                        prototype=proto)
   
   if (params[0] ne '') then begin
     for i = 0L, n_elements(params) - 1L do begin
@@ -554,7 +561,9 @@ end
 pro mg_dlm::addPoundDefineAccessor, name, type=type
   compile_opt strictarr
 
-  self->addRoutine, mg_routinePoundDefineAccessor(name=name, return_type=type)
+  self->addRoutine, mg_routinePoundDefineAccessor(name=name, $
+                                                  prefix=self.prefix, $
+                                                  return_type=type)
 end
 
 
@@ -600,6 +609,8 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
+;    prefix
+;      string to add before each routine name, i.e., `MG_`
 ;    basename
 ;       basename (including possible path) for `.c` and `.dlm` files
 ;    name
@@ -633,6 +644,7 @@ pro mg_dlm__define
   compile_opt strictarr
   
   define = { mg_dlm, $
+             prefix: '', $
              basename: '', $
              name: '', $
              description: '', $
