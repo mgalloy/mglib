@@ -17,5 +17,5 @@ pro mg_object_event_handler, event
   compile_opt strictarr
 
   widget_control, event.top, get_uvalue=owidget
-  owidget->handleEvents, event
+  owidget->handle_events, event
 end

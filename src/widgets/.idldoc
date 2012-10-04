@@ -1,0 +1,47 @@
+.. title:: Creating an object widget
+
+The routines and classes in the `widgets` directory make creating an "object
+widget" easy. All that must be done is to create a subclass of
+`MGwidObjectWidget`, for example `MGwidDemoObjectWidget`::
+
+  pro mgwiddemoobjectwidget__define
+    compile_opt strictarr
+  
+    define = { MGwidDemoObjectWidget, inherits MGwidObjectWidget}
+  end
+
+The `init` method would typically call the parent `init` method, create/realize
+the widget hierarchy, and finally start `XMANAGER`::
+
+  function mgwiddemoobjectwidget::init, _extra=e
+    compile_opt strictarr
+    
+    if (~self->mgwidobjectwidget::init(_extra=e)) then return, 0
+    
+    self->create_widgets
+    self->realize_widgets
+    self->start_xmanager
+    
+    return, 1
+  end
+
+It is important that the `create_widgets` method store the top-level base's
+widget identifier in `self.tlb` and put `self` in the tlb's `UVALUE`::
+
+  pro mgwiddemoobjectwidget::create_widgets
+    compile_opt strictarr
+    
+    self.tlb = widget_base(uvalue=self)
+    
+    ; create rest of widget hierarchy
+  end
+
+Override `handle_events` to write event handlers::
+
+  pro mgwiddemoobjectwidget::handle_events, event
+    compile_opt strictarr
+    
+    uname = widget_info(event.id, /uname)
+    
+    ; do event handling...
+  end

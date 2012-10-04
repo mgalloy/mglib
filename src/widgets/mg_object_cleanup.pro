@@ -16,5 +16,5 @@ pro mg_object_cleanup, tlb
   compile_opt strictarr
 
   widget_control, tlb, get_uvalue=owidget
-  owidget->cleanupWidgets, tlb
+  owidget->cleanup_widgets, tlb
 end
