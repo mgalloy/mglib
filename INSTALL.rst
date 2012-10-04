@@ -5,7 +5,7 @@ Use CMake (see http://www.cmake.org for download and more information) to config
 
   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install .
 
-There is a more complete configuration in `example_configure.sh` which specifies some optional libraries that are linked to if present.
+There is a more complete configuration in `example_configure.sh` which specifies some optional libraries that cause libraries that depend on them to be built.
 
 After configuration, build mglib with::
 
