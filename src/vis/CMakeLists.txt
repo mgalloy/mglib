@@ -17,7 +17,7 @@ add_subdirectory(text)
 add_subdirectory(treemaps)
 add_subdirectory(util)
 add_subdirectory(vtk)
-add_subdirectory(x3dom)
+add_subdirectory(x3d)
 
 install(FILES .idldoc DESTINATION lib/${DIRNAME})
 
