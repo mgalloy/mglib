@@ -1,17 +1,18 @@
 # - FindIdl: Module to find the IDL distribution.
 #
 # Module usage:
-#   find_package(SciIdl ...)
+#   find_package(IDL ...)
 #
 # Specify IDL_ROOT to indicate the location of an IDL distribution.
 #
 # This module will define the following variables:
 #   IDL_FOUND           = whether IDL was found
 #   Idl_PLATFORM_EXT    = DLM extension, i.e., darwin.x86_64, linux.x86, x86_64...
+#   Idl_DLL_EXT         = extension for DLM shared objects, i.e., so, dll
 #   Idl_INCLUDE_DIR     = IDL include directory
 #   Idl_LIBRARY         = IDL shared library location
 
-# convenience variable for ITT's install dir, should be fixed to use 
+# convenience variable for ITT's install dir, should be fixed to use
 # Program Files env var but it is problematic in cygwin
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set(_Idl_PROGRAM_FILES_DIR "C:/Program Files")
