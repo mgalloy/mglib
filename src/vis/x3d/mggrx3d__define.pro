@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Destination class for X3DOM graphics suitable for display on a web page by
+; Destination class for x3d graphics suitable for display on a web page by
 ; a modern browser.
 ;
 ; :Properties:
@@ -29,7 +29,7 @@
 ;    full_html : in, optional, type=boolean
 ;       set to write an entire HTML file instead of just the w3dom content
 ;-
-pro mggrx3dom::draw, tree, full_html=full_html
+pro mggrx3d::draw, tree, full_html=full_html
   compile_opt strictarr
   on_error, 2
   
@@ -68,7 +68,7 @@ end
 ;
 ; :Private:
 ;-
-pro mggrx3dom::_writeHTMLHeader
+pro mggrx3d::_writeHTMLHeader
   compile_opt strictarr
 
   printf, self.lun, '<html>'
@@ -89,7 +89,7 @@ end
 ;
 ; :Private:
 ;-
-pro mggrx3dom::_writeHTMLFooter
+pro mggrx3d::_writeHTMLFooter
   compile_opt strictarr
 
   printf, self.lun, '  </body>'
@@ -111,7 +111,7 @@ end
 ;    indent : in, optional, type=string, default=''
 ;       indent string
 ;-
-pro mggrx3dom::_traverse, tree, indent=indent
+pro mggrx3d::_traverse, tree, indent=indent
   compile_opt strictarr
   on_error, 2
   
@@ -129,8 +129,8 @@ end
 
 
 ;+
-; Write the x3dom scene node and its children that represent the object 
-; graphics view.
+; Write the x3d scene node and its children that represent the object graphics
+; view.
 ; 
 ; :Private:
 ;
@@ -142,7 +142,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3dom::_writeView, tree, indent=indent
+pro mggrx3d::_writeView, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, color=color, viewplane_rect=vpr, eye=eye
@@ -165,7 +165,7 @@ end
 
 
 ;+
-; Write the x3dom matrix transform node and children that represent an object
+; Write the x3d matrix transform node and children that represent an object
 ; graphics model.
 ;
 ; :Private:
@@ -178,7 +178,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3dom::_writeModel, tree, indent=indent
+pro mggrx3d::_writeModel, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, transform=transform
@@ -208,7 +208,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3dom::_writePolygon, tree, indent=indent
+pro mggrx3d::_writePolygon, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, data=pts, polygons=polygons, color=color
@@ -250,7 +250,7 @@ end
 
 
 ;+
-; Convert between IDL scheme and X3DOM scheme for specifying a color.
+; Convert between IDL scheme and x3d scheme for specifying a color.
 ;
 ; :Private:
 ;
@@ -261,7 +261,7 @@ end
 ;    rgb : in, required, type=bytarr(3)
 ;       connectivity list specified in IDL's scheme 
 ;-
-function mggrx3dom::_convertColor, rgb
+function mggrx3d::_convertColor, rgb
   compile_opt strictarr
   
   return, strjoin(strtrim(float(rgb) / 255., 2), ' ')
@@ -269,8 +269,7 @@ end
 
 
 ;+
-; Convert between IDL scheme and X3DOM scheme for connectivity list for a 
-; polygon.
+; Convert between IDL scheme and x3d scheme for connectivity list for a polygon.
 ;
 ; :Private:
 ;
@@ -281,7 +280,7 @@ end
 ;    conn : in, required, type=lonarr(n)
 ;       connectivity list specified in IDL's scheme 
 ;-
-function mggrx3dom::_convertPolygons, conn
+function mggrx3d::_convertPolygons, conn
   compile_opt strictarr
   
   n = n_elements(conn)
@@ -302,10 +301,10 @@ end
 ;+
 ; Retrieve properties.
 ;-
-pro mggrx3dom::getProperty, dimensions=dimensions, $
-                             filename=filename, $
-                             graphics_tree=graphics_tree, $
-                             indent=indent
+pro mggrx3d::getProperty, dimensions=dimensions, $
+                          filename=filename, $
+                          graphics_tree=graphics_tree, $
+                          indent=indent
   compile_opt strictarr
   
   dimensions = self.dimensions
@@ -317,10 +316,10 @@ end
 ;+
 ; Set properties.
 ;-
-pro mggrx3dom::setProperty, dimensions=dimensions, $
-                             filename=filename, $
-                             graphics_tree=graphics_tree, $
-                             indent=indent
+pro mggrx3d::setProperty, dimensions=dimensions, $
+                          filename=filename, $
+                          graphics_tree=graphics_tree, $
+                          indent=indent
   compile_opt strictarr
   
   if (n_elements(dimensions) gt 0L) then self.dimensions = dimensions
@@ -333,7 +332,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro mggrx3dom::cleanup
+pro mggrx3d::cleanup
   compile_opt strictarr
   
   if (obj_valid(self.graphics_tree)) then obj_destroy, self.graphics_tree
@@ -350,7 +349,7 @@ end
 ;    _extra : in, optional, type=keywords
 ;       properties
 ;-
-function mggrx3dom::init, _extra=e
+function mggrx3d::init, _extra=e
   compile_opt strictarr
 
   ; set default properties
@@ -379,10 +378,10 @@ end
 ;    lun
 ;       logical unit number to write to
 ;-
-pro mggrx3dom__define
+pro mggrx3d__define
   compile_opt strictarr
   
-  define = { MGgrX3DOM, $
+  define = { MGgrX3D, $
              dimensions: lonarr(2), $
              filename: '', $
              graphics_tree: obj_new(), $
@@ -427,7 +426,7 @@ win = obj_new('IDLgrWindow', dimensions=dims, title='Object graphics Cow')
 win->setProperty, graphics_tree=view
 win->draw
 
-x3d = obj_new('MGgrX3DOM', filename='cow.html', dimensions=dims)
+x3d = obj_new('MGgrX3D', filename='cow.html', dimensions=dims)
 x3d->draw, view, /full_html
 
 obj_destroy, x3d
