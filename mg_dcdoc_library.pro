@@ -15,5 +15,6 @@ pro mg_dcdoc_library
           title='idllib', $
           subtitle='Personal IDL library for M. Galloy', $
           index_level=1, format_style='rst', $
-          template_prefix='dc-'
+          template_prefix='dc-', $
+          comment_style='plain'
 end
