@@ -41,11 +41,11 @@ add_custom_command(
 add_custom_target(userdoc DEPENDS api-userdocs/index.html)
 
 add_custom_command(
-  OUTPUT api-dcdocs/index.html
+  OUTPUT api-dcdocs/idldoc-index.csv
   COMMAND idl -e mg_dcdoc_library
   DEPENDS ${PRO_FILES} ${DLM_FILES}
 )   
-add_custom_target(dcdoc DEPENDS api-dcdocs/index.html)
+add_custom_target(dcdoc DEPENDS api-dcdocs/idldoc-index.csv)
 
 add_custom_command(
  OUTPUT mglib-test-results.html
