@@ -1,22 +1,22 @@
 ; docformat = 'rst'
 
 ;+
-; Abstract class to define a list interface. This class is not intended to be 
+; Abstract class to define a list interface. This class is not intended to be
 ; instantiated, just to be inherited from.
 ;-
 
 
 ;+
 ; Get properties.
-; 
+;
 ; :Keywords:
 ;    version : out, optional, type=long
-;       a counter that is incremented as the list is modified (so iterators 
+;       a counter that is incremented as the list is modified (so iterators
 ;       know if the underlying list has changed)
 ;-
 pro mgcoabstractlist::getProperty, version=version
   compile_opt strictarr
-    
+
   if (arg_present(version)) then version = self.version
 end
 
@@ -44,7 +44,7 @@ end
 ; Returns the number of elements in the list.
 ;
 ; :Abstract:
-; :Returns: 
+; :Returns:
 ;    long integer
 ;-
 function mgcoabstractlist::count
@@ -55,24 +55,24 @@ end
 
 
 ;+
-; Get elements of the list. 
+; Get elements of the list.
 ;
 ; :Abstract:
 ;
-; :Returns: 
+; :Returns:
 ;    element(s) of the list or -1L if no elements to return
 ;
 ; :Keywords:
 ;    all : in, optional, type=boolean
 ;       set to return all elements
 ;    position : in, optional, type=integer
-;       set to an index or an index array of elements to return; defaults to 0 
+;       set to an index or an index array of elements to return; defaults to 0
 ;       if ALL keyword not set
 ;    count : out, optional, type=integer
-;       set to a named variable to get the number of elements returned by this 
+;       set to a named variable to get the number of elements returned by this
 ;       function
 ;    isa : in, optional, type=string or strarr
-;       classname(s) of objects to return; only allowable if list type is 
+;       classname(s) of objects to return; only allowable if list type is
 ;       object
 ;-
 function mgcoabstractlist::get, all=all, position=position, count=count, isa=isa
@@ -87,7 +87,7 @@ end
 ;
 ; :Abstract:
 ;
-; :Returns: 
+; :Returns:
 ;    1B if contained or 0B if otherwise
 ;
 ; :Params:
@@ -96,7 +96,7 @@ end
 ;
 ; :Keywords:
 ;    position : out, optional, type=long
-;       set to a named variable that will return the position of the first 
+;       set to a named variable that will return the position of the first
 ;       instance of the corresponding element of the specified elements
 ;-
 function mgcoabstractlist::isContained, elements, position=position
@@ -107,7 +107,7 @@ end
 
 ;+
 ; Move an element of the list to another position.
-; 
+;
 ; :Abstract:
 ;
 ; :Params:
@@ -124,7 +124,7 @@ end
 
 ;+
 ; Remove specified elements from the list.
-; 
+;
 ; :Abstract:
 ;
 ; :Params:
@@ -144,8 +144,8 @@ end
 
 
 ;+
-; Creates an iterator to iterate through the elements of the list. The 
-; destruction of the iterator is the responsibility of the caller of this 
+; Creates an iterator to iterate through the elements of the list. The
+; destruction of the iterator is the responsibility of the caller of this
 ; method.
 ;
 ; :Abstract:
@@ -173,7 +173,7 @@ end
 ;+
 ; Initialize list.
 ;
-; :Returns: 
+; :Returns:
 ;    1B
 ;-
 function mgcoabstractlist::init
@@ -187,8 +187,8 @@ end
 ; Define member variables.
 ;
 ; :Fields:
-;    version 
-;       a counter that is incremented as the list is modified (so iterators 
+;    version
+;       a counter that is incremented as the list is modified (so iterators
 ;       know if the underlying list has changed)
 ;-
 pro mgcoabstractlist__define

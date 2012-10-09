@@ -15,7 +15,7 @@
 ;-
 pro mg_make_cl_wrapper, app_name, script_name, location=location
   compile_opt strictarr
-  
+
   ; put script in current directory if location is not specified
   if (n_elements(location) gt 0L) then begin
     _location = location
@@ -23,9 +23,9 @@ pro mg_make_cl_wrapper, app_name, script_name, location=location
     cd, current=current
     _location = current
   endelse
-  
+
   _script_name = n_elements(script_name) eq 0L ? app_name : script_name
-  
+
   filename = filepath(_script_name, root=_location)
 
   ; write output
@@ -33,7 +33,7 @@ pro mg_make_cl_wrapper, app_name, script_name, location=location
   printf, lun, '#!/bin/sh'
   printf, lun, 'idl -quiet -e ' + app_name +' -args $@'
   free_lun, lun
-  
+
   ; make executable
   file_chmod, filename, /a_execute
 end

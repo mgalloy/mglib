@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; A `MGgrPOVRayPolygon` represents a polygon with POV-Ray specific attributes 
+; A `MGgrPOVRayPolygon` represents a polygon with POV-Ray specific attributes
 ; like the finish attribute class.
 ;
 ; :Categories:
@@ -19,9 +19,9 @@
 
 ;+
 ; Write the POV-Ray description of the polygon.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number to write to
@@ -37,32 +37,32 @@ pro mggrpovraypolygon::write, lun
                      clip_planes=clipPlanes, $
                      shininess=shininess, ambient=ambient, diffuse=diffuse, $
                      specular=specular, emission=emission
-  
-  hasVertColors = vertcolors[0] ne -1L  
+
+  hasVertColors = vertcolors[0] ne -1L
   hasTextureMap = obj_valid(textureMap)
 
   szVertices = size(vertices, /structure)
   nVertices = szVertices.dimensions[1]
-  
+
   if (polygons[0] eq -1L) then polygons = [nVertices, lindgen(nVertices)]
-  
+
   ntriangles = mesh_validate(vertices, polygons)
-  
+
   if (self.finish->hasName()) then begin
     printf, lun, '#include "metals.inc"'
     printf, lun, '#include "finish.inc"'
     printf, lun, '#include "textures.inc"'
     printf, lun
   endif
-  
+
   printf, lun, 'mesh2 {'
-  
+
   self->_writeVertices, lun, vertices, name='vertex_vectors'
-  
+
   case shading of
-    0: 
+    0:
     1: self->_writeVertices, lun, compute_mesh_normals(vertices, polygons), $
-                             name='normal_vectors'      
+                             name='normal_vectors'
     else: message, 'unknown shading method'
   endcase
 
@@ -93,14 +93,14 @@ pro mggrpovraypolygon::write, lun
     pre = '    texture { pigment { '
     post = ' }}'
     for t = 0L, tSize.dimensions[1] - 1L do begin
-      coords = reform(textureCoord[*, t]) * (imSize.dimensions[1:2] - 1L) 
+      coords = reform(textureCoord[*, t]) * (imSize.dimensions[1:2] - 1L)
       color = im[*, coords[0], coords[1]]
       printf, lun, pre + self->_getRGB(color, alpha_channel=alphaChannel) + post
     endfor
     printf, lun, '  }'
     printf, lun
   endif
-  
+
   ; count polygons
   nPolygons = 0L
   nPolyElements = n_elements(polygons)
@@ -116,8 +116,8 @@ pro mggrpovraypolygon::write, lun
   p = 0L
   while (p lt nPolyElements) do begin
     poly = polygons[p + 1L: p + polygons[p]]
-    p += polygons[p] + 1L    
-    comma = p eq nPolyElements ? '' : ','    
+    p += polygons[p] + 1L
+    comma = p eq nPolyElements ? '' : ','
     coords = strjoin(strtrim(poly, 2), ',')
     printf, lun, '    <' + coords + '>' $               ; coords
               + (hasVertColors ? ',' + coords : '') $   ; vert colors
@@ -126,27 +126,27 @@ pro mggrpovraypolygon::write, lun
   printf, lun, '  }'
 
   if (n_elements(clipPlanes) ne 1L) then begin
-    printf, lun, '  clipped_by { plane { <' + strjoin(strtrim(clipPlanes[0:2], 2), ', ') + '>, ' + strtrim(-clipPlanes[3], 2) + '}}'    
+    printf, lun, '  clipped_by { plane { <' + strjoin(strtrim(clipPlanes[0:2], 2), ', ') + '>, ' + strtrim(-clipPlanes[3], 2) + '}}'
   endif
-  
+
   self->_writeTransform, lun, self->getCTM()
-  
+
   ; TODO: use emission for radiosity
-  
+
   printf, lun
   printf, lun, '  pigment { ' + self->_getRgb(color, alpha_channel=alphaChannel) + ' }'
-  
+
   if (obj_valid(self.finish)) then begin
     self.finish->write, lun
   endif else begin
     printf, lun, '  finish {'
     printf, lun, '    phong ' + strtrim(shininess / 128.0, 2)
-    printf, lun, '    phong_size ' + strtrim(shininess, 2)  
-    printf, lun, '  }'  
+    printf, lun, '    phong_size ' + strtrim(shininess, 2)
+    printf, lun, '  }'
   endelse
-  
-  if (self.noShadow) then printf, lun, '  no_shadow'  
-  
+
+  if (self.noShadow) then printf, lun, '  no_shadow'
+
   printf, lun, '}'
 end
 
@@ -157,10 +157,10 @@ end
 pro mggrpovraypolygon::getProperty, finish=finish, no_shadow=noShadow, $
                                     _ref_extra=e
   compile_opt strictarr
-  
+
   if (arg_present(finish)) then finish = self.finish
   if (arg_present(noShadow)) then noShadow = self.noShadow
-  
+
   if (n_elements(e) gt 0) then begin
     self->idlgrpolygon::getproperty, _strict_extra=e
   endif
@@ -173,10 +173,10 @@ end
 pro mggrpovraypolygon::setProperty, finish=finish, no_shadow=noShadow, $
                                     _ref_extra=e
   compile_opt strictarr
-  
+
   if (n_elements(finish) gt 0L) then self.finish = finish
   if (n_elements(noShadow) gt 0L) then self.noShadow = noShadow
-  
+
   if (n_elements(e) gt 0) then begin
     self->idlgrpolygon::setproperty, _strict_extra=e
   endif
@@ -188,7 +188,7 @@ end
 ;-
 pro mggrpovraypolygon::cleanup
   compile_opt strictarr
-  
+
   self->idlgrpolygon::cleanup
 end
 
@@ -196,9 +196,9 @@ end
 ;+
 ; Create `MGgrPOVRayPolygon` object.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 for failure
-;    
+;
 ; :Params:
 ;    x : in, optional, type=fltarr(n)
 ;       x-coordinates of vertices of the polygon
@@ -211,13 +211,13 @@ function mggrpovraypolygon::init, x, y, z, $
                                   finish=finish, no_shadow=noShadow, $
                                   _extra=e
   compile_opt strictarr
-  
+
   if (~self->idlgrpolygon::init(x, y, z, _extra=e)) then return, 0
   if (~self->MGgrPOVRayObject::init()) then return, 0
-  
+
   if (obj_valid(finish)) then self.finish = finish
   self.noShadow = keyword_set(noShadow)
-    
+
   return, 1
 end
 
@@ -231,7 +231,7 @@ end
 ;-
 pro mggrpovraypolygon__define
   compile_opt strictarr
-  
+
   define = { MGgrPOVRayPolygon, $
              inherits IDLgrPolygon, inherits MGgrPOVRayObject, $
              finish: obj_new(), $

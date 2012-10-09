@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Create an array ranging from the `startValue` and stopping before the 
+; Create an array ranging from the `startValue` and stopping before the
 ; `stopValue`.
 ;
 ; :Examples:
@@ -21,7 +21,7 @@
 ;             6.0000000      6.5000000      7.0000000      7.5000000
 ;             8.0000000      8.5000000      9.0000000      9.5000000
 ;            10.0000000
-;     
+;
 ; :Returns:
 ;    `fltarr`
 ;
@@ -36,7 +36,7 @@
 ;       number of elements in the output array; if not set, it is calculated
 ;       from `INCREMENT`
 ;    count : out, optional, type=long
-;       set to a named variable to return the number of elements in the 
+;       set to a named variable to return the number of elements in the
 ;       returned array, i.e., `N` if `N` is used
 ;    increment : in, optional, type=float, default=1.0
 ;       if `N` is not set, then `INCREMENT` is used to compute `N`
@@ -44,9 +44,9 @@
 function mg_makerange, startValue, stopValue, increment=increment, n=n, $
                        count=count
   compile_opt strictarr
-  
+
   _increment = n_elements(increment) gt 0L ? increment : 1.0
-  
+
   if (n_elements(n) gt 0L) then begin
     count = long(n)
     return, startValue + findgen(n) / (n - 1L) * (stopValue - startValue)

@@ -5,9 +5,9 @@
 ;
 ; :Examples:
 ;    Run the main-level example program with::
-; 
+;
 ;       IDL> .run mg_maketrue
-; 
+;
 ; :Returns:
 ;    image of the `TRUE` format specified
 ;
@@ -17,19 +17,19 @@
 ;
 ; :Keywords:
 ;    red : in, out, optional, type=bytarr(256)
-;       red values of color table to use when converting to a TRUE=1-3 image, 
+;       red values of color table to use when converting to a TRUE=1-3 image,
 ;       defaults to current color table in this case; red values produced in
 ;       a conversion to a TRUE=0 image
 ;    green : in , out, optional, type=bytarr(256)
-;       green values of color table to use when converting to a TRUE=1-3 image, 
+;       green values of color table to use when converting to a TRUE=1-3 image,
 ;       defaults to current color table in this case; green values produced in
 ;       a conversion to a TRUE=0 image
 ;    blue : in, out, optional, type=bytarr(256)
-;       blue values of color table to use when converting to a TRUE=1-3 image, 
+;       blue values of color table to use when converting to a TRUE=1-3 image,
 ;       defaults to current color table in this case; blue values produced in
 ;       a conversion to a TRUE=0 image
 ;    rgb_table : in, out, optional, type=`bytarr(256, 3)`
-;       entire RGB color table instead of using `RED`, `GREEN`, and `BLUE` 
+;       entire RGB color table instead of using `RED`, `GREEN`, and `BLUE`
 ;       keywords
 ;    true : in, optional, type=long, default=1
 ;       desired interleave of output image: 0, 1, 2, or 3
@@ -47,12 +47,12 @@ function mg_maketrue, im, red=red, green=green, blue=blue, $
   dims = mg_image_getsize(im, true=inputTrue)
 
   if (_true eq inputTrue) then return, im
-  
+
   if (inputTrue eq 0L) then begin
     if (n_elements(red) gt 0L) then begin
       _red = red
       _green = green
-      _blue = blue    
+      _blue = blue
     endif else if (n_elements(rgbTable) gt 0L) then begin
       _red = reform(rgbTable[*, 0])
       _green = reform(rgbTable[*, 1])
@@ -61,16 +61,16 @@ function mg_maketrue, im, red=red, green=green, blue=blue, $
       if (!d.name eq 'WIN' || !d.name eq 'X' || !d.name eq 'Z') then begin
         device, get_decomposed=dec
       endif else dec = 0
-    
+
       if (dec) then begin
         _red = bindgen(256)
         _green = bindgen(256)
-        _blue = bindgen(256)                  
+        _blue = bindgen(256)
       endif else begin
         tvlct, _red, _green, _blue, /get
       endelse
     endelse
-  
+
     case _true of
       0: return, im
       1: return, transpose([[[_red[im]]], [[_green[im]]], [[_blue[im]]]], [2, 0, 1])
@@ -78,7 +78,7 @@ function mg_maketrue, im, red=red, green=green, blue=blue, $
       3: return, [[[_red[im]]], [[_green[im]]], [[_blue[im]]]]
     endcase
   endif
-  
+
   if (_true gt 0L) then begin
     ; just transpose to get the correct TRUE
     lookup = [[[0, 1, 2], [1, 0, 2], [1, 2, 0]], $

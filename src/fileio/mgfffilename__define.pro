@@ -2,10 +2,10 @@
 
 ;+
 ; This class represents a filename (or directory name).
-; 
+;
 ; This class corrects many of the errors found in FILEPATH, FILE_DIRNAME, and
 ; FILE_BASENAME.
-; 
+;
 ; :Properties:
 ;    dirname
 ;       characters before the last path separator in the filename; empty if no
@@ -13,7 +13,7 @@
 ;    directories
 ;       array of directories as listed in dirname
 ;    basename
-;       characters after the last path separator in the filename; the entire 
+;       characters after the last path separator in the filename; the entire
 ;       filename if no path separator
 ;    extension
 ;       characters after the last dot in the basename
@@ -34,16 +34,16 @@ pro mgfffilename::getProperty, extension=extension, basename=basename, $
                  self.filename $
                  : strmid(self.filename, seppos + 1L)
   endif
-  
+
   if (arg_present(dirname) || arg_present(directories)) then begin
     dirname = seppos eq -1L ? '.' : strmid(self.filename, 0, seppos)
     dirname += path_sep()
   endif
-  
+
   if (arg_present(directories)) then begin
     directories = strsplit(dirname, path_sep(), /extract)
   endif
-  
+
   if (arg_present(extension)) then begin
     dotpos = strpos(basename, '.', /reverse_search)
     extension = dotpos eq -1L ? '' : strmid(basename, dotpos + 1L)
@@ -56,7 +56,7 @@ end
 ;-
 pro mgfffilename::setProperty, extension=extension
   compile_opt strictarr
-  
+
   if (n_elements(extension) gt 0L) then begin
     seppos = strpos(self.filename, path_sep(), /reverse_search)
     basename = seppos eq -1L ? $
@@ -89,7 +89,7 @@ end
 ;    root_dir : in, optional, type=string, default=''
 ;       root directory
 ;    tmp : in, optional, type=boolean
-;       set to ignore `ROOT_DIR` keyword and use a root directory specially 
+;       set to ignore `ROOT_DIR` keyword and use a root directory specially
 ;       designated for temporary files
 ;-
 pro mgfffilename::compose, basename, clock_basename=clockBasename, $
@@ -99,25 +99,25 @@ pro mgfffilename::compose, basename, clock_basename=clockBasename, $
 
   if (keyword_set(tmp)) then begin
     _root = getenv('IDL_TMPDIR')
-  endif else _root = n_elements(rootDir) eq 0L ? '' : rootDir    
-  
+  endif else _root = n_elements(rootDir) eq 0L ? '' : rootDir
+
   ; add path_sep() to the end of the root if not there already
   if (strlen(_root) gt 0L $
         && strmid(_root, strlen(_root) - 1L) ne path_sep()) then begin
     _root += path_sep()
   endif
-  
+
   _subdir = n_elements(subdirectory) eq 0L $
               ? '' $
               : (strjoin(subdirectory, path_sep()) + path_sep())
-              
+
   _basename = n_elements(basename) eq 0L ? '' : basename
-  
+
   if (keyword_set(clockBasename)) then begin
     t = 1000.D * systime(/seconds)
     _basename = string(t, format='(%"' + _basename + '")')
   endif
-  
+
   self.filename = _root + _subdir + _basename
 end
 
@@ -135,7 +135,7 @@ end
 ;-
 function mgfffilename::toString, format=format
   compile_opt strictarr
-  
+
   return, string(self.filename, format=format)
 end
 
@@ -145,7 +145,7 @@ end
 ;-
 pro mgfffilename::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -155,7 +155,7 @@ end
 ; :Params:
 ;    basename : in, optional, type=string
 ;       basename or full filename of the new filename object
-; 
+;
 ; :Keywords:
 ;    _ref_extra : in, out, optional, type=keywords
 ;       input keywords to ::compose and output keywords to ::getProperty
@@ -165,7 +165,7 @@ function mgfffilename::init, basename, _ref_extra=e
 
   self->compose, basename, _extra=e
   self->getProperty, _extra=e
-  
+
   return, 1
 end
 
@@ -179,7 +179,7 @@ end
 ;-
 pro mgfffilename__define
   compile_opt strictarr
-  
+
   define = { MGffFilename, filename: '' }
 end
 

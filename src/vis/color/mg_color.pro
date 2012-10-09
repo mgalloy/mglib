@@ -13,7 +13,7 @@
 ;          0   0   0
 ;       IDL> print, mg_color('slateblue')
 ;        106  90 205
-;       IDL> c = mg_color('slateblue', /index) 
+;       IDL> c = mg_color('slateblue', /index)
 ;       IDL> print, c, c, format='(I, Z)'
 ;           13458026      CD5A6A
 ;       IDL> print, mg_color(['blue', 'red', 'yellow'])
@@ -32,14 +32,14 @@
 ;
 ; :Returns:
 ;    Returns a triple as a bytarr(3) or bytarr(3, n) by default if a single
-;    color name or n color names are given. Returns a decomposed color index 
+;    color name or n color names are given. Returns a decomposed color index
 ;    as a long or lonarr(n) if `INDEX` keyword is set.
-; 
+;
 ;    Returns a string array for the names if `NAMES` keyword is set.
 ;
 ; :Params:
 ;    colorname : in, required, type=string/strarr
-;       case-insensitive name(s) of the color; note that both "grey" and 
+;       case-insensitive name(s) of the color; note that both "grey" and
 ;       "gray" are accepted in all names that incorporate them
 ;
 ; :Keywords:
@@ -58,23 +58,23 @@ function mg_color, colorname, names=names, index=index, $
                    xkcd=xkcd, crayons=crayons
   compile_opt strictarr
   on_error, 2
-  
+
   if (~keyword_set(names) && size(colorname, /type) ne 7) then begin
     message, 'color name must be a string'
   endif
-  
+
   if (~keyword_set(names) && size(colorname, /n_dimensions) gt 1L) then begin
     message, 'color name must be a scalar or vector'
   endif
-  
+
   define = { mg_color, name: '', rgb:0L }
-  
+
   case 1 of
     keyword_set(xkcd): basename = 'xkcdcolors.dat'
     keyword_set(crayons): basename = 'crayons.dat'
     else: basename = 'htmlcolors.dat'
   endcase
-  
+
   colorFilename = filepath(basename, root=mg_src_root())
   ncolors = file_lines(colorFilename)
 
@@ -82,7 +82,7 @@ function mg_color, colorname, names=names, index=index, $
   openr, lun, colorFilename, /get_lun
   readf, lun, rawColors
   free_lun, lun
-  
+
   colors = replicate({ mg_color }, ncolors)
 
   for c = 0L, ncolors - 1L do begin
@@ -91,17 +91,17 @@ function mg_color, colorname, names=names, index=index, $
     name = strmid(rawColors[c], space + 1L)
     colors[c] = { mg_color, name: name, rgb: color }
   endfor
-  
+
   if (keyword_set(names)) then return, colors.name
-  
+
   nRequestedColors = n_elements(colorname)
-  
+
   if (keyword_set(index)) then begin
     result = nRequestedColors eq 1L ? 0L : lonarr(nRequestedColors)
   endif else begin
     result = bytarr(nRequestedColors, 3)
   endelse
-  
+
   for i = 0L, nRequestedColors - 1L do begin
     ind = where(strlowcase(colorname[i]) eq colors.name, count)
     if (count eq 0L) then message, 'invalid color name'
@@ -109,7 +109,7 @@ function mg_color, colorname, names=names, index=index, $
       result[i] = colors[ind[0]].rgb
     endif else begin
       result[i, *] = mg_index2rgb(colors[ind[0]].rgb)
-    endelse  
+    endelse
   endfor
 
   return, n_elements(result) gt 1L ? reform(result) : result
@@ -120,7 +120,7 @@ end
 
 print, mg_color('black')
 print, mg_color('slateblue')
-c = mg_color('slateblue', /index) 
+c = mg_color('slateblue', /index)
 print, c, c, format='(I, Z)'
 print, mg_color(['blue', 'red', 'yellow'])
 print, mg_color(/names)

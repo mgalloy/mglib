@@ -2,7 +2,7 @@
 
 ;+
 ; Inverse hyperbolic tangent. Uses the formula:
-; 
+;
 ; $$\text{atanh}(z) = \frac{\ln(\frac{1 + z}{1 - z})}{2}$$
 ;
 ; :Examples:
@@ -16,7 +16,7 @@
 ;    .. image:: atanh.png
 ;
 ; :Returns:
-;    float, double, complex, or double complex depending on the input 
+;    float, double, complex, or double complex depending on the input
 ;
 ; :Params:
 ;    z : in, required, type=numeric

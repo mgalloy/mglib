@@ -14,5 +14,5 @@
 ;-
 function mg_graph_layout, graph
   compile_opt strictarr
-  
+
 end

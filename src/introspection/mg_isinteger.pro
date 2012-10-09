@@ -12,7 +12,7 @@
 ;-
 function mg_isinteger, arg
   compile_opt strictarr
-  
+
   type = size(arg, /type)
   return, total(type eq [1, 2, 3, 12, 13, 14, 15], /preserve_type)
 end

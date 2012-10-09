@@ -12,7 +12,7 @@
 ;    title : in, optional, type=string
 ;       title of the base
 ;    offset : in, optional, type=lonarr(2)
-;       offset in pixels of the upper-left corner of the base from the 
+;       offset in pixels of the upper-left corner of the base from the
 ;       upper-left corner of the widget
 ;-
 pro mgwidobjectwidget::setProperty, title=title, offset=offset
@@ -35,7 +35,7 @@ end
 ;
 ; :Keywords:
 ;    offset : out, optional, type=lonarr(2)
-;       offset in pixels of the upper-left corner of the base from the 
+;       offset in pixels of the upper-left corner of the base from the
 ;       upper-left corner of the widget
 ;    size : out, optional, type=lonarr(2)
 ;       size in pixels of the tlb
@@ -85,7 +85,7 @@ end
 ;-
 pro mgwidobjectwidget::create_widgets
   compile_opt strictarr
-  
+
 end
 
 
@@ -94,7 +94,7 @@ end
 ;-
 pro mgwidobjectwidget::realize_widgets
   compile_opt strictarr
-  
+
   widget_control, self.tlb, /realize
 end
 
@@ -124,23 +124,23 @@ end
 ;+
 ; Create on object widget.
 ;
-; :Returns: 
+; :Returns:
 ;    1B for success, 0B otherwise
 ;-
 function mgwidobjectwidget::init, name=name
   compile_opt strictarr
 
   self.name = n_elements(name) eq 0 ? obj_class(self) : name
-  
+
   return, 1B
 end
 
 
 ;+
 ; Define member variables.
-; 
+;
 ; :Fields:
-;    tlb 
+;    tlb
 ;       top-level base widget ID
 ;    name
 ;       name of the widget program

@@ -2,7 +2,7 @@
 
 ;+
 ; Inverse hyperbolic cosine. Uses the formula:
-; 
+;
 ; $$\text{acosh}(z) = \ln(z + \sqrt{z + 1} \sqrt{z - 1})$$
 ;
 ; :Examples:
@@ -16,7 +16,7 @@
 ;    .. image:: acosh.png
 ;
 ; :Returns:
-;    float, double, complex, or double complex depending on the input 
+;    float, double, complex, or double complex depending on the input
 ;
 ; :Params:
 ;    z : in, required, type=numeric
@@ -24,6 +24,6 @@
 ;-
 function mg_acosh, z
   compile_opt strictarr
-  
+
   return, alog(z + sqrt(z + 1) * sqrt(z - 1))
 end

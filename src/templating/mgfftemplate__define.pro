@@ -13,7 +13,7 @@
 ;
 ; :Todo:
 ;    Allow a C format code specification string as in::
-;   
+;
 ;       [% "%0.1f" % temp %]
 ;
 ;    The format specification could be a variable itself, as in::
@@ -23,7 +23,7 @@
 ;    where the template was processed with variables like::
 ;
 ;       { format: '%0.1f', temp: 77. }
-; 
+;
 ; :Author:
 ;    Michael Galloy
 ;
@@ -31,10 +31,10 @@
 ; :Requires:
 ;    IDL 6.1
 ;
-; :Uses: 
+; :Uses:
 ;    `MGffTokenizer` class
 ;
-; :Categories: 
+; :Categories:
 ;    input/output
 ;
 ; :Properties:
@@ -46,15 +46,15 @@
 ;-
 
 ;+
-; Implements the getVariable method. This routine returns a value of a 
-; variable given the variable's name as a string. The only variable this 
+; Implements the getVariable method. This routine returns a value of a
+; variable given the variable's name as a string. The only variable this
 ; object should contain is the FOREACH loop index variable.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    any type
-; 
+;
 ; :Params:
 ;    name : in, required,type=string
 ;       name of the variable
@@ -67,7 +67,7 @@ function mgfffortemplate::getVariable, name, found=found
   compile_opt strictarr
 
   found = 0B
-  
+
   ; variable name must be a string
   if (size(name, /type) ne 7) then return, -1L
 
@@ -112,13 +112,13 @@ end
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 for failure
 ;
 ; :Params:
 ;    name : in, required, type=string
 ;       name of the FOREACH loop index variable
-;    value : in, required, type=any 
+;    value : in, required, type=any
 ;       initial value for the FOREACH loop index variable
 ;-
 function mgfffortemplate::init, name, value
@@ -138,9 +138,9 @@ end
 ; :Private:
 ;
 ; :Fields:
-;    name 
+;    name
 ;       name of the FOREACH loop index variable.
-;    value 
+;    value
 ;       pointer to the value of the FOREACH loop index variable.
 ;-
 pro mgfffortemplate__define
@@ -154,27 +154,27 @@ end
 
 
 ;+
-; Implements the getVariable method. This routine returns a value of a 
-; variable given the variable's name as a string. This routine checks its 
+; Implements the getVariable method. This routine returns a value of a
+; variable given the variable's name as a string. This routine checks its
 ; subobjects for the variable.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    any type
 ;
 ; :Params:
-;    name : in, required, type=string 
+;    name : in, required, type=string
 ;       name of the variable
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean 
+;    found : out, optional, type=boolean
 ;       true if the variable was found
 ;-
 function mgffcompoundtemplate::getVariable, name, found=found
   compile_opt strictarr
   on_error, 2
-  
+
   ; variable name must be a string
   if (size(name, /type) ne 7) then begin
     found = 0B
@@ -229,28 +229,28 @@ end
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    1L
 ;
 ; :Params:
 ;    template1 : in, required, type=object
 ;       an object which implements the getVariable method
-;    template2 : in, required, type=object 
+;    template2 : in, required, type=object
 ;       an object which implements the getVariable method or a structure
 ;-
 function mgffcompoundtemplate::init, template1, template2
   compile_opt strictarr
   on_error, 2
-  
+
   if (size(template1, /type) ne 11) then begin
     message, 'invalid type for template1: ' + size(template1, /tname)
   endif
-  
+
   type = size(template2, /type)
   if (type ne 8 && type ne 11) then begin
     message, 'invalid type for template2: ' + size(template2, /tname)
   endif
-  
+
   self.template1 = template1
   self.template2 = ptr_new(template2)
 
@@ -266,9 +266,9 @@ end
 ; :Private:
 ;
 ; :Fields:
-;    template1 
+;    template1
 ;       a subobject implementing the getVariable method
-;    template2 
+;    template2
 ;       a subobject implementing the getVariable method
 ;-
 pro mgffcompoundtemplate__define
@@ -293,13 +293,13 @@ end
 ;       data to print
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords 
+;    _extra : in, optional, type=keywords
 ;       keywords to PRINTF
 ;-
 pro mgfftemplate::_printf, lun, data, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   if (lun eq -3) then return else begin
     if (n_elements(data) gt 1) then begin
       if (size(data, /type) eq 10) then begin
@@ -321,15 +321,15 @@ end
 
 
 ;+
-; Process an [% IF %] directive. Note: this routine uses SCOPE_VARFETCH to pull 
-; variables from the template into the local scope of this routine. Therefore 
-; all the local variables have a prefix of "mgfftemplate$" to avoid name 
-; clashes. 
+; Process an [% IF %] directive. Note: this routine uses SCOPE_VARFETCH to pull
+; variables from the template into the local scope of this routine. Therefore
+; all the local variables have a prefix of "mgfftemplate$" to avoid name
+; clashes.
 ;
 ; :Private:
 ;
 ; :Params:
-;    mgfftemplate$variables : in, required, type=structure 
+;    mgfftemplate$variables : in, required, type=structure
 ;       anonymous structure of variables
 ;    mgfftemplate$output_lun : in, required, type=LUN
 ;       logical unit number of output file
@@ -337,7 +337,7 @@ end
 pro mgfftemplate::_process_if, mgfftemplate$variables, mgfftemplate$output_lun
   compile_opt strictarr, logical_predicate
   on_error, 2
-  
+
   ; get full expression
   mgfftemplate$expression = ''
   mgfftemplate$post_delim = ''
@@ -359,13 +359,13 @@ pro mgfftemplate::_process_if, mgfftemplate$variables, mgfftemplate$output_lun
       (scope_varfetch(mgfftemplate$vars[i], /enter)) = mgfftemplate$result
     endif
   endfor
-    
+
   ; evaluate the expression
   mgfftemplate$result = execute('mgfftemplate$condition = ' + mgfftemplate$expression, 1, 1)
   if (mgfftemplate$result) then begin
     mgfftemplate$new_output_lun = mgfftemplate$condition ? mgfftemplate$output_lun : -3
   endif else mgfftemplate$new_output_lun = -3
-  
+
   self->_process_tokens, mgfftemplate$variables, mgfftemplate$new_output_lun, $
                          else_clause=mgfftemplate$else_clause
   if (keyword_set(mgfftemplate$else_clause)) then begin
@@ -394,19 +394,19 @@ pro mgfftemplate::_process_foreach, variables, output_lun
 
   loopVariable = self.tokenizer->next()
   in = self.tokenizer->next(post_delim=post_delim)
-    
+
   loopVariable = strtrim(loopVariable, 2)
-  
-    self->_process_variable, '', variables, output_lun, $ 
+
+    self->_process_variable, '', variables, output_lun, $
                            value=array, post_delim=post_delim, $
                            found=found
-  
+
   if (~keyword_set(found) && (output_lun ne -3L)) then begin
     message, 'FOR loop array expression not found'
   endif
-  
+
   if (output_lun eq -3) then array = ''
-  
+
   ofor = obj_new('MGffForTemplate', loopVariable, array[0])
   ocompound = obj_new('MGffCompoundTemplate', ofor, variables)
   pos = self.tokenizer->savePos()
@@ -427,7 +427,7 @@ end
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename to include
-; 
+;
 ; :Keywords:
 ;    spaces : in, required, type=string
 ;       indentation of output
@@ -442,20 +442,20 @@ pro mgfftemplate::_copyFile, filename, output_lun, spaces=spaces
     free_lun, insertLun
     return
   endif
-  
+
   openr, insertLun, filename, /get_lun
   line = ''
   while (~eof(insertLun)) do begin
     readf, insertLun, line
     self->_printf, output_lun, spaces + line
   endwhile
-  free_lun, insertLun  
+  free_lun, insertLun
 end
 
 
 ;+
-; Process an [% INCLUDE filename %] directive. This includes the file 
-; specified by the "filename" variable directly (with not processing), as in 
+; Process an [% INCLUDE filename %] directive. This includes the file
+; specified by the "filename" variable directly (with not processing), as in
 ; the INSERT directive except the filename is specified with a variable.
 ;
 ; :Private:
@@ -476,11 +476,11 @@ pro mgfftemplate::_process_include, variables, output_lun, spaces=spaces
 
   filenameVariable = self.tokenizer->next()
   if (output_lun eq -3) then return
-  
+
   filename = self->_getVariable(variables, filenameVariable, found=found)
 
   line = self.tokenizer->getCurrentLine(number=lineNumber)
-    
+
   if (~found) then begin
     message, 'variable ' + filenameVariable + ' not found on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -488,7 +488,7 @@ pro mgfftemplate::_process_include, variables, output_lun, spaces=spaces
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   if (size(filename, /type) ne 7) then begin
     message, 'Variable ' + filenameVariable + ' must be a string on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -496,7 +496,7 @@ pro mgfftemplate::_process_include, variables, output_lun, spaces=spaces
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   if (~file_test(filename)) then begin
     message, 'filename ' + filename + ' not found on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -504,13 +504,13 @@ pro mgfftemplate::_process_include, variables, output_lun, spaces=spaces
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   self->_copyFile, filename, output_lun, spaces=spaces
 end
 
 
 ;+
-; Process a [% INCLUDE_TEMPLATE filename %] directive. This includes the 
+; Process a [% INCLUDE_TEMPLATE filename %] directive. This includes the
 ; file specified by the "filename" variable, processing it as a template with
 ; the same variables as the current template.
 ;
@@ -529,14 +529,14 @@ end
 pro mgfftemplate::_process_include_template, variables, output_lun, spaces=spaces
   compile_opt strictarr
   on_error, 2
-  
+
   filenameVariable = self.tokenizer->next()
   if (output_lun eq -3) then return
-  
+
   filename = self->_getVariable(variables, filenameVariable, found=found)
 
   line = self.tokenizer->getCurrentLine(number=lineNumber)
-  
+
   if (~found) then begin
     message, 'variable ' + filenameVariable + ' not found on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -544,7 +544,7 @@ pro mgfftemplate::_process_include_template, variables, output_lun, spaces=space
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   if (size(filename, /type) ne 7) then begin
     message, 'Variable ' + filenameVariable + ' must be a string on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -552,7 +552,7 @@ pro mgfftemplate::_process_include_template, variables, output_lun, spaces=space
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   if (~file_test(filename)) then begin
     message, 'filename ' + filename + ' not found on line ' $
                + strtrim(lineNumber, 2) + ' of ' + self.templateFilename $
@@ -560,7 +560,7 @@ pro mgfftemplate::_process_include_template, variables, output_lun, spaces=space
              /informational, /noname, /continue
     message, line, /noname
   endif
-  
+
   oinclude = obj_new('MGffTemplate', filename, spaces=spaces)
   oinclude->process, variables, lun=output_lun
   obj_destroy, oinclude
@@ -569,7 +569,7 @@ end
 
 ;+
 ; Process an [% INSERT filename %] directive. Insert the given filename. Here
-; "filename" is not a variable; it is a directly specified filename. The 
+; "filename" is not a variable; it is a directly specified filename. The
 ; filename can be absolute or relative to the template file.
 ;
 ; :Private:
@@ -585,9 +585,9 @@ end
 pro mgfftemplate::_process_insert, output_lun, spaces=spaces
   compile_opt strictarr
   on_error, 2
-  
+
   filename = self.tokenizer->next()
-  
+
   ; fill out filenames that are relative to the template file
   cd, current=origDir
   cd, self.includeRoot
@@ -597,7 +597,7 @@ pro mgfftemplate::_process_insert, output_lun, spaces=spaces
   if (~file_test(filename)) then begin
     message, 'filename ' + filename + ' not found', /noname
   endif
-  
+
   openr, insertLun, filename, /get_lun
   line = ''
   while (~eof(insertLun)) do begin
@@ -609,7 +609,7 @@ end
 
 
 ;+
-; Process a [% SCOPE ovariables %] directive. Only valid for a object 
+; Process a [% SCOPE ovariables %] directive. Only valid for a object
 ; template.
 ;
 ; :Private:
@@ -623,11 +623,11 @@ end
 pro mgfftemplate::_process_scope, variables, output_lun
     compile_opt strictarr
     on_error, 2
-    
+
     ;if (size(variables, /type) ne 11) then begin
     ;  message, 'SCOPE directive only valid for object templates'
     ;endif
-    
+
     varname = self.tokenizer->next()
     ovars = self->_getVariable(variables, varname, found=found)
 
@@ -639,7 +639,7 @@ pro mgfftemplate::_process_scope, variables, output_lun
                  /informational, /noname, /continue
         message, line, /noname
     endif
-    
+
     if (size(ovars, /type) ne 11) then begin
         self->_process_tokens, variables, output_lun
     endif else begin
@@ -651,12 +651,12 @@ end
 
 
 ;+
-; Finds a given variable name in a structure of variables or calls 
+; Finds a given variable name in a structure of variables or calls
 ; getVariable if variables is an object.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    value of variable or -1L if not found
 ;
 ; :Params:
@@ -666,7 +666,7 @@ end
 ;       name of a variable
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean 
+;    found : out, optional, type=boolean
 ;       true if name is a variable in variables structure
 ;-
 function mgfftemplate::_getVariable, variables, name, found=found
@@ -701,8 +701,8 @@ end
 ;+
 ; Process an [% expression %] directive. Note: this routine uses SCOPE_VARFETCH
 ; to pull variables from the template into the local scope of this routine.
-; Therefore all the local variables have a prefix of "mgfftemplate$" to 
-; avoid name clashes. 
+; Therefore all the local variables have a prefix of "mgfftemplate$" to
+; avoid name clashes.
 ;
 ; :Private:
 ;
@@ -732,7 +732,7 @@ pro mgfftemplate::_process_variable, mgfftemplate$expression, $
   on_error, 2
 
   if (mgfftemplate$output_lun eq -3L) then return
-  
+
   ; get full expression
   while (strpos(mgfftemplate$post_delim, '%]') eq -1) do begin
     mgfftemplate$expression += ' ' + self.tokenizer->next(post_delim=mgfftemplate$post_delim)
@@ -762,7 +762,7 @@ pro mgfftemplate::_process_variable, mgfftemplate$expression, $
   endif else begin
     mgfftemplate$line = self.tokenizer->getCurrentLine(number=mgfftemplate$lineNumber)
     message, 'invalid expression "' + mgfftemplate$expression + '" on line ' $
-               + strtrim(mgfftemplate$lineNumber, 2) + ' of ' + self.templateFilename $ 
+               + strtrim(mgfftemplate$lineNumber, 2) + ' of ' + self.templateFilename $
                + ' (error = ' + !error_state.msg + ')'
   endelse
 end
@@ -787,7 +787,7 @@ pro mgfftemplate::_process_tokens, variables, output_lun, $
                                    else_clause=else_clause
   compile_opt strictarr
   on_error, 2
-  
+
   while (~self.tokenizer->done()) do begin
     token = self.tokenizer->next(pre_delim=pre_delim, newline=newline, $
                                  post_delim=post_delim)
@@ -807,7 +807,7 @@ pro mgfftemplate::_process_tokens, variables, output_lun, $
           self->_process_include_template, variables, output_lun, spaces=spaces
         end
         'insert' : self->_process_insert, output_lun, spaces=spaces
-        'scope' : self->_process_scope, variables, output_lun       
+        'scope' : self->_process_scope, variables, output_lun
         'end' : return
         'else' : begin
           else_clause = 1
@@ -846,7 +846,7 @@ end
 pro mgfftemplate::process, variables, output_filename, lun=output_lun
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_elements(output_lun) eq 0) then begin
     openw, output_lun, output_filename, /get_lun
     self->_process_tokens, variables, output_lun
@@ -881,7 +881,7 @@ end
 ; Create a template class for a given template. A template can be used many
 ; times with different sets of data sent to the process method.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 otherwise
 ;
 ; :Params:
@@ -899,9 +899,9 @@ function mgfftemplate::init, template_filename, spaces=spaces, $
                              string_array=stringArray
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_params() ne 1) then message, 'template filename parameter required'
-  
+
   self.templateFilename = keyword_set(stringArray) $
                             ? 'string input' $
                             : template_filename
@@ -912,28 +912,28 @@ function mgfftemplate::init, template_filename, spaces=spaces, $
   endif else begin
     self.includeRoot = file_dirname(template_filename)
   endelse
-  
+
   self.spaces = n_elements(spaces) eq 0 ? '' : spaces
-  
+
   self.tokenizer = obj_new('MGffTokenizer', template_filename, $
                            pattern='(\[\%)|(\%\])| ', string_array=stringArray)
-      
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
-;    templateFilename 
+;    templateFilename
 ;       filename of the template file
-;    tokenizer 
+;    tokenizer
 ;       `MGffTokenizer` used to break a template into tokens
 ;-
 pro mgfftemplate__define
   compile_opt strictarr
-  
+
   define = { MGffTemplate, $
              templateFilename: '', $
              includeRoot: '', $

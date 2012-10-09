@@ -4,9 +4,9 @@
 ; Retrieve a variable from a save file.
 ;
 ; :Returns:
-;   variable restored or hash containing variables if more than one variable 
+;   variable restored or hash containing variables if more than one variable
 ;   is requested
-; 
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename of a `.sav` file
@@ -19,9 +19,9 @@
 ;-
 function mg_save_getdata, filename, varname, _extra=e
   compile_opt strictarr
-  
+
   savefile = obj_new('IDL_Savefile', filename=filename)
-  
+
   case n_elements(varname) of
     0: begin
         varnames = savefile->names(count=nvarnames)
@@ -41,13 +41,13 @@ function mg_save_getdata, filename, varname, _extra=e
         savefile->restore, varname, _extra=e
         result = hash()
         for v = 0L, n_elements(varname) - 1L do begin
-          result[strupcase(varname[v])] = scope_varfetch(varname[v], /enter)          
+          result[strupcase(varname[v])] = scope_varfetch(varname[v], /enter)
         endfor
       end
   endcase
 
   obj_destroy, savefile
-  
+
   return, result
 end
 

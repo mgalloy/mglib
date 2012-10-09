@@ -2,7 +2,7 @@
 
 ;+
 ; Pulls out a section of a variable in a file.
-; 
+;
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
@@ -18,7 +18,7 @@
 ;       h5_filename = filepath('hdf5_test.h5', subdir=['examples', 'data'])
 ;       arr3d = mg_getdata(h5_filename, '/arrays/3D int array[3, 5:*:2, 0:49:3]')
 ;
-; :Returns: 
+; :Returns:
 ;    data array
 ;
 ; :Params:
@@ -29,7 +29,7 @@
 ;
 ; :Keywords:
 ;    bounds : in, optional, type="lonarr(3, ndims) or string"
-;       gives start value, end value, and stride for each dimension of the 
+;       gives start value, end value, and stride for each dimension of the
 ;       variable
 ;    error : out, optional, type=long
 ;       error value
@@ -43,7 +43,7 @@ function mg_getdata, filename, variable, bounds=bounds, error=error
     '.hdf': return, mg_hdf_getdata(filename, variable, bounds=bounds, error=error)
     '.sav': return, mg_save_getdata(filename, variable, bounds=bounds, error=error)
     else: message, 'unknown file type', /informational
-  endcase  
+  endcase
 end
 
 

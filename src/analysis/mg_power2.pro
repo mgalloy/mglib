@@ -22,6 +22,6 @@ function mg_power2, x
   n = ishft(n, -16) or n
   n = ishft(n, -32) or n
   n = ishft(n, -64) or n
-  
+
   return, ++n
 end

@@ -7,9 +7,9 @@ function mg_loginname_ut::test_type
   assert, self->have_dlm('mg_analysis'), 'MG_DIST_TOOLS DLM not found', /skip
 
   loginname = mg_loginname()
-  
+
   assert, size(loginname, /type) eq 7L, 'incorrect type'
-  
+
   return, 1
 end
 
@@ -35,6 +35,6 @@ end
 ;-
 pro mg_loginname_ut__define
   compile_opt strictarr
-  
+
   define = { mg_loginname_ut, inherits MGutLibTestCase }
 end

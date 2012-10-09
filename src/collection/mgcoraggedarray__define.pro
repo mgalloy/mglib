@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; This class represents an array where each element is another array (of 
+; This class represents an array where each element is another array (of
 ; differing sizes).
 ;-
 
@@ -37,7 +37,7 @@ end
 ;       when a named variable is present routine returns HISTOGRAM type output
 ;       as the return value and REVERSE_INDICES through this keyword
 ;    connectivity_list : in, optional, type=boolean
-;       set to return a connectivity list format of the results; only valid 
+;       set to return a connectivity list format of the results; only valid
 ;       if the type is a numeric type
 ;-
 function mgcoraggedarray::get, all=all, position=position, count=count, $
@@ -56,23 +56,23 @@ pro mgcoraggedarray::cleanup
 
   ptr_free, self.pExample
   obj_destroy, [self.oData, self.lengths]
-  
+
   self->MGcoAbstractList::cleanup
 end
 
- 
+
 ;+
 ; Create a ragged array.
 ;
-; :Returns: 
+; :Returns:
 ;    1B for succes, 0B otherwise
 ;
 ; :Keywords:
 ;    type : in, optional, type=integer
-;       type code as in SIZE function to specify the type of elements in the 
+;       type code as in SIZE function to specify the type of elements in the
 ;       list; TYPE or EXAMPLE keyword must be used
 ;    example : in, optional, type=any
-;       used to specify the type of the list by example; necessary if defining 
+;       used to specify the type of the list by example; necessary if defining
 ;       a list of structures
 ;    block_size : in, optional, type=integer, default=1000L
 ;       initial size of data array
@@ -83,13 +83,13 @@ function mgcoraggedarray::init, type=type, example=example, block_size=blockSize
 
   self.oData = obj_new('mgarraylist', type=10L, blockSize=blockSize)
   self.lengths = obj_new('mgarraylist', type=3L, blockSize=blockSize)
-  
+
   ; set type
   self.type = n_elements(type) eq 0 ? size(example, /type) : type
   if (self.type eq 0) then message, 'List type is undefined'
 
   ; store example if structure
-  if (self.type eq 8) then begin 
+  if (self.type eq 8) then begin
     if (n_elements(example) eq 0) then begin
       message, 'Structure lists must specify type with EXAMPLE keyword'
     endif
@@ -104,13 +104,13 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    oData 
+;    oData
 ;       data
 ;    lengths
 ;       lengths of the arrays in the ragged array
 ;    type
 ;       type code
-;    pExample 
+;    pExample
 ;       pointer to example
 ;-
 pro mgcoraggedarray__define

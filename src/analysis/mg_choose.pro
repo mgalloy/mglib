@@ -20,6 +20,6 @@
 ;-
 function mg_choose, m, n
   compile_opt strictarr
-  
+
   return, round(exp(lngamma(m + 1.D) - lngamma(n + 1.D) - lngamma(m - n + 1.D)), /l64)
 end

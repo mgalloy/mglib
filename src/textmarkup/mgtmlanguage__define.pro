@@ -24,19 +24,19 @@ end
 
 ;+
 ; Text to include afer a markup node of the given type.
-;     
+;
 ; :Abstract:
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
-; :Keywords: 
+; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
 ;       set to a named variable to get whether a newline should be added
 ;       at the given node
@@ -45,25 +45,25 @@ end
 ;-
 function mgtmlanguage::_preTag, type, newline=newline, tag=tag
   compile_opt strictarr
-  
+
   return, ''
 end
 
 
 ;+
 ; Text to include after a markup node of the given type.
-;     
+;
 ; :Abstract:
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
-; :Params: 
+; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
-; :Keywords: 
+; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
 ;       set to a named variable to get whether a newline should be added
 ;       at the given node
@@ -72,17 +72,17 @@ end
 ;-
 function mgtmlanguage::_postTag, type, newline=newline, tag=tag
   compile_opt strictarr
-  
+
   return, ''
 end
 
 
 ;+
 ; Merges two string arrays into a single string array where the last line of
-; the first and first line of the second are concatenated onto a single line 
+; the first and first line of the second are concatenated onto a single line
 ; in the middle of the result.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    strarr
 ;
 ; :Params:
@@ -90,7 +90,7 @@ end
 ;       first string array
 ;    str2 : in, required, type=strarr
 ;        second string array
-;-     
+;-
 function mgtmlanguage::_textMerge, str1, str2
   compile_opt strictarr
 
@@ -108,15 +108,15 @@ end
 
 ;+
 ; Process a `MGtmNode` tree of markup to produce a string array of the result.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    `strarr`
 ;
 ; :Params:
 ;    formatTree : in, required, type=objref
 ;       `MGtmNode` object containing possibly other `MGtmNode`s
 ;
-; :Keywords: 
+; :Keywords:
 ;    _newline : in, optional, type=boolean
 ;       set if should start outputing to the next line of the result
 ;-
@@ -124,11 +124,11 @@ function mgtmlanguage::process, formatTree, _newline=newline
   compile_opt strictarr
 
   formatTree->getProperty, type=type
-  
+
   result = self->_preTag(type, newline=newline, tag=formatTree)
   if (obj_isa(formatTree, 'MGtmTag')) then begin
     formatTree->getProperty, n_children=nchildren
-    
+
     for c = 0L, nchildren - 1L do begin
       childNewline = 0
       child = formatTree->getChild(c)
@@ -141,7 +141,7 @@ function mgtmlanguage::process, formatTree, _newline=newline
     formatTree->getProperty, text=text
     result += text
   endif
-  
+
   postTag = self->_postTag(Type, newline=postNewline, tag=formatTree)
   result = self->_textMerge(result, postTag)
   if (keyword_set(postNewline)) then result = [result, replicate('', postNewline)]
@@ -151,10 +151,10 @@ end
 
 
 ;+
-; Parent class for all markup language definitions. 
-;     
-; :Fields: 
-;    name 
+; Parent class for all markup language definitions.
+;
+; :Fields:
+;    name
 ;       name of the language
 ;-
 pro mgtmlanguage__define

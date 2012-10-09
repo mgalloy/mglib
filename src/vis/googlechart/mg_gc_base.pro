@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Process a string for inclusion in the URL: replace spaces with + signs, 
-; join multiple array elements with |'s, and add the param=. If no string is 
+; Process a string for inclusion in the URL: replace spaces with + signs,
+; join multiple array elements with |'s, and add the param=. If no string is
 ; specified, the empty string will be returned.
-; 
+;
 ; :Returns:
 ;    string
 ;
@@ -24,8 +24,8 @@ function mg_gc_base_processstr, s, param
     _s = '&' + param + '=' + string(_bs)
   endif else begin
     _s = ''
-  endelse  
-  
+  endelse
+
   return, _s
 end
 
@@ -42,21 +42,21 @@ end
 ; :Examples:
 ;    An example of using the routine is given in a main-level program at the
 ;    end of this file. Run it using::
-; 
+;
 ;       IDL> .run mg_gc_base
 ;
 ;    It produces:
 ;
 ;    .. image:: gc_piechart.png
-; 
+;
 ; :Returns:
 ;    bytarr(3, xsize, ysize)
 ;
 ; :Keywords:
 ;    type : in, required, type=string
-;       type of chart required, options are: lc (line chart), lxy (xy points),  
+;       type of chart required, options are: lc (line chart), lxy (xy points),
 ;       ls (sparkline), bhs, bvs, bhg, bvg, p (pie chart), p3 (3D pie chart),
-;       v (Venn diagram), s (scatter plot), r (radar), t (map), 
+;       v (Venn diagram), s (scatter plot), r (radar), t (map),
 ;       gom (Google-o-meter)
 ;    data : in, required, type=numeric
 ;       array of data to displayed
@@ -71,7 +71,7 @@ end
 ;    background : in, optional, type=long
 ;       color of background
 ;    alpha_channel : in, optional, type=float
-;       transparency of chart: 0.0 for completely transparent, 1.0 for 
+;       transparency of chart: 0.0 for completely transparent, 1.0 for
 ;       completely opaque
 ;    title : in, optional, type=string or strarr
 ;       title of the chart
@@ -99,37 +99,37 @@ function mg_gc_base, type=type, $
                      bar_sizes=barSizes, $
                      url=url, just_url=justUrl
   compile_opt strictarr
-  
+
   ; construct the URL
   baseUrl = 'http://chart.apis.google.com/chart'
-  
+
   _dims = n_elements(dimensions) eq 0L ? [200, 100] : dimensions
   _dims = 'chs=' + strjoin(strtrim(_dims, 2), 'x')
-  
+
   _type = '&cht=' + type
-  
+
   _data = '&chd=t:' + strjoin(strjoin(strtrim(data, 2), ','), '|')
   _range = n_elements(range) eq 0L $
              ? '' $
-             : ('&chds=' + strjoin(strtrim(range, 2), ',')) 
-             
+             : ('&chds=' + strjoin(strtrim(range, 2), ','))
+
   _label = n_elements(label) eq 0L ? '' : ('&chl=' + strjoin(label, '|'))
   _legendLabels = mg_gc_base_processstr(legendLabels, 'chdl')
   _legendPosition = n_elements(legendPosition) eq 0L $
                       ? '' $
                       : ('&chdlp=' + strjoin(legendPosition, '|'))
-  _title = mg_gc_base_processstr(title, 'chtt')                      
-  
+  _title = mg_gc_base_processstr(title, 'chtt')
+
   _barSizes = n_elements(barSizes) eq 0L $
                 ? '' $
                 : '&chbh=' + strjoin(strtrim(barSizes, 2), ',')
-  
+
   device, get_decomposed=dec
   if (n_elements(color) ne 0L) then begin
-    ; must turn around RGB triplets because result should be RRGGBB instead of 
+    ; must turn around RGB triplets because result should be RRGGBB instead of
     ; BBGGRR
     if (dec eq 0L) then begin
-      tvlct, r, g, b, /get      
+      tvlct, r, g, b, /get
       _color = mg_rgb2index([[b[color]], [g[color]], [r[color]]])
     endif else begin
       rgb = mg_index2rgb(color)
@@ -138,10 +138,10 @@ function mg_gc_base, type=type, $
                              [reform(rgb[*, 1])], $
                              [reform(rgb[*, 0])]])
     endelse
-    
+
     _color = '&chco=' + strjoin(strtrim(string(_color, format='(z06)'), 2), ',')
   endif else _color = ''
-  
+
   if (n_elements(background) gt 0L) then begin
     if (dec eq 0L) then begin
       tvlct, r, g, b, /get
@@ -154,35 +154,35 @@ function mg_gc_base, type=type, $
   endif else begin
     _fill = 'ffffff'
   endelse
-  
+
   if (n_elements(alphaChannel) gt 0L) then begin
     _fill = '&chf=a,s,' + _fill + string(255 * alphaChannel, format='(z02)')
   endif else begin
     _fill = '&chf=bg,s,' + _fill
   endelse
-  
+
   if (n_elements(axisLabels) gt 0L) then begin
     nlabels = strlen(axisLabels)
     _axisLabels = '&chxt=' + strjoin(string(transpose(byte(axisLabels))), ',')
   endif else _axisLabels = ''
-  
+
   url = baseUrl + '?' + _dims + _type + _data + _range $
           + _axisLabels + _title + _label $
           + _legendLabels + _legendPosition $
           + _color + _fill + _barSizes
-  
+
   if (keyword_set(justUrl)) then return, -1L
-  
+
   ; get the data
   tmpFile = filepath('googlevis.png', /tmp)   ; TODO: should contain unique identifier
   ourl = obj_new('IDLnetURL')
   imBuffer = ourl->get(filename=tmpFile, url=url)
   obj_destroy, ourl
-  
+
   ; read the file and then get rid of it
   im = read_png(tmpFile)
   file_delete, tmpFile
-  
+
   ; return the image data
   return, im
 end
@@ -197,8 +197,8 @@ im = mg_gc_base(type='p3', $
                 dimensions=dims, $
                 label=['A', 'B'], $
                 url=url)
-                 
-window, xsize=dims[0], ysize=dims[1], title=url                 
+
+window, xsize=dims[0], ysize=dims[1], title=url
 tv, im, true=1
 
 end

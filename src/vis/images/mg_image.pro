@@ -60,7 +60,7 @@ pro mg_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
                  _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   _true = true
   case nchannels of
     1: lastChannel = 0L
@@ -72,15 +72,15 @@ pro mg_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
     4: lastChannel = 2L
     else: message, 'invalid number of channels'
   endcase
-  
+
   case true of
-    0: _im = im 
+    0: _im = im
     1: _im = reform(im[0:lastChannel, *, *])
     2: _im = reform(im[*, 0:lastChannel, *])
     3: _im = reform(im[*, *, 0:lastChannel])
     else: message, 'invalid TRUE value'
   endcase
-  
+
   if (keyword_set(scale)) then begin
     tvscl, _im, x, y, true=_true, _extra=e
   endif else begin
@@ -99,10 +99,10 @@ pro mg_image_setdims
 
   ; other devices besides a graphics window
   if (!d.name ne 'X' && !d.name ne 'WIN') then return
-  
+
   ; existing graphics window
   if (!d.window ne -1L) then return
-  
+
   window, /pixmap
   wdelete, !d.window
 end
@@ -110,7 +110,7 @@ end
 
 ;+
 ; Displays an image scaled to a "reasonable" size with optional x- and y-axes.
-; 
+;
 ; :Params:
 ;    im : in, required, type=image array
 ;       image array
@@ -125,12 +125,12 @@ end
 ;       and 3 for (m, n, 3).
 ;
 ;       If TRUE is not present, `MG_IMAGE_GETSIZE` will attempt to guess the
-;       size. 2D images will automatically be set to TRUE=0; 3D images' 
+;       size. 2D images will automatically be set to TRUE=0; 3D images'
 ;       dimensions will be searched for a size 3 dimension.
 ;    stretch : in, optional, type=float
 ;       set to a value between `0.` and `100.` to stretch the histogram
 ;    axes : in, optional, type=boolean
-;       set to display axes around the image 
+;       set to display axes around the image
 ;    scale : in, optional, type=float, default=1.0
 ;       set to scale the creation of a new window to a fraction of the image
 ;       size
@@ -149,8 +149,8 @@ end
 ;    charsize : in, optional, type=float, default=1.0
 ;       multiplier for size of characters
 ;    ticklen : in, optional, type=float, default=-0.02
-;       length of tickmarks in normalized window units 
-;    _extra : in, optional, type=keywords    
+;       length of tickmarks in normalized window units
+;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, CONGRID, or WINDOW routines
 ;-
 pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
@@ -161,16 +161,16 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
               _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   ndims = size(im, /n_dimensions)
   _ticklen = n_elements(ticklen) eq 0L ? -0.02 : ticklen
-  
+
   if (n_elements(true) gt 0L) then _true = true
   dims = mg_image_getsize(im, true=_true, n_channels=nchannels)
-  
+
   _scale = n_elements(scale) eq 0L ? 1.0 : scale
   dims *= _scale
-  
+
   ; _position specifically not set in the case that POSITION not specified and
   ; AXES was not set
   if (n_elements(position) ne 0L) then begin
@@ -178,11 +178,11 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
   endif else begin
     if (~keyword_set(axes)) then _position = [0., 0., 1., 1.]
   endelse
-                
+
   if ((_true gt 0L && ndims ne 3) || (_true eq 0L && ndims ne 2L)) then begin
     message, 'TRUE keyword value does not match dimensionality of image'
   endif
-  
+
   if (keyword_set(newWindow) && ((!d.name eq 'WIN' || !d.name eq 'X'))) then begin
     if (keyword_set(axes)) then begin
       if (n_elements(_position) gt 0L) then begin
@@ -191,24 +191,24 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
       endif else begin
         ; need to make sure !d is setup
         mg_image_setdims
-      
+
         _xmargin = n_elements(xmargin) gt 0L ? xmargin : !x.margin
         _ymargin = n_elements(ymargin) gt 0L ? ymargin : !y.margin
-      
+
         _charsize = [1.0, 1.0]
-        if (n_elements(charsize) gt 0L) then _charsize *= charsize      
+        if (n_elements(charsize) gt 0L) then _charsize *= charsize
         _charsize *= [!d.x_ch_size, !d.y_ch_size]
-      
-        wdims = dims + _charsize * [total(_xmargin), total(_ymargin)] + 1  
-      endelse       
+
+        wdims = dims + _charsize * [total(_xmargin), total(_ymargin)] + 1
+      endelse
     endif else begin
       wdims = dims
     endelse
-    
+
     window, /free, xsize=wdims[0], ysize=wdims[1], _extra=e
   endif
-  
-  ; if a window already exists fit the image into the window otherwise create 
+
+  ; if a window already exists fit the image into the window otherwise create
   ; one of a "good" size
   if (!d.name eq 'WIN' || !d.name eq 'X') then begin
     if (!d.window eq -1L) then begin
@@ -226,14 +226,14 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
           wdims = 1.1 * dims
         endelse
       endelse
-    
+
       window, xsize=wdims[0], ysize=wdims[1], _extra=e
     endif
   endif
-  
+
   _x = n_elements(x) eq 0L ? (findgen(dims[0]) / _scale) : x
-  _y = n_elements(y) eq 0L ? (findgen(dims[1]) / _scale) : y 
-  
+  _y = n_elements(y) eq 0L ? (findgen(dims[1]) / _scale) : y
+
   if (~keyword_set(axes)) then begin
     plot, _x, _y, xstyle=5, ystyle=5, /nodata, position=_position, $
           xmargin=xmargin, ymargin=ymargin, _extra=e
@@ -247,24 +247,24 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
           ticklen=_ticklen, $
           _extra=e
   endelse
-                  
+
   ; TODO: this thickness will not be correct in PS output
   lineThick = keyword_set(axes)
-  
+
   lower = round(convert_coord(!x.window[0], !y.window[0], /normal, /to_device))
   upper = round(convert_coord(!x.window[1], !y.window[1], /normal, /to_device))
   displaySize = (upper - lower - lineThick) > 1
 
   ; stretch if requested
   _im = n_elements(stretch) eq 0L ? im : hist_equal(im, percent=stretch)
-  
+
   if (~keyword_set(noData)) then begin
     if (!d.name eq 'PS') then begin
-      if (keyword_set(noScale)) then begin      
+      if (keyword_set(noScale)) then begin
         mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
                      xsize=!x.window[1] - !x.window[0], $
                      ysize=!y.window[1] - !y.window[0], $
-                     true=_true, n_channels=nchannels      
+                     true=_true, n_channels=nchannels
       endif else begin
         mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
                      xsize=!x.window[1] - !x.window[0], $
@@ -273,13 +273,13 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
       endelse
     endif else begin
       displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
-                                   true=_true, _extra=e)  
+                                   true=_true, _extra=e)
       if (keyword_set(noScale)) then begin
         mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                      true=_true, n_channels=nchannels 
+                      true=_true, n_channels=nchannels
       endif else begin
         mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                      true=_true, /scale, n_channels=nchannels  
+                      true=_true, /scale, n_channels=nchannels
       endelse
     endelse
   endif
@@ -296,7 +296,7 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
           charsize=charsize, $
           ticklen=_ticklen, $
           _extra=e
-  endelse  
+  endelse
 end
 
 

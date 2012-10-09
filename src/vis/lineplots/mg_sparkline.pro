@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
 ;+
-; Writes a sparkline plot to a PNG file. 
-; 
+; Writes a sparkline plot to a PNG file.
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename of PNG file to write
@@ -24,7 +24,7 @@
 ;       background color for the plot
 ;    band_range : in, optional, type=fltarr(2)
 ;       [min, max] for band
-;    band_color : in, optional, type=bytarr(3) 
+;    band_color : in, optional, type=bytarr(3)
 ;       color of band
 ;-
 pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
@@ -43,9 +43,9 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
     max_data = max(data, min=min_data)
     my_yrange = n_elements(yrange) eq 0 ? [min_data, max_data] : yrange
     n_data = n_elements(Data)
-    
+
     odest = obj_new('IDLgrBuffer', dimensions=[my_xsize, my_ysize] * multiplier)
-    
+
     oview = obj_new('IDLgrView', color=background, $
                     viewplane_rect=[0, my_yrange[0], $
                                     n_data - 1L, my_yrange[1] - my_yrange[0]])
@@ -55,7 +55,7 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
 
     oplot = obj_new('IDLgrPlot', data, color=color, thick=multiplier)
     omodel->add, oplot
-     
+
     if (n_elements(band_range) gt 0 || n_elements(band_color) gt 0) then begin
         if (n_elements(band_range) eq 0) then begin
             my_band_range = $
@@ -79,16 +79,16 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
     obj_destroy, [oview, odest, oimage]
 
     if (n_elements(endpoint_color) gt 0) then begin
-        end_x = my_xsize - 1L 
+        end_x = my_xsize - 1L
         end_y = (data[n_data - 1L] - my_yrange[0]) $
                 * (my_ysize - 1L) / (my_yrange[1] - my_yrange[0])
     endif
 
     if (n_elements(background) eq 0) then begin
-        final_image = bytarr(4, my_xsize, my_ysize) 
+        final_image = bytarr(4, my_xsize, my_ysize)
         for b = 0, 2 do begin
           final_Image[b, *, *] = congrid(reform(image[b, *, *]), $
-                                         my_xsize, my_ysize, $ 
+                                         my_xsize, my_ysize, $
                                          /center, /interp, /minus_one) $
                                  > 0B < 255B
         endfor
@@ -96,8 +96,8 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
         ind = where(image[0, *, *] eq 255B and $
                     image[1, *, *] eq 255B and $
                     image[1, *, *] eq 255B, count)
-        if (count gt 0) then alpha[ind] = 0B             
-         
+        if (count gt 0) then alpha[ind] = 0B
+
         final_image[3, *, *] = congrid(alpha, my_xsize, my_ysize, $
                                   /center, /interp, /minus_one) > 0B < 255B
         if (n_elements(endpoint_color) gt 0) then begin
@@ -105,7 +105,7 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
             final_image[*, end_x - 1L, end_y] = [endpoint_color, 255B]
         endif
 
-    endif else begin 
+    endif else begin
         final_image = congrid(image, 3, my_xsize, my_ysize, $
                               /center, /interp, /minus_one) > 0B < 255B
         if (n_elements(endpoint_color) gt 0) then begin
@@ -114,5 +114,5 @@ pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
         endif
     endelse
 
-    write_png, filename, final_image    
+    write_png, filename, final_image
 end

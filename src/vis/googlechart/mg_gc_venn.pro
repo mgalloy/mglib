@@ -44,7 +44,7 @@
 ;    background : in, optional, type=long
 ;       background color of chart
 ;    alpha_channel : in, optional, type=float
-;       transparency of chart: 0.0 for completely transparent, 1.0 for 
+;       transparency of chart: 0.0 for completely transparent, 1.0 for
 ;       completely opaque
 ;    url : out, optional, type=string
 ;       URL used by Google Charts API
@@ -58,13 +58,13 @@ function mg_gc_venn, sizes, ab, ac, bc, abc, $
                      alpha_channel=alphaChannel, $
                      url=url
   compile_opt strictarr
-  
+
   return, mg_gc_base(data=[sizes, ab, ac, bc, abc], $
                      type='v', $
                      dimensions=dimensions, $
                      title=title, $
                      legend_labels=legendLabels, $
-                     legend_position=legendPosition, $                      
+                     legend_position=legendPosition, $
                      color=color, background=background, $
                      alpha_channel=alphaChannel, $
                      url=url)
@@ -84,7 +84,7 @@ im = mg_gc_venn([100, 80, 60], 10, 30, 50, 10, $
                 legend_position='l', $
                 color=color, background='F0FFFF'x, alpha=0.5, $
                 url=url)
-                     
+
 window, /free, xsize=400, ysize=250, title=url
 tv, im, true=1
 

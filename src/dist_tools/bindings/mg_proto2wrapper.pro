@@ -5,7 +5,7 @@
 ;
 ; :Returns:
 ;    string
-; 
+;
 ; :Params:
 ;    prototype : in, required, type=string
 ;       C prototype as found in a header file
@@ -16,7 +16,7 @@ function mg_proto2wrapper, prototype
   name = mg_parse_cprototype(prototype, params=params, return_type=return_type)
 
   r = mg_routinebinding(name=name, return_type=return_type, prototype=proto)
-  
+
   if (params[0] ne '') then begin
     for i = 0L, n_elements(params) - 1L do begin
       param_type = mg_parse_cdeclaration(params[i], $
@@ -29,9 +29,9 @@ function mg_proto2wrapper, prototype
       endif
     endfor
   endif
-  
-  result = r->output()  
+
+  result = r->output()
   obj_destroy, r
-  
+
   return, result
 end

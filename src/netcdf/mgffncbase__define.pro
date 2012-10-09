@@ -3,7 +3,7 @@
 ;+
 ; Class of functionality common to files, groups, and variables.
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;
 ; :Properties:
@@ -47,10 +47,10 @@ function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
       ncdf_attget, parent_id, id, attname, attvalue
     endif
   endelse
-    
+
   result = ''
   _indent = n_elements(indent) eq 0L ? '' : indent
-  
+
   length = attinfo.dataType eq 'CHAR' ? (attinfo.length - 1L) : attinfo.length
 
   if (attinfo.dataType eq 'CHAR') then begin
@@ -63,12 +63,12 @@ function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
       attValue = string(attvalue)
       truncated = 0B
     endelse
-    
+
     if (strlen(attvalue) gt 60) then begin
       attValue = strmid(attvalue, 0, 60)
       truncated = 1B
     endif
-  
+
     result += string(mg_newline(), $
                      _indent, $
                      attname, $
@@ -82,8 +82,8 @@ function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
                      length, $
                      attname, $
                      format='(%"%s%s  . ATTRIBUTE %s(%d) %s")')
-  endelse        
-  
+  endelse
+
   return, result
 end
 
@@ -95,7 +95,7 @@ pro mgffncbase::getProperty, identifier=identifier, $
                              parent=parent
 
   compile_opt strictarr
-  
+
   if (arg_present(identifier)) then identifier = self.id
   if (arg_present(parent)) then parent = self.parent
 end
@@ -106,7 +106,7 @@ end
 ;-
 pro mgffncbase::setProperty
   compile_opt strictarr
-  
+
 end
 
 
@@ -129,7 +129,7 @@ function mgffncbase::_overloadHelp, varname, type=type, specs=specs
   _type = n_elements(type) eq 0L ? 'NC_BASE' : type
   _specs = n_elements(specs) eq 0L ? '<undefined>' : specs
 
-  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')   
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -138,7 +138,7 @@ end
 ;-
 pro mgffncbase::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -150,10 +150,10 @@ end
 ;-
 function mgffncbase::init, identifier=identifier, parent=parent
   compile_opt strictarr
-  
+
   self.id = identifier
   self.parent = n_elements(parent) eq 0L ? obj_new()  : parent
-  
+
   return, 1
 end
 
@@ -167,7 +167,7 @@ end
 ;-
 pro mgffncbase__define
   compile_opt strictarr
-  
+
   define = { MGffNCBase, inherits IDL_Object, $
              parent: obj_new(), $
              id: 0L $

@@ -2,14 +2,14 @@
 
 ;+
 ; This makes MGffTemplate_ut a template object.
-;     
+;
 ; :Params:
 ;    name : in, required, type=string
 ;       name of the variable to find
 ;
 ; :Keywords:
 ;    found : out, optional, type=boolean
-;       true if variable found    
+;       true if variable found
 ;-
 function mgfftemplate_ut::getVariable, name, found=found
   compile_opt strictarr
@@ -32,20 +32,20 @@ function mgfftemplate_ut::_runTest, templateBasename, variables, answer, $
                                     line=line
   compile_opt strictarr
   on_error, 2
-  
+
   root = mg_src_root()
   templateFilename = filepath(templateBasename + '.tt', root=root)
   outputFilename = filepath(templateBasename + '.out', root=root)
-  
+
   template = obj_new('MGffTemplate', templateFilename)
   template->process, variables, outputFilename
   obj_destroy, template
-  
+
   openr, lun, outputFilename, /get_lun
   line = ''
   readf, lun, line
-  free_lun, lun  
-  
+  free_lun, lun
+
   file_delete, outputFilename
 
   return, line eq answer
@@ -80,7 +80,7 @@ function mgfftemplate_ut::test_include_object
                           self, $
                           '[% 3 * a %]')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -95,7 +95,7 @@ function mgfftemplate_ut::test_insert_object
                           self, $
                           '[% 3 * a %]')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -111,16 +111,16 @@ function mgfftemplate_ut::test_scope
     o.a = i
     self.objects[i] = o
   endfor
-  
+
   answer = '       0       1       2       3       4       5       6       7       8       9'
   result = self->_runTest('scope', $
                           self, $
                           answer, $
                           line=line)
-                          
-  obj_destroy, self.objects                           
+
+  obj_destroy, self.objects
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -136,17 +136,17 @@ function mgfftemplate_ut::test_double_scope
     o.a = i
     self.objects[i] = o
   endfor
-  
+
   answer = '       0       1       2       3       4       5       6       7       8       9'
   answer = answer + answer
   result = self->_runTest('double-scope', $
                           self, $
                           answer, $
                           line=line)
-                          
-  obj_destroy, self.objects                        
+
+  obj_destroy, self.objects
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -162,7 +162,7 @@ function mgfftemplate_ut::test_for_object
                           self, $
                           '   0   1   2   3   4   5   6   7   8   9')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -178,7 +178,7 @@ function mgfftemplate_ut::test_double_for_object
                           self, $
                           '   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9', line=line)
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -192,15 +192,15 @@ function mgfftemplate_ut::test_if_object
   self.a = 7S
   result = self->_runTest('if', self, 'True', line=line)
   assert, result, 'not true'
-  
+
   self.a = 4S
   result = self->_runTest('if', self, 'False', line=line)
   assert, result, 'not false'
 
   return, 1
 end
-  
-  
+
+
 ;+
 ; Process a simple expression with an object template.
 ;-
@@ -214,8 +214,8 @@ function mgfftemplate_ut::test_simple_object
 
   return, 1
 end
-   
-     
+
+
 ;+
 ; Process an INCLUDE_TEMPLATE.
 ;-
@@ -243,7 +243,7 @@ function mgfftemplate_ut::test_include
                           { filename: simpleFilename }, $
                           '[% 3 * a %]')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -258,7 +258,7 @@ function mgfftemplate_ut::test_insert
                           { a: 5 }, $
                           '[% 3 * a %]')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -273,11 +273,11 @@ function mgfftemplate_ut::test_for
                           { arr:bindgen(10) }, $
                           '   0   1   2   3   4   5   6   7   8   9')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
- 
+
 ;+
 ; Process an IF/ELSE.
 ;-
@@ -288,12 +288,12 @@ function mgfftemplate_ut::test_if
                           { a: 7 }, $
                           'True')
   assert, result, 'incorrect result'
-  
+
   result = self->_runTest('if', $
                           { a: 4 }, $
                           'False')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -308,7 +308,7 @@ function mgfftemplate_ut::test_simple
                           { a: 5 }, $
                           '      15')
   assert, result, 'incorrect result'
-  
+
   return, 1
 end
 
@@ -318,7 +318,7 @@ end
 ;-
 pro mgfftemplate_ut__define
 	compile_opt strictarr
-	
+
 	define = { mgfftemplate_ut, inherits MGutLibTestCase, $
 	           a: 0S, $
 	           arr: bytarr(10), $
@@ -326,4 +326,3 @@ pro mgfftemplate_ut__define
 	           filename: '' $
 	         }
 end
-     

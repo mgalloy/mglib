@@ -28,29 +28,29 @@
 ;       IDL> adata = mg_read_ascii(file_which('ascii.dat'), data_start=3, $
 ;       IDL>                       delimiter=string(9B), comment_symbol='%', $
 ;       IDL>                       groups=lonarr(4), missing_value=-999.)
-;       IDL> print, adata.col0                                                
+;       IDL> print, adata.col0
 ;             55.3000      22.1000      19.3000      40.0000
 ;             19.1000     -999.000      15.1000      33.4000
 ;             100.300      79.0000      22.1000      3.30000
 ;
 ; :Returns:
-;    structure with field names given by `COLUMN_NAMES` keyword, or, if 
+;    structure with field names given by `COLUMN_NAMES` keyword, or, if
 ;    `COLUMN_NAMES` is not present, "col0", "col1", etc.
-; 
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename of file to read
 ;
 ; :Keywords:
 ;    column_names : in, optional, type=strarr
-;       names for the columns in the data; if there are groups specified, 
+;       names for the columns in the data; if there are groups specified,
 ;       the column names should be repeated for each column in the group, so
 ;       that the number of column names is always equal to the number of
 ;       columns
 ;    column_types : in, optional, type=lonarr
-;       SIZE type codes for the columns in the data; if there are groups 
-;       specified, the column types should be repeated for each column in the 
-;       group, so that the number of column types is always equal to the 
+;       SIZE type codes for the columns in the data; if there are groups
+;       specified, the column types should be repeated for each column in the
+;       group, so that the number of column types is always equal to the
 ;       number of columns
 ;    comment_symbol : in, optional, type=string
 ;       specifies a comment character for the lines in the file
@@ -112,27 +112,27 @@ function mg_read_ascii, filename, $
                          : n_elements(groups)) $
                     : n_elements(columnNames)) $
                : n_elements(columnTypes)
-  
+
   if (nColumns eq 0L) then begin
     message, 'one of COLUMN_NAMES, COLUMN_TYPES, or GROUPS must be defined'
   endif
-  
+
   ; pad column names with the correct number of zeros
   colNameFormat = '(I0' + strtrim(ceil(alog10(nColumns)), 2) + ')'
-  
+
   _columnNames = n_elements(columnNames) eq 0L $
                    ? 'col' + string(sindgen(nColumns), format=colNameFormat) $
                    : columnNames
   _columnTypes = n_elements(columnTypes) eq 0L $
                    ? (lonarr(nColumns) + 4L) $
                    : columnTypes
-                   
+
   _groups = n_elements(groups) eq 0L ? lonarr(nColumns) : groups
-  
+
   _missingValue = n_elements(missingValue) eq 0L $
                     ? fix(0, type=_columnTypes[0]) $
                     : missingValue
-  
+
   t = { version: 1., $
         datastart:_dataStart, $
         delimiter:byte(_delimiter), $
@@ -143,13 +143,13 @@ function mg_read_ascii, filename, $
         fieldnames:_columnNames, $
         fieldlocations:lindgen(nColumns), $
         fieldgroups:_groups }
-  
+
   return, read_ascii(filename, $
                      count=count, $
                      header=header, $
                      template=t, $
                      num_records=numRecords, $
-                     record_start=recordStart, $                   
+                     record_start=recordStart, $
                      verbose=verbose)
 end
 

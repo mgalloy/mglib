@@ -20,7 +20,7 @@
 ;-
 function mg_strwrap, str, width=width, indent=indent, first_indent=firstIndent
   compile_opt strictarr
-  
+
   strArray = strsplit(str, mg_newline(), count=count, /extract)
   if (count gt 1L) then begin
     result = [mg_strwrap(strArray[0], width=width, indent=indent, $
@@ -30,40 +30,40 @@ function mg_strwrap, str, width=width, indent=indent, first_indent=firstIndent
     endfor
     return, result
   endif
-  
+
   _width = n_elements(width) eq 0L ? mg_termcolumns() : width
-  
-  _indent = n_elements(indent) eq 0L ? 0L : indent  
+
+  _indent = n_elements(indent) eq 0L ? 0L : indent
   indentString = _indent eq 0L ? '' : string(bytarr(_indent) + 32B)
 
-  _firstIndent = n_elements(firstIndent) eq 0L ? _indent : firstIndent  
+  _firstIndent = n_elements(firstIndent) eq 0L ? _indent : firstIndent
   firstIndentString = _firstIndent eq 0L ? '' : string(bytarr(_firstIndent) + 32B)
-  
+
   tmp = str
-  
+
   while (strlen(tmp) gt 0L) do begin
     _i = n_elements(result) eq 0L ? _firstIndent : _indent
-    
+
     if (strlen(tmp) le _width - _i) then begin
       line = tmp
       tmp = ''
     endif else begin
-      space = strpos(tmp, ' ', _width - _i, /reverse_search)  
+      space = strpos(tmp, ' ', _width - _i, /reverse_search)
       if (space eq -1L) then begin
         space = strpos(tmp, ' ', _width - _i)
         if (space eq -1L) then space = strlen(tmp)
       endif
-      
+
       line = strtrim(strmid(tmp, 0, space))
       tmp = strtrim(strmid(tmp, space + 1), 1)
     endelse
-    
+
     result = n_elements(result) eq 0L $
                ? firstIndentString + line $
-               : [result, indentString + line] 
-    
+               : [result, indentString + line]
+
   endwhile
-  
+
   return, result
 end
 

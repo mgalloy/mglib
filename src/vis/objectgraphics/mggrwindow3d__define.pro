@@ -3,7 +3,7 @@
 ;+
 ; `MGgrWindow3D` is an object graphics destination for displaying a scene
 ; as an anaglyph in an `IDLgrWindow`.
-; 
+;
 ; :Categories:
 ;    object graphics
 ;
@@ -17,15 +17,15 @@
 ;
 ;    .. image:: anaglyph.png
 ;
-; :Properties: 
+; :Properties:
 ;    color : type=boolean
 ;       set to produce color anaglyphs
 ;    dimensions : type=intarr(2)
 ;       dimensions of the window
 ;    eye_separation : type=float
-;       number of degrees of the cone formed by drawing lines from each eye to 
+;       number of degrees of the cone formed by drawing lines from each eye to
 ;       the origin of the view
-;    _extra : out, optional, type=keywords 
+;    _extra : out, optional, type=keywords
 ;       properties of IDLgrWindow
 ;-
 
@@ -43,7 +43,7 @@ pro mggrwindow3d::getProperty, eye_separation=eyeSeparation, color=color, $
   if (arg_present(eyeSeparation)) then begin
     self.converter->getProperty, eye_separation=eyeSeparation
   endif
-  
+
   if (n_elements(e) gt 0) then begin
     self->IDLgrWindow::getProperty, _strict_extra=e
   endif
@@ -51,8 +51,8 @@ end
 
 
 ;+
-; Set properties of the `MGgrWindow3D`. Must intercept `DIMENSIONS` property to 
-; set the converter's buffer size correctly; otherwise, just pass along stuff 
+; Set properties of the `MGgrWindow3D`. Must intercept `DIMENSIONS` property to
+; set the converter's buffer size correctly; otherwise, just pass along stuff
 ; to `IDLgrWindow`'s setProperty method.
 ;-
 pro mggrwindow3d::setProperty, dimensions=dimensions, $
@@ -73,7 +73,7 @@ pro mggrwindow3d::setProperty, dimensions=dimensions, $
 
   if (n_elements(eye_separation) gt 0) then begin
     self.converter->setProperty, eye_separation=eyeSeparation
-  endif  
+  endif
 end
 
 
@@ -82,7 +82,7 @@ end
 ;
 ; :Params:
 ;    picture : in, optional, type=obj ref
-;       the view, viewgroup, or scene to be drawn; if the GRAPHICS_TREE 
+;       the view, viewgroup, or scene to be drawn; if the GRAPHICS_TREE
 ;       property is set to a valid picture, then this argument must *not*
 ;       be given
 ;-
@@ -113,7 +113,7 @@ end
 ;+
 ; Initialize Window3D object.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, o/w for failure
 ;-
 function mggrwindow3d::init, eye_separation=eyeSeparation, $
@@ -130,10 +130,10 @@ function mggrwindow3d::init, eye_separation=eyeSeparation, $
       'windows': begin
           dims = [pref_get('idl_gr_win_width'), pref_get('idl_gr_win_height')]
         end
-      else: message, 'unsupported OS family' 
+      else: message, 'unsupported OS family'
     endcase
   endif else dims = dimensions
-    
+
   if (~self->IDLgrWindow::init(dimensions=dims, _extra=e)) then return, 0
 
   self.converter = obj_new('MGgr3dConverter', $
@@ -150,7 +150,7 @@ end
 ; appropriate to view with red-blue glasses.
 ;
 ; :Fields:
-;    converter 
+;    converter
 ;       object which takes a view and converts to a 3D anaglyph
 ;-
 pro mggrwindow3d__define

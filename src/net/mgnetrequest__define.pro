@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Class representing a URI request: GET, PUT, POST, DELETE, HEAD, OPTIONS, 
+; Class representing a URI request: GET, PUT, POST, DELETE, HEAD, OPTIONS,
 ; TRACE, and CONNECT.
 ;
 ; :Todo:
@@ -10,7 +10,7 @@
 ;       * handle HTTPS requests besides GET, PUT, and POST
 ;       * handle proxies
 ;       * write some tests
-; 
+;
 ; :Examples:
 ;    For example::
 ;
@@ -47,20 +47,20 @@
 ;-
 function mgnetrequest_callback, status, progress, request
   compile_opt strictarr
-  
+
   request->getProperty, debug=debug
   if (debug) then begin
     if (strpos(status, 'Verbose: Header Out:  ') ne -1L) then begin
       print, strmid(status, 22)
     endif
   endif
-  
+
   return, 1
 end
 
 
 ;+
-; Sends its output to the given socket LUN and, if self.debug is set, to 
+; Sends its output to the given socket LUN and, if self.debug is set, to
 ; standard output.
 ;
 ; :Params:
@@ -71,7 +71,7 @@ end
 ;-
 pro mgnetrequest::_printf, lun, s
   compile_opt strictarr
-  
+
   printf, lun, s
   if (self.debug) then print, s
 end
@@ -86,14 +86,14 @@ end
 ;-
 pro mgnetrequest::_sendHeaders, lun
   compile_opt strictarr
-  
+
   headerKeys = self.headers->keys(count=nHeaders)
   headerValues = self.headers->values()
 
   ; Host header should be first
-  hostname = self.headers->get('Host')  
+  hostname = self.headers->get('Host')
   self->_printf, lun, 'Host: ' + hostname
-  
+
   for h = 0L, nHeaders - 1L do begin
     if (headerKeys[h] eq 'Host') then continue
     self->_printf, lun, headerKeys[h] + ': ' + headerValues[h]
@@ -103,10 +103,10 @@ end
 
 pro mgnetrequest::_sendHeadersNetUrl, netUrl
   compile_opt strictarr
-  
+
   headerKeys = self.headers->keys(count=nHeaders)
   headerValues = self.headers->values()
-  
+
   for h = 0L, nHeaders - 1L do begin
     if (headerKeys[h] eq 'Host') then continue
     netUrl->setProperty, headers=headerKeys[h] + ': ' + headerValues[h]
@@ -118,7 +118,7 @@ end
 ;-
 pro mgnetrequest::_initializeHeaders
   compile_opt strictarr
-  
+
   urlparts = parse_url(self.url)
   self.headers->put, 'Host', urlparts.host
   self.headers->put, 'User-agent', 'IDL-MGnetRequest/' + self.version
@@ -133,7 +133,7 @@ end
 ;
 ; :Params:
 ;    method : in, required, type=string
-;       method to use to send the request: GET, PUT, POST, HEAD, DELETE, 
+;       method to use to send the request: GET, PUT, POST, HEAD, DELETE,
 ;       OPTIONS, TRACE, or CONNECT
 ;    data : in, optional, type=any
 ;       data to send in PUT and POST methods
@@ -146,42 +146,42 @@ function mgnetrequest::_sendNetUrl, method, data, $
                                     response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   urlparts = parse_url(self.url)
-  
+
   netUrl = obj_new('IDLnetURL')
-  
+
   netUrl->setProperty, /verbose, $
                        callback_function='mgnetrequest_callback', $
                        callback_data=self
-  self->_sendHeadersNetUrl, netUrl                     
+  self->_sendHeadersNetUrl, netUrl
 
   if (self.debug) then begin
     print, urlparts.host, self.port, format='(%"connect: (%s, %d)\n")'
     print, 'send: '''
   endif
-  
+
   case strupcase(method) of
     'GET': content = netUrl->get(url=self.url, /string_array)
     'PUT': content = netUrl->put(data, url=self.url, /buffer)
     'POST': content = netUrl->post(data, url=self.url, /post, /buffer)
     else: message, 'method not supported'
   endcase
-  
+
   if (self.debug) then begin
     print, ''''
     print
   endif
-  
-  netUrl->getProperty, response_header=responseHeaderArray  
+
+  netUrl->getProperty, response_header=responseHeaderArray
   if (self.debug) then begin
-    print, 'response header: '''  
+    print, 'response header: '''
     print, responseHeaderArray
     print, ''''
   endif
 
   obj_destroy, netUrl
-  
+
   return, content
 end
 
@@ -194,7 +194,7 @@ end
 ;
 ; :Params:
 ;    method : in, required, type=string
-;       method to use to send the request: GET, PUT, POST, HEAD, DELETE, 
+;       method to use to send the request: GET, PUT, POST, HEAD, DELETE,
 ;       OPTIONS, TRACE, or CONNECT
 ;    data : in, optional, type=any
 ;       data to send in PUT and POST methods
@@ -205,53 +205,53 @@ end
 ;-
 function mgnetrequest::_send, method, data, response_header=responseHeaderArray
   compile_opt strictarr
-  
+
   urlparts = parse_url(self.url)
 
   socket, lun, urlparts.host, self.port, /get_lun
   if (self.debug) then print, urlparts.host, self.port, format='(%"connect: (%s, %d)\n")'
 
   if (self.debug) then print, 'send: '''
-  
+
   queryLocation = urlparts.path  + (urlparts.query eq '' ? '' : '?') + urlparts.query
   requestMethod = method + ' /' + queryLocation + ' HTTP/1.0'
   self->_printf, lun, requestMethod
-  
+
   self->_sendHeaders, lun
-  
+
   if (self.debug) then print, ''''
   self->_printf, lun, ''
-    
+
   responseHeader = obj_new('MGcoArrayList', type=7)
   response = obj_new('MGcoArrayList', type=7)
   inContent = 0B
-  
+
   if (self.debug) then print, 'response header: '''
-  line = '' 
+  line = ''
   while (~eof(lun)) do begin
-    readf, lun, line 
+    readf, lun, line
 
     if (~inContent && line eq '') then begin
       inContent = 1B
       continue
     endif
-    
+
     if (inContent) then begin
-      response->add, line 
+      response->add, line
     endif else begin
       if (self.debug) then print, line
       responseHeader->add, line
     endelse
-  endwhile 
+  endwhile
   if (self.debug) then print, ''''
-  
+
   free_lun, lun
-  
+
   responseArray = response->get(/all)
   responseHeaderArray = responseHeader->get(/all)
-  
+
   obj_destroy, [responseHeader, response]
-  
+
   return, responseArray
 end
 
@@ -266,7 +266,7 @@ end
 function mgnetrequest::get, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('GET', response_header=responseHeaderArray)
     'https': return, self->_sendNetUrl('GET', response_header=responseHeaderArray)
@@ -292,7 +292,7 @@ end
 ;+
 ; Send a PUT request.
 ;
-; :Todo: 
+; :Todo:
 ;    add content body of request
 ;
 ; :Keywords:
@@ -302,7 +302,7 @@ end
 function mgnetrequest::put, data, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('PUT', data, response_header=responseHeaderArray)
     'https': return, self->_sendNetUrl('PUT', response_header=responseHeaderArray)
@@ -314,7 +314,7 @@ end
 ;+
 ; Send a POST request.
 ;
-; :Todo: 
+; :Todo:
 ;    add content body of request
 ;
 ; :Params:
@@ -328,7 +328,7 @@ end
 function mgnetrequest::post, data, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('POST', data, response_header=responseHeaderArray)
     'https': return, self->_sendNetUrl('POST', response_header=responseHeaderArray)
@@ -365,7 +365,7 @@ end
 function mgnetrequest::options, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('OPTIONS', data, response_header=responseHeaderArray)
     else: message, 'scheme not implemented yet'
@@ -383,11 +383,11 @@ end
 function mgnetrequest::trace, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('TRACE', data, response_header=responseHeaderArray)
     else: message, 'scheme not implemented yet'
-  endcase  
+  endcase
 end
 
 
@@ -401,16 +401,16 @@ end
 function mgnetrequest::connect, response_header=responseHeaderArray
   compile_opt strictarr
   on_error, 2
-  
+
   case strlowcase(self.scheme) of
     'http': return, self->_send('CONNECT', data, response_header=responseHeaderArray)
     else: message, 'scheme not implemented yet'
-  endcase  
+  endcase
 end
 
 
 ;+
-; Add a header field to the request. If the header already exists in the 
+; Add a header field to the request. If the header already exists in the
 ; request, then it is replaced by the next value.
 ;
 ; :Params:
@@ -421,7 +421,7 @@ end
 ;-
 pro mgnetrequest::addHeader, key, value
   compile_opt strictarr
-  
+
   self.headers->put, key, value
 end
 
@@ -431,7 +431,7 @@ end
 ;-
 pro mgnetrequest::getProperty, debug=debug
   compile_opt strictarr
-  
+
   if (arg_present(debug)) then debug = self.debug
 end
 
@@ -442,7 +442,7 @@ end
 pro mgnetrequest::setProperty, debug=debug
   compile_opt strictarr
 
-  if (n_elements(debug) gt 0L) then self.debug = keyword_set(debug)  
+  if (n_elements(debug) gt 0L) then self.debug = keyword_set(debug)
 end
 
 
@@ -451,39 +451,39 @@ end
 ;-
 pro mgnetrequest::cleanup
   compile_opt strictarr
-  
+
   obj_destroy, self.headers
 end
 
 
 ;+
 ; Create a request object.
-; 
+;
 ; :Params:
 ;    url_param : in, optional, type=string
-;       URL to send request to; either url_param parameter or URL keyword must 
+;       URL to send request to; either url_param parameter or URL keyword must
 ;       be set to the URL to send the request to
-; 
+;
 ; :Keywords:
 ;    url : in, optional, type=string
-;       URL to send request to; either url_param parameter or URL keyword must 
+;       URL to send request to; either url_param parameter or URL keyword must
 ;       be set to the URL to send the request to
 ;-
 function mgnetrequest::init, url_param, url=url, debug=debug
   compile_opt strictarr
   on_error, 2
-  
+
   self.version = '1.0'
-  
+
   self.url = n_params() gt 0L ? url_param : url
-  
+
   urlparts = parse_url(self.url)
   if (urlparts.scheme eq '') then self.url = 'http://' + self.url
-  
+
   urlparts = parse_url(self.url)
   self.scheme = urlparts.scheme
-  
-  if (urlparts.port eq 80L) then begin  
+
+  if (urlparts.port eq 80L) then begin
     case urlparts.scheme of
       'http': self.port = 80L
       'https': self.port = 443L
@@ -492,12 +492,12 @@ function mgnetrequest::init, url_param, url=url, debug=debug
   endif else begin
     self.port = urlparts.port
   endelse
-  
+
   self.debug = keyword_set(debug)
-  
+
   self.headers = obj_new('MGcoHashTable', key_type=7, value_type=7)
   self->_initializeHeaders
-  
+
   return, 1
 end
 
@@ -519,7 +519,7 @@ end
 ;-
 pro mgnetrequest__define
   compile_opt strictarr
-  
+
   define = { MGnetRequest, $
              version: '', $
              url: '', $

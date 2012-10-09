@@ -8,7 +8,7 @@
 
 
 ;+
-; Converts a `SIZE` type code into various C declaration names. By default, it 
+; Converts a `SIZE` type code into various C declaration names. By default, it
 ; converts into the `IDL_ALLTYPES` member field name.
 ;
 ; :Returns:
@@ -34,10 +34,10 @@ function mg_idltype, type_code, declaration=declaration, type=type
         if (strmid(_type_code, strlen(_type_code) - 1) eq '*') then begin
           return, 'IDL_TYP_PTRINT'
         endif
-           
+
         return, 'CUSTOM_C_TYPE'
       endif
-      
+
       case type_code of
         0: return, 'IDL_TYP_UNDEF'
         1: return, 'IDL_TYP_BYTE'
@@ -61,7 +61,7 @@ function mg_idltype, type_code, declaration=declaration, type=type
       if (size(type_code, /type) eq 7) then begin
         return, type_code
       endif
-      
+
       case type_code of
         0: return, ''
         1: return, 'UCHAR'
@@ -85,7 +85,7 @@ function mg_idltype, type_code, declaration=declaration, type=type
       if (size(type_code, /type) eq 7) then begin
         return, 'ptrint'
       endif
-       
+
       case type_code of
         0: return, ''
         1: return, 'c'

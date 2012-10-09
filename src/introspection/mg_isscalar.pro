@@ -12,6 +12,6 @@
 ;-
 function mg_isscalar, arg
   compile_opt strictarr
-  
+
   return, n_elements(arg) eq 1 && size(arg, /n_dimensions) eq 0
 end

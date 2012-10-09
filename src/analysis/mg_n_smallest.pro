@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Finds the `n` smallest elements of a data array. This algorithm works 
-; fastest on uniformly distributed data. The worst case for it is a single 
-; smallest data element and all other elements with another value. This will 
-; be nearly equivalent to just sorting all the elements and choosing the first 
+; Finds the `n` smallest elements of a data array. This algorithm works
+; fastest on uniformly distributed data. The worst case for it is a single
+; smallest data element and all other elements with another value. This will
+; be nearly equivalent to just sorting all the elements and choosing the first
 ; `n` elements.
 ;
 ; :Examples:

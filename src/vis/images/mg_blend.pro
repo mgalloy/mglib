@@ -10,7 +10,7 @@
 ; precision of both type codes. The promotion order of the types is shown in:
 ;
 ; .. image:: idl-type-promotion.png
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -24,7 +24,7 @@
 ;-
 function mg_blend_type, type1, type2
   compile_opt strictarr
-  
+
   types = [[intarr(16) - 1], $ ; undefined
            [-1,  1,  2,  3,  4,  5,  6, -1, -1,  9, -1, -1, 12, 13, 14, 15], $ ; byte
            [-1,  2,  2,  3,  4,  5,  6, -1, -1,  9, -1, -1,  3, 14, 14,  4], $ ; int
@@ -40,15 +40,15 @@ function mg_blend_type, type1, type2
            [-1, 12,  3,  3,  4,  5,  6, -1, -1,  9, -1, -1, 12, 13, 14, 15], $ ; uint
            [-1, 13, 14, 14,  4,  5,  6, -1, -1,  9, -1, -1, 13, 13, 14, 15], $ ; ulong
            [-1, 14, 14, 14,  4,  5,  6, -1, -1,  9, -1, -1, 14, 14, 14,  4], $ ; long64
-           [-1, 15,  4,  4,  4,  5,  6, -1, -1,  9, -1, -1, 15, 15,  4, 15]] ; ulong64           
+           [-1, 15,  4,  4,  4,  5,  6, -1, -1,  9, -1, -1, 15, 15,  4, 15]] ; ulong64
 
-  
+
   return, types[type1, type2]
 end
 
 
 ;+
-; Return the permutation array to TRANSPOSE an array from `TRUE=true1` to 
+; Return the permutation array to TRANSPOSE an array from `TRUE=true1` to
 ; `TRUE=true2`.
 ;
 ; :Private:
@@ -68,20 +68,20 @@ function mg_blend_perm, true1, true2
   allPerms = [[[0, 1, 2], [1, 0, 2], [1, 2, 0]], $
               [[1, 0, 2], [0, 1, 2], [0, 2, 1]], $
               [[2, 0, 1], [0, 2, 1], [0, 1, 2]]]
-  
+
   return, reform(allPerms[*, true2 - 1L, true1 - 1L])
 end
 
 
 ;+
-; Blend two images together using the given alpha channel. If the images are 
+; Blend two images together using the given alpha channel. If the images are
 ; of different interleaves they are converted to a common interleave:
 ;
-;    * if one image is 2D and one is 3D, the 2D image is converted to the 
+;    * if one image is 2D and one is 3D, the 2D image is converted to the
 ;      interleave of the 3D image (using the current color table)
 ;    * if both images are 3D, the second image is converted to the interleave
 ;      of the first image
-; 
+;
 ; :Examples:
 ;    Run the main-level program at the end of this file with::
 ;
@@ -100,25 +100,25 @@ end
 ;    im2 : in, required, type=image
 ;       second image to blend; must have the same xsize and ysize as im1, but
 ;       may have a different number of bands
-; 
+;
 ; :Keywords:
 ;    alpha_channel : in, optional, type=float, default=0.5
 ;       value in 0.0 - 1.0; 1.0 is all im1 and 0.0 is all im2; can be a scalar
-;       or a 2-dimensional image the same size as the combined images 
+;       or a 2-dimensional image the same size as the combined images
 ;-
 function mg_blend, im1, im2, alpha_channel=alphaChannel
   compile_opt strictarr
   on_error, 2
-  
+
   _alphaChannel = n_elements(alphaChannel) eq 0L ? 0.5 : alphaChannel
-  
+
   _im1 = im1
   _im2 = im2
-  
+
   sz1 = size(_im1, /structure)
   sz2 = size(_im2, /structure)
   szAlpha = size(_alphaChannel, /structure)
-  
+
   if (sz1.n_dimensions lt 2L || sz1.n_dimensions gt 3L) then begin
     message, 'images must have 2 or 3 dimensions'
   endif
@@ -126,26 +126,26 @@ function mg_blend, im1, im2, alpha_channel=alphaChannel
   if (sz2.n_dimensions lt 2L || sz2.n_dimensions gt 3L) then begin
     message, 'images must have 2 or 3 dimensions'
   endif
-  
+
   if (szAlpha.n_dimensions ne 0L && szAlpha.n_dimensions ne 2L) then begin
     message, 'ALPHA_CHANNEL must be a scalar or 2-dimensional'
   endif
-  
+
   dims1 = mg_image_getsize(_im1, true=true1)
   dims2 = mg_image_getsize(_im2, true=true2)
-  
+
   if (~array_equal(dims1, dims2)) then begin
     message, 'images must have matching sizes'
   endif
 
   if (n_elements(_alphaChannel) gt 1L) then begin
-    dimsAlpha  = mg_image_getsize(_alphaChannel, true=trueAlpha)  
-  
+    dimsAlpha  = mg_image_getsize(_alphaChannel, true=trueAlpha)
+
     if (~array_equal(dims1, dimsAlpha)) then begin
       message, 'ALPHA_CHANNEL size must match image sizes if not a scalar'
     endif
   endif
-  
+
   ; convert images to the same interleave
   if (sz1.n_dimensions ne sz2.n_dimensions) then begin
     ; one 2D image, one 3D image
@@ -156,28 +156,28 @@ function mg_blend, im1, im2, alpha_channel=alphaChannel
     endcase
   endif else begin
     ; both 2D images or both 3D images (but possibly different interleaves)
-    if (sz1.n_dimensions eq 3L) then begin  
+    if (sz1.n_dimensions eq 3L) then begin
       _im2 = transpose(_im2, mg_blend_perm(true1, true2))
     endif
   endelse
-  
+
   ; convert alpha channel to the correct interleave if it is a channel
   if (n_elements(_alphaChannel) gt 1L) then begin
-    
+
     if (true1 gt 0L) then begin
       _alphaChannel = reform(_alphaChannel, 1, dimsAlpha[0], dimsAlpha[1])
       _alphaChannel = rebin(_alphaChannel, 3, dimsAlpha[0], dimsAlpha[1])
 
       case true1 of
-        1: 
+        1:
         2: _alphaChannel = transpose(_alphaChannel, [1, 0, 2])
         3: _alphaChannel = transpose(_alphaChannel, [1, 2, 0])
       endcase
     endif
   endif
-  
+
   ; make result image the correct type (higher precision of the types of
-  ; the two input images)  
+  ; the two input images)
   return, fix(_alphaChannel * _im1 + (1.0 - _alphaChannel) * _im2, $
               type=mg_blend_type(sz1.type, sz2.type))
 end

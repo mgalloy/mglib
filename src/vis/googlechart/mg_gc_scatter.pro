@@ -12,7 +12,7 @@
 ;       IDL> .run mg_gc_scatter
 ;
 ;    It should generate:
-; 
+;
 ;    .. image:: gc_scatter.png
 ;
 ; :Returns:
@@ -42,16 +42,16 @@ function mg_gc_scatter, x, y, $
                         dimensions=dimensions, $
                         url=url
   compile_opt strictarr
-  
+
   _xrange = n_elements(xrange) eq 0L ? [min(x, max=xmax), xmax] : xrange
   _yrange = n_elements(yrange) eq 0L ? [min(y, max=ymax), ymax] : yrange
   range = [_xrange, _yrange]
-  
+
   data = [[x], [y]]
   if (n_elements(symSize) gt 0L) then begin
     data = [[data], [fltarr(n_elements(x)) + symSize]]
   endif
-  
+
   return, mg_gc_base(data=data, $
                      range=range, $
                      type='s', $

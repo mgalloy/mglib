@@ -7,7 +7,7 @@
 
 ;+
 ; Read portions of a file using bracket notation in IDL 8.0.
-; 
+;
 ; :Returns:
 ;    `bytarr`
 ;-
@@ -16,8 +16,8 @@ function mgfffile::_overloadBracketsRightSide, isRange, $
                                                ss5, ss6, ss7, ss8
   compile_opt strictarr
 
-  openr, lun, self.filename, /get_lun  
-  
+  openr, lun, self.filename, /get_lun
+
   if (isRange[0]) then begin
     point_lun, lun, ss1[0]
     dim = (ss1[1] lt 0L ? (self.size + ss1[1]) : ss1[1]) - ss1[0] + 1
@@ -51,7 +51,7 @@ pro mgfffile::getProperty, filename=filename, exists=exists, read=read, write=wr
                            symlink=symlink, dangling_symlink=danglingSymlink, $
                            atime=atime, ctime=ctime, mtime=mtime, size=size
   compile_opt strictarr
-  
+
   if (arg_present(filename)) then filename = self.filename
   if (arg_present(exists)) then exists = self.exists
   if (arg_present(read)) then read = self.read
@@ -95,18 +95,18 @@ function mgfffile::readu, type=type, dimension=dimension, offset=offset
 
   _offset = n_elements(offset) eq 0L ? 0L : offset
   _type = n_elements(type) eq 0L ? 1L : type
-  
+
   _dimension = n_elements(dimension) eq 0L $
                  ? (self.size / mg_typesize(_type) - _offset) $
                  : dimension
-  
+
   data = make_array(dimension=_dimension, type=_type)
-  
+
   openr, lun, self.filename, /get_lun
   point_lun, lun, _offset
   readu, lun, data
   free_lun, lun
-  
+
   return, data
 end
 
@@ -118,7 +118,7 @@ end
 ;    string, strarr
 ;
 ; :Keywords:
-;    single : in, optional, type=boolean 
+;    single : in, optional, type=boolean
 ;-
 function mgfffile::readf, single=single
   compile_opt strictarr
@@ -128,7 +128,7 @@ function mgfffile::readf, single=single
   openr, lun, self.filename, /get_lun
   readf, lun, result
   free_lun, lun
-  
+
   return, keyword_set(single) ? mg_strmerge(result) : result
 end
 
@@ -145,24 +145,24 @@ end
 ;-
 function mgfffile::init, filename
   compile_opt strictarr
-  
+
   self.filename = filename
   struct_assign, file_info(self.filename), self, /nozero
-  
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
 ;    filename
 ;       full filename
 ;-
 pro mgfffile__define
   compile_opt strictarr
-  
+
   define = { MGffFile, inherits file_info, inherits IDL_Object, filename: '' }
 end
 

@@ -3,7 +3,7 @@
 ;+
 ; Parent class for POV-Ray specific graphics classes. Classes that inherit
 ; from this class use specific POV-Ray functionality not available in IDL.
-; 
+;
 ; :Private:
 ;
 ; :Categories:
@@ -11,11 +11,11 @@
 ;-
 
 ;+
-; Convert an RGB 3-element byte array to a POV-Ray string specifying the 
+; Convert an RGB 3-element byte array to a POV-Ray string specifying the
 ; color, like `[255, 0, 0]` to `<1.0, 0.0, 0.0>`.
-; 
+;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    POV-Ray string representation of a color
 ;
@@ -27,7 +27,7 @@
 ;     alpha_channel : in, optional, type=float
 ;        value from 0.0 (completely transparent) to 1.0 (completely opaque)
 ;     filter : in, optional, type=boolean
-;        set to use filter transparency instead of transmittance or 
+;        set to use filter transparency instead of transmittance or
 ;        non-filtering transparency
 ;-
 function mggrpovrayobject::_getRgb, color, alpha_channel=alphaChannel, $
@@ -36,13 +36,13 @@ function mggrpovrayobject::_getRgb, color, alpha_channel=alphaChannel, $
 
   if (n_elements(alphaChannel) gt 0L) then begin
     a = 1.0 - alphaChannel
-    if (keyword_set(filter)) then begin    
+    if (keyword_set(filter)) then begin
       return, 'rgbf <' + strjoin(strtrim([float(color) / 255.0, a], 2), ', ') + '>'
     endif else begin
       return, 'rgbt <' + strjoin(strtrim([float(color) / 255.0, a], 2), ', ') + '>'
     endelse
   endif else begin
-    return, 'rgb <' + strjoin(strtrim(float(color) / 255.0, 2), ', ') + '>' 
+    return, 'rgb <' + strjoin(strtrim(float(color) / 255.0, 2), ', ') + '>'
   endelse
 end
 
@@ -52,7 +52,7 @@ end
 ; matrix of the object graphics object).
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number to write to
@@ -65,12 +65,12 @@ pro mggrpovrayobject::_writeTransform, lun, transform
   ; transformation in POV-Ray eliminates the bottom row since it doesn't give
   ; any information
   matrix = transpose((transform)[*, 0:2])
-  
+
   printf, lun
   printf, lun, '  matrix <' + strjoin(strtrim(matrix[*, 0], 2), ',') + ','
   printf, lun, '          ' + strjoin(strtrim(matrix[*, 1], 2), ',') + ','
   printf, lun, '          ' + strjoin(strtrim(matrix[*, 2], 2), ',') + ','
-  printf, lun, '          ' + strjoin(strtrim(matrix[*, 3], 2), ',') + '>'  
+  printf, lun, '          ' + strjoin(strtrim(matrix[*, 3], 2), ',') + '>'
 end
 
 
@@ -78,7 +78,7 @@ end
 ; Write a list of vertices to the open output file.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       lun for output file
@@ -93,17 +93,17 @@ pro mggrpovrayobject::_writeVertices, lun, vertices, name=name
   compile_opt strictarr
 
   nVertices = (size(vertices, /dimensions))[1]
-  
+
   printf, lun, '  ' + name + ' {'
   printf, lun, '    ' + strtrim(nVertices, 2) + ','
-  
+
   for v = 0L, nVertices - 2L do begin
     printf, lun, '    <' + strjoin(strtrim(vertices[*, v], 2), ',') + '>,'
   endfor
-  
+
   printf, lun, '    <' + strjoin(strtrim(vertices[*, v], 2), ',') + '>'
 
-  printf, lun, '  }'  
+  printf, lun, '  }'
 end
 
 
@@ -114,7 +114,7 @@ function mggrpovrayobject::init
   compile_opt strictarr
 
   self.lightIntensityMultiplier = 1.75
-  
+
   return, 1
 end
 
@@ -129,7 +129,7 @@ end
 ;-
 pro mggrpovrayobject__define
   compile_opt strictarr
-  
+
   define = { MGgrPOVRayObject, $
              lightIntensityMultiplier: 0.0 $
            }

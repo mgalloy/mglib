@@ -5,9 +5,9 @@
 ;
 ; :Examples:
 ;    See the main-level program at the end of this file::
-; 
+;
 ;       IDL> .run mg_themeriver
-; 
+;
 ;    The first example is similar to an error plot:
 ;
 ;    .. image:: themeriver.png
@@ -31,7 +31,7 @@
 ;    colors : in, required, type=bytarr(nlines - 1)
 ;       colors of shaded regions between datasets (starting from the bottom)
 ;
-; :Keywords: 
+; :Keywords:
 ;    show_lines : in, optional, type=lonarr
 ;       indices of dataset lines in data to overplot
 ;    axis_color : in, optional, type=color
@@ -56,12 +56,12 @@ pro mg_themeriver, x, data, colors, show_lines=showlines, $
   endif
 
   mind = min(data, max=maxd)
-  
+
   ; setup the coordinate system
   plot, _x, _x, yrange=[mind, maxd], xstyle=9, ystyle=8, /nodata, $
         color=axiscolor, _extra=e
 
-  xvert = [_x,  reverse(_x), _x[0]]  
+  xvert = [_x,  reverse(_x), _x[0]]
   for line = 0L, nlines - 1L do begin
     if (line ne nlines - 1L) then begin
       yvert = [reform(data[line, *]), $
@@ -76,11 +76,11 @@ pro mg_themeriver, x, data, colors, show_lines=showlines, $
     if (show gt 0L) then begin
       oplot, _x, data[line, *], color=color, _extra=e
     endif
-  endfor  
-  
+  endfor
+
   ; repeated so that the axis is *above* the filled regions
   plot, x, x, yrange=[mind, maxd], xstyle=9, ystyle=8, /nodata, $
-        color=axiscolor, _extra=e, /noerase  
+        color=axiscolor, _extra=e, /noerase
 end
 
 ; example creating a theme river plot similar to an error bar plot

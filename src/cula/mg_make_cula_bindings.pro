@@ -2,7 +2,7 @@
 
 pro mg_make_cula_bindings
   compile_opt strictarr
-  
+
   dlm = mg_dlm(basename='idlcula', $
                name='IDLCULA', $
                description='IDL bindings for CULAtools', $
@@ -23,6 +23,6 @@ pro mg_make_cula_bindings
 
   dlm->write
   dlm->build, /show_all_output
-  
+
   obj_destroy, dlm
 end

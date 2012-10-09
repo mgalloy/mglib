@@ -32,17 +32,17 @@
 pro mggrx3d::draw, tree, full_html=full_html
   compile_opt strictarr
   on_error, 2
-  
+
   ; if no tree argument, then use self.graphicsTree
   if (n_params() eq 0 && ~obj_valid(self.graphicsTree)) then begin
     message, 'GRAPHICS_TREE property must be set if no argument'
   endif
-  
+
   ; if arg is present, it must be a valid object
   if (n_params() gt 0 && ~obj_valid(tree)) then message, 'invalid tree object'
-  
+
   _tree = n_elements(tree) eq 0L ? self.graphicsTree : tree
-  
+
   openw, lun, self.filename, /get_lun
   self.lun = lun
 
@@ -51,13 +51,13 @@ pro mggrx3d::draw, tree, full_html=full_html
 
   scene_format = '(%"%s<x3d width=\"%dpx\" height=\"%dpx\">")'
   printf, self.lun, _indent, self.dimensions, format=scene_format
-  
+
   self->_traverse, _tree, indent=_indent + self.indent
-  
+
   printf, self.lun, _indent, format='(%"%s</x3d>")'
 
   if (keyword_set(full_html)) then self->_writeHTMLFooter
-  
+
   free_lun, self.lun
   self.lun = -1L
 end
@@ -80,7 +80,7 @@ pro mggrx3d::_writeHTMLHeader
   printf, self.lun, '            src="http://www.x3dom.org/x3dom/release/x3dom.js">'
   printf, self.lun, '    </script'
   printf, self.lun, '  </head>'
-  printf, self.lun, '  <body>'      
+  printf, self.lun, '  <body>'
 end
 
 
@@ -98,7 +98,7 @@ end
 
 
 ;+
-; Traverse the given object graphics hierarchy and write the output to the 
+; Traverse the given object graphics hierarchy and write the output to the
 ; file specified by the `FILENAME` property.
 ;
 ; :Private:
@@ -114,10 +114,10 @@ end
 pro mggrx3d::_traverse, tree, indent=indent
   compile_opt strictarr
   on_error, 2
-  
+
   _indent = n_elements(indent) eq 0L ? self.indent : indent
   format = '(%"unsupported class in graphics tree: %s")'
-  
+
   case 1 of
     obj_isa(tree, 'IDLgrView'): self->_writeView, tree, indent=_indent
     obj_isa(tree, 'IDLgrModel'): self->_writeModel, tree, indent=_indent
@@ -131,7 +131,7 @@ end
 ;+
 ; Write the x3d scene node and its children that represent the object graphics
 ; view.
-; 
+;
 ; :Private:
 ;
 ; :Params:
@@ -146,7 +146,7 @@ pro mggrx3d::_writeView, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, color=color, viewplane_rect=vpr, eye=eye
-  
+
   printf, self.lun, indent, format='(%"%s<scene>")'
 
   printf, self.lun, indent, self.indent, eye, $
@@ -191,7 +191,7 @@ pro mggrx3d::_writeModel, tree, indent=indent
     self->_traverse, tree->get(position=c), indent=indent + self.indent
   endfor
 
-  printf, self.lun, indent, format='(%"%s</matrixtransform>")'  
+  printf, self.lun, indent, format='(%"%s</matrixtransform>")'
 end
 
 
@@ -221,9 +221,9 @@ pro mggrx3d::_writePolygon, tree, indent=indent
   tex_pts = ''
   normal_index = ''
   tex_index = ''
-  
+
   printf, self.lun, indent, format='(%"%s<shape>")'
-  
+
   ; write appearance
   printf, self.lun, indent, self.indent, format='(%"%s%s<appearance>")'
   ; TODO: fill in material, imagetexture
@@ -231,7 +231,7 @@ pro mggrx3d::_writePolygon, tree, indent=indent
           format='(%"%s%s<material diffusecolor=''%s''>")'
   printf, self.lun, indent, self.indent, format='(%"%s%s</material>")'
   printf, self.lun, indent, self.indent, format='(%"%s%s</appearance>")'
-  
+
   ; write polygons
 
   printf, self.lun, indent, self.indent, coord_index, $   ; normal_index, tex_index, $
@@ -243,9 +243,9 @@ pro mggrx3d::_writePolygon, tree, indent=indent
   ; printf, self.lun, indent, self.indent, self.indent, tex_pts, $
   ;         format='(%"%s%s%s<texturecoordinate point=''%s''/>")'
   printf, self.lun, indent, self.indent, format='(%"%s%s</indexedfaceset>")'
-  
+
   printf, self.lun, indent, format='(%"%s</shape>")'
-  
+
 end
 
 
@@ -259,11 +259,11 @@ end
 ;
 ; :Params:
 ;    rgb : in, required, type=bytarr(3)
-;       connectivity list specified in IDL's scheme 
+;       connectivity list specified in IDL's scheme
 ;-
 function mggrx3d::_convertColor, rgb
   compile_opt strictarr
-  
+
   return, strjoin(strtrim(float(rgb) / 255., 2), ' ')
 end
 
@@ -278,14 +278,14 @@ end
 ;
 ; :Params:
 ;    conn : in, required, type=lonarr(n)
-;       connectivity list specified in IDL's scheme 
+;       connectivity list specified in IDL's scheme
 ;-
 function mggrx3d::_convertPolygons, conn
   compile_opt strictarr
-  
+
   n = n_elements(conn)
   result = conn
-  
+
   pos = 0
   while (pos lt n && conn[pos] gt 0L) do begin
     nverts = conn[pos]
@@ -293,7 +293,7 @@ function mggrx3d::_convertPolygons, conn
     result[pos + nverts] = -1L
     pos += nverts + 1L
   endwhile
-  
+
   return, result
 end
 
@@ -306,7 +306,7 @@ pro mggrx3d::getProperty, dimensions=dimensions, $
                           graphics_tree=graphics_tree, $
                           indent=indent
   compile_opt strictarr
-  
+
   dimensions = self.dimensions
   filename = self.filename
   graphics_tree = self.graphics_tree
@@ -321,7 +321,7 @@ pro mggrx3d::setProperty, dimensions=dimensions, $
                           graphics_tree=graphics_tree, $
                           indent=indent
   compile_opt strictarr
-  
+
   if (n_elements(dimensions) gt 0L) then self.dimensions = dimensions
   if (n_elements(filename) gt 0L) then self.filename = filename
   if (n_elements(graphics_tree) gt 0L) then self.graphics_tree = graphics_tree
@@ -334,7 +334,7 @@ end
 ;-
 pro mggrx3d::cleanup
   compile_opt strictarr
-  
+
   if (obj_valid(self.graphics_tree)) then obj_destroy, self.graphics_tree
 end
 
@@ -356,9 +356,9 @@ function mggrx3d::init, _extra=e
   self.indent = '  '
   self.dimensions = [400L, 400L]
   self.lun = -1L
-  
+
   self->setProperty, _extra=e
-  
+
   return, 1
 end
 
@@ -380,7 +380,7 @@ end
 ;-
 pro mggrx3d__define
   compile_opt strictarr
-  
+
   define = { MGgrX3D, $
              dimensions: lonarr(2), $
              filename: '', $

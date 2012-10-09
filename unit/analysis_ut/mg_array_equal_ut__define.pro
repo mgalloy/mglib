@@ -134,7 +134,7 @@ function mg_array_equal_ut::test_no_typeconv
   seed = 100L
   n = 20L
   a = randomu(seed, n)
-  result = mg_array_equal(a, double(a), /no_typeconv)  
+  result = mg_array_equal(a, double(a), /no_typeconv)
 
   assert, result eq 0, 'incorrect result'
 
@@ -144,14 +144,14 @@ end
 
 ; function mg_array_equal_ut::test_typeconversion
 ;   compile_opt strictarr
-;   
+;
 ;   return, 0
 ; end
-; 
-; 
+;
+;
 ; function mg_array_equal_ut::test_array2scalar
 ;   compile_opt strictarr
-;   
+;
 ;   return, 0
 ; end
 

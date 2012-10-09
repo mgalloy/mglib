@@ -16,7 +16,7 @@
 ;    .. image:: asinh.png
 ;
 ; :Returns:
-;    float, double, complex, or double complex depending on the input 
+;    float, double, complex, or double complex depending on the input
 ;
 ; :Params:
 ;    z : in, required, type=numeric
@@ -24,6 +24,6 @@
 ;-
 function mg_asinh, z
   compile_opt strictarr
-  
+
   return, alog(z + sqrt(1 + z*z))
 end

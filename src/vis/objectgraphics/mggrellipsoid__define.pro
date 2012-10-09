@@ -17,20 +17,20 @@
 ;
 ; :Properties:
 ;    pos : type=fltarr(3)
-;       A three-element vector, [x, y, z], specifying the position of the 
+;       A three-element vector, [x, y, z], specifying the position of the
 ;       center of the ellipsoid, measured in data units
 ;    radius : type=fltarr(3)
-;       a floating point number representing the radius of the ellipsoid 
+;       a floating point number representing the radius of the ellipsoid
 ;       (measured in data units) in the x-, y-, and z-directions
 ;    density : type=float
-;       A floating point number representing the density at which the vertices 
+;       A floating point number representing the density at which the vertices
 ;       should be generated along the surface of the orb
 ;    parent : type=object
 ;       not used, included only for compatibility to Orb class
 ;    pobj : type=object
 ;       underlying polygon object
-;    tex_coords : type=boolean 
-;       set this keyword to a nonzero value if texture map coordinates are to 
+;    tex_coords : type=boolean
+;       set this keyword to a nonzero value if texture map coordinates are to
 ;       be generated for the orb
 ;    _extra : type=keywords
 ;       keywords to IDLgrModel::setProperty or IDLgrPolygon::setProperty
@@ -59,7 +59,7 @@ pro mggrellipsoid::setProperty, pos=pos, radius=radius, density=density, $
   endcase
 
   self.density = n_elements(density) eq 1 ? density : self.density
-  
+
   ; rebuild the polygon according to keyword settings
   self->_buildPoly
 end
@@ -76,22 +76,22 @@ pro mggrellipsoid::getProperty, pos=pos, radius=radius, density=density, $
   ; so that the model settings (for common keywords) will prevail
   self.polygon->getProperty, _extra=re
   self->IDLgrModel::getProperty, _extra=re
-  
+
   if (arg_present(pos)) then pos = self.pos
-  if (arg_present(radius)) then radius = self.radius 
-  if (arg_present(density)) then density = self.density 
+  if (arg_present(radius)) then radius = self.radius
+  if (arg_present(density)) then density = self.density
   if (arg_present(pobj)) then pobj = self.polygon
 end
 
 
 ;+
-; Prints position, radius, and density of the ellipsoid for debugging 
+; Prints position, radius, and density of the ellipsoid for debugging
 ; purposes.
 ;-
 pro mggrellipsoid::print
   compile_opt strictarr
 
-  print, self.pos 
+  print, self.pos
   print, self.radius
   print, self.density
 end
@@ -123,7 +123,7 @@ pro mggrellipsoid::_buildPoly
   j = 0L
   k = 0L
   tzinc = !pi / float(nrows + 1)
-  tz = !pi / 2.0 - tzinc 
+  tz = !pi / 2.0 - tzinc
   for k = 0, nrows - 1 do begin
     t = 0
     if (self.texture) then begin
@@ -135,12 +135,12 @@ pro mggrellipsoid::_buildPoly
       verts[0, i] = self.radius[0] * cos(tz) * cos(t) + self.pos[0]
       verts[1, i] = self.radius[1] * cos(tz) * sin(t) + self.pos[1]
       verts[2, i] = self.radius[2] * sin(tz)          + self.pos[2]
-      
+
       if (self.texture) then begin
         tex[0, i] = t / (2.0 * !pi)
         tex[1, i] = (tz + (!pi / 2.0)) / !pi
       endif
-      
+
       t += tinc
       ++i
     endfor
@@ -156,32 +156,32 @@ pro mggrellipsoid::_buildPoly
   verts[0, i] = self.pos[0]
   verts[1, i] = self.pos[1]
   verts[2, i] = - self.radius[2] + self.pos[2]
-  
+
   if (self.texture) then begin
     tex[0, i] = 0.5
     tex[1, i] = 0.0
     tex[0, i - 1] = 0.5
     tex[1, i - 1] = 1.0
   endif
-  
+
   ; fill in the connectivity array.
   i = 0
   for k = 0, nrows - 2 do begin
     for j = 0, ncols - 1 do begin
       conn[i] = 4
-      
+
       conn[i + 4] = k * ncols + j
-      
+
       w = k * ncols + j + 1L
       if (j eq (ncols-1)) then w = k * ncols
       conn[i + 3] = w
-      
+
       w = k * ncols + j + 1L + ncols
       if (j eq (ncols - 1)) then w = k * ncols + ncols
       conn[i + 2] = w
-      
+
       conn[i + 1] = k * ncols + j + ncols
-      
+
       i += 5L
       if ((self.texture) and (j eq (ncols - 1))) then i -= 5L
     endfor
@@ -206,9 +206,9 @@ pro mggrellipsoid::_buildPoly
     i += 4L
     if ((self.texture) and (j eq (ncols - 1))) then i -= 4L
   endfor
-  
+
   self.polygon->setProperty, data=verts, polygons=conn
-  
+
   if (self.texture) then self.polygon->setProperty, texture_coord=tex
 end
 
@@ -221,7 +221,7 @@ pro mggrellipsoid::cleanup
 
   ; cleanup the polygon object used to represent the orb
   obj_destroy, self.polygon
-  
+
   ; cleanup the superclass
   self->IDLgrModel::cleanup
 end
@@ -230,7 +230,7 @@ end
 ;+
 ; Initialize ellipsoid.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 for failure
 ;-
 function mggrellipsoid::init, pos=pos, radius=radius, density=density, $
@@ -251,15 +251,15 @@ function mggrellipsoid::init, pos=pos, radius=radius, density=density, $
 
   self.density = n_elements(density) eq 1 ? density : 1.0
   self.texture = n_elements(texCoords) eq 1 ? keyword_set(texCoords) : 0
-  
+
   ; initialize the polygon object that will be used to represent the orb
   self.polygon = obj_new('IDLgrPolygon', shading=1, /reject, _extra=e)
-  
+
   self->add, self.polygon
-  
+
   ; build the polygon vertices and connectivity based on its properties
   self->_buildPoly
-  
+
   return, 1
 end
 
@@ -268,18 +268,18 @@ end
 ; Define member variables.
 ;
 ; :Fields:
-;    pos 
+;    pos
 ;       position of the center of the ellipsoid
-;    radius 
-;       floating point numbers representing the radius of the ellipsoid 
+;    radius
+;       floating point numbers representing the radius of the ellipsoid
 ;       (measured in data units) in the x-, y-, and z-directions
-;    density 
-;       value representing the density at which the vertices should be 
+;    density
+;       value representing the density at which the vertices should be
 ;       generated along the surface of the orb
-;    texture 
-;       boolean for whether texture coordinates are needed for the 
+;    texture
+;       boolean for whether texture coordinates are needed for the
 ;       ellipsoid
-;    polygon 
+;    polygon
 ;       IDLgrPolygon object containing verts and conn of the ellipsoid
 ;-
 pro mggrellipsoid__define

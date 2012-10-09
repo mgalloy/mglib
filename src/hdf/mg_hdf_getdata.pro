@@ -3,11 +3,11 @@
 
 ;+
 ; Convert string bounds like `0:*` to a 3-element bounds specification::
-; 
+;
 ;    [start_index, stop_index, string]
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    `lonarr(3)`
 ;
@@ -22,7 +22,7 @@ function mg_hdf_getdata_convertbounds_1d, sbounds, dim_size
 
   args = strsplit(sbounds, ':', /extract, count=nargs)
   result = [0L, dim_size - 1L, 1L]
-  
+
   case nargs of
     1: begin
         if (args[0] ne '*') then begin
@@ -50,23 +50,23 @@ function mg_hdf_getdata_convertbounds_1d, sbounds, dim_size
           result[0:2] = long(args)
           if (result[0] lt 0L) then result[0] = dim_size + result[0]
           if (result[1] lt 0L) then result[1] = dim_size + result[1]
-        endelse        
+        endelse
       end
     else: message, 'invalid indexing notation: ' + sbounds
   endcase
-  
+
   return, result
 end
 
 
 ;+
 ; Converts normal IDL indexing notation (represented as a string) into a
-; `lonarr(ndims, 3)` where the first row is start values, the second row is 
+; `lonarr(ndims, 3)` where the first row is start values, the second row is
 ; the end values, and the last row is the stride value.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    lonarr(ndims, 3)
 ;
 ; :Params:
@@ -87,18 +87,18 @@ function mg_hdf_getdata_convertbounds, sbounds, dimensions=dimensions, $
 
   dimIndices = strtrim(strsplit(sbounds, ',', /extract, count=ndims), 2)
   result = lonarr(ndims, 3)
-  
+
   case ndims of
     1: begin
         single = 1B
         result[0, *] = mg_hdf_getdata_convertbounds_1d(dimIndices[0], $
-                                                       dimensions[0])     
+                                                       dimensions[0])
       end
     n_elements(dimensions): begin
         single = 0B
         for d = 0L, ndims - 1L do begin
           result[d, *] = mg_hdf_getdata_convertbounds_1d(dimIndices[0], $
-                                                         dimensions[0]) 
+                                                         dimensions[0])
         endfor
       end
     else:  message, 'invalid number of dimensions in array indexing notation'
@@ -115,7 +115,7 @@ end
 ;
 ; :Params:
 ;    bounds : in, required, type="lonarr(ndims, 3)"
-;       bounds 
+;       bounds
 ;
 ; :Keywords:
 ;    start : out, optional, type=lonarr(ndims)
@@ -128,12 +128,12 @@ end
 pro mg_hdf_getdata_computeslab, bounds, $
                                 start=start, count=count, stride=stride
   compile_opt strictarr
-  
+
   ndims = (size(bounds, /dimensions))[0]
-  
+
   start = reform(bounds[*, 0])
   stride = reform(bounds[*, 2])
-    
+
   count = ceil((bounds[*, 1] - bounds[*, 0] + 1L) / float(bounds[*, 2])) > 1
 end
 
@@ -142,12 +142,12 @@ end
 ; Retrieves an SD variable from an HDF file, scaled appropriately.
 ;
 ; :Private:
-; 
+;
 ; :Requires:
 ;    IDL 8.0
 ;
 ; :Returns:
-; 
+;
 ; :Params:
 ;    sd_id : in, required, type=long
 ;       HDF file identifier
@@ -158,10 +158,10 @@ function mg_hdf_getdata_getsdvariable, sd_id, varname, $
                                        bounds=bounds, $
                                        error=error
   compile_opt strictarr
-  
+
   catch, error
   if (error ne 0L) then begin
-    catch, /cancel    
+    catch, /cancel
     return, !null
   endif
 
@@ -179,18 +179,18 @@ function mg_hdf_getdata_getsdvariable, sd_id, varname, $
 
   mg_hdf_getdata_computeslab, _bounds, $
                               start=start, count=count, stride=stride
-                                 
+
   hdf_sd_getdata, sds_id, data, count=count, start=start, stride=stride
   hdf_sd_endaccess, sds_id
-  
+
   return, data
 end
 
 
 ;+
 ; Pulls out a section of a HDF variable.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    data array
 ;
 ; :Params:
@@ -201,7 +201,7 @@ end
 ;
 ; :Keywords:
 ;    bounds : in, optional, type="lonarr(3, ndims) or string"
-;       gives start value, end value, and stride for each dimension of the 
+;       gives start value, end value, and stride for each dimension of the
 ;       variable
 ;    error : out, optional, type=long
 ;       error value
@@ -209,7 +209,7 @@ end
 function mg_hdf_getdata, filename, variable, bounds=bounds, error=error
   compile_opt strictarr
   on_error, 2
-  
+
   file_id = hdf_sd_start(filename)
 
   tokens = strsplit(variable, '.', escape='\', count=ndots)
@@ -236,8 +236,8 @@ function mg_hdf_getdata, filename, variable, bounds=bounds, error=error
     ;result = mg_hdf_getdata_getattribute(fileId, variable, error=error)
     ;if (error) then message, 'attribute not found', /informational
   endelse
-  
+
   hdf_sd_end, file_id
-  
+
   return, result
 end

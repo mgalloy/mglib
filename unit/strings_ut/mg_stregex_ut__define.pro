@@ -2,35 +2,35 @@
 
 ; function mg_stregex_ut::testUrlsWithFindAll
 ;   compile_opt strictarr
-;   
+;
 ;   s = 'www.michaelgalloy.com and http://www.espn.com are two of my favorite sites'
 ;   result = mg_stregex(s, /url, /extract, /find_all)
-;   
+;
 ;   assert, result[0] eq 'www.michaelgalloy.com', $
 ;           'did not find www.michaelgalloy.com'
 ;   assert, result[1] eq 'http://www.espn.com', $
 ;           'did not find http://www.espn.com'
-;   
+;
 ;   return, 1
 ; end
-; 
-; 
+;
+;
 ; function mg_stregex_ut::testUrls
 ;   compile_opt strictarr
-;   
+;
 ;   urlsFilename = filepath('urls.txt', root=mg_src_root())
 ;   urlsFile = mg_file(urlsFilename)
 ;   urls = urlsFile->readf()
 ;   obj_destroy, urlsFile
-;   
+;
 ;   positions = mg_stregex(urls, /url, length=length)
-; 
+;
 ;   correctPositions = [0, 0, 16, 0, 16, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7]
 ;   correctLength = [24, 25, 24, 36, 36, 24, 25, 24, 25, 24, 37, 19, 11, 10, 39, 25, 30, 34, 23, 70, 17, 14, 18, 15]
-; 
+;
 ;   assert, array_equal(positions, correctPositions), 'incorrect positions'
 ;   assert, array_equal(length, correctLength), 'incorrect length'
-;                        
+;
 ;   return, 1
 ; end
 
@@ -54,7 +54,7 @@ function mg_stregex_ut::test_basic
 
     assert, array_equal(position, correctPositions[i]), 'incorrect positions'
     assert, array_equal(length, correctLength[i]), 'incorrect length'
-  endfor  
+  endfor
 
   return, 1
 end

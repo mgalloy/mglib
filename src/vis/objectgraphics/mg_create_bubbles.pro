@@ -19,8 +19,8 @@
 ;       colors to cycle through, can be a 1-dimensional array of indices or
 ;       2-dimensional (i.e., m x 3) array of RGB color values
 ;    border_colors : in, optional, type=bytarr
-;       colors to cycle through for the bubble border, can be a 1-dimensional 
-;       array of indices or 2-dimensional (i.e., m x 3) array of RGB color 
+;       colors to cycle through for the bubble border, can be a 1-dimensional
+;       array of indices or 2-dimensional (i.e., m x 3) array of RGB color
 ;       values
 ;    _extra : in, optional, type=keywords
 ;       keywords to `MGgrBubble`::init
@@ -31,11 +31,11 @@ function mg_create_bubbles, x, y, sizes=sizes, area=area, $
   compile_opt strictarr
 
   n = n_elements(x)
-  
+
   _sizes = n_elements(sizes) eq 0L ? 1.0 : sizes
   _colors = n_elements(colors) eq 0L ? 0B : colors
   _borderColors = n_elements(borderColors) eq 0L ? 0B : borderColors
-  
+
   nsizes = n_elements(_sizes)
 
   colors_dims = size(_colors, /dimensions)
@@ -45,7 +45,7 @@ function mg_create_bubbles, x, y, sizes=sizes, area=area, $
   border_colors_dims = size(_borderColors, /dimensions)
   border_colors_ndims = size(_borderColors, /n_dimensions)
   nbordercolors = border_colors_dims[0]
-  
+
   arr = objarr(n)
   for b = 0L, n - 1L do begin
     bubble_color = colors_ndims eq 2L $
@@ -58,7 +58,7 @@ function mg_create_bubbles, x, y, sizes=sizes, area=area, $
                      size=_sizes[b mod nsizes], area=keyword_set(area), $
                      color=bubble_color, border_color=border_color, _extra=e)
   endfor
-  
+
   return, arr
 end
 

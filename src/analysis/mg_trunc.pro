@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Truncate argument towards 0.0, i.e., takes the `FLOOR` of positive values 
+; Truncate argument towards 0.0, i.e., takes the `FLOOR` of positive values
 ; and the `CEIL` of negative values.
 ;
 ; :Examples:
@@ -23,14 +23,14 @@
 ;-
 function mg_trunc, x
   compile_opt strictarr
-  
+
   result = ceil(x)
   posInd = where(x gt 0, nposInd)
-  
+
   if (nposInd gt 0L) then begin
     result[posInd] = floor(x[posInd])
   endif
-  
+
   return, result
 end
 

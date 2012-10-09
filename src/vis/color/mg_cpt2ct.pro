@@ -4,11 +4,11 @@
 ; Converts a GMT color table file to an RGB color table.
 ;
 ; :Examples:
-;    For example, if the GMT color tables files were stored in the `cpt` 
+;    For example, if the GMT color tables files were stored in the `cpt`
 ;    directory::
 ;
 ;       IDL> tvlct, mg_cpt2ct('gmt/GMT_relief')
-; 
+;
 ; :Returns:
 ;    bytarr(256, 3)
 ;
@@ -24,21 +24,21 @@
 function mg_cpt2ct, filename, name=name
   compile_opt strictarr
   on_error, 2
-  
+
   _filename = file_test(filename) $
                 ? filename $
                 : filepath(filename, subdir=['cpt-city'], root=mg_src_root())
-  
+
   if (~file_test(_filename)) then begin
     message, string(filename, format='(%"cpt file %s not found")')
   endif
-  
+
   nlines = file_lines(_filename)
   lines = strarr(nlines)
   openr, lun, _filename, /get_lun
   readf, lun, lines
   free_lun, lun
-  
+
   colorModel = 'RGB'
   matches = ''
   i = 0
@@ -46,7 +46,7 @@ function mg_cpt2ct, filename, name=name
     matches = stregex(lines[i++], '^# COLOR_MODEL = ([+HSVRGB]*)', /subexpr, /extract)
     if (matches[0] ne '') then colorModel = matches[1]
   endwhile
-  
+
   dataLines = stregex(lines, '^[[:space:]]*[-[:digit:]]', /boolean)
   dataLinesInd = where(dataLines eq 1B, count)
 
@@ -54,13 +54,13 @@ function mg_cpt2ct, filename, name=name
   for i = 0L, count - 1L do begin
     data[*, i] = float((strsplit(lines[dataLinesInd[i]], /extract))[0:7])
   endfor
-  
+
   minValue = data[0, 0]
   maxValue = data[4, count - 1]
-  
+
   cutoffs = value_locate([reform(data[0, *]), data[4, count - 1L]], $
                          (maxValue - minValue) * findgen(256) / 255. + minValue)
-  
+
   ncolors = histogram(cutoffs < (count - 1L))
 
   result = bytarr(256, 3)
@@ -78,17 +78,17 @@ function mg_cpt2ct, filename, name=name
         colors[*, 1] = g
         colors[*, 2] = b
       endif
-    
+
       result[pos, 0] = colors
     endif
-    
+
     pos += ncolors[i]
   endfor
-  
+
   name = stregex(file_basename(_filename), 'GMT_([_[:alnum:]]*).cpt', /subexpr, /extract)
   if (name[0] eq '') then name = stregex(file_basename(_filename), '([_[:alnum:]]*).cpt', /subexpr, /extract)
   name = name[1]
-  
+
   return, result
 end
 

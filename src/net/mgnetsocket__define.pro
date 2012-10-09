@@ -1,38 +1,38 @@
 ; docformat = 'rst'
 
 ;+
-; The MGnetSocket class implements client and server-side internet sockets 
+; The MGnetSocket class implements client and server-side internet sockets
 ; using the TCP/IP or UDP/IP protocols.
 ;
-; This class was originally developed to provide UDP/IP support in IDL. While 
-; it provides a few methods that may be convienient, if you need TCP/IP client 
+; This class was originally developed to provide UDP/IP support in IDL. While
+; it provides a few methods that may be convienient, if you need TCP/IP client
 ; sockets you may want to consider the built in support in IDL.
-;           
-; This class depends on the idl_net DLM which provides the interface to the OS 
-; sockets library. This DLM is based *heavily* on Randall Frank's `idl_sock.c` 
+;
+; This class depends on the idl_net DLM which provides the interface to the OS
+; sockets library. This DLM is based *heavily* on Randall Frank's `idl_sock.c`
 ; code distributed with his idl_tools DLM.
 ;
-; Note on byteswapping: Make sure you swap in the correct place.  If you are 
-; reading into the buffer, and you are extracting other than byte type you 
-; need to swap on the call to ReadBuffer. If you are simply receiving data via 
-; ::receive or extracting byte data from `::readBuffer` then you can swap on 
+; Note on byteswapping: Make sure you swap in the correct place.  If you are
+; reading into the buffer, and you are extracting other than byte type you
+; need to swap on the call to ReadBuffer. If you are simply receiving data via
+; ::receive or extracting byte data from `::readBuffer` then you can swap on
 ; either the call to `::receive` or `::readBuffer`.
 ;
 ; :Todo:
-;    Should add in a network endianess property so that swapping is automagic. 
-;    This would require Receive to be modified such that Rx'ing to buffer 
-;    would not swap even if the local and remote endianess were different. 
-;    Further, if receiving to buffer, data should not be returned to the 
-;    caller so there is no confusion. If this endianess property is undefined 
+;    Should add in a network endianess property so that swapping is automagic.
+;    This would require Receive to be modified such that Rx'ing to buffer
+;    would not swap even if the local and remote endianess were different.
+;    Further, if receiving to buffer, data should not be returned to the
+;    caller so there is no confusion. If this endianess property is undefined
 ;    (the default) no swapping is performed.
 ;
-; :Categories: 
+; :Categories:
 ;    networking
 ;
 ; :Examples:
 ;    Try the main-level program at the end of this file::
-;  
-;       IDL> .run mgnetsocket__define        
+;
+;       IDL> .run mgnetsocket__define
 ;
 ; :History:
 ;    Original written by Randall Frank in idl_sock.c in his idl_tools DLM
@@ -63,10 +63,10 @@ function mgnetsocket::connect, destHost, $
                                udp=udp, $
                                tcp=tcp
   compile_opt strictarr
-  
+
   ;  check if socket is currently open
   if (self.sockId ge 0L) then self->close
-  
+
   ;  process keywords
   locPort = (n_elements(locPort) ne 1) ? 0L : locPort
 
@@ -112,22 +112,22 @@ function mgnetsocket::connect, destHost, $
     endif
     self.type = 2B
   endelse
-  
+
   ; get local port if auto assigned
   if (locPort eq 0L) then err = mg_net_query(sId, local_port=locPort)
-  
+
   self.destPort = destPort[0]
   self.locPort = locPort
   self.sockID = sId
   *self.buffer = 0B
-  
+
   return, 1L
 end
 
 
 ;+
-; Creates a socket listening on the specified port. Socket can be either TCP 
-; or UDP based. Specify a local port of 0 to allow the OS to select an open 
+; Creates a socket listening on the specified port. Socket can be either TCP
+; or UDP based. Specify a local port of 0 to allow the OS to select an open
 ; port for you.
 ;
 ; :Returns:
@@ -183,13 +183,13 @@ end
 ; I/O can be performed.
 ;
 ; :Returns:
-;    MGnetSocket object 
+;    MGnetSocket object
 ;
 ; :Keywords:
 ;    buffer
 ;    nodelay
 ;    timeout : in, optional, type=long, default=0L
-;       timeout 
+;       timeout
 ;-
 function mgnetsocket::accept, buffer=buffer, nodelay=nodelay, timeout=timeout
   compile_opt strictarr
@@ -216,7 +216,7 @@ function mgnetsocket::accept, buffer=buffer, nodelay=nodelay, timeout=timeout
     endif else begin
       newSId = mg_net_accept(self.sockId, nodelay=keyword_set(nodelay))
     endelse
-    
+
     if (newSId ge 0L) then begin
       newSock = obj_new('MGnetSocket', newSId)
     endif else begin
@@ -368,33 +368,33 @@ end
 
 
 ;+
-; Return data stored in the local (object's) buffer. This method can be used 
-; to return specific data types, even mixed types, from the buffer by 
+; Return data stored in the local (object's) buffer. This method can be used
+; to return specific data types, even mixed types, from the buffer by
 ; specifying the type.
 ;
 ; Returns NaN if the buffer is empty.
 ;
 ; :Returns:
 ;    array of the type specified by the TYPE keyword
-; 
+;
 ; :Params:
 ;    nbytes : out, optional, type=long
 ;       number of bytes read
 ;
 ; :Keywords:
 ;    type : in, optional, type=string, default=''
-;       type of data: 'integer', 'double', 'float', 'long', 'string', 'uint', 
+;       type of data: 'integer', 'double', 'float', 'long', 'string', 'uint',
 ;       'ulong', 'l64', or 'ul64'; if not specified or not one of the above
 ;       types, data is returned as bytes
 ;    peek : in, optional, type=boolean
-;       set the peek keyword to "take a peek" at data but not remove it from 
+;       set the peek keyword to "take a peek" at data but not remove it from
 ;       the buffer
 ;    skipbytes : in, optional, type=long
 ;       bytes to skip at the beginning of the buffer
 ;    byteswap : in, optional, type=boolean
 ;       set to swap endianness of data
 ;    nels : in, out, optional, type=long
-;       the number of elements read; if not specified, as many elements as 
+;       the number of elements read; if not specified, as many elements as
 ;       possible are read
 ;-
 function mgnetsocket::readBuffer, nbytes, $
@@ -407,7 +407,7 @@ function mgnetsocket::readBuffer, nbytes, $
 
   _type = (n_elements(type) gt 0) ? type[0] : ''
   nels = (n_elements(nels) gt 0) ? nels[0] : -1L
-  
+
   _skipbytes = (n_elements(skipbytes) gt 0L) ? skipbytes[0] : 0L
   ts = 1L
 
@@ -568,7 +568,7 @@ end
 function mgnetsocket::host2Name, hostId
   compile_opt strictarr
   on_error, 2
-  
+
   if (size(hostID, /type) ne 13L) then begin
     message, 'host ID must be passed as ULONG'
   endif
@@ -608,7 +608,7 @@ end
 ;-
 pro mgnetsocket::close
   compile_opt strictarr
-  
+
   ;  close UDP port if open
   if (self.sockId ge 0L) then err = mg_net_close(self.sockId)
 
@@ -626,8 +626,8 @@ end
 ;-
 pro mgnetsocket::setProperty
   compile_opt strictarr
-  
-  ; There aren't any properties that are settable by the user at this point.  
+
+  ; There aren't any properties that are settable by the user at this point.
   ; The network endianess prop is one that would be.
 end
 
@@ -642,7 +642,7 @@ pro mgnetsocket::getProperty, localhost=locHost, $
                               remoteport=destPort, $
                               type=type
   compile_opt strictarr
-  
+
   destPort = self.destPort
   locPort = self.locPort
 
@@ -652,17 +652,17 @@ pro mgnetsocket::getProperty, localhost=locHost, $
     2: type = 'IO_TCP'
     3: type = 'PEERED_UDP'
   endcase
-  
+
   if (arg_present(locHost)) then begin
     err = mg_net_query(self.sockId, local_host=lh)
     locHost = mg_net_host2name(lh)
   endif
-  
+
   if (arg_present(destHost)) then begin
     err = mg_net_query(self.sockID, remote_host=rh)
     destHost = mg_net_host2name(rh)
   endif
-  
+
   open = self.sockId ge 0L ? 1L : 0L
 end
 
@@ -672,7 +672,7 @@ end
 ;-
 pro mgnetsocket::cleanup
   compile_opt strictarr
-  
+
   ; close the socket if open
   if (self.sockId ge 0) then self->close
 
@@ -693,7 +693,7 @@ end
 ;-
 function mgnetsocket::init, sockId
   compile_opt strictarr
-  
+
   if (n_params() gt 0) then begin
     ; internal call from MGnetSocket::accept
     err = mg_net_query(sockId, $
@@ -724,7 +724,7 @@ end
 ;    sockId
 ;       socket identififer
 ;    type
-;       type code: 0 => 'LISTEN_TCP', 1 => 'UDP', 2 => 'IO_TCP', 3 => 
+;       type code: 0 => 'LISTEN_TCP', 1 => 'UDP', 2 => 'IO_TCP', 3 =>
 ;       'PEERED_UDP'
 ;    hostId
 ;       host identifier
@@ -735,7 +735,7 @@ end
 ;-
 pro mgnetsocket__define
   compile_opt strictarr
-  
+
   define = { MGnetSocket, $
              buffer: ptr_new(), $
              bsize: 0L, $
@@ -750,14 +750,14 @@ end
 
 ; main-level example
 
-; This is a simple example that requests time via TCP port 37 taken from a 
+; This is a simple example that requests time via TCP port 37 taken from a
 ; recent thread on comp.lang.idl-pvwave.
 ;
-; Note that time-a.nist.gov doesn't always return data so it may time out on 
+; Note that time-a.nist.gov doesn't always return data so it may time out on
 ; you. Just try again.
 ;
-; The point is not to actually get the actual time, just an example of how to 
-; do this using MGnetSocket. This also illustrates a problem that is probably 
+; The point is not to actually get the actual time, just an example of how to
+; do this using MGnetSocket. This also illustrates a problem that is probably
 ; best handled via IDL's built in client side socket support.
 
 timeServer = 'time-a.nist.gov'
@@ -786,7 +786,7 @@ if (nBytes gt 0L) then begin
   time = timeSock->readBuffer(/byteswap, nels=1, type='ulong')
 
   print, time / 60. / 60. / 24. / 365.26, $
-         format='(%"Approximate number of years since Midnight Jan 1, 1900: %f")'  
+         format='(%"Approximate number of years since Midnight Jan 1, 1900: %f")'
 endif
 
 timeSock->close

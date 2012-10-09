@@ -40,7 +40,7 @@ end
 pro mg_timelinetext::getProperty, text=text, color=color, date=date, $
                                   level=level, alignment=alignment
   compile_opt strictarr
-  
+
   if (arg_present(text)) then text = *self.text
   if (arg_present(color)) then color = self.color
   if (arg_present(date)) then date = self.date
@@ -55,7 +55,7 @@ end
 pro mg_timelinetext::setProperty, text=text, color=color, date=date, $
                                   level=level, alignment=alignment
   compile_opt strictarr
-  
+
   if (n_elements(text) gt 0L) then *self.text = strjoin(mg_strunmerge(text), '!C')
   if (n_elements(color) gt 0L) then self.color = color
   if (n_elements(date) gt 0L) then self.date = date
@@ -69,7 +69,7 @@ end
 ;-
 pro mg_timelinetext::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.text
 end
 
@@ -79,10 +79,10 @@ end
 ;-
 function mg_timelinetext::init
   compile_opt strictarr
-  
+
   self.text = ptr_new(/allocate_heap)
-  
-  return, 1  
+
+  return, 1
 end
 
 
@@ -91,7 +91,7 @@ end
 ;-
 pro mg_timelinetext__define
   compile_opt strictarr
-  
+
   define = { mg_timelinetext, $
              text: ptr_new(), $
              color: '', $
@@ -108,7 +108,7 @@ end
 pro mg_timelineactivity::getProperty, name=name, color=color, value=value, $
                                       level=level, report=report, start=start
   compile_opt strictarr
-  
+
   if (arg_present(name)) then name = *self.name
   if (arg_present(value)) then value = *self.value
   if (arg_present(color)) then color = self.color
@@ -124,7 +124,7 @@ end
 pro mg_timelineactivity::setProperty, name=name, color=color, value=value, $
                                       level=level, report=report, start=start
   compile_opt strictarr
-  
+
   if (n_elements(name) gt 0L) then *self.name = strjoin(mg_strunmerge(name), '!C')
   if (n_elements(value) gt 0L) then *self.value = value
   if (n_elements(color) gt 0L) then self.color = color
@@ -139,7 +139,7 @@ end
 ;-
 pro mg_timelineactivity::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.name, self.value
 end
 
@@ -149,13 +149,13 @@ end
 ;-
 function mg_timelineactivity::init
   compile_opt strictarr
-  
+
   self.name = ptr_new(/allocate_heap)
   self.value = ptr_new(/allocate_heap)
 
   self.start = 1L
-  
-  return, 1  
+
+  return, 1
 end
 
 
@@ -164,7 +164,7 @@ end
 ;-
 pro mg_timelineactivity__define
   compile_opt strictarr
-  
+
   define = { mg_timelineactivity, $
              name: ptr_new(), $
              value: ptr_new(), $
@@ -183,7 +183,7 @@ pro mg_timelineinterval::getProperty, name=name, color=color, $
                                       start_date=startDate, end_date=endDate, $
                                       level=level
   compile_opt strictarr
-  
+
   if (arg_present(name)) then name = *self.name
   if (arg_present(color)) then color = self.color
   if (arg_present(startDate)) then startDate = self.startDate
@@ -199,7 +199,7 @@ pro mg_timelineinterval::setProperty, name=name, color=color, $
                                       start_date=startDate, end_date=endDate, $
                                       level=level
   compile_opt strictarr
-  
+
   if (n_elements(name) gt 0L) then *self.name = strjoin(mg_strunmerge(name), '!C')
   if (n_elements(color) gt 0L) then self.color = color
   if (n_elements(startDate) gt 0L) then self.startDate = startDate
@@ -213,7 +213,7 @@ end
 ;-
 pro mg_timelineinterval::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.name
 end
 
@@ -223,10 +223,10 @@ end
 ;-
 function mg_timelineinterval::init
   compile_opt strictarr
-  
+
   self.name = ptr_new(/allocate_heap)
-  
-  return, 1  
+
+  return, 1
 end
 
 
@@ -235,7 +235,7 @@ end
 ;-
 pro mg_timelineinterval__define
   compile_opt strictarr
-  
+
   define = { mg_timelineinterval, $
              name: ptr_new(), $
              color: '', $
@@ -251,7 +251,7 @@ end
 ;-
 pro mg_timelineevent::getProperty, text=text, color=color, date=date, level=level
   compile_opt strictarr
-  
+
   if (arg_present(text)) then text = *self.text
   if (arg_present(color)) then color = self.color
   if (arg_present(date)) then date = self.date
@@ -264,7 +264,7 @@ end
 ;-
 pro mg_timelineevent::setProperty, text=text, color=color, date=date, level=level
   compile_opt strictarr
-  
+
   if (n_elements(text) gt 0L) then *self.text = strjoin(mg_strunmerge(text), '!C')
   if (n_elements(color) gt 0L) then self.color = color
   if (n_elements(date) gt 0L) then self.date = date
@@ -277,7 +277,7 @@ end
 ;-
 pro mg_timelineevent::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.text
 end
 
@@ -287,10 +287,10 @@ end
 ;-
 function mg_timelineevent::init
   compile_opt strictarr
-  
+
   self.text = ptr_new(/allocate_heap)
-  
-  return, 1  
+
+  return, 1
 end
 
 
@@ -299,7 +299,7 @@ end
 ;-
 pro mg_timelineevent__define
   compile_opt strictarr
-  
+
   define = { mg_timelineevent, $
              text: ptr_new(), $
              color: '', $
@@ -331,7 +331,7 @@ pro mg_timeline::getProperty, start_date=startDate, end_date=endDate, $
   if (arg_present(nowColor)) then nowColor = self.nowColor
 end
 
-                              
+
 ;+
 ; :Private:
 ;-
@@ -346,15 +346,15 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
             'end': self.endDate = mg_timeline_julday(attvalue[a])
             'ticks': self.ticks = attvalue[a]
             'major': self.major = long(attvalue[a])
-            'color': self.color = attvalue[a]            
+            'color': self.color = attvalue[a]
             else: print, attname[a], format='(%"%s attribute unknown")'
           endcase
         endfor
       end
-      
+
     'event': begin
         event = obj_new('MG_TimelineEvent')
-        
+
         for a = 0L, n_elements(attname) - 1L do begin
           case strlowcase(attname[a]) of
             'date': event->setProperty, date=mg_timeline_julday(attvalue[a])
@@ -363,14 +363,14 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
             else: print, attname[a], format='(%"%s attribute unknown")'
           endcase
         endfor
-        
+
         self.events->add, event
         self.insideEvent = 1B
       end
-      
+
     'interval': begin
         interval = obj_new('MG_TimelineInterval')
-        
+
         for a = 0L, n_elements(attname) - 1L do begin
           case strlowcase(attname[a]) of
             'start': interval->setProperty, start_date=mg_timeline_julday(attvalue[a])
@@ -381,13 +381,13 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
             else: print, attname[a], format='(%"%s attribute unknown")'
           endcase
         endfor
-        
-        self.intervals->add, interval      
+
+        self.intervals->add, interval
       end
 
     'activity': begin
         activity = obj_new('MG_TimelineActivity')
-        
+
         for a = 0L, n_elements(attname) - 1L do begin
           case strlowcase(attname[a]) of
             'color': activity->setProperty, color=attvalue[a]
@@ -398,9 +398,9 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
             else: print, attname[a], format='(%"%s attribute unknown")'
           endcase
         endfor
-        
-        self.activities->add, activity 
-        self.insideActivity = 1B     
+
+        self.activities->add, activity
+        self.insideActivity = 1B
       end
 
     'now': begin
@@ -415,7 +415,7 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
 
       'text': begin
           text = obj_new('MG_TimelineText')
-          
+
           for a = 0L, n_elements(attname) - 1L do begin
             case strlowcase(attname[a]) of
               'level': text->setProperty, level=float(attvalue[a])
@@ -430,12 +430,12 @@ pro mg_timeline::startElement, uri, local, qname, attname, attvalue
                 end
               else: print, attname[a], format='(%"%s attribute unknown")'
             endcase
-          endfor 
-          
+          endfor
+
           self.texts->add, text
-          self.insideText = 1B       
+          self.insideText = 1B
         end
-                  
+
     else: print, qname, format='(%"%s element unknown")'
   endcase
 end
@@ -446,7 +446,7 @@ end
 ;-
 pro mg_timeline::endElement, uri, local, qname
   compile_opt strictarr
-  
+
   case strlowcase(qname) of
     'timeline':
     'event': self.insideEvent = 0B
@@ -454,7 +454,7 @@ pro mg_timeline::endElement, uri, local, qname
     'activity': self.insideActivity = 0B
     'text': self.insideText = 0B
     else:
-  endcase  
+  endcase
 end
 
 
@@ -463,12 +463,12 @@ end
 ;-
 pro mg_timeline::characters, chars
   compile_opt strictarr
-  
+
   if (self.insideEvent) then begin
     event = self.events->get(position=self.events->count() - 1L)
     event->setProperty, text=chars
   endif
-  
+
   if (self.insideActivity) then begin
     activity = self.activities->get(position=self.activities->count() - 1L)
     activity->setProperty, value=long(strsplit(chars, /extract))
@@ -477,7 +477,7 @@ pro mg_timeline::characters, chars
   if (self.insideText) then begin
     text = self.texts->get(position=self.texts->count() - 1L)
     text->setProperty, text=chars
-  endif  
+  endif
 end
 
 
@@ -498,17 +498,17 @@ function mg_timeline::init, _extra=e
   compile_opt strictarr
 
   if (~self->IDLffXMLSAX::init(_extra=e)) then return, 0
-  
+
   self.ticks = 'weeks'
   self.color = 'black'
   self.markNow = 0B
   self.nowColor = 'black'
-  
+
   self.events = obj_new('IDL_Container')
   self.intervals = obj_new('IDL_Container')
   self.activities = obj_new('IDL_Container')
   self.texts = obj_new('IDL_Container')
-  
+
   return, 1
 end
 
@@ -518,7 +518,7 @@ end
 ;-
 pro mg_timeline__define
   compile_opt strictarr
-  
+
   define = { MG_Timeline, inherits IDLffXMLSAX, $
              startDate: 0.0D, $
              endDate: 0.0D, $
@@ -549,10 +549,10 @@ end
 ;-
 pro mg_timeline, filename, outputFilename
   compile_opt strictarr
-  
+
   parser = obj_new('MG_Timeline')
   parser->parseFile, filename
-  
+
   parser->getProperty, start_date=startDate, end_date=endDate, $
                        ticks=ticks, major=major_length, $
                        events=events, intervals=intervals, $
@@ -567,17 +567,17 @@ pro mg_timeline, filename, outputFilename
         major = (endDate - startDate) / minor_length / major_length + 1.
       end
   endcase
-  
+
   xc = mg_linear_function([startDate, endDate], [0.1, 0.9])
 
   viewgroup = obj_new('IDLgrViewGroup')
-  
+
   view = obj_new('IDLgrView', viewplane_rect=[0., 0., 1., 1.])
   viewgroup->add, view
-  
+
   model = obj_new('IDLgrModel')
   view->add, model
-  
+
   ; add axis
   result = label_date(date_format='%D %M %Y')
 
@@ -590,7 +590,7 @@ pro mg_timeline, filename, outputFilename
                     range=[startDate, endDate], /exact, $
                     xcoord_conv=xc)
   model->add, topaxis
-  
+
   bottomaxis = obj_new('IDLgrAxis', direction=0, location=[0.1, 0.1], $
                        textpos=0, textalignments=[0., 2.0], $
                        tickformat='label_date', $
@@ -600,24 +600,24 @@ pro mg_timeline, filename, outputFilename
                        range=[startDate, endDate], /exact, $
                        xcoord_conv=xc)
   model->add, bottomaxis
-    
+
   font = obj_new('IDLgrFont', size=6.)
   viewgroup->add, font
-  
+
   smallfont = obj_new('IDLgrFont', size=4.)
   viewgroup->add, smallfont
 
   bigfont = obj_new('IDLgrFont', size=14.)
   viewgroup->add, bigfont
-  
+
   topaxis->getProperty, ticktext=ticktext
   ticktext->setProperty, font=font
   bottomaxis->getProperty, ticktext=ticktext
   ticktext->setProperty, font=font
-  
+
   xgap = 0
-  ygap = 0.01  
-  
+  ygap = 0.01
+
   ; add vertical bars
   for m = 0L, (minor + 1L) * (major - 1L) + 1L - 1L do begin
     model->add, obj_new('IDLgrPolyline', $
@@ -628,16 +628,16 @@ pro mg_timeline, filename, outputFilename
                         color=[220, 220, 220], $
                         xcoord_conv=xc)
   endfor
-  
+
   ; add events
   for e = 0L, events->count() - 1L do begin
     event = events->get(position=e)
     event->getProperty, date=eventDate, level=level, text=eventText, $
                         color=color
-                        
+
     ; skip events before or after timeline range
     if (eventDate lt startDate || eventDate gt endDate) then continue
-    
+
     model->add, obj_new('IDLgrPolyline', $
                         fltarr(2) + eventDate, $
                         0.9 - [10 * ygap, level] / 10., $
@@ -651,20 +651,20 @@ pro mg_timeline, filename, outputFilename
                         /enable_formatting, $
                         xcoord_conv=xc)
   endfor
-  
+
   ; add intervals
   for i = 0L, intervals->count() - 1L do begin
     interval = intervals->get(position=i)
     interval->getProperty, start_date=intervalStartDate, end_date=intervalEndDate, $
                            level=level, name=name, color=color
-                           
-    ; skip events before or after timeline range                           
+
+    ; skip events before or after timeline range
     if (intervalEndDate lt startDate || intervalStartDate gt endDate) then continue
-    
+
     ; also truncate events to timeline range
     intervalStartDate >= startDate
     intervalEndDate <= endDate
-    
+
     model->add, obj_new('IDLgrPolyline', $
                         [intervalStartDate, intervalEndDate], $
                         fltarr(2) + 0.9 - level / 10., $
@@ -683,37 +683,37 @@ pro mg_timeline, filename, outputFilename
     text = texts->get(position=i)
     text->getProperty, date=date, level=level, text=textChars, color=color, $
                        alignment=alignment
-                           
-    ; skip texts before or after timeline range                           
+
+    ; skip texts before or after timeline range
     if (date lt startDate || date gt endDate) then continue
-    
+
     model->add, obj_new('IDLgrText', textChars, font=font, $
                         location=[date, 0.9 - (6. * ygap + level) / 10.], $
                         alignment=alignment, vertical_alignment=1.0, $
                         /enable_formatting, $
                         xcoord_conv=xc)
   endfor
-    
+
   ; add activities
   for a = 0L, activities->count() - 1L do begin
     activity = activities->get(position=a)
     activity->getProperty, name=name, value=value, color=color, level=level, $
                            report=report, start=start
-                           
+
     model->add, obj_new('IDLgrText', name, $
                         location=[startDate - xgap, 0.9 - level / 10.], $
                         alignment=1.0, vertical_alignment=0.5, $
                         /enable_formatting, $
                         font=font, $
                         xcoord_conv=xc)
-    
+
     case report of
       'weekly': skip = 1L
       'biweekly': skip = 2L
       else: skip = 1L
     endcase
-    
-    for v = 0L, n_elements(value) - 1L do begin                       
+
+    for v = 0L, n_elements(value) - 1L do begin
       model->add, obj_new('IDLgrText', strtrim(value[v], 2), $
                           location=[startDate + minor_length / 2. + (v * skip + start - 1L) * minor_length, 0.9 - level / 10.], $
                           alignment=0.5, vertical_alignment=0.5, $
@@ -722,7 +722,7 @@ pro mg_timeline, filename, outputFilename
                           xcoord_conv=xc)
     endfor
   endfor
-  
+
   ; mark now
   if (markNow) then begin
     now = systime(/julian)
@@ -733,11 +733,11 @@ pro mg_timeline, filename, outputFilename
                         color=vis_color(nowColor), $
                         xcoord_conv=xc)
   endif
-  
+
   clipboard = obj_new('IDLgrClipboard', dimensions=[11, 8.5], units=1)
   clipboard->draw, viewgroup, /vector, /postscript, filename=outputFilename
   obj_destroy, [viewgroup, clipboard]
-  
+
   obj_destroy, parser
 end
 

@@ -15,6 +15,6 @@
 ;-
 function mg_strunmerge, s, unix=unix, windows=windows
   compile_opt strictarr
-  
-  return, strsplit(s, mg_newline(unix=unix, windows=windows), /extract)  
+
+  return, strsplit(s, mg_newline(unix=unix, windows=windows), /extract)
 end

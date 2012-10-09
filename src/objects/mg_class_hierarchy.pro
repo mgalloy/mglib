@@ -27,11 +27,11 @@
 ;-
 pro mg_class_hierarchy_cleanup, hierarchy
   compile_opt strictarr
-  
+
   foreach h, hierarchy, classname do begin
     mg_class_hierarchy_cleanup, h
   endforeach
-  
+
   obj_destroy, hierarchy
 end
 
@@ -48,9 +48,9 @@ end
 ;-
 pro mg_class_hierarchy_print, hierarchy, indent=indent
   compile_opt strictarr
-  
+
   _indent = n_elements(indent) eq 0L ? '' : indent
-  
+
   foreach h, hierarchy, classname do begin
     print, _indent, classname, format='(%"%s%s")'
     mg_class_hierarchy_print, h, indent=_indent + '  '
@@ -72,14 +72,14 @@ end
 ;-
 function mg_class_hierarchy_helper, object
   compile_opt strictarr
-  
+
   hierarchy = hash()
   superclasses = obj_class(object, count=nsuperclasses, /superclass)
 
   for c = 0L, nsuperclasses - 1L do begin
     hierarchy[superclasses[c]] = mg_class_hierarchy_helper(superclasses[c])
   endfor
-  
+
   return, hierarchy
 end
 
@@ -104,7 +104,7 @@ pro mg_class_hierarchy, object, hierarchy=hierarchy, no_print=no_print
   hierarchy = hash()
   classname = size(object, /type) eq 11 ? obj_class(object) : strupcase(object)
   hierarchy[classname] = mg_class_hierarchy_helper(object)
-  
+
   if (~keyword_set(no_print)) then mg_class_hierarchy_print, hierarchy
   if (~arg_present(hierarchy)) then mg_class_hierarchy_cleanup, hierarchy
 end

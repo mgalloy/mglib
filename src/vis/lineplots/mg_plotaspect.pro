@@ -2,7 +2,7 @@
 
 ;+
 ; Calculates the optimal aspect ratio for a plot of the given values. The best
-; aspect ratio will make most lines slope at about 45 degrees so that 
+; aspect ratio will make most lines slope at about 45 degrees so that
 ; anomolies are more easily spotted.
 ;
 ; :Categories:
@@ -13,7 +13,7 @@
 ; Calculate aspect ratio for a plot.
 ;
 ; :Returns:
-;    float 
+;    float
 ;
 ; :Params:
 ;    x : in, required, type=fltarr
@@ -38,6 +38,6 @@ function mg_plotaspect, x, y
   endcase
 
   displaySlope = (xrange / yrange) * meanAbsSlope
-  
-  return, displaySlope  
+
+  return, displaySlope
 end

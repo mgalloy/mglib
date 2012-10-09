@@ -37,7 +37,7 @@ end
 ;    eye_spacing : in, optional, type=float, default=0.5
 ;       space between eyes, range: 0 (close) - 1 (far apart)
 ;    pupil_size : in, optional, type=float, default=0.5
-;       size of pupil relative to eye size, range: 0 (no pupils) - 1 (fills 
+;       size of pupil relative to eye size, range: 0 (no pupils) - 1 (fills
 ;       eye)
 ;    eyebrow_slant : in, optional, type=float, default=0.5
 ;       slant of eyebrows, range: 0 (raised on outside) - 1 (raised on inside)
@@ -48,16 +48,16 @@ function mggrchernoffface::init, head_eccentricity=head_eccentricity, $
                                  nose_length=nose_length, $
                                  mouth_size=mouth_size, $
                                  mouth_shape=mouth_shape, $
-                                 eye_size=eye_size, $ 
+                                 eye_size=eye_size, $
                                  eye_eccentricity=eye_eccentricity, $
                                  eye_spacing=eye_spacing, $
                                  pupil_size=pupil_size, $
                                  eyebrow_slant=eyebrow_slant, $
                                  _ref_extra=e
   compile_opt strictarr
-  
+
   if (~self->IDLgrModel::init(_extra=e)) then return, 0
-  
+
   myThick = n_elements(thick) eq 0L ? 1.0 : thick
 
   ; nose
@@ -82,18 +82,18 @@ function mggrchernoffface::init, head_eccentricity=head_eccentricity, $
 
   ; eyes
   self.eyeSize = n_elements(eye_size) eq 0L ? 0.5 : eye_size
-  self.eyeSpacing = n_elements(eye_spacing) eq 0L ? 0.5 : eye_spacing 
+  self.eyeSpacing = n_elements(eye_spacing) eq 0L ? 0.5 : eye_spacing
   self.eyeEccentricity = n_elements(eye_eccentricity) eq 0L $
                            ? 0.5 $
-                           : eye_eccentricity    
+                           : eye_eccentricity
 
   t = findgen(37) * 10.0 * !dtor
   eyeX = self.eyeSize / 6.0 * cos(t)
-  eyeY = self.eyeSize * (1.0 - self.eyeEccentricity) / 6.0 * sin(t) 
+  eyeY = self.eyeSize * (1.0 - self.eyeEccentricity) / 6.0 * sin(t)
   eyeHeight = 0.4
-  eyeSep = 0.2 + 0.15 * self.eyeSpacing 
+  eyeSep = 0.2 + 0.15 * self.eyeSpacing
   oLeftEye = obj_new('IDLgrPolyline', - eyeSep + eyeX, eyeHeight + eyeY, _extra=e)
-  self->add, oLeftEye   
+  self->add, oLeftEye
   oRightEye = obj_new('IDlgrPolyline', eyeSep + eyeX, eyeHeight + eyeY, _extra=e)
   self->add, oRightEye
 
@@ -106,7 +106,7 @@ function mggrchernoffface::init, head_eccentricity=head_eccentricity, $
   eyebrowHeight = 0.2
   eyebrowY = eyeHeight + eyebrowMargin $
                + [- self.eyebrowSlant + 1, self.eyebrowSlant] * eyebrowHeight
-   
+
   oLeftEyebrow = obj_new('IDLgrPolyline', leftEyebrowX, reverse(eyebrowY), _extra=e)
   self->add, oLeftEyebrow
   oRightEyebrow = obj_new('IDLgrPolyline', rightEyebrowX, eyebrowY, _extra=e)
@@ -119,7 +119,7 @@ function mggrchernoffface::init, head_eccentricity=head_eccentricity, $
                        - eyeSep + eyeX * self.pupilSize, $
                        eyeHeight + eyeY * self.pupilSize, $
                        _extra=e)
-  self->add, oLeftPupil 
+  self->add, oLeftPupil
   oRightPupil = obj_new('IDLgrPolygon', $
                         eyeSep + eyeX * self.pupilSize, $
                         eyeHeight + eyeY * self.pupilSize, $
@@ -143,37 +143,37 @@ end
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
-;    noseLength 
+;    noseLength
 ;       length of nose, range: 0 (small) - 1 (large)
-;    mouthSize 
+;    mouthSize
 ;       size of mouth, range: 0 (small) - 1 (large)
-;    mouthShape 
+;    mouthShape
 ;       shape of mouth, not implemented yet
-;    eyeSize 
+;    eyeSize
 ;       size of eyes, range: 0 (small) - 1 (large)
-;    eyeSpacing 
+;    eyeSpacing
 ;       space between eyes, range: 0 (close) - 1 (far apart)
-;    eyeEccentricity 
+;    eyeEccentricity
 ;       shape of eyes, range: 0 (round) - 1 (oval)
-;    eyebrowSlant 
+;    eyebrowSlant
 ;       slant of eyebrows, range: 0 (raised on outside) - 1 (raised on inside)
-;    pupilSize 
-;       size of pupil relative to eye size, range: 0 (no pupils) - 1 (fills 
+;    pupilSize
+;       size of pupil relative to eye size, range: 0 (no pupils) - 1 (fills
 ;       eye)
-;    headEccentricity 
+;    headEccentricity
 ;       shape of head, range: 0 (round) - 1 (oval)
 ;-
 pro mggrchernoffface__define
     compile_opt strictarr
-    
+
     define = { MGgrChernoffFace, inherits IDLgrModel, $
                noseLength : 0.0, $
                mouthSize : 0.0, $
                mouthShape : 0.0, $
                eyeSize : 0.0, $
-               eyeSpacing : 0.0, $ 
+               eyeSpacing : 0.0, $
                eyeEccentricity : 0.0, $
                eyebrowSlant : 0.0, $
                pupilSize : 0.0, $

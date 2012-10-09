@@ -3,7 +3,7 @@
 ;+
 ; Class representing a netCDF group.
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;
 ; :Properties:
@@ -38,7 +38,7 @@
 ;-
 function mgffncvariable::_getAttribute, name, found=found
   compile_opt strictarr
-  
+
   found = 0B
   return, !null
 end
@@ -56,7 +56,7 @@ pro mgffncgroup::getProperty, attributes=attributes, $
   compile_opt strictarr
 
   if (arg_present(attributes)) then attributes = !null
-  
+
   if (arg_present(groups)) then begin
     group_ids = ncdf_groupsinq(self.id)
 
@@ -64,7 +64,7 @@ pro mgffncgroup::getProperty, attributes=attributes, $
       groups = !null
     endif else begin
       groups = strarr(n_elements(group_ids))
-    
+
       for g = 0L, n_elements(group_ids) - 1L do begin
         groups[g] = ncdf_groupname(group_ids[g])
       endfor
@@ -73,7 +73,7 @@ pro mgffncgroup::getProperty, attributes=attributes, $
 
   if (arg_present(variables)) then begin
     var_ids = ncdf_varidsinq(self.id)
-    
+
     if (var_ids[0] eq -1L) then begin
       variables = !null
     endif else begin
@@ -84,10 +84,10 @@ pro mgffncgroup::getProperty, attributes=attributes, $
       endfor
     endelse
   endif
-      
+
   if (arg_present(name)) then name = ncdf_groupname(self.id)
   if (arg_present(fullname)) then fullname = ncdf_fullgroupname(self.id)
-  
+
   if (n_elements(e) gt 0L) then self->MGffNCBase::getProperty, _extra=e
 end
 
@@ -108,7 +108,7 @@ function mgffncgroup::_overloadHelp, varname
 
   type = 'NCGroup'
   specs = string(ncdf_fullgroupname(self.id), format='(%"%s")')
-  return, self->MGffNCBase::_overloadHelp(varname, type=type, specs=specs) 
+  return, self->MGffNCBase::_overloadHelp(varname, type=type, specs=specs)
 end
 
 
@@ -127,11 +127,11 @@ function mgffncgroup::dump, indent=indent
 
   result = ''
   _indent = n_elements(indent) eq 0L ? '' : indent
-  
+
   result += string(_indent eq '' ? '' : mg_newline(), _indent, $
                    ncdf_groupname(self.id), $
                    format='(%"%s%s+ GROUP %s")')
-  
+
   self->getProperty, attributes=attributes
   foreach att_name, attributes do begin
     result += string(mg_newline(), _indent, att_name, format='(%"%s%s  = ATTRIBUTE %s")')
@@ -141,12 +141,12 @@ function mgffncgroup::dump, indent=indent
   foreach group_name, groups do begin
     result += self[group_name]->dump(indent=_indent + '  ')
   endforeach
-  
+
   self->getProperty, variables=variables
   foreach var_name, variables do begin
     result += self[var_name]->dump(indent=_indent + '  ')
   endforeach
-  
+
   return, result
 end
 
@@ -159,7 +159,7 @@ end
 ;-
 function mgffncgroup::_overloadPrint
   compile_opt strictarr
-  
+
   return, self->dump()
 end
 
@@ -169,7 +169,7 @@ end
 ;
 ; :Returns:
 ;    attribute value, group object, or variable object
-; 
+;
 ; :Params:
 ;    isRange : in, required, type=lonarr(ndims)
 ;       array indicating whether each dimensions present is a range or a list
@@ -196,7 +196,7 @@ function mgffncgroup::_overloadBracketsRightSide, isRange, $
                                                   ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-  
+
   ; check the variables for one with the given name
   vars = ncdf_varidsinq(self.id)
   for v = 0L, n_elements(vars) - 1 do begin
@@ -208,7 +208,7 @@ function mgffncgroup::_overloadBracketsRightSide, isRange, $
       return, new_var
     endif
   endfor
-      
+
   ; check the groups for one with the given name
   groups = ncdf_groupsinq(self.id)
   for g = 0L, n_elements(groups) - 1L do begin
@@ -220,7 +220,7 @@ function mgffncgroup::_overloadBracketsRightSide, isRange, $
       return, new_group
     endif
   endfor
-  
+
   message, string(ss1, format='(%"%s not found")')
 end
 
@@ -230,7 +230,7 @@ end
 ;-
 pro mgffncgroup::cleanup
   compile_opt strictarr
-  
+
   obj_destroy, self.children
 end
 
@@ -245,9 +245,9 @@ function mgffncgroup::init, _extra=e
   compile_opt strictarr
 
   if (~self->MGffNCBase::init(_extra=e)) then return, 0
-  
+
   self.children = obj_new('IDL_Container')
-  
+
   return, 1
 end
 
@@ -261,7 +261,7 @@ end
 ;-
 pro mgffncgroup__define
   compile_opt strictarr
-  
+
   define = { MGffNCGroup, inherits MGffNCBase, $
              children: obj_new() $
            }

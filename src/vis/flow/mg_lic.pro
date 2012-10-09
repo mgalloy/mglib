@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Example program demonstrating the use of `MG_LIC`. Run the main-level example 
+; Example program demonstrating the use of `MG_LIC`. Run the main-level example
 ; program with::
 ;
 ;    IDL> .run mg_lic
@@ -11,7 +11,7 @@
 ; .. image:: lic_example1.png
 ;
 ; The next image introduces color by using HSV color coordinates with
-; hue equal to red, saturation equal to the vector field magnitude, and 
+; hue equal to red, saturation equal to the vector field magnitude, and
 ; value equal to `MG_LIC` output:
 ;
 ; .. image:: lic_example3.png
@@ -21,7 +21,7 @@
 ;
 ; .. image:: lic_example3.png
 ;
-; The second set of images are done with a smoothed instead of a random 
+; The second set of images are done with a smoothed instead of a random
 ; texture:
 ;
 ; .. image:: smooth_lic_example1.png
@@ -36,7 +36,7 @@
 ;
 ; :Returns:
 ;    bytarr(m, n)
-; 
+;
 ; :Params:
 ;    u : in, required, type="fltarr(m, n)"
 ;       x-coordinates of vector field
@@ -45,7 +45,7 @@
 ;
 ; :Keywords:
 ;    texture : in, optional, type="bytarr(m, n)"
-;       random texture map; it is useful to use the same texture map for 
+;       random texture map; it is useful to use the same texture map for
 ;       generating frames of a movie
 ;-
 pro mg_lic, u, v, texture=texture
@@ -54,7 +54,7 @@ pro mg_lic, u, v, texture=texture
 
   ; empty because `MG_LIC` is implemented in `mg_flow.c` as a DLM; this header
   ; is for documenting the routine
-    
+
   message, 'MG_FLOW DLM not found'
 end
 
@@ -166,6 +166,6 @@ pinkIm3 = pink_lic_image * m_image
 
 tv, pinkIm3, 8, true=1
 
-print, format='(%"Time to compute: %0.1f seconds")', endTime - startTime 
-       
+print, format='(%"Time to compute: %0.1f seconds")', endTime - startTime
+
 end

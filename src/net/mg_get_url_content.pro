@@ -3,7 +3,7 @@
 ;+
 ; Get the content for the given URL.
 ;
-; :Returns: 
+; :Returns:
 ;    string, strarr
 ;
 ; :Params:
@@ -12,8 +12,8 @@
 ;
 ; :Keywords:
 ;    error_message : out, optional, type=string
-;       pass a named variable, will be set to a non empty string if an error 
-;       occurs in getting the content of the URL (in which case the return 
+;       pass a named variable, will be set to a non empty string if an error
+;       occurs in getting the content of the URL (in which case the return
 ;       value will be the empty string)
 ;    response_code : out, optional, type=boolean
 ;       response code for get attempt, 200 is OK
@@ -26,7 +26,7 @@ function mg_get_url_content, url, error_message=errorMsg, $
                              response_code=responseCode, $
                              response_header=responseHeader, _extra=e
   compile_opt strictarr
-  
+
   errorMsg = ''
   catch, errorNumber
   if (errorNumber ne 0L) then begin
@@ -41,6 +41,6 @@ function mg_get_url_content, url, error_message=errorMsg, $
   content = ourl->get(url=url, /string_array)
   ourl->getProperty, response_code=responseCode, response_header=responseHeader
   obj_destroy, ourl
-  
+
   return, content
 end

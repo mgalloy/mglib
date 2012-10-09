@@ -19,15 +19,15 @@
 ;       path and basename to .ini file
 ;    output : in, optional, type=string
 ;       output basename (must be in same directory as basename)
-; 
+;
 ; :Keywords:
 ;    subset : in, optional, type=lonarr(4)
 ;       set POV-Ray to only calculate the subset of the image specified by::
 ;
 ;          [x0, y0, xsize, ysize]
 ;
-;       The returned image will be xsize by ysize and start at [x0, y0]. 
-;       Rows and columns start at 0, but the origin is at the upper left 
+;       The returned image will be xsize by ysize and start at [x0, y0].
+;       Rows and columns start at 0, but the origin is at the upper left
 ;       corner of the image.
 ;    format : in, optional, type=string
 ;       output format: 'targus' or 'png'
@@ -36,7 +36,7 @@
 ;    output : out, optional, type=strarr
 ;       contents of the output log of the povray run
 ;    convert_location : in, optional, type=string
-;       full path of the convert command; needed if convert is not in the 
+;       full path of the convert command; needed if convert is not in the
 ;       shell path
 ;    povray_location : in, optional, type=string
 ;       full path of the povray command; needed if povray is not in the shell
@@ -58,10 +58,10 @@ function mg_povray, basename, output, subset=subset, format=format, $
                     tile_size=tileSize, full_size=fullSize, n_procs=nprocs
   compile_opt strictarr
   on_error, 2
-  
+
   if (keyword_set(distributed)) then begin
     _tileSize = n_elements(tileSize) eq 0L ? [100L, 100L] : tileSize
-    _nprocs = n_elements(nprocs) eq 0L ? 1L : nprocs 
+    _nprocs = n_elements(nprocs) eq 0L ? 1L : nprocs
     if (n_elements(fullSize) eq 0L) then begin
       ; figure out the size of the output image from the .ini file
       iniFilename = basename + '.ini'
@@ -69,13 +69,13 @@ function mg_povray, basename, output, subset=subset, format=format, $
       openr, lun, iniFilename, /get_lun
       readf, lun, iniOutput
       free_lun, lun
-      
+
       tokens = strsplit(iniOutput[1], /extract)
       _fullSize = long(strmid(tokens, 2))
     endif else begin
       _fullSize = fullSize
     endelse
-    
+
     templateFilename = filepath('mg_povray_mpidl.tt', root=mg_src_root())
     template = obj_new('MGffTemplate', templateFilename)
     vars = { basename:basename, tile_size:_tileSize, full_size:_fullSize }
@@ -84,16 +84,16 @@ function mg_povray, basename, output, subset=subset, format=format, $
                             format='(%"%s%smg_povray_mpidl.pro")')
     template->process, vars, templateOutput
     obj_destroy, template
-    
+
     cd, current=origDir
     cd, file_dirname(basename)
-    
+
     resolve_routine, 'mg_povray_mpidl'
-    
+
     cd, origDir
-    
+
     save, /routines, filename='mg_povray_mpidl.sav'
-    
+
     runmpidlCmd = string(_nprocs, $
                          file_expand_path(file_dirname(basename)), $
                          path_sep(), $
@@ -105,10 +105,10 @@ function mg_povray, basename, output, subset=subset, format=format, $
   dir = file_dirname(basename)
   cd, current=origDir
   cd, dir
-  
+
   _format = n_elements(format) eq 0L ? '' : format
   if (n_elements(subset) gt 0L) then _format = 'targa'
-  
+
   case strlowcase(_format) of
     'targa': formatString = '+FT '
     'png': formatString = '+FN8 '
@@ -118,7 +118,7 @@ function mg_povray, basename, output, subset=subset, format=format, $
   _output = n_elements(output) eq 0L $
               ? file_basename(basename) $
               : file_basename(output)
-  
+
   ; create a string of povray subsetting options; remember: POV-Ray rows and
   ; columns start with 1
   if (n_elements(subset) gt 0L) then begin
@@ -128,8 +128,8 @@ function mg_povray, basename, output, subset=subset, format=format, $
                      subset[1] + subset[3], $
                      format='(%"+SC%d +EC%d +SR%d +ER%d ")')
   endif else _subset = ''
-  
-  ; assemble the povray command and execute it    
+
+  ; assemble the povray command and execute it
   defsysv, '!povray_location', exists=locationExists
   if (n_elements(povrayLocation) gt 0L) then begin
     _povrayLocation = povrayLocation
@@ -139,13 +139,13 @@ function mg_povray, basename, output, subset=subset, format=format, $
                         ? !povray_location $
                         : (!version.os_family eq 'unix' $
                              ? 'povray' $
-                             : 'pvengine.exe')          
+                             : 'pvengine.exe')
   endelse
-  
+
   windowsOptions = !version.os_family eq 'unix' $
                      ? '' $
                      : '/render /exit exit'
-                             
+
   cmd = string(_povrayLocation, _subset, formatString, $
                file_basename(basename), $
                (strlen(_output) eq 0L ? '' : ('+O' + _output)), $
@@ -160,9 +160,9 @@ function mg_povray, basename, output, subset=subset, format=format, $
   endif else begin
     _convertLocation = locationExists $
                          ? !convert_location $
-                         : 'convert'          
+                         : 'convert'
   endelse
-    
+
   case strlowcase(_format) of
     'targa': begin
         convertSubset = n_elements(subset) eq 0L $
@@ -177,17 +177,17 @@ function mg_povray, basename, output, subset=subset, format=format, $
                             _output, $
                             _output, $
                             format='(%"\"%s\" %s%s.tga %s.png")')
-                            
+
         spawn, convertCmd, convertOutput, convertErrors
       end
-    else: 
+    else:
   endcase
-  
+
   ; read output file
   im = read_png(_output + '.png')
-  
+
   ; return to original directory
   cd, origDir
-  
+
   return, im
 end

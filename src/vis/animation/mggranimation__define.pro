@@ -2,7 +2,7 @@
 
 ;+
 ; Destination class for object graphics.
-; 
+;
 ; :Properties:
 ;    destination
 ;       object graphics destination class to do rendering
@@ -24,7 +24,7 @@
 ;-
 pro mggranimation_timer, animation
   compile_opt strictarr
-  
+
   animation->_draw
 end
 
@@ -38,7 +38,7 @@ end
 ;-
 pro mggranimation::_draw
   compile_opt strictarr
-  
+
   self.animator->animate, float(++self.currentFrame) / float(self.totalFrames)
   self.destination->draw, self.picture
 end
@@ -49,19 +49,19 @@ end
 ;
 ; :Params:
 ;    picture : in, optional, type=object
-;       root of object graphics hierarchy to render: scene, view group, or 
+;       root of object graphics hierarchy to render: scene, view group, or
 ;       view
 ;-
 pro mggranimation::draw, picture
   compile_opt strictarr
-  
+
   self.animator->reset
   self.picture = picture
-  
+
   self.animator->getProperty, duration=duration
   self.currentFrame = 0L
   self.totalFrames = long(duration * self.frameRate)
-  
+
   timer = obj_new('MG_Timer', callback='mggranimation_timer', uvalue=self, $
                   duration=1. / self.frameRate, nframes=self.totalFrames)
   timer->start
@@ -105,7 +105,7 @@ function mggranimation::init, destination=destination, animator=animator, $
 
   self.animator = n_elements(animator) gt 0L ? animator : obj_new()
   self.frameRate = 24
-  
+
   return, 1
 end
 
@@ -123,7 +123,7 @@ end
 ;-
 pro mggranimation__define
   compile_opt strictarr
-  
+
   define = { MGgrAnimation, $
              destination: obj_new(), $
              animator: obj_new(), $
@@ -159,7 +159,7 @@ grow = obj_new('MGgrScaleAnimator', $
 gotoStart = obj_new('MGgrTranslateAnimator', $
                     target=model, $
                     translation=[-0.75, -0.75, 0.])
-                    
+
 translateRight = obj_new('MGgrTranslateAnimator', $
                          target=model, $
                          translation=[1.5, 0., 0.], $
@@ -183,7 +183,7 @@ translateLeft = obj_new('MGgrTranslateAnimator', $
 translateDown = obj_new('MGgrTranslateAnimator', $
                         target=model, $
                         translation=[0., -1.5, 0.])
-                                             
+
 sequence = obj_new('MGgrSequenceAnimator')
 sequence->add, [grow, parallel, translateUp, translateLeft, translateDown]
 

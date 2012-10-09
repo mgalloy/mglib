@@ -7,7 +7,7 @@
 ;
 ; :Properties:
 ;    name
-;       name of routine to wrap 
+;       name of routine to wrap
 ;    prefix
 ;       prefix to add to routine for name of wrapper routine
 ;    prototype
@@ -30,7 +30,7 @@ pro mg_routinePoundDefineAccessor::setProperty, name=name, $
                                                 return_type=returnType, $
                                                 prototype=prototype
   compile_opt strictarr
-  
+
   if (n_elements(name) gt 0L) then self.name = name
   if (n_elements(prefix) gt 0L) then self.prefix = prefix
   if (n_elements(cprefix) gt 0L) then self.cprefix = cprefix
@@ -71,7 +71,7 @@ function mg_routinePoundDefineAccessor::output
   compile_opt strictarr
 
   output = ''
-  
+
   if (self.prototype ne '') then begin
     output += string(self.prototype, mg_newline(), format='(%"// %s%s")')
   endif
@@ -84,7 +84,7 @@ function mg_routinePoundDefineAccessor::output
                    self.cprefix, $
                    self.name, $
                    format='(%"static %s %s_%s(int argc, IDL_VPTR *argv, char *argk) {")')
-                       
+
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
                      mg_idltype(*self.returnType, /declaration), $
@@ -93,7 +93,7 @@ function mg_routinePoundDefineAccessor::output
   endif
 
   output += string(mg_newline(), format='(%"%s}")')
-  
+
   return, output
 end
 
@@ -103,25 +103,25 @@ end
 ;-
 pro mg_routinePoundDefineAccessor::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.returnType
 end
 
 
 ;+
 ; Create routine binding.
-; 
+;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
 function mg_routinePoundDefineAccessor::init, _extra=e
   compile_opt strictarr
-  
+
   self.prefix = 'GET_'
   self.cprefix = 'IDL'
-  self.prototype = 'accessor'  
+  self.prototype = 'accessor'
   self.returnType = ptr_new(/allocate_heap)
-  
+
   self->setProperty, _extra=e
 
   return, 1
@@ -130,9 +130,9 @@ end
 
 ;+
 ; Defines instance variables.
-; 
+;
 ; :Fields:
-;    name 
+;    name
 ;       name of the routine to call
 ;    prefix
 ;       prefix to add to routine for name of wrapper routine
@@ -141,7 +141,7 @@ end
 ;-
 pro mg_routinePoundDefineAccessor__define
   compile_opt strictarr
-  
+
   define = { mg_routinePoundDefineAccessor, $
              name: '', $
              prefix: '', $

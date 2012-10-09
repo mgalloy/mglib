@@ -14,13 +14,13 @@ pro mg_cula_demo
   status = culaGetDeviceCount(ndevices)
 
   print, nDevices, format='(%"%d devices available")'
-  
-  ; int culaSgemm(char transa, char transb, 
-  ;               int m, int n, int k, 
-  ;               float alpha, 
-  ;               float a[], int lda, 
-  ;               float b[], int ldb, 
-  ;               float beta, 
+
+  ; int culaSgemm(char transa, char transb,
+  ;               int m, int n, int k,
+  ;               float alpha,
+  ;               float a[], int lda,
+  ;               float b[], int ldb,
+  ;               float beta,
   ;               float c[], int ldc);
 
   noTrans = (byte('N'))[0]

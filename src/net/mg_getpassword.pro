@@ -3,7 +3,7 @@
 ;+
 ; Get a password from the command line. Shows asterisks instead of the actual
 ; password.
-; 
+;
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
 ;
@@ -18,17 +18,17 @@
 ;
 ; :Returns:
 ;    string
-; 
+;
 ; :Keywords:
 ;    prompt : in, optional, type=string
 ;       prompt to display before the password is typed
 ;-
 function mg_getpassword, prompt=prompt
   compile_opt strictarr
-  
+
   _prompt = n_elements(prompt) eq 0L ? '' : (prompt + ' ')
   print, _prompt, format='(A, $)'
-  
+
   ch = ''
   result = ''
   while (1B) do begin
@@ -37,9 +37,9 @@ function mg_getpassword, prompt=prompt
     print, '*', format='(A1, $)'
     result += ch
   endwhile
-  
+
   print
-  
+
   return, result
 end
 

@@ -2,29 +2,29 @@
 
 ;+
 ; An array list is a way to have an arbitrary length list of any particular
-; IDL variable (but all elements must be the same type). An `MGcoArrayList` 
-; implements the same interface as `IDL_Container`, but can contain any IDL 
+; IDL variable (but all elements must be the same type). An `MGcoArrayList`
+; implements the same interface as `IDL_Container`, but can contain any IDL
 ; type.
 ;
-; :Author: 
+; :Author:
 ;    Michael Galloy
 ;
-; :Version: 
+; :Version:
 ;    1.1
 ;
 ; :Properties:
-;    type 
-;       type code as in `SIZE` function to specify the type of elements in the 
-;       list; `TYPE` or `EXAMPLE` keyword must be used when initializing the 
+;    type
+;       type code as in `SIZE` function to specify the type of elements in the
+;       list; `TYPE` or `EXAMPLE` keyword must be used when initializing the
 ;       array list
-;    block_size 
+;    block_size
 ;       initial size of the data array; defaults to 1000 if not specified
-;    example 
-;       type defined by an example instead of a type code (required for array 
+;    example
+;       type defined by an example instead of a type code (required for array
 ;       lists of structures)
-;    count 
+;    count
 ;       number of elements in the array list
-;    _ref_extra 
+;    _ref_extra
 ;       keywords to `MGcoAbstractList::getProperty`
 ;
 ; :Examples:
@@ -57,8 +57,8 @@
 ; :Bugs:
 ;    when using an index array to index an array list, out-of-bounds indices
 ;    larger than the last element's index are not handled property -- they do
-;    not return the last element (negative indices will return the first 
-;    element, though) 
+;    not return the last element (negative indices will return the first
+;    element, though)
 ;
 ; :Returns:
 ;    elements of the same type as the array list
@@ -68,22 +68,22 @@ function mgcoarraylist::_overloadBracketsRightSide, isRange, $
                                                     ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-     
+
   if (isRange[0]) then begin
     _ss1 = ss1
-    if (_ss1[1] le 0L) then _ss1[1] = (_ss1[1] + self.nUsed) mod self.nUsed    
+    if (_ss1[1] le 0L) then _ss1[1] = (_ss1[1] + self.nUsed) mod self.nUsed
     return, (*self.pData)[_ss1[0]:_ss1[1]:_ss1[2]]
   endif else begin
     ; handle index arrays
     if (n_elements(ss1) gt 1) then return, (*self.pData)[ss1]
-    
+
     if (ss1 ge self.nUsed) then begin
       message, string(ss1, format='(%"Attempt to subscript with %d is out of range")')
     endif
 
     index = ss1 mod self.nUsed
     if (index lt 0) then index = (index + self.nUsed) mod self.nUsed
-    
+
     return, (*self.pData)[index]
   endelse
 end
@@ -106,8 +106,8 @@ pro mgcoarraylist::_overloadBracketsLeftSide, objref, value, isRange, $
                                               ss1, ss2, ss3, ss4, $
                                               ss5, ss6, ss7, ss8
   compile_opt strictarr
-  
-  if (isRange[0]) then begin  
+
+  if (isRange[0]) then begin
     _ss1 = ss1
     if (_ss1[1] le 0L) then _ss1[1] = (_ss1[1] + self.nUsed) mod self.nUsed
     (*self.pData)[_ss1[0]:_ss1[1]:_ss1[2]] = value
@@ -118,7 +118,7 @@ pro mgcoarraylist::_overloadBracketsLeftSide, objref, value, isRange, $
 
     index = ss1 mod self.nUsed
     if (index lt 0) then index = (index + self.nUsed) mod self.nUsed
-        
+
     (*self.pData)[index] = value
   endelse
 end
@@ -133,25 +133,25 @@ end
 function mgcoarraylist::_overloadPlus, left, right
   compile_opt strictarr
   on_error, 2
-  
+
   left->getProperty, block_size=leftBlockSize, type=leftType, $
                      count=leftCount, example=leftExample
   right->getProperty, block_size=rightBlockSize, type=rightType, $
                       count=rightCount, example=rightExample
-  
+
   if (leftType ne rightType) then begin
     message, 'cannot concatenate array lists of different types'
   endif
-  
+
   ; TODO: should check to see that leftExample and rightExample are the same
   ;       if they are defined, but don't know how to compare them
-  
+
   result = obj_new('MGcoArrayList', $
                    type=leftType, example=leftExample, $
                    block_size=(leftCount > rightCount) > (leftBlockSize > rightBlockSize))
   if (leftCount gt 0L) then result->add, left->get(/all)
   if (rightCount gt 0L) then result->add, right->get(/all)
-  
+
   return, result
 end
 
@@ -160,7 +160,7 @@ end
 ; Helper routine to repeat numeric elements.
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    array of same type as elements
 ;
@@ -172,7 +172,7 @@ end
 ;-
 function mgcoarraylist::_repeatNumeric, elements, mult
   compile_opt strictarr
-  
+
   n = n_elements(elements)
   return, reform(rebin(reform(elements, n, 1), n, mult), n * mult)
 end
@@ -183,7 +183,7 @@ end
 ; numeric elements).
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    array of same type as elements
 ;
@@ -198,7 +198,7 @@ function mgcoarraylist::_repeatNonNumeric, elements, mult
 
   n = n_elements(elements)
   result = make_array(n * mult, type=size(elements, /type))
-  
+
   for i = 0L, mult - 1L do result[i * n] = elements
 
   return, result
@@ -210,7 +210,7 @@ end
 ; numeric elements).
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    array of same type as elements
 ;
@@ -225,7 +225,7 @@ function mgcoarraylist::_repeatStructure, elements, mult
 
   n = n_elements(elements)
   result = replicate(elements[0], n * mult)
-  
+
   for i = 0L, mult - 1L do result[i * n] = elements
 
   return, result
@@ -241,28 +241,28 @@ end
 function mgcoarraylist::_overloadAsterisk, left, right
   compile_opt strictarr
   on_error, 2
-  
+
   case 1 of
     size(left, /type) ne 11: begin
         mult = left
         lst = right
       end
     size(right, /type) ne 11: begin
-        mult = right 
+        mult = right
         lst = left
       end
     else: message, 'need a non-object multiplier'
   endcase
-     
+
   if (mult le 0) then message, 'multiplier must be positive'
 
   lst->getProperty, block_size=blockSize, count=count, type=type, example=example
 
   elements = lst->get(/all)
-  
+
   result = obj_new('MGcoArrayList', $
                    type=type, example=example, $
-                   block_size=blockSize > (mult * count))  
+                   block_size=blockSize > (mult * count))
 
   case type of
     0:
@@ -284,8 +284,8 @@ function mgcoarraylist::_overloadAsterisk, left, right
   endcase
 
   result->add, rep
-                  
-  return, result                  
+
+  return, result
 end
 
 
@@ -304,7 +304,7 @@ end
 ;-
 function mgcoarraylist::_overloadForeach, value, key
   compile_opt strictarr
-  
+
   key = n_elements(key) eq 0L ? 0L : (key + 1L)
   if (key lt self.nUsed) then begin
     value = (*self.pData)[key]
@@ -314,7 +314,7 @@ end
 
 
 ;+
-; Returns the elements to print. Called by PRINT to determine what should be 
+; Returns the elements to print. Called by PRINT to determine what should be
 ; displayed.
 ;
 ; :Returns:
@@ -322,14 +322,14 @@ end
 ;-
 function mgcoarraylist::_overloadPrint
   compile_opt strictarr
-  
+
   return, self.nUsed eq 0L ? '[]' : (*self.pData)[0:self.nUsed-1L]
 end
 
 
 ;+
 ; Returns a string describing the array list. Called by the HELP routine.
-; 
+;
 ; :Returns:
 ;    string
 ;
@@ -339,14 +339,14 @@ end
 ;-
 function mgcoarraylist::_overloadHelp, varname
   compile_opt strictarr
-  
+
   all_types = ['UNDEFINED', 'BYTE', 'INT', 'LONG', 'FLOAT', 'DOUBLE', $
                'COMPLEX', 'STRING', 'STRUCTURE', 'DCOMPLEX', 'POINTER', $
                'OBJREF', 'UINT', 'ULONG', 'LONG64', 'ULONG64']
   type = all_types[self.type]
 
   specs = string(self.nUsed, '(%"MGcoArrayList[%d]")')
-  return, string(varname, type, specs, format='(%"%-15s %-9s = %s")')  
+  return, string(varname, type, specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -359,7 +359,7 @@ end
 ;-
 function mgcoarraylist::_overloadSize
   compile_opt strictarr
-  
+
   return, self.nUsed
 end
 
@@ -377,7 +377,7 @@ pro mgcoarraylist::getProperty, type=type, block_size=blockSize, $
     example = *self.pExample
   endif
   if (arg_present(count)) then count = self.nUsed
-  
+
   if (n_elements(e) gt 0) then begin
     self->mgcoabstractlist::getProperty, _strict_extra=e
   endif
@@ -390,28 +390,28 @@ end
 pro mgcoarraylist::setProperty, type=type, block_size=blockSize
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_elements(type) gt 0 && ((type eq 8) ne (self.type eq 8))) then begin
     message, 'Cannot convert between structures and other types'
   endif
-  
+
   if (n_elements(blockSize) gt 0 && (blockSize lt self.nUsed)) then begin
     message, 'Cannot set the blockSize to less than number of elements in list'
   endif
-  
+
   if (n_elements(type) eq 0 && n_elements(blockSize) eq 0) then return
-  
+
   self.version++
-  
-  self.type = n_elements(type) eq 0 ? self.type : type 
+
+  self.type = n_elements(type) eq 0 ? self.type : type
   self.blockSize = n_elements(blockSize) eq 0 ? self.blockSize : blockSize
-  
+
   if (self.type eq 8) then begin
-    newData = replicate(*self.pExample, self.blockSize) 
+    newData = replicate(*self.pExample, self.blockSize)
   endif else begin
     newData = make_array(self.blockSize, type=self.type, /nozero)
   endelse
-  
+
   newData[0] = (*self.pData)[0:self.nUsed-1L]
   *self.pData = newData
 end
@@ -419,15 +419,15 @@ end
 
 ;+
 ; Remove specified elements from the list.
-; 
+;
 ; :Params:
-;    elements : in, optional, type=type of list 
+;    elements : in, optional, type=type of list
 ;       elements of the list to remove
 ;
 ; :Keywords:
-;    position : in, optional, type=long 
+;    position : in, optional, type=long
 ;       set to a scalar or vector array of indices to remove from the list
-;    all : in, optional, type=boolean 
+;    all : in, optional, type=boolean
 ;       set to remove all elements of the list
 ;-
 pro mgcoarraylist::remove, elements, position=position, all=all
@@ -467,14 +467,14 @@ pro mgcoarraylist::remove, elements, position=position, all=all
   endif
 
   ; remove specified elements in the list
-  for i = 0L, n_elements(elements) - 1L do begin 
+  for i = 0L, n_elements(elements) - 1L do begin
     keepIndices = where((*self.pData)[0L:self.nUsed-1L] ne elements[i], $
                         nKeep)
     if (nKeep gt 0L) then begin
       self.nUsed = nKeep
       (*self.pData)[0L] = (*self.pData)[keepIndices]
     endif else begin
-      self.nUsed = 0L 
+      self.nUsed = 0L
       break
     endelse
   endfor
@@ -483,9 +483,9 @@ end
 
 ;+
 ; Move an element of the list to another position.
-; 
+;
 ; :Params:
-;    source : in, required, type=long 
+;    source : in, required, type=long
 ;       index of the element to move
 ;    destination : in, required, type=long
 ;       index of position to move element
@@ -506,7 +506,7 @@ pro mgcoarraylist::move, source, destination
   sourceElement = (*self.pData)[source]
   if (source lt destination) then begin
     (*self.pData)[source] =  (*self.pData)[source+1L:destination]
-  endif else begin 
+  endif else begin
     (*self.pData)[destination+1L] = (*self.pData)[destination:source-1L]
   endelse
   (*self.pData)[destination] = sourceElement
@@ -519,12 +519,12 @@ end
 ; :Returns: 1B if contained or 0B if otherwise
 ;
 ; :Params:
-;    elements : in, required, type=type of list 
+;    elements : in, required, type=type of list
 ;       scalar or vector of elements of the same type as the list
 ;
 ; :Keywords:
 ;    position : out, optional, type=long
-;       set to a named variable that will return the position of the first 
+;       set to a named variable that will return the position of the first
 ;       instance of the corresponding element of the specified elements
 ;-
 function mgcoarraylist::isContained, elements, position=position
@@ -552,8 +552,8 @@ end
 ;       scalar or vector array of the same type as the list
 ;
 ; :Keywords:
-;    position : in, optional, type=long/lonarr, default=end of list 
-;       index or index array to insert elements at; if array, must match 
+;    position : in, optional, type=long/lonarr, default=end of list
+;       index or index array to insert elements at; if array, must match
 ;       number of elements
 ;-
 pro mgcoarraylist::add, elements, position=position
@@ -564,7 +564,7 @@ pro mgcoarraylist::add, elements, position=position
 
   ; double the size of the list until there is enough room
   if (self.nUsed + nNew gt self.blockSize) then begin
-    self.blockSize *= 2L  
+    self.blockSize *= 2L
     while (self.nUsed + nNew gt self.blockSize) do self.blockSize *= 2L
     if (self.type eq 8) then begin
       newData = replicate(*self.pExample, self.blockSize)
@@ -574,7 +574,7 @@ pro mgcoarraylist::add, elements, position=position
     newData[0] = *self.pData
     *self.pData = temporary(newData)
   endif
-  
+
   ; add the elements
   case n_elements(position) of
     0 : begin
@@ -599,27 +599,27 @@ end
 
 
 ;+
-; Private method to screen for given class(es). Indices returned are indices 
+; Private method to screen for given class(es). Indices returned are indices
 ; POSITION (or data array if ALL is set).
-; 
+;
 ; :Private:
 ;
 ; :Returns: index array or -1L if none
 ;
 ; :Keywords:
-;    position : in, optional, type=lonarr 
+;    position : in, optional, type=lonarr
 ;       indices of elements to check
-;    isa : in, required, type=string/strarr 
+;    isa : in, required, type=string/strarr
 ;       classes to check objects for
 ;    count : out, optional, type=long
 ;       number of matched items
-;    all : in, optional, type=boolean 
+;    all : in, optional, type=boolean
 ;       screen from all elements
 ;-
 function mgcoarraylist::isaGet, position=position, isa=isa, all=all, $
                                 count=count
   compile_opt strictarr
-  
+
   ; handle the /ALL case separately because I don't want to create a large
   ; index array for POSITION
   if (keyword_set(all)) then begin
@@ -629,33 +629,33 @@ function mgcoarraylist::isaGet, position=position, isa=isa, all=all, $
     endfor
     return, where(good, count)
   endif
-  
+
   nPos = n_elements(position)
   good = bytarr(nPos)
   for i = 0L, n_elements(isa) - 1L do begin
     good or= obj_isa((*self.pData)[position], isa[i])
   endfor
-  
+
   return, where(good, count)
 end
 
 
 ;+
-; Get elements of the list. 
+; Get elements of the list.
 ;
 ; :Returns: element(s) of the list or -1L if no elements to return
 ;
 ; :Keywords:
-;    all : in, optional, type=boolean 
+;    all : in, optional, type=boolean
 ;       set to return all elements
-;    position : in, optional, type=long/lonarr 
-;       set to an index or an index array of elements to return; defaults to 0 
+;    position : in, optional, type=long/lonarr
+;       set to an index or an index array of elements to return; defaults to 0
 ;       if ALL keyword not set
-;    count : out, optional, type=integer 
-;       set to a named variable to get the number of elements returned by this 
+;    count : out, optional, type=integer
+;       set to a named variable to get the number of elements returned by this
 ;       function
-;    isa : in, optional, type=string/strarr 
-;       classname(s) of objects to return; only allowable if list type is 
+;    isa : in, optional, type=string/strarr
+;       classname(s) of objects to return; only allowable if list type is
 ;       object
 ;-
 function mgcoarraylist::get, all=all, position=position, count=count, isa=isa
@@ -675,7 +675,7 @@ function mgcoarraylist::get, all=all, position=position, count=count, isa=isa
       ind = self->isaGet(all=all, isa=isa, count=count)
       if (count eq 0) then return, -1L
       return, (*self.pData)[ind]
-    endif 
+    endif
     return, (*self.pData)[0:self.nUsed-1L]
   endif
 
@@ -686,7 +686,7 @@ function mgcoarraylist::get, all=all, position=position, count=count, isa=isa
       ind = self->isaGet(position=0, isa=isa, count=count)
       if (count eq 0) then return, -1L
       return, (*self.pData)[ind]
-    endif 
+    endif
     return, (*self.pData)[0]
   endif
 
@@ -702,7 +702,7 @@ function mgcoarraylist::get, all=all, position=position, count=count, isa=isa
     ind = self->isaGet(position=position, isa=isa, count=count)
     if (count eq 0) then return, -1L
     return, (*self.pData)[position[ind]]
-  endif 
+  endif
   return, (*self.pData)[position]
 end
 
@@ -720,11 +720,11 @@ end
 
 
 ;+
-; Creates an iterator to iterate through the elements of the ArrayList. The 
-; destruction of the iterator is the responsibility of the caller of this 
+; Creates an iterator to iterate through the elements of the ArrayList. The
+; destruction of the iterator is the responsibility of the caller of this
 ; method.
 ;
-; :Returns: 
+; :Returns:
 ;    MGcoArrayListIterator object
 ;-
 function mgcoarraylist::iterator
@@ -742,9 +742,9 @@ pro mgcoarraylist::cleanup
 
   ; if data is objects, free them
   if (self.type eq 11) then obj_destroy, *self.pData
-  
+
   ptr_free, self.pExample, self.pData
-  
+
   self->MGcoAbstractList::cleanup
 end
 
@@ -752,7 +752,7 @@ end
 ;+
 ; Create a list.
 ;
-; :Returns: 
+; :Returns:
 ;    1B for succes, 0B otherwise
 ;
 ; :Params:
@@ -779,9 +779,9 @@ function mgcoarraylist::init, elements, $
   self.blockSize = n_elements(blockSize) eq 0 ? 1000 : blockSize
   if (self.blockSize le 0) then message, 'List size must be positive'
   self.blockSize >= n_elements(value)
-  
+
   ; create the list elements -- structures are special
-  if (self.type eq 8) then begin 
+  if (self.type eq 8) then begin
     if (n_elements(example) eq 0) then begin
       message, 'Structure lists must specify type with EXAMPLE keyword'
     endif
@@ -790,30 +790,30 @@ function mgcoarraylist::init, elements, $
   endif else begin
     data = make_array(self.blockSize, type=self.type)
   endelse
-  
+
   self.pData = ptr_new(data, /no_copy)
 
   if (n_elements(elements) gt 0) then self->add, elements
-  
+
   return, 1B
 end
 
 
 ;+
 ; Define member variables.
-; 
+;
 ; :Categories: object, collection
-; 
+;
 ; :Fields:
-;    pData 
+;    pData
 ;       pointer to the data array
-;    nUsed 
+;    nUsed
 ;       number of elements of the list actually in use
-;    type 
+;    type
 ;       SIZE type code of the data array
-;    blockSize 
+;    blockSize
 ;       size of the data array
-;    pExample 
+;    pExample
 ;       used if list of structures to specify the structure
 ;-
 pro mgcoarraylist__define

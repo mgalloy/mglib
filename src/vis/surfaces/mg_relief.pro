@@ -34,7 +34,7 @@ function mg_relief, elevation, dimensions=dims, color_table=color_table, $
 
   _dims = n_elements(dims) eq 0 ? size(elevation, /dimensions) : dims
   _color_table = n_elements(color_table) eq 0L ? 39 : color_table
-  
+
   view = obj_new('IDLgrView', $
                  color=[0B, 0B, 0B])
 
@@ -44,7 +44,7 @@ function mg_relief, elevation, dimensions=dims, color_table=color_table, $
   palette = obj_new('VISgrPalette')
   palette->loadct, _color_table, _extra=e
   texture = obj_new('IDLgrImage', bytscl(elevation), palette=palette)
-  
+
   s = obj_new('IDLgrSurface', elevation, style=2, /shading, $
               color=[255B, 255B, 255B], texture_map=texture)
   model->add, s

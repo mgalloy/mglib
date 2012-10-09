@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; :Categories: 
+; :Categories:
 ;    file i/o, hdf5, sdf
 ;
 ; :Requires:
@@ -51,7 +51,7 @@ end
 ; Open an HDF 5 file.
 ;
 ; :Private:
-; 
+;
 ; :Keywords:
 ;    error : out, optional, type=long
 ;       error code: 0 for none
@@ -64,7 +64,7 @@ pro mgffh5file::_open, error=error
     catch, /cancel
     return
   endif
-  
+
   self.id = h5f_open(self.filename)
 end
 
@@ -73,7 +73,7 @@ end
 ; Close an HDF 5 file.
 ;
 ; :Private:
-; 
+;
 ; :Keywords:
 ;    error : out, optional, type=long
 ;       error code: 0 for none
@@ -86,7 +86,7 @@ pro mgffh5file::_close, error=error
     catch, /cancel
     return
   endif
-  
+
   h5f_close, self.id
 end
 
@@ -95,7 +95,7 @@ end
 ; Get object info for child object inside file.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    name : in, required, type=string
 ;       name of child object
@@ -112,7 +112,7 @@ function mgffh5file::_statObject, name, error=error
     catch, /cancel
     return, -1
   endif
-  
+
   for i = 0L, h5g_get_num_objs(self.id) - 1L do begin
     ; find first case-insensitive match
     objName = h5g_get_obj_name_by_idx(self.id, i)
@@ -121,7 +121,7 @@ function mgffh5file::_statObject, name, error=error
       break
     endif
   endfor
-  
+
   return, h5g_get_objinfo(self.id, name)
 end
 
@@ -133,14 +133,14 @@ end
 ;
 ; :Returns:
 ;    string
-; 
+;
 ; :Params:
 ;    varname : in, required, type=string
 ;       name of variable containing group object
 ;-
 function mgffh5file::_overloadHelp, varname
   compile_opt strictarr
-  
+
   type = 'H5File'
   specs = string(self.filename, format='(%"<%s>")')
   return, self->MGffH5Base::_overloadHelp(varname, type=type, specs=specs)
@@ -157,18 +157,18 @@ end
 ;-
 function mgffh5file::_overloadPrint
   compile_opt strictarr
-  
+
   ; TODO: show group name, not filename
-  
+
   nmembers = h5g_get_num_objs(self.id)
   names = strarr(nmembers)
   types = strarr(nmembers)
   for g = 0L, nmembers - 1L do begin
-    names[g] = h5g_get_obj_name_by_idx(self.id, g)    
+    names[g] = h5g_get_obj_name_by_idx(self.id, g)
     info = h5g_get_objinfo(self.id, names[g])
     types[g] = info.type
   endfor
-  
+
   listing = mg_strmerge('  ' + names + ' (' + strlowcase(types) + ')')
   return, string(self.filename, listing, format='(%"HDF5 file: %s\n%s")')
 end
@@ -177,12 +177,12 @@ end
 ;+
 ; Handles accessing groups/variables, particularly those with case-sensitive
 ; names or spaces/other characters in their names.
-; 
+;
 ; :Private:
 ;
 ; :Examples:
 ;    For example::
-; 
+;
 ;       h = mg_h5(file_which('hdf5_test.h5'))
 ;       d = h['2D int array']
 ;-
@@ -191,12 +191,12 @@ function mgffh5file::_overloadBracketsRightSide, isRange, $
                                                  ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-    
+
   objInfo = self->_statObject(ss1, error=error)
   if (error ne 0L) then message, string(ss1, format='(%"object %s not found")')
 
   ; TODO: search existing children before creating a new one
-  
+
   case objInfo.type of
     'GROUP': result = obj_new('MGffH5Group', parent=self, name=ss1)
     'DATASET': result = obj_new('MGffH5Dataset', parent=self, name=ss1)
@@ -208,9 +208,9 @@ function mgffh5file::_overloadBracketsRightSide, isRange, $
         message, string(ss1, format='(%"object %s unknown")')
       end
   endcase
-  
-  self.children->add, result 
-  
+
+  self.children->add, result
+
   if (n_elements(ss2) gt 0L) then begin
     return, result->_overloadBracketsRightSide(isRange[1:*], ss2, ss3, ss4, ss5, ss6, ss7, ss8)
   endif else begin
@@ -224,7 +224,7 @@ end
 ;-
 pro mgffh5file::cleanup
   compile_opt strictarr
-  
+
   obj_destroy, self.children
   self->_close
 end
@@ -241,14 +241,14 @@ function mgffh5file::init, filename=filename, _extra=e
   on_error, 2
 
   if (~self->MGffH5Base::init(_extra=e)) then return, 0
-  
+
   self.filename = n_elements(filename) eq 0L ? '' : filename
   self.children = obj_new('IDL_Container')
   self.name = ''
-  
+
   self->_open, error=error
   if (error ne 0L) then message, 'invalid HDF5 file'
-    
+
   return, 1
 end
 
@@ -264,7 +264,7 @@ end
 ;-
 pro mgffh5file__define
   compile_opt strictarr
-  
+
   define = { MGffH5File, inherits MGffH5Base, $
              filename: '', $
              children: obj_new() $

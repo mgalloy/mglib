@@ -1,19 +1,19 @@
 ; docformat = 'rst'
 
 ;+
-; Helper routine to convert an netCDF data type to an IDL variable 
+; Helper routine to convert an netCDF data type to an IDL variable
 ; declaration.
 ;
 ; :Private:
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;-
 
 
 ;+
 ; Converts an netCDF data type to an IDL variable declaration.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -25,7 +25,7 @@
 ;-
 function mg_nc_typedecl, dataType
   compile_opt strictarr
-  
+
   case strlowcase(dataType) of
     'unknown': return, '<undefined>'
     'byte': return, 'bytarr'

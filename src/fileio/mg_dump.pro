@@ -2,16 +2,16 @@
 
 ;+
 ; Convert an extension to a file format phrase.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    type : in, required, type=string
 ;       extension
 ;-
 function mg_dump_typename, type
   compile_opt strictarr
-  
+
   case type of
     '.nc': return, 'netCDF'
     '.h5': return, 'HDF5'
@@ -23,7 +23,7 @@ end
 
 
 ;+
-; Determine the data file type and display a simple listing of the contents of 
+; Determine the data file type and display a simple listing of the contents of
 ; the file.
 ;
 ; :Params:
@@ -39,9 +39,9 @@ pro mg_dump, filename, verbose=verbose
 
   type = mg_sdf_type(filename)
   type_name = mg_dump_typename(type)
-  
+
   if (type ne '') then print, type_name, format='(%"File is of type: %s")'
-  
+
   case type of
     '.nc': mg_nc_dump, filename
     '.h5': mg_h5_dump, filename

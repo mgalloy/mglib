@@ -14,11 +14,11 @@ end
 pro mggrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
                                    order=order
   compile_opt strictarr
-  
+
   if (n_elements(size) gt 0L) then self.size = size
   if (n_elements(bounds) gt 0L) then self.bounds = bounds
   if (n_elements(depth) gt 0L) then self.depth = depth
-  if (n_elements(order) gt 0L) then self.order = order      
+  if (n_elements(order) gt 0L) then self.order = order
 end
 
 
@@ -32,7 +32,7 @@ end
 function mggrtreemapitem::init, size=size, bounds=bounds, $
                                 depth=depth, order=order
   compile_opt strictarr
-  
+
   return, 1
 end
 

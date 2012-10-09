@@ -9,7 +9,7 @@
 ;       IDL> .run mg_histplot
 ;
 ;    This should result in::
-; 
+;
 ;    .. image:: histogram.png
 ;
 ; :Categories:
@@ -32,7 +32,7 @@
 pro mg_histplot, x, y, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   case n_params() of
     0: message, 'incorrect number of parameters'
     1: begin
@@ -44,7 +44,7 @@ pro mg_histplot, x, y, _extra=e
         _y = [y, y[n_elements(y) - 1L]]
       end
   endcase
-  
+
   mg_stepchart, _x, _y, _extra=e
 end
 

@@ -5,11 +5,11 @@ function mg_reads, str, format=format
 
   tokens = strsplit(format, '%', /extract, count=ntokens)
   if (strpos(format, '%') eq -1L) then ntokens = 0L
-  
+
   re = '^[[:digit:]]*.?[[:digit:]]*([a-zA-Z])'
-  
+
   varnames = strarr(ntokens)
-  
+
   for t = 0L, ntokens - 1L do begin
     varnames[t] = string(t, format='(%"t%d")')
     format_code = stregex(tokens[t], re, /extract, /subexpr)
@@ -29,10 +29,10 @@ function mg_reads, str, format=format
                           format='(%"unsupported format code %s")')
         end
     endcase
-    
+
     status = execute(string(varnames[t], value, format='(%"%s = %s")'))
   endfor
-  
+
   _format = string(format, format='(%"(\%\"%s\")")')
 
   reads_cmd = string(strjoin(varnames, ', '), _format, $
@@ -40,10 +40,10 @@ function mg_reads, str, format=format
   status = execute(reads_cmd)
 
   values = list()
-  
+
   for t = 0L, ntokens - 1L do begin
     status = execute(string(varnames[t], format='(%"values->add, %s")'))
   endfor
-  
+
   return, values
 end

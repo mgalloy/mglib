@@ -20,7 +20,7 @@
 ;-
 pro mgtmtext::_print, indent=indent
   compile_opt strictarr
-  
+
   _indent = n_elements(indent) eq 0L ? '' : indent
   print, _indent, *self.text, format='(%"%s+ text: \"%s\"")'
 end
@@ -34,7 +34,7 @@ end
 ;-
 function mgtmtext::isBlank
   compile_opt strictarr
-  
+
   return, *self.text eq ''
 end
 
@@ -49,7 +49,7 @@ pro mgtmtext::getProperty, text=text, _ref_extra=e
 
   if (n_elements(e) gt 0) then begin
     self->mgtmnode::getProperty, _strict_extra=e
-  endif  
+  endif
 end
 
 
@@ -61,7 +61,7 @@ end
 ;-
 function mgtmtext::_clone
   compile_opt strictarr
-  
+
   return, obj_new('MGtmText', type=self.type, text=*self.text)
 end
 
@@ -80,7 +80,7 @@ end
 
 ;+
 ; Creates a text node.
-;     
+;
 ; :Returns: 1 for success, 0 for failure
 ;
 ; :Keywords:
@@ -103,8 +103,8 @@ end
 ;+
 ; Defines `MGtmText` which is a `MGtmNode` that contains text.
 ;
-; :Fields:     
-;    text 
+; :Fields:
+;    text
 ;       pointer to `strarr`
 ;-
 pro mgtmtext__define

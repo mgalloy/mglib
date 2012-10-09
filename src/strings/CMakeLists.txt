@@ -3,12 +3,12 @@ set(DLM_NAME mg_${DIRNAME})
 
 if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   include_directories(${TRE_INCLUDE_DIR})
-  
+
   add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 
-  if (APPLE) 
-    set_target_properties("${DLM_NAME}" 
-      PROPERTIES 
+  if (APPLE)
+    set_target_properties("${DLM_NAME}"
+      PROPERTIES
         PREFIX ""
         SUFFIX ".so"
     )
@@ -19,7 +19,7 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   install(TARGETS ${DLM_NAME}
     RUNTIME DESTINATION lib/${DIRNAME}
     LIBRARY DESTINATION lib/${DIRNAME}
-  )  
+  )
   install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
 

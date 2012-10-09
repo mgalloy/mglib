@@ -19,12 +19,12 @@
 ;-
 pro mggrrotateanimator::animate, progress
   compile_opt strictarr
-  
+
   _progress = self.easing->ease(progress)
-  
+
   a = (_progress - self.currentProgress) * self.angle
   self.target->rotate, self.axis, a
-  
+
   self.currentProgress = _progress
 end
 
@@ -47,17 +47,17 @@ function mggrrotateanimator::init, angle=angle, axis=axis, _extra=e
   compile_opt strictarr
 
   if (~self->mggranimator::init(_extra=e)) then return, 0
-  
+
   self.angle = n_elements(angle) eq 0L ? fltarr(3) + 1.0 : angle
   self.axis = n_elements(axis) eq 0L ? fltarr(3) + 1.0 : axis
-  
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
 ;    angle
 ;       degrees to rotate
@@ -66,7 +66,7 @@ end
 ;-
 pro mggrrotateanimator__define
   compile_opt strictarr
-  
+
   define = { MGgrRotateAnimator, inherits MGgrAnimator, $
              angle: 0.0, $
              axis: fltarr(3) $

@@ -37,15 +37,15 @@
 ;    thick : in, optional, type=fltarr
 ;       thicknes of flat portions of the graph
 ;    fill : in, optional, type=boolean
-;       set to fill under the plot      
+;       set to fill under the plot
 ;    color : in, optional, type=color
-;       color of steps 
+;       color of steps
 ;    _extra : in, optional, type=keywords
 ;       keywords to `PLOTS`
 ;-
 pro mg_stepchart_plotflats, x, y, thick=thick, fill=fill, color=color, _extra=e
   compile_opt strictarr
-  
+
   for s = 0L, n_elements(x) / 2 - 1L do begin
     if (keyword_set(fill)) then begin
       polyfill, [x[2 * s], x[2 * s], x[2 * s + 1], x[2 * s + 1]], $
@@ -62,7 +62,7 @@ end
 ;
 ; :Params:
 ;    x : in, required, type=fltarr(n)
-;       x-coordinates if both x and y are passed; y-coordinates if only x is 
+;       x-coordinates if both x and y are passed; y-coordinates if only x is
 ;       passed
 ;    y : in, optional, type=fltarr(n)
 ;       y-coordinates
@@ -89,7 +89,7 @@ pro mg_stepchart, x, y, overplot=overplot, $
                   _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   case n_params() of
     0: message, 'incorrect number of arguments'
     1: begin
@@ -101,33 +101,33 @@ pro mg_stepchart, x, y, overplot=overplot, $
         _y = y
       end
   endcase
-  
+
   _thick = n_elements(thick) gt 0L ? thick : 1.0
   _riserThick = n_elements(riserThick) gt 0L ? riserThick : 0.5 * _thick
-  
+
   if (n_elements(axisColor) gt 0L) then _axisColor = axisColor
   if (n_elements(axisColor) eq 0L && n_elements(color) gt 0L) then _axisColor = color
-  
+
   n = n_elements(x)
-  
+
   _x = reform(rebin(reform(_x, 1, n), 2, n), 2 * n)
-  _y = reform(rebin(reform(_y, 1, n), 2, n), 2 * n)  
-  
+  _y = reform(rebin(reform(_y, 1, n), 2, n), 2 * n)
+
   _x = _x[1:*]
   _y = _y[0: 2 * (n - 1)]
-  
+
   if (keyword_set(overplot)) then begin
     if (_riserThick ne 0.) then oplot, _x, _y, thick=_riserThick, color=color, _extra=e
   endif else begin
     plot, [min(_x, max=_xmax), _xmax], [min(_y, max=_ymax), _ymax], $
           /nodata, color=_axisColor, _extra=e
   endelse
-  
-  mg_stepchart_plotflats, _x, _y, thick=_thick, fill=fill, color=color, _extra=e  
-  
+
+  mg_stepchart_plotflats, _x, _y, thick=_thick, fill=fill, color=color, _extra=e
+
   if (~keyword_set(overplot) && _riserThick gt 0.) then begin
     oplot, _x, _y, thick=_riserThick, color=color, _extra=e
-  endif  
+  endif
 end
 
 

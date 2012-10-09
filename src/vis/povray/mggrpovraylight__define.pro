@@ -2,34 +2,34 @@
 
 ;+
 ; Any IDL type of light source plus the POV-Ray area light.
-; 
+;
 ; :Categories:
 ;    object graphics
 ;
 ; :Examples:
 ;    To create an area light::
-;      
+;
 ;       light = obj_new('MGgrPOVRayLight', type=2, location=[0, 5, 5], $
 ;                       intensity=2.0, $
 ;                       /arealight, $
 ;                       width_axis=[0.3, 0, 0], height_axis=[0, 0.3, 0], $
 ;                       n_width_light=5, n_height_lights=5, $
 ;                       adaptive=1.0, /jitter)
-;    
+;
 ;    This light is actually a 5 by 5 grid of lights spanning 0.3 units in the
-;    x direction and 0.3 units in the y direction (although each light is 
+;    x direction and 0.3 units in the y direction (although each light is
 ;    moved slightly by the JITTER keyword). This creates softer shadows.
-;                
-;    See the example attached to the end of this file as a main-level program 
+;
+;    See the example attached to the end of this file as a main-level program
 ;    (only available if you have the source code version of this routine)::
-;       
+;
 ;       IDL> .run mggrpovraylight__define
-;        
-;    This should produce output with an area light (which makes a fuzzy 
+;
+;    This should produce output with an area light (which makes a fuzzy
 ;    shadow):
-;    
+;
 ;    .. image:: arealight.png
-;    
+;
 ; :Properties:
 ;    arealight
 ;       set to use an area light
@@ -59,14 +59,14 @@ pro mggrpovraylight::getProperty, arealight=arealight, $
                                   adaptive=adaptive, jitter=jitter, $
                                   _ref_extra=e
   compile_opt strictarr
-  
+
   if (arg_present(arealight)) then arealight = self.arealight
   if (arg_present(widthAxis)) then widthAxis = self.widthAxis
   if (arg_present(heightAxis)) then heightAxis = self.heightAxis
   if (arg_present(nWidthLights)) then nWidthLights = self.nWidthLights
   if (arg_present(nHeightLights)) then nHeightLights = self.nHeightLights
   if (arg_present(adaptive)) then adaptive = self.adaptive
-  if (arg_present(jitter)) then jitter = self.jitter            
+  if (arg_present(jitter)) then jitter = self.jitter
 
   if (n_elements(e) gt 0L) then begin
     self->idlgrlight::getProperty, _extra=e
@@ -85,15 +85,15 @@ pro mggrpovraylight::setProperty, arealight=arealight, $
                                   adaptive=adaptive, jitter=jitter, $
                                   _extra=e
   compile_opt strictarr
-  
-  if (n_elements(arealight) gt 0L) then self.arealight = arealight       
-  if (n_elements(widthAxis) gt 0L) then self.widthAxis = widthAxis       
-  if (n_elements(heightAxis) gt 0L) then self.heightAxis = heightAxis       
-  if (n_elements(nWidthLights) gt 0L) then self.nWidthLights = nWidthLights       
-  if (n_elements(nHeightLights) gt 0L) then self.nHeightLights = nHeightLights       
-  if (n_elements(adaptive) gt 0L) then self.adaptive = adaptive       
-  if (n_elements(jitter) gt 0L) then self.jitter = jitter                   
-  
+
+  if (n_elements(arealight) gt 0L) then self.arealight = arealight
+  if (n_elements(widthAxis) gt 0L) then self.widthAxis = widthAxis
+  if (n_elements(heightAxis) gt 0L) then self.heightAxis = heightAxis
+  if (n_elements(nWidthLights) gt 0L) then self.nWidthLights = nWidthLights
+  if (n_elements(nHeightLights) gt 0L) then self.nHeightLights = nHeightLights
+  if (n_elements(adaptive) gt 0L) then self.adaptive = adaptive
+  if (n_elements(jitter) gt 0L) then self.jitter = jitter
+
   if (n_elements(e) gt 0L) then begin
     self->idlgrlight::setProperty, _extra=e
   endif
@@ -102,9 +102,9 @@ end
 
 ;+
 ; Write out the POV-Ray description of an area light.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number to write to
@@ -120,15 +120,15 @@ pro mggrpovraylight::_writeArealight, lun
               + strtrim(self.nHeightLights, 2)
     printf, lun, '  adaptive ' + strtrim(self.adaptive, 2)
     if (self.jitter) then printf, lun, '  jitter'
-  endif  
+  endif
 end
 
 
 ;+
 ; Write out the POV-Ray description of the light.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number to write to
@@ -136,28 +136,28 @@ end
 pro mggrpovraylight::write, lun
   compile_opt strictarr
 
-  self->getProperty, type=type, intensity=intensity, color=color, $ 
+  self->getProperty, type=type, intensity=intensity, color=color, $
                      location=location
-  
+
   intensity *= self.lightIntensityMultiplier
-  
+
   ; TODO: handle positional lights and spotlights
   case type of
     0: ; ambient, already taken care of
     1: ; positional
     2: begin ; directional
         sLocation = strjoin(strtrim(location, 2), ',')
-        printf, lun, 'light_source {' 
+        printf, lun, 'light_source {'
         printf, lun, '  <' +  sLocation + '>'
-        printf, lun, '  color ' + self->_getRGB(color) + ' * ' + strtrim(intensity, 2) 
-        
-        self->_writeAreaLight, lun        
+        printf, lun, '  color ' + self->_getRGB(color) + ' * ' + strtrim(intensity, 2)
+
+        self->_writeAreaLight, lun
         self->_writeTransform, lun, self->getCTM()
-        printf, lun, '}' 
+        printf, lun, '}'
       end
     3: ; spotlight
     else: message, 'unknown light source type'
-  endcase 
+  endcase
 end
 
 
@@ -184,10 +184,10 @@ function mggrpovraylight::init, arealight=arealight, $
   self.widthAxis = n_elements(widthAxis) eq 0L ? [1., 0., 0.] : widthAxis
   self.heightAxis = n_elements(heightAxis) eq 0L ? [1., 0., 0.] : heightAxis
   self.nWidthLights = n_elements(nWidthLights) eq 0L ? 3 : nWidthLights
-  self.nHeightLights = n_elements(nHeightLights) eq 0L ? 3 : nHeightLights  
+  self.nHeightLights = n_elements(nHeightLights) eq 0L ? 3 : nHeightLights
   self.adaptive = n_elements(adaptive) eq 0L ? 1.0 : adaptive
   self.jitter = keyword_set(jitter)
-  
+
   return, 1
 end
 
@@ -213,7 +213,7 @@ end
 ;-
 pro mggrpovraylight__define
   compile_opt strictarr
-  
+
   define = { MGgrPOVRayLight, $
              inherits IDLgrLight, inherits MGgrPOVRayObject, $
              arealight: 0B, $

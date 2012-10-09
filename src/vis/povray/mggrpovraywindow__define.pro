@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Destination class graphics window like `IDLgrWindow` that uses POVRay to 
+; Destination class graphics window like `IDLgrWindow` that uses POVRay to
 ; render the graphics.
 ;
 ; :Properties:
@@ -21,21 +21,21 @@
 ;-
 pro mggrpovraywindow::draw, picture
   compile_opt strictarr
-  
+
   if (n_elements(picture) gt 0L) then begin
     _picture = picture
   endif else begin
     self->IDLgrWindow::getProperty, graphics_tree=_picture
   endelse
-  
+
   self.povray->draw, _picture
-  
+
   self.povray->getProperty, file_prefix=filePrefix
   im = mg_povray(filePrefix)
-  
+
   image = self.view->getByName('model/image')
-  image->setProperty, data=im  
-  
+  image->setProperty, data=im
+
   self->IDLgrWindow::draw, self.view
 end
 
@@ -45,20 +45,20 @@ end
 ;-
 pro mggrpovraywindow::getProperty, _ref_extra=e
   compile_opt strictarr
-  
+
   if (n_elements(e) gt 0L) then begin
     self->IDLgrWindow::getProperty, _extra=e
     self.povray->getProperty, _extra=e
   endif
 end
 
-  
+
 ;+
 ; Set properties.
 ;-
 pro mggrpovraywindow::setProperty, _extra=e
   compile_opt strictarr
-  
+
   if (n_elements(e) gt 0L) then begin
     self->IDLgrWindow::setProperty, _extra=e
     self.povray->setProperty, _extra=e
@@ -71,7 +71,7 @@ end
 ;-
 pro mggrpovraywindow::cleanup
   compile_opt strictarr
-  
+
   if (~self.keepFiles) then begin
     self.povray->getProperty, file_prefix=filePrefix
     file_delete, file_dirname(filePrefix), /recursive
@@ -93,7 +93,7 @@ function mggrpovraywindow::init, file_prefix=filePrefix, $
                                  keep_files=keepFiles, $
                                  _extra=e
   compile_opt strictarr
-  
+
   if (~self->IDLgrWindow::init(_extra=e)) then return, 0
 
   self.keepFiles = keyword_set(keepFiles)
@@ -105,15 +105,15 @@ function mggrpovraywindow::init, file_prefix=filePrefix, $
                   : filePrefix
   self.povray = obj_new('MGgrPovray', file_prefix=_filePrefix, _extra=e)
   self.povray->getProperty, dimensions=dimensions
-  
+
   self.view = obj_new('IDLgrView', viewplane_rect=[0, 0, dimensions])
-  
+
   model = obj_new('IDLgrModel', name='model')
   self.view->add, model
-  
+
   image = obj_new('IDLgrImage', name='image')
   model->add, image
-  
+
   return, 1
 end
 

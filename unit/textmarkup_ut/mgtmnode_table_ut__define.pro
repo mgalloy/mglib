@@ -2,17 +2,17 @@
 
 function mgtmnode_table_ut::test_rst
   compile_opt strictarr
-  
+
   @error_is_fail
-  
+
   rst = obj_new('MGtmRst')
   rstResult = rst->process(self.msg)
 
   ;print, 'Restructured text'
   ;print, transpose(rstResult)
-  
+
   obj_destroy, rst
-  
+
   return, 1
 end
 
@@ -21,15 +21,15 @@ function mgtmnode_table_ut::test_html
   compile_opt strictarr
 
   @error_is_fail
-  
+
   html = obj_new('MGtmHTML')
   htmlResult = html->process(self.msg)
 
   ;print, 'HTML'
   ;print, transpose(htmlResult)
-  
+
   obj_destroy, html
-  
+
   return, 1
 end
 
@@ -38,15 +38,15 @@ function mgtmnode_table_ut::test_latex
   compile_opt strictarr
 
   @error_is_fail
-  
+
   latex = obj_new('MGtmLatex')
   latexResult = latex->process(self.msg)
 
   ;print, 'LaTeX'
   ;print, transpose(latexResult)
-  
+
   obj_destroy, latex
-  
+
   return, 1
 end
 
@@ -56,13 +56,13 @@ pro mgtmnode_table_ut::setup
 
   self->mgutlibtestcase::setup
   self.msg = obj_new('MGtmTag', type='paragraph')
-  
+
   table = obj_new('MGtmTag', type='table')
   self.msg->addChild, table
-  
+
   row1 = obj_new('MGtmTag', type='row')
   table->addChild, row1
-  
+
   col11 = obj_new('MGtmTag', type='column_header')
   row1->addChild, col11
   col11->addChild, obj_new('MGtmText', text='Output name')
@@ -81,13 +81,13 @@ pro mgtmnode_table_ut::setup
   col22 = obj_new('MGtmTag', type='column')
   row2->addChild, col22
   col22->addChild, obj_new('MGtmText', text='Send output to HTML')
-  
+
 end
 
 
 pro mgtmnode_table_ut::teardown
   compile_opt strictarr
-  
+
   obj_destroy, self.msg
   self->mgutlibtestcase::teardown
 end
@@ -95,7 +95,7 @@ end
 
 pro mgtmnode_table_ut__define
   compile_opt strictarr
-  
+
   define = { MGtmNode_table_ut, inherits MGutLibTestCase, $
              msg: obj_new() $
            }

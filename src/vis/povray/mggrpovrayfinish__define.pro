@@ -3,14 +3,14 @@
 ;+
 ; Attribute class for `MGgrPOVRayPolygons` representing the surface properties
 ; of objects.
-; 
+;
 ; :Categories:
 ;    object graphics
 ;
 ; :Examples:
 ;    To create a finish object using one of the finishes named in finish.inc,
 ;    use::
-;    
+;
 ;       finish = obj_new('MGgrPOVRayFinish', finish_name='F_MetalB')
 ;
 ;    This can then be used in one of the `MGgrPOVRay` classes like::
@@ -19,8 +19,8 @@
 ;                      color=[150, 100, 20], shading=1, $
 ;                      shininess=25.0, ambient=[150, 100, 20], diffuse=[150, 100, 20], $
 ;                      finish=finish)
-;              
-;    See the example attached to the end of this file as a main-level program 
+;
+;    See the example attached to the end of this file as a main-level program
 ;    (only available if you have the source code version of this routine)::
 ;
 ;       IDL> .run mggrpovraygrid__define
@@ -28,13 +28,13 @@
 ;    This should produce:
 ;
 ;    .. image:: metal.png
-;    
+;
 ; :Properties:
 ;    finish_name
 ;       name of a finish in finish.inc
 ;    ambient
-;       controls the amount of ambient light that falls on the surface; 
-;       increase this amount to increase details in shadows; default value is 
+;       controls the amount of ambient light that falls on the surface;
+;       increase this amount to increase details in shadows; default value is
 ;       0.2
 ;    diffuse
 ;       controls the amount of light from a light source falls on the surface;
@@ -42,42 +42,42 @@
 ;       is 0.6
 ;    brilliance
 ;       controls the way that light intensity varies with incidence angle; the
-;       default value is 1.0, higher values will cause the light to fall of 
-;       less at low and medium angles of incidence 
+;       default value is 1.0, higher values will cause the light to fall of
+;       less at low and medium angles of incidence
 ;    metallic
-;       set to give the surface a more metallic appearance; default value is 
+;       set to give the surface a more metallic appearance; default value is
 ;       not metallic
 ;    specular
-;       controls specular highlights in conjunction with ROUGHNESS; controls 
+;       controls specular highlights in conjunction with ROUGHNESS; controls
 ;       the brightness of the specular highlight; default value is 0.0
 ;    roughness
-;       controls specular highlights in conjunction with SPECULAR; controls 
-;       the size of the specular highlight, small values make small, tight 
+;       controls specular highlights in conjunction with SPECULAR; controls
+;       the size of the specular highlight, small values make small, tight
 ;       specular highlights; default value is 0.05
 ;    reflection
 ;       amount the surface reflects; generally reflection and diffuse should
 ;       be inversely proportional; default value is 0.0
 ;    irid_amount
-;       amount of contribution of iridescence to overall surface color, 
-;       usually 0.1 to 0.5 is sufficient; iridescence is not used by default, 
-;       but if any iridescence property is set it is used; default value is 
+;       amount of contribution of iridescence to overall surface color,
+;       usually 0.1 to 0.5 is sufficient; iridescence is not used by default,
+;       but if any iridescence property is set it is used; default value is
 ;       0.35
 ;    irid_thickness
 ;       thickness affects busyness of the iridescence, 0.25 to 1.0 yields best
-;       results; iridescence is not used by default, but if any iridescence 
+;       results; iridescence is not used by default, but if any iridescence
 ;       property is set it is used; default value is 0.5
 ;    irid_turbulence
-;       slightly difference way to affect thickness, 0.25 to 1.0 work best; 
+;       slightly difference way to affect thickness, 0.25 to 1.0 work best;
 ;       iridescence is not used by default, but if any iridescence property is
 ;       set it is used; default value is 0.5
 ;-
 
-  
+
 ;+
 ; Returns true if the finish is given by name instead of property values.
-; 
+;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    1 if finish_name is used, 0 if not
 ;-
@@ -90,16 +90,16 @@ end
 
 ;+
 ; Write the finish properties to a file.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number to write to
 ;-
 pro mggrpovrayfinish::write, lun
   compile_opt strictarr
-  
+
   if (self.finishName ne '') then begin
     printf, lun, '  finish { ' + self.finishName + ' }'
   endif else begin
@@ -108,20 +108,20 @@ pro mggrpovrayfinish::write, lun
     printf, lun, '    brilliance ' + strtrim(self.brilliance, 2)
     printf, lun, '    diffuse ' + strtrim(self.diffuse, 2)
     if (self.metallic) then printf, lun, '    metallic'
-    printf, lun, '    specular ' + strtrim(self.specular, 2) 
+    printf, lun, '    specular ' + strtrim(self.specular, 2)
     printf, lun, '    roughness ' + strtrim(self.roughness, 2)
     printf, lun, '    reflection ' + strtrim(self.reflection, 2)
-    
+
     if (self.hasIrid) then begin
       printf, lun, '    irid {'
       printf, lun, '      ' + strtrim(self.iridAmount, 2)
       printf, lun, '      thickness ' + strtrim(self.iridThickness, 2)
-      printf, lun, '      turbulence ' + strtrim(self.iridTurbulence, 2)      
+      printf, lun, '      turbulence ' + strtrim(self.iridTurbulence, 2)
       printf, lun, '    }'
     endif
-    
+
     printf, lun, '  }'
-  endelse  
+  endelse
 end
 
 
@@ -135,9 +135,9 @@ pro mggrpovrayfinish::getProperty, finish_name=finishName, $
                                    reflection=reflection, $
                                    irid_amount=iridAmount, $
                                    irid_thickness=iridThickness, $
-                                   irid_turbulence=iridTurbulence                                    
+                                   irid_turbulence=iridTurbulence
   compile_opt strictarr
-  
+
   if (arg_present(finishName)) then finishName = self.finishName
   if (arg_present(ambient)) then ambient = self.ambient
   if (arg_present(brilliance)) then brilliance = self.brilliance
@@ -146,7 +146,7 @@ pro mggrpovrayfinish::getProperty, finish_name=finishName, $
   if (arg_present(specular)) then specular = self.specular
   if (arg_present(roughness)) then roughness = self.roughness
   if (arg_present(reflection)) then reflection = self.reflection
-  
+
   if (arg_present(iridAmount)) then iridAmount = self.iridAmount
   if (arg_present(iridThickness)) then iridThickness = self.iridThickness
   if (arg_present(iridTurbulence)) then iridTurbulence = self.iridTurbulence
@@ -165,7 +165,7 @@ pro mggrpovrayfinish::setProperty, finish_name=finishName, $
                                    irid_thickness=iridThickness, $
                                    irid_turbulence=iridTurbulence
   compile_opt strictarr
-  
+
   if (n_elements(finishName) gt 0L) then self.finishName = finishName
   if (n_elements(ambient) gt 0L) then self.ambient = ambient
   if (n_elements(brilliance) gt 0L) then self.brilliance = brilliance
@@ -173,21 +173,21 @@ pro mggrpovrayfinish::setProperty, finish_name=finishName, $
   if (n_elements(metallic) gt 0L) then self.metallic = keyword_set(metallic)
   if (n_elements(specular) gt 0L) then self.specular = specular
   if (n_elements(roughness) gt 0L) then self.roughness = roughness
-  if (n_elements(reflection) gt 0L) then self.reflection = reflection  
+  if (n_elements(reflection) gt 0L) then self.reflection = reflection
 
   self.hasIrid = self.hasIrid $
                    || (n_elements(iridAmount) gt 0L) $
                    || (n_elements(iridThickness) gt 0L) $
-                   || (n_elements(iridTurbulence) gt 0L)                   
-  if (n_elements(iridAmount) gt 0L) then self.iridAmount = iridAmount  
-  if (n_elements(iridThickness) gt 0L) then self.iridThickness = iridThickness  
-  if (n_elements(iridTurbulence) gt 0L) then self.iridTurbulence = iridTurbulence                     
+                   || (n_elements(iridTurbulence) gt 0L)
+  if (n_elements(iridAmount) gt 0L) then self.iridAmount = iridAmount
+  if (n_elements(iridThickness) gt 0L) then self.iridThickness = iridThickness
+  if (n_elements(iridTurbulence) gt 0L) then self.iridTurbulence = iridTurbulence
 end
 
 
 ;+
 ; Create a finish.
-; 
+;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
@@ -200,9 +200,9 @@ function mggrpovrayfinish::init, finish_name=finishName, $
                                  irid_thickness=iridThickness, $
                                  irid_turbulence=iridTurbulence
   compile_opt strictarr
-  
+
   if (~self->MGgrPOVRayObject::init()) then return, 0
-  
+
   self.finishName = n_elements(finishName) eq 0L ? '' : finishName
 
   self.ambient = n_elements(ambient) eq 0L ? 0.2 : ambient
@@ -211,22 +211,22 @@ function mggrpovrayfinish::init, finish_name=finishName, $
   self.metallic = keyword_set(metallic)
   self.specular = n_elements(specular) eq 0L ? 0.0 : specular
   self.roughness = n_elements(roughness) eq 0L ? 0.05 : roughness
-  self.reflection = n_elements(reflection) eq 0L ? 0.0 : reflection  
+  self.reflection = n_elements(reflection) eq 0L ? 0.0 : reflection
 
   self.hasIrid = (n_elements(iridAmount) gt 0L) $
                    || (n_elements(iridThickness) gt 0L) $
                    || (n_elements(iridTurbulence) gt 0L)
   self.iridAmount = n_elements(iridAmount) eq 0L ? 0.35 : iridAmount
-  self.iridThickness = n_elements(iridThickness) eq 0L ? 0.5 : iridThickness                   
+  self.iridThickness = n_elements(iridThickness) eq 0L ? 0.5 : iridThickness
   self.iridTurbulence = n_elements(iridTurbulence) eq 0L ? 0.5 : iridTurbulence
-                     
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
 ;    finishName
 ;       name of finish in finish.inc
@@ -255,7 +255,7 @@ end
 ;-
 pro mggrpovrayfinish__define
   compile_opt strictarr
-  
+
   define = { MGgrPOVRayFinish, inherits MGgrPOVRayObject, $
              finishName: '', $
              ambient: 0.0, $

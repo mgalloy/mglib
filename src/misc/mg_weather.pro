@@ -64,11 +64,11 @@
 ;-
 pro mgffweatherparser::print
   compile_opt strictarr, hidden
-  
-  print, self.city, self.datetime, format='(%"Weather report for %s (%s)")'  
+
+  print, self.city, self.datetime, format='(%"Weather report for %s (%s)")'
   print, self.current_temp, self.current_condition, $
          format='(%"Current conditions are %s and %s")'
-  
+
   ; print the forecast
   foreach day, self.forecast_conditions do begin
     print, day['day_of_week'], day['condition'], day['high'], day['low'], $
@@ -82,7 +82,7 @@ end
 ;-
 pro mgffweatherparser::startElement, uri, local, qname, attName, attValue
   compile_opt strictarr, hidden
-  
+
   case qname of
     ; some information about the forecast itself
     'current_date_time': self.datetime = attValue[0]
@@ -99,12 +99,12 @@ pro mgffweatherparser::startElement, uri, local, qname, attName, attValue
 
     ; the only special current condition tag
     'temp_f': self.current_temp = attValue
-    
+
     ; the forecast condition tags
     'day_of_week': ((self.forecast_conditions)[-1])['day_of_week'] = attValue[0]
     'low': ((self.forecast_conditions)[-1])['low'] = attValue[0]
     'high': ((self.forecast_conditions)[-1])['high'] = attValue[0]
-    
+
     ; condition is an accepted tag for both current and forecast conditions
     'condition': begin
         if (self.current) then begin
@@ -115,7 +115,7 @@ pro mgffweatherparser::startElement, uri, local, qname, attName, attValue
       end
     else:
   endcase
-    
+
 end
 
 
@@ -124,14 +124,14 @@ end
 ;
 ; :Returns:
 ;    1 for success, 0 for failure
-; 
+;
 ; :Keywords:
 ;    _extra : in, optional, type=keywords
 ;       keywords to IDLffXMLSAX::init
 ;-
 function mgffweatherparser::init, _extra=e
   compile_opt strictarr, hidden
-  
+
   if (~self->IDLffXMLSAX::init(_extra=e)) then return, 0
 
   self.forecast_conditions = list()
@@ -145,7 +145,7 @@ end
 ;-
 pro mgffweatherparser__define
   compile_opt strictarr, hidden
-  
+
   define = { MGffWeatherParser, inherits IDLffXMLSAX, $
              city: '', $
              datetime: '', $
@@ -153,7 +153,7 @@ pro mgffweatherparser__define
              current_temp: '', $
              current_condition: '', $
              forecast_conditions: obj_new() $
-           }  
+           }
 end
 
 
@@ -177,13 +177,13 @@ end
 ;-
 pro mg_weather, location
   compile_opt strictarr
-  
+
   ; replace contiguous spaces with a '%20'
   _location = strjoin(strsplit(location, ' ', /extract), '%20')
-  
+
   ; define the web service call URL
   url = string(_location, format='(%"http://google.com/ig/api?weather=%s")')
-  
+
   weatherParser = MGffWeatherParser()
   weatherParser->parseFile, url, /url
   weatherParser->print

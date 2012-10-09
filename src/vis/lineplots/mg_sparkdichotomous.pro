@@ -2,17 +2,17 @@
 
 ;+
 ; Creates a dichotomous sparkline as a PNG image file.
-; 
+;
 ; :Todo:
 ;    maybe this should be a function that returns an image array instead of
-;    directly creating the PNG; show example; add POSITION keyword and make it 
+;    directly creating the PNG; show example; add POSITION keyword and make it
 ;    just do regular output in direct graphics as well (maybe using a FILENAME
 ;    keyword to create a file)
 ;-
 
 ;+
 ; Create a dichotomous sparkline as a PNG image file.
-; 
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename of PNG file to write
@@ -24,7 +24,7 @@
 ;       ysize in pixels of the output image
 ;    color : in, optional, type=bytarr(3) or index, default="[0, 0, 0] or 0"
 ;       color of the plot
-;    background : in, optional, type=bytarr(3) or index, default="[255, 255, 255] or 255" 
+;    background : in, optional, type=bytarr(3) or index, default="[255, 255, 255] or 255"
 ;       background color for the plot
 ;-
 pro mg_sparkdichotomous, filename, data, ysize=ysize, $
@@ -35,9 +35,9 @@ pro mg_sparkdichotomous, filename, data, ysize=ysize, $
   multiplier = 1L
 
   _xsize = 2 * ndata - 1L
-  _ysize = n_elements(ysize) eq 0 ? 12 : ysize 
+  _ysize = n_elements(ysize) eq 0 ? 12 : ysize
 
-  _color = n_elements(color) eq 0 ? bytarr(3) : color 
+  _color = n_elements(color) eq 0 ? bytarr(3) : color
   _background = n_elements(background) eq 0 ? bytarr(3) + 255B : background
 
   band = bytarr(_xsize, _ysize)
@@ -53,7 +53,7 @@ pro mg_sparkdichotomous, filename, data, ysize=ysize, $
           bar_max = _ysize - 1L
         end
       else : begin
-          bar_min = _ysize / 2 
+          bar_min = _ysize / 2
           bar_max = _ysize / 2
         end
     endcase

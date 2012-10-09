@@ -2,15 +2,15 @@
 
 ;+
 ; Wrap a string to a given width.
-; 
+;
 ; :Examples:
 ;    To run a simple example::
-; 
+;
 ;       IDL> .run vis_strwrap
-; 
+;
 ; :Returns:
 ;    string array
-; 
+;
 ; :Params:
 ;    text : in, required, type=string
 ;       scalar string to wrap
@@ -32,10 +32,10 @@ function vis_strwrap, text, width, $
   wordstart = strsplit(text, count=nwords, length=wordlength)
   output = ['']
   line = 0L
-  
+
   linestart = 0L
   linelength = 0L
-  
+
   window, /pixmap, /free, xsize=1000
   winId = !d.window
 
@@ -46,7 +46,7 @@ function vis_strwrap, text, width, $
     xyouts, 0, 0, s, /device, $
             charsize=charsize, charthick=charthick, font=font, $
             width=lineWidth
-            
+
     lineWidth *= 1000
 
     if (lineWidth le width) then begin
@@ -58,9 +58,9 @@ function vis_strwrap, text, width, $
       linelength = 0L
     endelse
   endfor
-  
+
   wdelete, winId
-  
+
   return, output
 end
 
@@ -94,7 +94,7 @@ xyouts, 0.05, 0.70, $
 xyouts, 0.05, 0.45, $
         'WRAPPED LINE (at ' + strtrim(width / 2, 2) + ' pixels):!C' + strjoin(v2, '!C'), $
         /normal, font=font, charsize=charsize
-        
+
 tvlct, 255, 255, 0, 0
 ;vis_ps_ctswap
 plots, coords[0, 0:1], coords[1, 0:1], /device, color='00ffff'x

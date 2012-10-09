@@ -5,11 +5,11 @@
 ;-
 pro mg_use_wrapper
   compile_opt strictarr
-  
+
   args = command_line_args(count=nargs)
-  
+
   ; check for -h option
-  if (total(args eq '-h') gt 0.) then begin    
+  if (total(args eq '-h') gt 0.) then begin
     print, 'usage: mg_use [options] routines...'
     print
     print, 'options:'
@@ -29,7 +29,7 @@ pro mg_use_wrapper
       else: routines = [arg[0:ind[0] - 1L], args[ind[0] + 2L:*]]
     endcase
   endif else routines = args
-  
+
   ; finally, call MG_USE
   mg_use, routines, outdir
 end

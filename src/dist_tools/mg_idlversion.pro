@@ -2,7 +2,7 @@
 
 ;+
 ; Returns the IDL version number as a string or a boolean indicating whether
-; a required version is met. 
+; a required version is met.
 ;
 ; :Examples:
 ;    For example, try::
@@ -25,15 +25,15 @@
 ;
 ; :Keywords:
 ;    require : in, optional, type=string
-;       IDL version required; if set, `MG_IDLVERSION` returns a boolean of 
+;       IDL version required; if set, `MG_IDLVERSION` returns a boolean of
 ;       whether the version requirement is met
 ;-
 function mg_idlversion, require=require
   compile_opt strictarr
 
   version = (strsplit(!version.release, /extract))[0]
-  
-  if (n_elements(require) gt 0L) then begin  
+
+  if (n_elements(require) gt 0L) then begin
     return, mg_cmp_version(version, require) ge 0B
   endif else begin
     return, version

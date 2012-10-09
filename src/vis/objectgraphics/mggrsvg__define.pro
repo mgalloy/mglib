@@ -1,11 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Object graphics destination for producing Scalable Vector Graphics (SVG) 
+; Object graphics destination for producing Scalable Vector Graphics (SVG)
 ; files.
 ;
 ; Because SVG is inherently 2-dimensional, it only supports 2-dimensional
-; object graphics hierarchies. Only objects of the following classes are 
+; object graphics hierarchies. Only objects of the following classes are
 ; supported::
 ;
 ;    IDLgrScene                          svg element
@@ -27,16 +27,16 @@
 ;    This should produce the following:
 ;
 ;    .. embed:: triangle.svg
-; 
+;
 ; :Properties:
 ;    filename
 ;       filename of file to write to
 ;    graphics_tree
 ;       default picture to draw
 ;    dimensions
-;       dimensions of the drawing canvas in units specified by the EM, EX, PX, 
-;       PT, PC, CM, MM, INCHES, PERCENTAGE property at the same time as the 
-;       DIMENSIONS property is set; if no dimensions are specified, the canvas 
+;       dimensions of the drawing canvas in units specified by the EM, EX, PX,
+;       PT, PC, CM, MM, INCHES, PERCENTAGE property at the same time as the
+;       DIMENSIONS property is set; if no dimensions are specified, the canvas
 ;       is scaled to fill the available area
 ;-
 
@@ -53,7 +53,7 @@
 ;-
 function mggrsvg::_getRgb, color
   compile_opt strictarr
-  
+
   return, string(color, '(%"rgb(%d, %d, %d)")')
 end
 
@@ -78,7 +78,7 @@ function mggrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
           dims = [1., 1.]
           units = 3
         endif
-        
+
         case units of
           0: dimUnits = 'px'
           1: dimUnits = 'in'
@@ -103,7 +103,7 @@ end
 function mggrsvg::_convertUnits, x, xUnits, outUnits
   compile_opt strictarr
   on_error, 2
-  
+
   ; convert to user coordinates (or pixel coordinates)
   case xUnits of
     'em': message, 'not suppored'
@@ -117,7 +117,7 @@ function mggrsvg::_convertUnits, x, xUnits, outUnits
     ''  : _x = x * 1.
     'px': _x = x * 1.
   endcase
-  
+
   ; convert to desired output coordinates
   case outUnits of
     'em': message, 'not suppored'
@@ -130,13 +130,13 @@ function mggrsvg::_convertUnits, x, xUnits, outUnits
     'in': return, _x / 90.
     ''  : return, _x / 1.
     'px': return, _x / 1.
-  endcase  
+  endcase
 end
 
 
 function mggrsvg::_transformCoords, data, tree=tree
   compile_opt strictarr
-  
+
   vpr = self->_getVpr(tree)
   vpr *= self.textMultiplier
 
@@ -152,7 +152,7 @@ function mggrsvg::_transformCoords, data, tree=tree
   result = result * self.textMultiplier
 
   result[1, *] = vpr[3] + 2. * vpr[1] - result[1, *]
-  
+
   return, result
 end
 
@@ -172,7 +172,7 @@ end
 ;-
 pro mggrsvg::_handleScene, scene, lun=lun, indent=indent
   compile_opt strictarr
-  
+
   ; TODO: implement
 end
 
@@ -217,14 +217,14 @@ pro mggrsvg::_handleView, view, lun=lun, indent=indent
   self.textMultiplier = 200. / (vpr[2] < vpr[3])
   vpr *= self.textMultiplier
   viewBox = strjoin(strtrim(vpr, 2), ' ')
-  
+
   if (array_equal(self.dimensions, [0., 0.])) then begin
     dims = ''
   endif else begin
     dims = strtrim(self.dimensions, 2) + self.dimensionUnits
     dims = string(dims, '(%"width=\"%s\" height=\"%s\"")')
   endelse
-  
+
   format = '(%"<svg version=\"1.1\" ' $
              + 'xmlns=\"http://www.w3.org/2000/svg\" ' $
              + 'xmlns:xlink=\"http://www.w3.org/1999/xlink\" ' $
@@ -233,7 +233,7 @@ pro mggrsvg::_handleView, view, lun=lun, indent=indent
   printf, lun, indent + s
   for c = 0L, view->count() - 1L do begin
     self->_traverse, view->get(position=c), lun=lun, indent=indent + '    '
-  endfor    
+  endfor
   printf, lun, indent + '</svg>'
 end
 
@@ -255,7 +255,7 @@ pro mggrsvg::_handleModel, model, lun=lun, indent=indent
   compile_opt strictarr
 
   vpr = self->_getVpr(model)
-  
+
   model->getProperty, transform=transform
 
   printf, lun, indent, (2. * vpr[1] + vpr[3]) * self.textMultiplier, $
@@ -270,10 +270,10 @@ pro mggrsvg::_handleModel, model, lun=lun, indent=indent
           format='(%"%s    <g transform=\"scale(1, -1) translate(0, %f)\">")'
   for c = 0L, model->count() - 1L do begin
     self->_traverse, model->get(position=c), lun=lun, indent=indent + '      '
-  endfor    
-  printf, lun, indent + '    </g>'  
-  printf, lun, indent + '  </g>'  
-  printf, lun, indent + '</g>'  
+  endfor
+  printf, lun, indent + '    </g>'
+  printf, lun, indent + '  </g>'
+  printf, lun, indent + '</g>'
 end
 
 
@@ -293,13 +293,13 @@ end
 pro mggrsvg::_handlePolyline, polyline, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
-  
+
   polyline->getProperty, data=data, color=color, thick=thick
   dims = size(data, /dimensions)
   if (dims[0] eq 3L) then data = data[0:1, *]
-  
+
   data = self->_transformCoords(data, tree=polyline)
-  
+
   path = strjoin(strjoin(strtrim(data, 2), ' ') + ' L ', ' ')
   path = strmid(path, 0, strlen(path) - 3L)  ; remove last L
   format = '(%"<path d=\"M %s\" stroke=\"%s\" stroke-width=\"%f\" ' $
@@ -309,8 +309,8 @@ pro mggrsvg::_handlePolyline, polyline, lun=lun, indent=indent
   vpr = self->_getVpr(polyline)
   dimsInPts = self->_convertUnits(self.dimensions, self.dimensionUnits, 'pt')
   thick = vpr[3] * self.textMultiplier * thick / min(dimsInPts)
-               
-  s = string(path, self->_getRgb(color), thick, format=format)  
+
+  s = string(path, self->_getRgb(color), thick, format=format)
   printf, lun, indent + s
 end
 
@@ -331,13 +331,13 @@ end
 pro mggrsvg::_handlePolygon, polygon, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
-  
+
   polygon->getProperty, data=data, color=color, thick=thick
   dims = size(data, /dimensions)
   if (dims[0] eq 3L) then message, '3-dimensional polyline data is not supported'
-  
+
   data = self->_transformCoords(data, tree=polygon)
-  
+
   path = strjoin(strjoin(strtrim(data, 2), ' ') + ' L ', ' ')
   path = strmid(path, 0, strlen(path) - 3L)  ; remove last L
   format = '(%"<path d=\"M %s\" stroke-width=\"%f\" ' $
@@ -364,7 +364,7 @@ end
 pro mggrsvg::_handleText, text, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
-  
+
   text->getProperty, strings=strings, locations=locations, color=color, font=font
   locations = self->_transformCoords(locations, tree=text)
   vpr = self->_getVpr(text, dimensions=dims, dimension_units=dimUnits)
@@ -375,12 +375,12 @@ pro mggrsvg::_handleText, text, lun=lun, indent=indent
     fontSize = 12
     fontFamily = 'Helvetica'
   endelse
-  
+
   height = self->_convertUnits(self.dimensions[1], self.dimensionUnits, 'pt')
   fontSize = vpr[3] * self.textMultiplier * fontSize / height
 
   format = '(%"<text x=\"%f\" y=\"%f\" font-family=\"%s\" font-size=\"%f\" fill=\"%s\">%s</text>")'
-  s = string(locations[0:1], fontFamily, fontSize, self->_getRgb(color), strings[0], format=format)  
+  s = string(locations[0:1], fontFamily, fontSize, self->_getRgb(color), strings[0], format=format)
   printf, lun, indent + s
 end
 
@@ -418,13 +418,13 @@ pro mggrsvg::_handleImage, image, lun=lun, indent=indent
     url = filepath('image' + name + '-' + strtrim(urlCount++, 2) + '.png', $
                    root=file_dirname(self.filename))
   endwhile
-  
+
   write_png, url, data
 
   format = '(%"<image x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" xlink:href=\"%s\"/>")'
   s = string(loc, dims, url, format=format)
-  
-  printf, lun, indent + s  
+
+  printf, lun, indent + s
 end
 
 
@@ -469,13 +469,13 @@ end
 
 
 ;+
-; Routine which is recursively called to traverse the object graphics 
+; Routine which is recursively called to traverse the object graphics
 ; hierarchy.
 ;
 ; :Params:
 ;    tree : in, required, type=object
 ;       object graphics element
-; 
+;
 ; :Keywords:
 ;    lun : in, required, type=long
 ;       logical unit number of file to write output to
@@ -485,11 +485,11 @@ end
 pro mggrsvg::_traverse, tree, lun=lun, indent=indent
   compile_opt strictarr
   on_error, 2
-  
+
   tree->getProperty, hide=hide
-  if (hide) then return  
+  if (hide) then return
   indent = n_elements(indent) eq 0L ? '' : indent
-  
+
   case 1 of
     obj_isa(tree, 'IDLgrScene'): self->_handleScene, tree, lun=lun, indent=indent
     obj_isa(tree, 'IDLgrViewGroup'): self->_handleViewgroup, tree, lun=lun, indent=indent
@@ -498,9 +498,9 @@ pro mggrsvg::_traverse, tree, lun=lun, indent=indent
     obj_isa(tree, 'IDLgrPolyline'): self->_handlePolyline, tree, lun=lun, indent=indent
     obj_isa(tree, 'IDLgrPolygon'): self->_handlePolygon, tree, lun=lun, indent=indent
     obj_isa(tree, 'IDLgrText'): self->_handleText, tree, lun=lun, indent=indent
-    obj_isa(tree, 'IDLgrImage'): self->_handleImage, tree, lun=lun, indent=indent    
-    obj_isa(tree, 'IDLgrPlot'): self->_handlePlot, tree, lun=lun, indent=indent    
-    obj_isa(tree, 'IDLgrAxis'): self->_handleAxis, tree, lun=lun, indent=indent    
+    obj_isa(tree, 'IDLgrImage'): self->_handleImage, tree, lun=lun, indent=indent
+    obj_isa(tree, 'IDLgrPlot'): self->_handlePlot, tree, lun=lun, indent=indent
+    obj_isa(tree, 'IDLgrAxis'): self->_handleAxis, tree, lun=lun, indent=indent
     else: message, 'unknown object graphics element'
   endcase
 end
@@ -508,7 +508,7 @@ end
 
 ;+
 ; Write the object graphics rooted at the specified scene or view.
-; 
+;
 ; :Params:
 ;    tree : in, optional, type=object
 ;       scene or view object
@@ -516,17 +516,17 @@ end
 pro mggrsvg::draw, tree
   compile_opt strictarr
   on_error, 2
-  
+
   ; if no tree argument, then use self.graphicsTree
   if (n_params() eq 0 && ~obj_valid(self.graphicsTree)) then begin
     message, 'GRAPHICS_TREE property must be set if no argument'
   endif
-  
+
   ; if arg is present, it must be a valid object
   if (n_params() gt 0 && ~obj_valid(tree)) then message, 'invalid tree object'
-  
-  _tree = n_elements(tree) eq 0L ? self.graphicsTree : tree  
-  
+
+  _tree = n_elements(tree) eq 0L ? self.graphicsTree : tree
+
   openw, lun, self.filename, /get_lun
   printf, lun, '<?xml version="1.0" encoding="UTF-8"?>'
   self->_traverse, tree, lun=lun
@@ -570,7 +570,7 @@ pro mggrsvg::getProperty, filename=filename, graphics_tree=graphicsTree, $
                           text_multipler=textMultiplier, $
                           dimensions=dimensions, dimension_units=dimensionUnits
   compile_opt strictarr
-  
+
   if (arg_present(filename)) then filename = self.filename
   if (arg_present(graphicsTree)) then graphicsTree = self.graphicsTree
   if (arg_present(textMultiplier)) then textMultiplier = self.textMultiplier
@@ -584,7 +584,7 @@ end
 ;-
 pro mggrsvg::cleanup
   compile_opt strictarr
-  
+
   if (obj_valid(self.graphicsTree)) then obj_destroy, self.graphicsTree
 end
 
@@ -603,9 +603,9 @@ function mggrsvg::init, _extra=e
   compile_opt strictarr
 
   self.textMultiplier = 1.0
-  
+
   self->setProperty, _extra=e
-  
+
   return, 1
 end
 
@@ -619,7 +619,7 @@ end
 ;-
 pro mggrsvg__define
   compile_opt strictarr
-  
+
   define = { MGgrSVG, $
              filename: '', $
              graphicsTree: obj_new(), $

@@ -5,7 +5,7 @@
 ;
 ; :Todo:
 ;    need to handle XPOS/YPOS/LOCATION for PS device
-; 
+;
 ; :Params:
 ;    index : in, optional, type=long
 ;
@@ -17,13 +17,13 @@
 ;    dimensions : in, optional, type=lonarr(2)
 ;       alternative to XSIZE and YSIZE
 ;    xpos : in, optional, type=long
-;       offset of the window in the horizontal direction from the lower left 
+;       offset of the window in the horizontal direction from the lower left
 ;       corner
 ;    ypos : in, optional, type=long
 ;       offset of the window in the vertical direction from the lower left
 ;       corner
 ;    location : in, optional, type=lonarr(2)
-;       alternative to XPOS and YPOS 
+;       alternative to XPOS and YPOS
 ;    inches : in, optional, type=boolean
 ;       set to specify the XSIZE, YSIZE, XPOS, and YPOS in inches
 ;    pixels : in, optional, type=boolean
@@ -42,13 +42,13 @@ pro mg_window, index, $
                _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   ; nothing required if NULL device
   if (!d.name eq 'NULL') then return
-  
+
   _inches = keyword_set(inches)
   _pixels = keyword_set(pixels)
-  
+
   if (n_elements(dimensions) eq 0L) then begin
     case !d.name of
       'X': _dimensions = [pref_get('IDL_GR_X_WIDTH'), pref_get('IDL_GR_X_HEIGHT')]
@@ -57,15 +57,15 @@ pro mg_window, index, $
       'Z': _dimensions = [640, 480]
       else: message, 'devices besides X, WIN, Z, PS, and NULL are currently not supported'
     endcase
-    
+
     if (~_pixels) then _dimensions /= !d.y_px_cm * (_inches ? 2.54 : 1.)
   endif else begin
     _dimensions = dimensions
   endelse
-  
+
   if (n_elements(xsize) gt 0L) then _dimensions[0] = xsize
   if (n_elements(ysize) gt 0L) then _dimensions[1] = ysize
-   
+
   if (n_elements(xpos) gt 0L || n_elements(ypos) gt 0L || n_elements(location) gt 0L) then begin
     _xpos = n_elements(location) gt 0L ? location[0] : 0L
     if (n_elements(xpos) gt 0L) then _xpos = xpos
@@ -73,49 +73,49 @@ pro mg_window, index, $
     _ypos = n_elements(location) gt 0L ? location[1] : 0L
     if (n_elements(ypos) gt 0L) then _ypos = ypos
   endif
-  
+
   switch !d.name of
     'X':
     'WIN': begin
         if (~_pixels) then _dimensions *= !d.y_px_cm * (_inches ? 2.54 : 1.)
         if (~_pixels && n_elements(_xpos) gt 0L) then begin
           _xpos *= !d.x_px_cm * (_inches ? 2.54 : 1.)
-          _ypos *= !d.y_px_cm * (_inches ? 2.54 : 1.)          
+          _ypos *= !d.y_px_cm * (_inches ? 2.54 : 1.)
         endif
-        
+
         if (n_elements(_xpos) gt 0L && !d.name eq 'WIN') then begin
           ; TODO: may need to use IDLsysMonitorInfo for this on multi-monitor
           ; systems to get info for the correct monitor
           ss = get_screen_size()
-          
+
           ; TODO: need to find a good value for titlebarHeight
           titlebarHeight = 15
           _ypos = ss[1] - _ypos - _dimensions[1] - titlebarHeight
         endif
-        
+
         case n_params() of
           0: window, xsize=_dimensions[0], ysize=_dimensions[1], xpos=_xpos, ypos=_ypos, _extra=e
           1: window, index, xsize=_dimensions[0], ysize=_dimensions[1], xpos=_xpos, ypos=_ypos, _extra=e
         endcase
-        
+
         if (arg_present(identifier)) then identifier = !d.window
-        
+
         break
       end
-    
-    'PS': begin      
+
+    'PS': begin
         ; TODO: handle _xpos and _ypos
         device, xsize=_dimensions[0], ysize=_dimensions[1], inches=_inches, $
                 xoffset=_xpos, yoffset=_ypos
-        
+
         break
       end
-      
+
     'Z': begin
         if (~_pixels) then _dimensions *= !d.y_px_cm * (inches ? 2.54 : 1.)
-              
+
         device, set_resolution=_dimensions
-        
+
         break
       end
     else: message, 'devices besides X, WIN, Z, PS, and NULL are currently not supported'

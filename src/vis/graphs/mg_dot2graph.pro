@@ -15,14 +15,14 @@
 ;-
 pro mg_graph2dot_getattr, node, attrname, attrvalue
   compile_opt strictarr
-  
+
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
     help, error, attrname
     return
   endif
-  
+
   case strlowcase(attrname) of
     'color': node->setProperty, color=attrvalue
     'name': node->setProperty, name=attrvalue
@@ -33,7 +33,7 @@ end
 ;+
 ; Create a graph representation from a `.dot` file.
 
-; The Graphviz website provides a formal specification of the 
+; The Graphviz website provides a formal specification of the
 ; `dot language <http://www.graphviz.org/content/dot-language>`
 ;
 ; :Todo:
@@ -56,7 +56,7 @@ function mg_dot2graph, filename, $
                        graph_class=graph_class, $
                        node_class=node_class
   compile_opt strictarr
-  
+
   ; TODO: implement
 end
 

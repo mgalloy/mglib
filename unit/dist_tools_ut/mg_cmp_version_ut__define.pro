@@ -2,11 +2,11 @@
 
 function mg_cmp_version_ut::test_tie
   compile_opt strictarr
-  
+
   cmp = mg_cmp_version('1.1', '1.1.0')
-  
+
   assert, cmp eq 0, 'incorrect comparison'
-  
+
   return, 1
 end
 
@@ -16,10 +16,10 @@ end
 ;-
 function mg_cmp_version_ut::test_basic
   compile_opt strictarr
-  
+
   versions = ['0.1', '1.0alpha', '1.0beta', '1.0rc1', '1.0rc2', '1.0', $
               '2.0', '2.0.1', '2.0.2']
-  
+
   for i = 0L, n_elements(versions) - 1L do begin
     for j = 0L, n_elements(versions) - 1L do begin
       result = mg_cmp_version(versions[i], versions[j])
@@ -30,8 +30,8 @@ function mg_cmp_version_ut::test_basic
               string(versions[i], versions[j], expectedResult, result, $
                      format='(%"result of (%s, %s) should be %d, but is %d")')
     endfor
-  endfor  
-  
+  endfor
+
   return, 1
 end
 
@@ -41,6 +41,6 @@ end
 ;-
 pro mg_cmp_version_ut__define
 	compile_opt strictarr
-	
+
 	define = { mg_cmp_version_ut, inherits MGutLibTestCase }
 end

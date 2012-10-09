@@ -4,16 +4,16 @@ Copyright (c) 2007-2010, Michael Galloy <mgalloy@idldev.com>
 
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
     a. Redistributions of source code must retain the above copyright notice,
        this list of conditions and the following disclaimer.
-    b. Redistributions in binary form must reproduce the above copyright 
-       notice, this list of conditions and the following disclaimer in the 
+    b. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
        documentation and/or other materials provided with the distribution.
-    c. Neither the name of Michael Galloy nor the names of its contributors 
-       may be used to endorse or promote products derived from this software 
+    c. Neither the name of Michael Galloy nor the names of its contributors
+       may be used to endorse or promote products derived from this software
        without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -52,8 +52,8 @@ are met:
    must display the following acknowledgment:
      This product includes software developed by Randall Frank
      and other unpaid contributors.
-5. The name of Randall Frank may not be used to endorse or promote 
-   products derived from this software without 
+5. The name of Randall Frank may not be used to endorse or promote
+   products derived from this software without
    specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY RANDALL FRANK AND CONTRIBUTORS ``AS IS'' AND
@@ -72,7 +72,7 @@ SUCH DAMAGE.
 LICENSE FOR BREWER COLOR TABLES
 -------------------------------
 
-Brewer color tables are provided courtesy of Brewer, Cynthia A., 2007. 
+Brewer color tables are provided courtesy of Brewer, Cynthia A., 2007.
 http://www.ColorBrewer.org, accessed 20 October 2007.
 
 Apache-Style Software License for ColorBrewer software and ColorBrewer Color

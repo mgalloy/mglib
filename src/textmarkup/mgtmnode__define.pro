@@ -1,13 +1,13 @@
 ; docformat = 'rst'
 
 ;+
-; Base class for any objects in a text markup hierarchy, i.e., tags and text 
+; Base class for any objects in a text markup hierarchy, i.e., tags and text
 ; objects.
 ;-
 
 
 ;+
-; Interface that `MGtmTag` and `MGtmText` should implement. Helper routine for 
+; Interface that `MGtmTag` and `MGtmText` should implement. Helper routine for
 ; debugging.
 ;
 ; :Abstract:
@@ -18,13 +18,13 @@
 ;-
 pro mgtmnode::_print, indent=indent
   compile_opt strictarr
-  
+
 end
 
 
 ;+
 ; Get properties of the node.
-;     
+;
 ; :Keywords:
 ;    type : out, optional, type=string
 ;       type code of the node
@@ -41,7 +41,7 @@ end
 ;-
 pro mgtmnode::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -53,15 +53,15 @@ end
 ;-
 function mgtmnode::_clone
   compile_opt strictarr
-  
+
   return, obj_new('MGtmNode', type=self.type)
 end
 
 
 ;+
 ; Create a node in the markup tree.
-;   
-; :Returns: 
+;
+; :Returns:
 ;    1 for success, 0 for failure
 ;
 ; :Keywords:
@@ -79,9 +79,9 @@ end
 
 ;+
 ; Node representing text or markup of some kind.
-;     
+;
 ; :Fields:
-;    type 
+;    type
 ;       type of node
 ;-
 pro mgtmnode__define

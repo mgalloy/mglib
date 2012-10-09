@@ -4,34 +4,34 @@
 ; Get/set header information in a PostScript file.
 ;
 ; This routine requires `sed` be installed and available in the system path.
-; 
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       .ps or .eps file to examine/change attributes of
 ;
 ; :Keywords:
 ;    bounding_box : in, out, optional, type=lonarr(4)
-;       if passed an undefined name variable, returns the bounding box for the 
+;       if passed an undefined name variable, returns the bounding box for the
 ;       file; if defined, sets the bounding box to the value
 ;    hires_bounding_box : in, out, optional, type=fltarr(4)
-;       if passed an undefined name variable, returns the hires bounding box 
+;       if passed an undefined name variable, returns the hires bounding box
 ;       for the file; if defined, sets the bounding box to the value
 ;-
 pro mg_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
   compile_opt strictarr
-  
+
   header = strarr(10)
   openr, lun, filename, /get_lun
   readf, lun, header
   free_lun, lun
-  
+
   if (n_elements(bb) eq 4L) then begin
     temp_filename = mg_temp_filename('psfile-%s')
     sedCmdF = '(%"sed -e\"s/%%BoundingBox: .*/%%BoundingBox: %d %d %d %d/\" %s > %s")'
     sedCmd = string(bb, filename, temp_filename, format=sedCmdF)
     spawn, sedCmd, sedOutput, sedErrorOutput, exit_status=status
     if (status ne 0L) then message, 'bounding box write failed'
-    
+
     file_copy, temp_filename, filename, /overwrite
     file_delete, temp_filename
   endif else begin
@@ -51,7 +51,7 @@ pro mg_psinfo, filename, bounding_box=bb, hires_bounding_box=hires_bb
     sedCmd = string(hires_bb, filename, temp_filename, format=sedCmdF)
     spawn, sedCmd, sedOutput, sedErrorOutput, exit_status=status
     if (status ne 0L) then message, 'hires bounding box write failed'
-    
+
     file_copy, temp_filename, filename, /overwrite
     file_delete, temp_filename
   endif else begin

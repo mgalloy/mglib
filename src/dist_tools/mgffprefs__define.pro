@@ -1,19 +1,19 @@
 ; docformat = 'rst'
 
 ;+
-; Class responsible for storing and retrieving preferences. Preferences are 
+; Class responsible for storing and retrieving preferences. Preferences are
 ; persistent across IDL sessions on the same computer.
 ;
 ; :Examples:
-;    The main-level program at the end of this file has an example use of 
+;    The main-level program at the end of this file has an example use of
 ;    `MGffPrefs`. To run it, type::
 ;
 ;       IDL> .run mgffprefs__define
 ;
-;    The code creates an `MFffPrefs` object and uses the `set` and `get` 
+;    The code creates an `MFffPrefs` object and uses the `set` and `get`
 ;    methods to set and retrieve a preference.
 ;
-;    Creating the `MGffPrefs` requires setting the `AUTHOR_NAME` and 
+;    Creating the `MGffPrefs` requires setting the `AUTHOR_NAME` and
 ;    `APP_NAME` properties so that the `APP_DIRECTORY`, where the prefence
 ;    value files are stored, can be specified::
 ;
@@ -21,7 +21,7 @@
 ;       appName = 'mgffprefs_demo'
 ;       prefs = obj_new('mgffprefs', author_name=authorName, app_name=appName)
 ;
-;    We can now set a preference value, remember the preference name is 
+;    We can now set a preference value, remember the preference name is
 ;    case-insensitive, but the value is stored exactly::
 ;
 ;       prefs->set, 'name', 'Michael'
@@ -30,7 +30,7 @@
 ;    persistent between IDL sessions::
 ;
 ;       obj_destroy, prefs
-;       
+;
 ;    A new `MGffPrefs` object is created with the same `AUTHOR_NAME` and
 ;    `APP_NAME` values::
 ;
@@ -50,11 +50,11 @@
 ;       obj_destroy, prefs
 ;
 ;    Print the preference value::
-;       
+;
 ;       print, name, format='(%"Preference value for name: %s")'
 ;
 ;    We can manually clean out the entire directory for our preferences::
-;       
+;
 ;       file_delete, file_dirname(appdir), /recursive, /allow_nonexistent, /quiet
 ;
 ;    Individual preferences can be cleared with the `clear` method.
@@ -75,7 +75,7 @@
 
 ;+
 ; Save the value of a preference.
-; 
+;
 ; :Params:
 ;    prefname : in, required, type=string
 ;       case-insensitive name of preference to retrieve
@@ -85,7 +85,7 @@
 pro mgffprefs::set, prefname, prefvalue
   compile_opt strictarr
   on_error, 2
-  
+
   filename = filepath(self->_prefnameToFilename(prefname), root=self.appdir)
   save, prefvalue, filename=filename
 end
@@ -100,7 +100,7 @@ end
 ;-
 pro mgffprefs::clear, prefname
   compile_opt strictarr
-  
+
   filename = filepath(self->_prefnameToFilename(prefname), root=self.appdir)
   if (file_test(filename)) then file_delete, filename
 end
@@ -108,7 +108,7 @@ end
 
 ;+
 ; Retrieve the value of a preference.
-; 
+;
 ; :Returns:
 ;    preference value
 ;
@@ -129,7 +129,7 @@ end
 ;-
 function mgffprefs::get, prefname, found=found, default=default, names=names
   compile_opt strictarr
-  
+
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
@@ -142,14 +142,14 @@ function mgffprefs::get, prefname, found=found, default=default, names=names
     found = count gt 0L
     return, found ? file_basename(files, '.sav') : -1L
   endif
-    
+
   found = 0B
   if (n_elements(prefname) eq 0L) then message, 'preference name required'
-  
+
   filename = filepath(self->_prefnameToFilename(prefname), root=self.appdir)
   if (~file_test(filename)) then return, n_elements(default) gt 0L ? default : -1L
   restore, filename=filename
-  
+
   found = 1B
   return, prefvalue
 end
@@ -162,21 +162,21 @@ end
 ;
 ; :Returns:
 ;    string
-; 
+;
 ; :Params:
 ;    prefname : in, required, type=string
 ;       name of preference
 ;-
 function mgffprefs::_prefnameToFilename, prefname
   compile_opt strictarr
-  
+
   return, strlowcase(idl_validname(prefname, /convert_all)) + '.sav'
 end
 
 
 ;+
 ; Returns directory for application data.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -200,22 +200,22 @@ function mgffprefs::_getAppDir, authorName, appName, $
   compile_opt strictarr
 
   readmeVersion = 1
-  
+
   _authorDescription = n_elements(authorDescription) eq 0L $
                          ? authorName $
                          : authorDescription
   _appDescription = n_elements(appDescription) eq 0L $
                       ? appName $
                       : appDescription
-  
+
   readmeText = ['This is the user configuration directory for ' + _appDescription, $
                 'by ' + _authorDescription + '.']
-                  
+
   configDir = app_user_dir(authorName, _authorDescription, $
                            appName, _appDescription, $
                            readmeText, readmeVersion)
-                           
-  return, configDir  
+
+  return, configDir
 end
 
 
@@ -224,7 +224,7 @@ end
 ;-
 pro mgffprefs::getProperty, app_directory=appDirectory
   compile_opt strictarr
-  
+
   if (arg_present(appDirectory)) then appDirectory = self.appdir
 end
 
@@ -234,7 +234,7 @@ end
 ;-
 pro mgffprefs::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -259,15 +259,15 @@ function mgffprefs::init, author_name=authorName, app_name=appName, $
                           app_description=appDescription
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_elements(authorName) eq 0L || n_elements(appName) eq 0L) then begin
     message, 'Author and application name required'
   endif
-  
+
   self.appdir = self->_getAppDir(authorName, appName, $
                                  author_description=authorDescription, $
                                  app_description=appDescription)
-  
+
   return, 1
 end
 
@@ -305,5 +305,5 @@ obj_destroy, prefs
 print, name, format='(%"Preference value for name: %s")'
 
 file_delete, file_dirname(appdir), /recursive, /allow_nonexistent, /quiet
-                 
+
 end

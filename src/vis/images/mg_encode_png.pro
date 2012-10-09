@@ -5,7 +5,7 @@
 ;
 ; :Returns:
 ;    bytarr
-; 
+;
 ; :Params:
 ;    im : in, required, type=bytarr
 ;       2- or 3-dimensional image
@@ -28,16 +28,16 @@ function mg_encode_png, im, r, g, b, _extra=e
 
   ; write a PNG file
   write_png, filename, im, r, g, b, _extra=e
-  
+
   ; read back PNG file as a byte stream
   info = file_info(filename)
   stream = bytarr(info.size)
   openr, lun, filename, /get_lun
   readu, lun, stream
   free_lun, lun
-  
+
   ; cleanup
   file_delete, filename, /quiet
-  
+
   return, stream
 end

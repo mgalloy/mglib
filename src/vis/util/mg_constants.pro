@@ -3,8 +3,8 @@
 ;+
 ; Defines constants for values of LINESTYLE, PSYM, and [XYZ]STYLE keywords.
 ;
-; This routine defines a system variable !mg which contains constants for the 
-; LINESTYLE keyword to direct graphics routines or the LINESTYLE property of 
+; This routine defines a system variable !mg which contains constants for the
+; LINESTYLE keyword to direct graphics routines or the LINESTYLE property of
 ; object graphics classes::
 ;
 ;    IDL> help, !mg.linestyle, /structures
@@ -20,7 +20,7 @@
 ; Also defined are the constants for the PSYM keyword to the direct graphics
 ; routines or the value of the IDLgrSymbol object graphics class::
 ;
-;    IDL> help, !mg.psym, /structures     
+;    IDL> help, !mg.psym, /structures
 ;    ** Structure <1887e08>, 11 tags, length=22, data length=22, refs=2:
 ;       PLUSSIGN        INT              1
 ;       ASTERISK        INT              2
@@ -34,7 +34,7 @@
 ;       LESSTHAN        INT              9
 ;       HISTOGRAM       INT             10
 ;
-; Also defined are values for the [XYZ]STYLE keyword of the direct graphics 
+; Also defined are values for the [XYZ]STYLE keyword of the direct graphics
 ; routines::
 ;
 ;    IDL> help, !mg.style, /structures
@@ -47,7 +47,7 @@
 ;-
 pro mg_constants
   compile_opt strictarr
-  
+
   defsysv, '!mg', { linestyle: { solid: 0, $
                                  dotted: 1, $
                                  dashed: 2, $

@@ -14,7 +14,7 @@
 ;       IDL> print, mg_evalexpr('1 + 2 + 3', error=error), error
 ;                            6       0
 ;
-;    Note that the `ERROR` keyword returns whether there was an error in 
+;    Note that the `ERROR` keyword returns whether there was an error in
 ;    evaluating the expression. Expressions can also take variables, if their
 ;    values are provided via a structure or hash-like object::
 ;
@@ -30,7 +30,7 @@
 
 
 ;+
-; Given a starting position in a string representing an expression, returns 
+; Given a starting position in a string representing an expression, returns
 ; the next token.
 ;
 ; :Returns:
@@ -46,41 +46,41 @@
 ;
 ; :Keywords:
 ;    length : out, optional, type=long
-;       set to a named variable to get the length of the returned token from 
+;       set to a named variable to get the length of the returned token from
 ;       `start_index`, i.e., it might include whitespace and hence by longer
-;       than the actual length of the return token; this is the value to 
+;       than the actual length of the return token; this is the value to
 ;       advance the `start_index` to find the next token
 ;-
 function mg_evalexpr_parse, expr, start_index, length=length
   compile_opt strictarr
-  
+
   if (start_index ge strlen(expr)) then begin
     length = 0
     return, !null
   endif
-  
+
   char = strmid(expr, start_index, 1)
   bchar = (byte(char))[0]
-  
+
   ; whitespace
-  
+
   if (char eq ' ') then begin
     result = mg_evalexpr_parse(expr, start_index + 1, length=slength)
     length = slength + 1
     return, result
   endif
-  
+
   ; operator/symbol
-  
+
   if (char eq '(' || char eq ')' $
         || char eq '+' || char eq '-' or char eq '*' || char eq '/' $
         || char eq '^') then begin
     length = 1
     return, char
   endif
-  
-  ; number 
-  
+
+  ; number
+
   ; ASCII 48 = '0', ASCII 57 = '9'
   if (char eq '.' || (bchar ge 48 && bchar le 57)) then begin
     i = start_index + 1
@@ -99,9 +99,9 @@ function mg_evalexpr_parse, expr, start_index, length=length
       return, double(value)
     endelse
   endif
-  
+
   ; name
-  
+
   ; ASCII 65 = 'a', ASCII 90 = 'z', ASCII 97 = 'A', ASCII 122 = 'Z'
   if (char eq '_' $
         || (bchar ge 65 && bchar le 90) $
@@ -118,7 +118,7 @@ function mg_evalexpr_parse, expr, start_index, length=length
       if (~done) then i++
     endwhile
     length = i - start_index
-    return, strmid(expr, start_index, length)    
+    return, strmid(expr, start_index, length)
   endif
 end
 
@@ -136,8 +136,8 @@ end
 ;    name : in, required, type=string
 ;       name of variable to lookup
 ;    vars : in, required, type=structure/object
-;       either a structure or a hash-like object, i.e., an object that has a 
-;       `hasKey` method and implements the right-side bracket operators to 
+;       either a structure or a hash-like object, i.e., an object that has a
+;       `hasKey` method and implements the right-side bracket operators to
 ;       retrieve a value for a given name
 ;-
 function mg_evalexpr_lookup, name, vars, found=found
@@ -178,7 +178,7 @@ end
 ;-
 function mg_evalexpr_expr, stack, pos, vars
   compile_opt strictarr
-  
+
   value = mg_evalexpr_term(stack, pos, vars)
   while (pos lt stack->count() && (stack[pos] eq '+' || stack[pos] eq '-')) do begin
     if (size(stack[pos], /type) eq 7) then begin
@@ -219,13 +219,13 @@ function mg_evalexpr_superscript, stack, pos, vars
 
   value = mg_evalexpr_factor(stack, pos, vars)
   while (pos lt stack->count() && stack[pos] eq '^') do begin
-    if (stack[pos] eq '^') then begin   
+    if (stack[pos] eq '^') then begin
       pos++
       value ^= mg_evalexpr_superscript(stack, pos, vars)
     endif
   endwhile
 
-  return, value   
+  return, value
 end
 
 
@@ -263,7 +263,7 @@ function mg_evalexpr_term, stack, pos, vars
     endif
   endwhile
 
-  return, value  
+  return, value
 end
 
 
@@ -287,7 +287,7 @@ end
 function mg_evalexpr_factor, stack, pos, vars
   compile_opt strictarr
   on_error, 2
-  
+
   if (size(stack[pos], /type) eq 5 || size(stack[pos], /type) eq 14) then begin
     factor = stack[pos]
     pos++
@@ -305,12 +305,12 @@ function mg_evalexpr_factor, stack, pos, vars
       if (stack[pos] eq ')') then pos++ else message, 'expecting close parenthesis'
     endif else begin
       factor = mg_evalexpr_lookup(stack[pos], vars)
-      pos++ 
-    endelse   
+      pos++
+    endelse
   endif else begin
     message, 'unexpected operator'
   endelse
-  
+
   return, factor
 end
 
@@ -325,19 +325,19 @@ end
 ;    expr : in, required, type=string
 ;       expression to evaluate
 ;    vars : in, optional, type=structure or hash
-;       variables to substitute into expression specified as a structure or 
-;       hash-like object; if a structure, the variable names are 
+;       variables to substitute into expression specified as a structure or
+;       hash-like object; if a structure, the variable names are
 ;       case-insensitive
-; 
+;
 ; :Keywords:
 ;    error : out, optional, type=boolean
-;       set to named variable to return if there was an error evaluating the 
+;       set to named variable to return if there was an error evaluating the
 ;       expression
 ;-
 function mg_evalexpr, expr, vars, error=error
   compile_opt strictarr
   on_error, 2
-  
+
   error = 0
   catch, err
   if (err ne 0) then begin
@@ -346,23 +346,23 @@ function mg_evalexpr, expr, vars, error=error
     if (obj_valid(stack)) then obj_destroy, stack
     return, !null
   endif
-  
+
   stack = list()
 
   start_index = 0
   token = mg_evalexpr_parse(expr, start_index, length=length)
-  
+
   while (n_elements(token) gt 0) do begin
     ; handle current token
     stack->add, token
-    
+
     ; get next token
     start_index += length
     token = mg_evalexpr_parse(expr, start_index, length=length)
   endwhile
-  
+
   result = mg_evalexpr_expr(stack, 0, vars)
-  
+
   obj_destroy, stack
   return, result
 end

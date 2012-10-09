@@ -2,7 +2,7 @@
 
 ;+
 ; Find the least common multiple (LCM) for two positive integers.
-; 
+;
 ; :Examples:
 ;    For example, try::
 ;
@@ -23,8 +23,8 @@
 function mg_lcm, a, b
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_params() ne 2) then message, 'incorrect number of arguments'
-    
+
   return, abs(a) / mg_gcd(a, b) * abs(b)
 end

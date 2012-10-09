@@ -3,9 +3,9 @@
 ;+
 ; Object to save/restore direct graphics system variables. This is needed when
 ; using multiple graphics windows and it is necessary to use the coordinate
-; system of a window which does not contain the last item plotted. For 
-; example, this happens when using `WSET` to change to a graphics window 
-; containing a plot (but not the most recently plotted) and overplotting or 
+; system of a window which does not contain the last item plotted. For
+; example, this happens when using `WSET` to change to a graphics window
+; containing a plot (but not the most recently plotted) and overplotting or
 ; using CONVERT_COORD with the coordinate system of that window.
 ;
 ; :Examples:
@@ -66,17 +66,17 @@ end
 
 ;+
 ; Define member variables.
-; 
+;
 ; :Fields:
-;    p 
+;    p
 ;       saved !p system variable
-;    x 
+;    x
 ;       saved !x system variable
-;    y 
+;    y
 ;       saved !y system variable
-;    z 
+;    z
 ;       saved !z system variable
-;    map 
+;    map
 ;       saved !map system variable
 ;-
 pro mgdgvars__define

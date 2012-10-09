@@ -20,7 +20,7 @@ pro mgffh5base::getProperty, parent=parent, identifier=identifier, $
                              name=name, fullname=fullname
   compile_opt strictarr
 
-  if (arg_present(parent)) then parent = self.parent  
+  if (arg_present(parent)) then parent = self.parent
   if (arg_present(identifier)) then identifier = self.id
   if (arg_present(name)) then name = self.name
   if (arg_present(fullname)) then begin
@@ -51,7 +51,7 @@ function mgffh5base::_overloadHelp, varname, type=type, specs=specs
   _type = n_elements(type) eq 0L ? 'H5_BASE' : type
   _specs = n_elements(specs) eq 0L ? '<undefined>' : specs
 
-  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')   
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -64,11 +64,11 @@ end
 function mgffh5base::init, parent=parent, identifier=identifier, name=name
   compile_opt strictarr
   on_error, 2
-  
+
   self.parent = n_elements(parent) eq 0L ? obj_new() : parent
-  self.id = n_elements(identifier) eq 0L ? '' : identifier  
+  self.id = n_elements(identifier) eq 0L ? '' : identifier
   self.name = n_elements(name) eq 0L ? '' : name
-  
+
   return, 1
 end
 

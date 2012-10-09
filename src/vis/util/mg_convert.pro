@@ -6,18 +6,18 @@
 ;
 ; All rights reserved.
 ;
-; Redistribution and use in source and binary forms, with or without 
+; Redistribution and use in source and binary forms, with or without
 ; modification, are permitted provided that the following conditions are met:
-; 
+;
 ;     a. Redistributions of source code must retain the above copyright notice,
 ;        this list of conditions and the following disclaimer.
-;     b. Redistributions in binary form must reproduce the above copyright 
-;        notice, this list of conditions and the following disclaimer in the 
+;     b. Redistributions in binary form must reproduce the above copyright
+;        notice, this list of conditions and the following disclaimer in the
 ;        documentation and/or other materials provided with the distribution.
-;     c. Neither the name of Michael Galloy nor the names of its contributors 
-;        may be used to endorse or promote products derived from this software 
+;     c. Neither the name of Michael Galloy nor the names of its contributors
+;        may be used to endorse or promote products derived from this software
 ;        without specific prior written permission.
-; 
+;
 ; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 ; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,19 +30,19 @@
 ; OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;+
-; Use ImageMagick to convert a file between formats. To specify the location 
-; of the convert command from the ImageMagick utilities, do one of the 
+; Use ImageMagick to convert a file between formats. To specify the location
+; of the convert command from the ImageMagick utilities, do one of the
 ; following:
 ;
 ;    1. set the CONVERT_LOCATION keyword
 ;    2. set the !convert_location system variable
 ;    3. place convert in the OS PATH
-;      
+;
 ; :Examples:
 ;    Try the main-level program at the end of this file::
 ;
 ;       IDL> .run mg_convert
-; 
+;
 ; :Categories:
 ;    system utility
 ;-
@@ -50,7 +50,7 @@
 
 ;+
 ; Attempt to read an image file.
-; 
+;
 ; :Returns:
 ;    image or -1L if format not supported
 ;
@@ -60,13 +60,13 @@
 ;-
 function mg_convert_read_image, filename
   compile_opt strictarr
-  
+
   catch, error
   if (error ne 0L) then begin
-    catch, cancel    
+    catch, cancel
     return, -1L
   endif
-  
+
   return, read_image(filename)
 end
 
@@ -77,7 +77,7 @@ end
 ; :Params:
 ;    basename : in, optional, type=string
 ;       basename of file to convert (used for output name as well)
-; 
+;
 ; :Keywords:
 ;    density : in, optional, type=long, default=300
 ;       density of output image in dots per inch
@@ -119,36 +119,36 @@ pro mg_convert, basename, $
                 to_extension=toExtension, $
                 to_eps=toEps, $
                 to_png=toPng, $
-                to_ps=toPs, $                 
+                to_ps=toPs, $
                 command=cmd, $
                 output=output, $
                 convert_location=convertLocation
   compile_opt strictarr
   on_error, 2
-  
+
   case 1 of
     n_elements(fromExtension) gt 0L: inputExtension = fromExtension
     keyword_set(fromEps): inputExtension = 'eps'
     keyword_set(fromPng): inputExtension = 'png'
-    keyword_set(fromPs): inputExtension = 'ps'        
+    keyword_set(fromPs): inputExtension = 'ps'
     else: inputExtension = 'ps'
   endcase
-  
+
   case 1 of
     n_elements(toExtension) gt 0L: outputExtension = toExtension
     keyword_set(toEps): outputExtension = 'eps'
     keyword_set(toPng): outputExtension = 'png'
-    keyword_set(toPs): outputExtension = 'ps'        
+    keyword_set(toPs): outputExtension = 'ps'
     else: outputExtension = 'png'
   endcase
-  
+
   _density = n_elements(density) eq 0L ? 300L : density
   _resize = n_elements(maxDimensions) eq 0L $
               ? (n_elements(scale) eq 0 $
                    ? '' $
                    : ' -resize ' + strtrim(scale, 2) + '%') $
               : ' -resize ' + strjoin(strtrim(maxDimensions, 2), 'x')
-  
+
   defsysv, '!convert_location', exists=locationExists
   if (n_elements(convertLocation) gt 0L) then begin
     _convertLocation = convertLocation
@@ -156,9 +156,9 @@ pro mg_convert, basename, $
   endif else begin
     _convertLocation = locationExists $
                          ? !convert_location $
-                         : 'convert'          
+                         : 'convert'
   endelse
-  
+
   ; create ImageMagick command:
   ;    -alpha is needed to produce a normal background for a PNG file that IDL
   ;           can read
@@ -168,15 +168,15 @@ pro mg_convert, basename, $
                _resize, $
                (outputExtension eq 'png' ? 'PNG24:' : ''), basename, $
                outputExtension)
-  
+
   ; run ImageMagick and check for an error
-  spawn, cmd, result, errorResult, exit_status=err 
+  spawn, cmd, result, errorResult, exit_status=err
   if (err ne 0L || strjoin(errorResult) ne '') then message, errorResult[0]
-  
+
   ; send output back if requested
   if (arg_present(output)) then begin
     output = mg_convert_read_image(basename + '.' + outputExtension)
-  endif  
+  endif
 end
 
 

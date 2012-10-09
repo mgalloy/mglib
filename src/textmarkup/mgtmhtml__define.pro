@@ -25,7 +25,7 @@ function mgtmhtml::markup_listing, lines
     if (pos[0] eq 0L) then begin
       _lines[l] = string(strmid(lines[l], pos[1], len[1]), $
                          '<span class="code-prompt">IDL&gt;</span>', $
-                         strmid(lines[l], pos[0] + len[0]), $                       
+                         strmid(lines[l], pos[0] + len[0]), $
                          format='(%"%s%s%s")')
     endif else begin
       _lines[l] = string('<span class="code-output">', lines[l], '</span>', $
@@ -39,10 +39,10 @@ end
 
 ;+
 ; Text to include afer a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -51,7 +51,7 @@ end
 ;
 ; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added at the 
+;       set to a named variable to get whether a newline should be added at the
 ;       given node
 ;    tag : in, required, type=object
 ;       tag's object reference
@@ -83,7 +83,7 @@ function mgtmhtml::_preTag, type, newline=newline, tag=tag
     'embed': begin
         src = tag->getAttribute('source')
         return, '<embed src="' + src + '"/>'
-      end    
+      end
     'link': begin
         href = tag->getAttribute('reference')
         if (href eq '') then return, ''
@@ -109,10 +109,10 @@ end
 
 ;+
 ; Text to include after a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -121,7 +121,7 @@ end
 ;
 ; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added at 
+;       set to a named variable to get whether a newline should be added at
 ;       the given node
 ;    tag : in, required, type=object
 ;       tag's object reference
@@ -141,12 +141,12 @@ function mgtmhtml::_postTag, type, newline=newline, tag=tag
     'heading3': return, '</h3>'
     'heading4': return, '</h4>'
     'heading5': return, '</h5>'
-    'heading6': return, '</h6>'    
+    'heading6': return, '</h6>'
     'image': return, ''
     'embed': return, ''
     'link': begin
         href = tag->getAttribute('reference')
-        if (href eq '') then return, ''    
+        if (href eq '') then return, ''
         return, '</a>'
       end
     'listing': return, '</code></div></div>'
@@ -161,10 +161,10 @@ function mgtmhtml::_postTag, type, newline=newline, tag=tag
         newline = 1
         return, '</p>'
       end
-    'table': return, '</table>'      
+    'table': return, '</table>'
     'row': return, '</tr>'
     'column': return, '</td>'
-    'column_header': return, '</th>'    
+    'column_header': return, '</th>'
     else: return, ''
   endcase
 end

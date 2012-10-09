@@ -5,10 +5,10 @@
 ;
 ; :Categories:
 ;    object graphics
-; 
+;
 ; :Examples:
 ;    Try the main-level program at the end of this file::
-; 
+;
 ;       IDL> .run mggrimagefile__define
 ;
 ;    This should produce:
@@ -29,13 +29,13 @@
 ;-
 pro mggrimagefile::getProperty, filename=filename, vector=vector, _ref_extra=e
   compile_opt strictarr
-  
+
   if (arg_present(filename)) then filename = self.filename
-  if (arg_present(vector)) then vector = self.vector  
-  
+  if (arg_present(vector)) then vector = self.vector
+
   if (n_elements(e) gt 0L) then begin
     self.buffer->getProperty, _extra=e
-    self.clipboard->getProperty, _extra=e    
+    self.clipboard->getProperty, _extra=e
   endif
 end
 
@@ -45,10 +45,10 @@ end
 ;-
 pro mggrimagefile::setProperty, filename=filename, vector=vector, _extra=e
   compile_opt strictarr
-  
+
   if (n_elements(filename) gt 0L) then self.filename = filename
-  if (n_elements(vector) gt 0L) then self.vector = vector  
-  
+  if (n_elements(vector) gt 0L) then self.vector = vector
+
   if (n_elements(e) gt 0L) then begin
     self.buffer->setProperty, _extra=e
     self.clipboard->setProprty, _extra=e
@@ -76,13 +76,13 @@ pro mggrimagefile::draw, picture
   endif else begin
     _picture = picture
   endelse
-  
+
   if (self.vector) then begin
     basename = strmid(self.filename, 0, dotpos)
     self.clipboard->draw, _picture, /vector, /postscript, $
                           filename=basename + '.ps'
     self.clipboard->getProperty, dimensions=dims
-    mg_convert, basename, /from_ps, to_extension=format, max_dimensions=dims       
+    mg_convert, basename, /from_ps, to_extension=format, max_dimensions=dims
     file_delete, basename + '.ps'
   endif else begin
     self.buffer->draw, _picture
@@ -95,7 +95,7 @@ pro mggrimagefile::draw, picture
         end
       else: message, 'unknown color model'
     endcase
-    
+
   endelse
 end
 
@@ -105,14 +105,14 @@ end
 ;-
 pro mggrimagefile::cleanup
   compile_opt strictarr
-  
+
   obj_destroy, [self.buffer, self.clipboard]
 end
 
 
 ;+
 ; Create an image file destination.
-; 
+;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
@@ -121,10 +121,10 @@ function mggrimagefile::init, filename=filename, vector=vector, _extra=e
 
   self.filename = n_elements(filename) eq 0L ? '' : filename
   self.vector = keyword_set(vector)
-  
+
   self.buffer = obj_new('IDLgrBuffer', _extra=e)
   self.clipboard = obj_new('IDLgrClipboard', _extra=e)
-  
+
   return, 1
 end
 
@@ -138,7 +138,7 @@ end
 ;-
 pro mggrimagefile__define
   compile_opt strictarr
-  
+
   define = { MGgrImageFile, $
              filename: '',  $
              vector: 0B, $

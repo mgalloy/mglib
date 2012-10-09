@@ -1,11 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Merges a string array into a single string separated by carriage 
-; return/linefeeds. 
+; Merges a string array into a single string separated by carriage
+; return/linefeeds.
 ;
-; Defaults to use just linefeed on UNIX platforms and both carriage returns 
-; and linefeeds on Windows platforms unless the UNIX or WINDOWS keywords are 
+; Defaults to use just linefeed on UNIX platforms and both carriage returns
+; and linefeeds on Windows platforms unless the UNIX or WINDOWS keywords are
 ; set to force a particular separator.
 ;
 ; :Returns:
@@ -23,6 +23,6 @@
 ;-
 function mg_strmerge, s, unix=unix, windows=windows
   compile_opt strictarr
-  
+
   return, strjoin(s, mg_newline(unix=unix, windows=windows))
 end

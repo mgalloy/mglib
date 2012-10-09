@@ -2,7 +2,7 @@
 
 ;+
 ; Finds a 1-dimensional pattern in an array.
-; 
+;
 ; :Examples:
 ;    For example, try the main-level program at the end of this file::
 ;
@@ -38,14 +38,14 @@
 ;-
 function mg_find_pattern, data, pattern
   compile_opt strictarr
-  
+
   n = n_elements(data)
   w = where(data eq pattern[(c = 0L)], /null)
   while ((n_elements(w) gt 0L) && (++c lt n_elements(pattern))) do begin
     keep = where(data[w + c < n] eq pattern[c], /null)
     w = w[keep]
   endwhile
-  
+
   return, w
 end
 
@@ -57,4 +57,4 @@ print, d
 print, mg_find_pattern(d, [63, 88, 51])
 print, d[11:13]
 
-end          
+end

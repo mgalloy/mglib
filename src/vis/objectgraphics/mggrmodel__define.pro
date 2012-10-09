@@ -23,10 +23,10 @@
 ;-
 pro mggrmodel::rotate, axis, angle, about=about, _extra=extra
   compile_opt strictarr
-  
+
   if (n_elements(about) gt 0L) then self->translate, -about[0], -about[1], -about[2]
   self->idlgrmodel::rotate, axis, angle, _extra=e
-  if (n_elements(about) gt 0L) then self->translate, about[0], about[1], about[2]  
+  if (n_elements(about) gt 0L) then self->translate, about[0], about[1], about[2]
 end
 
 
@@ -35,7 +35,7 @@ end
 ;-
 pro mggrmodel__define
   compile_opt strictarr
-  
+
   define = { MGgrModel, inherits IDLgrModel }
 end
 

@@ -16,11 +16,11 @@
 ;
 ; :Examples:
 ;    Run the main-level example program at the end of this file with::
-;    
+;
 ;       IDL> .run mg_spotmatrix
-;       
+;
 ;    This should produce:
-;    
+;
 ;    .. image:: spotmatrix.png
 ;-
 
@@ -38,12 +38,12 @@
 ;-
 pro mg_spotmatrix_makeglyph, val, x, y, _extra=e
   compile_opt strictarr
-  
+
   r = 0.35
   t = findgen(36) * 10 * !dtor
   outsideX = r * cos(t) + x
   outsideY = r * sin(t) + y
-  
+
   ; TODO: might need to do this by area instead of by radius
   insideX = r * (1. - val) * cos(t) + x
   insideY = r * (1. - val) * sin(t) + y
@@ -64,24 +64,24 @@ end
 ;    rowTitles : in, required, type=strarr(m)
 ;       row headers
 ;-
-pro mg_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleColor, _extra=e 
+pro mg_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleColor, _extra=e
   compile_opt strictarr
-  
+
   ; normal data
   _data = data / max(data)
-  
+
   ; establish coordinate system
   plot, findgen(n_elements(colTitles)), findgen(n_elements(rowTitles)), $
         /nodata, position=[0.4, 0.1, 0.95, 0.6], xstyle=5, ystyle=5, $
-        color=color, _extra=e        
-  
+        color=color, _extra=e
+
   for col = 0L, n_elements(colTitles) - 1L do begin
     for row = 0L, n_elements(rowTitles) - 1L do begin
-      mg_spotmatrix_makeglyph, _data[col, row], col, row, color=color, _extra=e    
+      mg_spotmatrix_makeglyph, _data[col, row], col, row, color=color, _extra=e
     endfor
   endfor
-  
-  xpos = convert_coord(0.05, 0.0, /normal, /to_data)  
+
+  xpos = convert_coord(0.05, 0.0, /normal, /to_data)
   xyouts, fltarr(n_elements(rowTitles)) + xpos[0], $
           findgen(n_elements(rowTitles)) - 0.2, $
           rowTitles, $
@@ -91,7 +91,7 @@ pro mg_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleCol
           fltarr(n_elements(colTitles)) + ypos[1], $
           orientation=60, $
           colTitles, $
-          /data, color=titleColor, _extra=e          
+          /data, color=titleColor, _extra=e
 end
 
 

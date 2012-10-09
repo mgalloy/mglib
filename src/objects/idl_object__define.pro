@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; This class is used to inherit from in IDL versions before 8.0, allowing 
-; operator overloaded classes to still compile on earlier versions (though not 
-; to offer operator overloading, of course). For IDL versions 8.0 or later, 
-; the internal IDL provided `IDL_Object` class should be found before this 
+; This class is used to inherit from in IDL versions before 8.0, allowing
+; operator overloaded classes to still compile on earlier versions (though not
+; to offer operator overloading, of course). For IDL versions 8.0 or later,
+; the internal IDL provided `IDL_Object` class should be found before this
 ; class.
 ;-
 
@@ -14,7 +14,7 @@
 ;-
 pro idl_object::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -26,7 +26,7 @@ end
 ;-
 function idl_object::init
   compile_opt strictarr
-  
+
   return, 1
 end
 

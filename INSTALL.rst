@@ -10,7 +10,7 @@ There is a more complete configuration in `example_configure.sh` which specifies
 After configuration, build mglib with::
 
   make
-  
+
 And install with::
 
   make install

@@ -16,7 +16,7 @@
 ;-
 function mg_repeat, vec, nreps
   compile_opt strictarr
-  
+
   nvec = n_elements(vec)
   return, reform(rebin(reform(vec, nvec, 1), nvec, nreps), nvec * nreps)
 end

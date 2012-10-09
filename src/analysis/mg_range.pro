@@ -8,7 +8,7 @@
 ;
 ;       IDL> print, mg_range(randomu(0L, 10))
 ;           0.0668422     0.930436
-;    
+;
 ; :Returns:
 ;    `fltarr(2)`
 ;

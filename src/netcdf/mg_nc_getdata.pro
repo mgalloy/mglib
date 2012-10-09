@@ -8,7 +8,7 @@
 ;    better error messages when items not found
 ;    access for global attributes
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;
 ; :Examples:
@@ -27,7 +27,7 @@
 ;       IDL> help, res1
 ;       RESULT1         LONG      = Array[1, 23, 17]
 ;
-;    Verify that the slice is the same as the slice pulled out of the 
+;    Verify that the slice is the same as the slice pulled out of the
 ;    fullResult::
 ;
 ;       IDL> same = array_equal(fullResult[3, 5:*:2, 0:49:3], res1)
@@ -42,7 +42,7 @@
 ;       equal
 ;
 ;    The variable location and bounds can be combined to slice a variable::
-; 
+;
 ;       IDL> res3 = mg_h5_getdata(f, '/arrays/3D int array[3, 5:*:2, 0:49:3]')
 ;       IDL> print, array_equal(res1, res3) ? 'equal' : 'error'
 ;       equal
@@ -53,7 +53,7 @@
 ;       IMAGE
 ;
 ;    This example is available as a main-level program included in this file::
-; 
+;
 ;       IDL> .run mg_nc_getdata
 ;
 ; :Author:
@@ -66,7 +66,7 @@
 ; to `[start_index, stop_index, stride]` form.
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    `lonarr(3)`
 ;
@@ -81,7 +81,7 @@ function mg_nc_getdata_convertbounds_1d, sbounds, dim_size
 
   args = strsplit(sbounds, ':', /extract, count=nargs)
   result = [0L, dim_size - 1L, 1L]
-  
+
   case nargs of
     1: begin
         if (args[0] ne '*') then begin
@@ -109,23 +109,23 @@ function mg_nc_getdata_convertbounds_1d, sbounds, dim_size
           result[0:2] = long(args)
           if (result[0] lt 0L) then result[0] = dim_size + result[0]
           if (result[1] lt 0L) then result[1] = dim_size + result[1]
-        endelse        
+        endelse
       end
     else: message, 'invalid indexing notation: ' + sbounds
   endcase
-  
+
   return, result
 end
 
 
 ;+
 ; Converts normal IDL indexing notation (represented as a string) into a
-; `lonarr(ndims, 3)` where the first row is start values, the second row is 
+; `lonarr(ndims, 3)` where the first row is start values, the second row is
 ; the end values, and the last row is the stride value.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    lonarr(ndims, 3)
 ;
 ; :Params:
@@ -143,10 +143,10 @@ function mg_nc_getdata_convertbounds, sbounds, dimensions=dimensions, $
                                       single=single
   compile_opt strictarr
   on_error, 2
-  
+
   dimIndices = strtrim(strsplit(sbounds, ',', /extract, count=ndims), 2)
   result = lonarr(ndims, 3)
-  
+
   case ndims of
     1: begin
         single = 1B
@@ -173,7 +173,7 @@ end
 ;
 ; :Params:
 ;    bounds : in, required, type="lonarr(ndims, 3)"
-;       bounds 
+;       bounds
 ;
 ; :Keywords:
 ;    offset : out, optional, type=lonarr(ndims)
@@ -188,19 +188,19 @@ pro mg_nc_getdata_computeslab, bounds, $
                                count=count, $
                                stride=stride
   compile_opt strictarr
-  
+
   ndims = (size(bounds, /dimensions))[0]
-  
+
   offset = reform(bounds[*, 0])
   stride = reform(bounds[*, 2])
-    
+
   count = ceil((bounds[*, 1] - bounds[*, 0] + 1L) / float(bounds[*, 2])) > 1
 end
 
 
 ;+
 ; Reads data in a dataset.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -214,7 +214,7 @@ end
 ;
 ; :Keywords:
 ;    bounds : in, optional, type="lonarr(3, ndims) or string"
-;       gives start value, end value, and stride for each dimension of the 
+;       gives start value, end value, and stride for each dimension of the
 ;       variable
 ;    error : out, optional, type=long
 ;       error value
@@ -238,11 +238,11 @@ function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
     ncdf_diminq, fileId, varInfo.dim[d], dimName, dimSize
     dimensions[d] = dimSize
   endfor
-  
+
   fullBounds = [[lonarr(varInfo.ndims)], $
                 [dimensions - 1L], $
                 [lonarr(varInfo.ndims) + 1L]]
-  
+
   ; convert input bounds to a lonarr(ndims, 3) bounds specification
   case size(bounds, /type) of
     0: _bounds = fullBounds
@@ -254,9 +254,9 @@ function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
                              offset=offset, $
                              count=count, $
                              stride=stride
-                                   
+
   ncdf_varget, fileId, varId, value, count=count, offset=offset, stride=stride
-  
+
   return, value
 end
 
@@ -265,7 +265,7 @@ end
 ; Get the value of the attribute from its group, dataset, or type.
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    attribute data
 ;
@@ -280,17 +280,17 @@ end
 function mg_h5_getdata_getattributedata, fileId, varId, attname, global=global
   compile_opt strictarr
   on_error, 2
-  
+
   if (keyword_set(global)) then begin
     ncdf_attget, fileId, attname, attvalue, /global
-    attInfo = ncdf_attinq(fileId, attname, /global)    
+    attInfo = ncdf_attinq(fileId, attname, /global)
   endif else begin
     ncdf_attget, fileId, varId, attname, attvalue
     attInfo = ncdf_attinq(fileId, varId, attname)
   endelse
-  
+
   if (attInfo.dataType eq 'CHAR') then attvalue = string(attvalue)
-  
+
   return, attvalue
 end
 
@@ -307,7 +307,7 @@ end
 ;    fileId : in, required, type=long
 ;       netCDF file identifier of the file to read
 ;    variable : in, required, type=string
-;       path to attribute using "/" to navigate groups/datasets and "." to 
+;       path to attribute using "/" to navigate groups/datasets and "." to
 ;       indicate the attribute name
 ;
 ; :Keywords:
@@ -336,15 +336,15 @@ function mg_nc_getdata_getattribute, fileId, variable, error=error
     varId = ncdf_varid(fileId, loc)
     data = mg_h5_getdata_getattributedata(fileId, varId, attname)
   endelse
-  
+
   return, data
 end
 
 
 ;+
 ; Pulls out a section of a netCDF variable.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    data array
 ;
 ; :Params:
@@ -355,7 +355,7 @@ end
 ;
 ; :Keywords:
 ;    bounds : in, optional, type="lonarr(3, ndims) or string"
-;       gives start value, end value, and stride for each dimension of the 
+;       gives start value, end value, and stride for each dimension of the
 ;       variable
 ;    error : out, optional, type=long
 ;       error value
@@ -363,7 +363,7 @@ end
 function mg_nc_getdata, filename, variable, bounds=bounds, error=error
   compile_opt strictarr
   on_error, 2
-  
+
   fileId = ncdf_open(filename, /nowrite)
 
   tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null)
@@ -390,13 +390,13 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
     result = mg_nc_getdata_getattribute(fileId, _variable, error=error)
     if (error) then message, 'attribute not found', /informational
   endelse
-  
+
   ncdf_close, fileId
-  
-  return, result    
+
+  return, result
 end
 
-  
+
 ; main-level example program
 
 sample_filename = file_which('sample.nc')

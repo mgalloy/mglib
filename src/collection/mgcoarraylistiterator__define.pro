@@ -1,14 +1,14 @@
 ; docformat = 'rst'
 
 ;+
-; This class provides a nice way to iterate through all the elements of an 
+; This class provides a nice way to iterate through all the elements of an
 ; array list.
 ;-
 
 ;+
 ; Determine if the underlying collection has another element to retrieve.
 ;
-; :Returns: 
+; :Returns:
 ;    1 if underlying collection has another element, 0 otherwise
 ;-
 function mgcoarraylistiterator::hasNext
@@ -21,7 +21,7 @@ end
 ;+
 ; Return the next item in the underlying collection.
 ;
-; :Returns: 
+; :Returns:
 ;    list item
 ;-
 function mgcoarraylistiterator::next
@@ -77,7 +77,7 @@ end
 ;+
 ; Initialize an MGArrayListIterator.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 otherwise
 ;
 ; :Params:
@@ -88,7 +88,7 @@ function mgcoarraylistiterator::init, arraylist
   compile_opt strictarr
 
   if (~self->mgcoabstractiterator::init()) then return, 0
-    
+
   self.arraylist = arraylist
   self.arraylist->getProperty, version=version
   self.version = version
@@ -102,13 +102,13 @@ end
 ;+
 ; Define member variables.
 ;
-; :Requires: 
+; :Requires:
 ;    IDL 6.0
-; 
+;
 ; :Fields:
-;    arraylist 
+;    arraylist
 ;       arraylist being interated over
-;    pos 
+;    pos
 ;       position of the next element in the ArrayList to be returned by the
 ;       "next" method
 ;-

@@ -3,9 +3,9 @@
 ;+
 ; Reads from the current graphics device (WIN, X, or Z devices) and returns
 ; the image in the TRUE format specified.
-; 
+;
 ; NOTE: on Mac OS X, the resize indicator in the lower right of the image is
-; filled with a solid color using the pixel immediately to the left of the 
+; filled with a solid color using the pixel immediately to the left of the
 ; indicator at y=0.
 ;
 ; :Examples:
@@ -33,13 +33,13 @@
 ;       TRUE format of output image desired; defaults to 0 on 8-bit hardware
 ;       and 1 on higher bit-depths
 ;    red : out, optional, type=bytarr
-;       red values for the color table produced if TRUE was set to 0 on a 
+;       red values for the color table produced if TRUE was set to 0 on a
 ;       graphics device supporting 24-bit color
 ;    green : out, optional, type=bytarr
-;       green values for the color table produced if TRUE was set to 0 on a 
+;       green values for the color table produced if TRUE was set to 0 on a
 ;       graphics device supporting 24-bit color
 ;    blue : out, optional, type=bytarr
-;       blue values for the color table produced if TRUE was set to 0 on a 
+;       blue values for the color table produced if TRUE was set to 0 on a
 ;       graphics device supporting 24-bit color
 ;    _extra : in, optional, type=keywords
 ;       keywords to TVRD
@@ -48,34 +48,34 @@ function mg_read, xstart, ystart, nx, ny, channel, true=true, $
                   red=red, green=green, blue=blue, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   ; make sure we have a valid graphics device
   if (!d.name ne 'WIN' && !d.name ne 'X' && !d.name ne 'Z') then begin
     message, 'unable to read from current device: ' + !d.name
   endif
-  
+
   ; can't read from non-existent windows
   if (!d.name ne 'Z' && !d.window eq -1L) then begin
     message, 'no open graphics windows'
   endif
-  
+
   ; get the visual depth based on the graphics device
   if (!d.name eq 'Z') then begin
     device, get_pixel_depth=depth
   endif else begin
     device, get_visual_depth=depth
   endelse
-  
+
   ; set default values
   _xstart = n_elements(xstart) gt 0L ? xstart : 0L
   _ystart = n_elements(ystart) gt 0L ? ystart : 0L
   _nx = n_elements(nx) gt 0L ? nx : !d.x_size - _xstart
   _ny = n_elements(ny) gt 0L ? ny : !d.y_size - _ystart
   _channel = n_elements(channel) gt 0L ? channel : 0L
-  
+
   ; this is the TRUE value that the user wants...
   _desiredTrue = n_elements(true) gt 0L ? true : (depth gt 8 ? 1L : 0L)
-  
+
   ; ...but TRUE must be set to match the visual depth when doing the read (the
   ; output will be converted later if this does not match the user's desire)
   if (n_elements(true) gt 0L) then begin
@@ -87,28 +87,28 @@ function mg_read, xstart, ystart, nx, ny, channel, true=true, $
   endif else begin
     _neededTrue = depth gt 8 ? 1L : 0L
   endelse
-  
+
   ; remember decomppsed state
   device, get_decomposed=decomposed
-  
+
   ; must be in decomposed color if device supports it
   if (depth gt 8L) then device, decomposed=1L
-  
+
   ; read from the graphics device
   im = tvrd(_xstart, _ystart, _nx, _ny, _channel, true=_neededTrue, _extra=e)
-  
+
   ; place back original decomposed state
   device, decomposed=decomposed
-  
+
   ; convert the image if it is not in the user's desired TRUE format
   if (_neededTrue ne _desiredTrue) then begin
     im = mg_maketrue(im, true=_desiredTrue, input_true=_neededTrue, $
                      red=red, green=green, blue=blue)
   endif
-  
+
   ; fix lower right corner if on a Mac
   if (!version.os eq 'darwin' && !d.name eq 'X') then begin
-    ; Mac OS X puts a 15 x 15 pixel resizing indicator in the lower right of 
+    ; Mac OS X puts a 15 x 15 pixel resizing indicator in the lower right of
     ; it's graphics windows
     dims = mg_image_getsize(im)
     if (total(dims gt 15) ge 2) then begin
@@ -123,7 +123,7 @@ function mg_read, xstart, ystart, nx, ny, channel, true=true, $
       endcase
     endif
   endif
-  
+
   return, im
 end
 

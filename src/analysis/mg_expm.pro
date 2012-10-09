@@ -15,6 +15,6 @@ function mg_expm, m
 
   eigenvals = la_eigenproblem(m, eigenvectors=evecs)
   expm = evecs # diag_matrix(exp(eigenvals)) # invert(evecs)
-  
+
   return, expm
 end

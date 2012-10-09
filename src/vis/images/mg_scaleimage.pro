@@ -12,7 +12,7 @@
 ;
 ;       im = mg_scaleimage(elev, dividers=[0, 1, 256], outputs=[0, 144, 256])
 ;
-;    Here, the interval 0..1 in the input image is scaled to 0..144, and 
+;    Here, the interval 0..1 in the input image is scaled to 0..144, and
 ;    1..256 is scaled to 144..245.
 ;
 ; :Returns:
@@ -30,19 +30,19 @@
 ;-
 function mg_scaleimage, im, dividers=dividers, outputs=outputs
   compile_opt strictarr
-  
+
   bins = value_locate(dividers, im)
-  
+
   result = im
   for b = 0L, max(bins) do begin
     ind = where(bins eq b, count)
     if (count eq 0L) then continue
-    
+
     ; linearly scale elements in ind to _outputs[i].._outputs[i + 1]
     result[ind] = mg_linear_function(dividers[b:b+1], outputs[b:b+1], $
                                      data=im[ind])
   endfor
-  
+
   return, result
 end
 

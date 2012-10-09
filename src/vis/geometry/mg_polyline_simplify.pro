@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; This function simplifies the vertices of an `n`-dimenstional polyline. 
+; This function simplifies the vertices of an `n`-dimenstional polyline.
 ; Vertices are removed if they are within a tolerance tangential distance from
 ; an approximating line segment.
 ;
@@ -24,7 +24,7 @@
 ;
 ; :Returns:
 ;    float
-; 
+;
 ; :Params:
 ;    x : in, required, type=vector
 ;      first parameter
@@ -33,7 +33,7 @@
 ;-
 function mg_polyline_simplify_dot, x, y
   compile_opt strictarr
-  
+
   return, total(x * y)
 end
 
@@ -43,7 +43,7 @@ end
 ;
 ; :Returns:
 ;    float
-; 
+;
 ; :Params:
 ;    x : in, required, type=fltarr(2)
 ;       first point
@@ -52,15 +52,15 @@ end
 ;-
 function mg_polyline_simplify_d2, x, y
   compile_opt strictarr
-  
+
   diff = x - y
   return, total(diff * diff)
 end
 
 
 ;+
-; This is the Douglas-Peucker recursive simplification routine. It marks 
-; vertices that are part of the simplified polyline for approximating the 
+; This is the Douglas-Peucker recursive simplification routine. It marks
+; vertices that are part of the simplified polyline for approximating the
 ; polyline subchain `vertices[j]` to `vertices[k]`.
 ;
 ; :Params:
@@ -77,10 +77,10 @@ end
 ;-
 pro mg_polyline_simplify_dp, tol2, vertices, j, k, mk
   compile_opt strictarr
-  
+
   if (k le j + 1L) then return ; there is nothing to simplify
 
-  ; check for adequate approximation by segment s from vertices[j] to 
+  ; check for adequate approximation by segment s from vertices[j] to
   ; vertices[k]
   maxi = j ; index of vertex farthest from s
   maxd2 = 0. ; distance squared of farthest vertex
@@ -104,10 +104,10 @@ pro mg_polyline_simplify_dp, tol2, vertices, j, k, mk
         dv2 = mg_polyline_simplify_d2(vertices[*, i], pb)
       endelse
     endelse
-      
+
     ; test with current max distance squared
     if (dv2 le maxd2) then continue
-    
+
     ; vertices[i] is a new max vertex
     maxi = i
     maxd2 = dv2
@@ -116,50 +116,50 @@ pro mg_polyline_simplify_dp, tol2, vertices, j, k, mk
   if (maxd2 gt tol2) then begin ; error is worse than the tolerance
     ; split the polyline at the farthest vertex from s
     mk[maxi] = 1B  ; mark vertices[maxi] for the simplified polyline
-    
+
     ; recursively simplify the two subpolylines at vertices[*, maxi]
-    
+
     ; vertices[j] to vertices[maxi]
-    mg_polyline_simplify_dp, tol2, vertices, j, maxi, mk 
+    mg_polyline_simplify_dp, tol2, vertices, j, maxi, mk
     ; vertices[maxi] to vertices[k]
-    mg_polyline_simplify_dp, tol2, vertices, maxi, k, mk 
+    mg_polyline_simplify_dp, tol2, vertices, maxi, k, mk
   endif
   ; else the approximation is OK, so ignore intermediate vertices
-  
+
   return
 end
 
 
 ;+
 ;
-; `VIS_POLYLINE_SIMPLIFY` uses the Douglas-Peucker (DP) approximation 
+; `VIS_POLYLINE_SIMPLIFY` uses the Douglas-Peucker (DP) approximation
 ; algorithm that is used extensively for both computer graphics and geographic
 ; information systems. See `geometryalgorithms.com <geometryalgorithms.com>`.
 ;
 ; :Params:
 ;    vertices : in, required, type="fltarr(m, n)"
-;       An array of vertices representing the polyline. Must be a [m, n] 
-;       array, where `m` is the dimensionality and `n` is the number of 
+;       An array of vertices representing the polyline. Must be a [m, n]
+;       array, where `m` is the dimensionality and `n` is the number of
 ;       vertices. Both `m > 1` and `n > 1` are required.
 ;
 ; :Keywords:
 ;    tolerance : in, optional, type=float
 ;       Set this keyword to the tolerance value to use. If `tolerance` is not
-;       set, or set to a negative or zero value, then the tolerance will be 
-;       set automatically to the minimum average spacing along any dimension 
+;       set, or set to a negative or zero value, then the tolerance will be
+;       set automatically to the minimum average spacing along any dimension
 ;       between points.
 ;
-;       Choice of tolerance is key to the amount of simplification. The 
-;       routine approximates the polyline with line segments that are no 
-;       further than tolerance from any vertices. Vertices that are within 
-;       tolerance from the approximating lines are removed. If no tolerance is 
-;       specified, the routine uses the minimum distance in each dimension 
+;       Choice of tolerance is key to the amount of simplification. The
+;       routine approximates the polyline with line segments that are no
+;       further than tolerance from any vertices. Vertices that are within
+;       tolerance from the approximating lines are removed. If no tolerance is
+;       specified, the routine uses the minimum distance in each dimension
 ;       between vertices, and multiplies this by `factor` as a tolerance.
 ;
-;    factor : in, optional, type=float, default=1. 
-;       Set this keyword instead of `tolerance` to scale the automatic 
+;    factor : in, optional, type=float, default=1.
+;       Set this keyword instead of `tolerance` to scale the automatic
 ;       tolerance. For example, `FACTOR=10` will use 10x the minimum average
-;       spacing between points as the tolerance. Ignored if `tolerance` is 
+;       spacing between points as the tolerance. Ignored if `tolerance` is
 ;       set.
 ;
 ; :Returns:
@@ -168,9 +168,9 @@ end
 ;-
 function mg_polyline_simplify, vertices, tolerance=tolerance, factor=factor
   compile_opt strictarr
-  
+
   _factor = n_elements(factor) eq 0L ? 1. : factor
-    
+
   ; don't do any simplification if factor is 0 or -ve
   if (_factor lt 1.) then return, vertices
 
@@ -191,15 +191,15 @@ function mg_polyline_simplify, vertices, tolerance=tolerance, factor=factor
 
   if (_tolerance le 0.) then begin  ; automatically set tolerance
     diff = abs((vertices - shift(vertices, 0, 1))[*, 1:*])
-    
+
     ; minimum distance in x or y between adjacent points
     inds = where(diff ne 0., count)
     if (count eq 0L) then begin
       message, 'vertices have no unique points', /continue
       return, vertices * 0L - 1L
     endif
-    
-    ; tolerance is the minimum difference in x or y beteween adjacent points 
+
+    ; tolerance is the minimum difference in x or y beteween adjacent points
     ; times the factor
     _tolerance = min(diff[inds]) * _factor
   endif
@@ -221,14 +221,14 @@ function mg_polyline_simplify, vertices, tolerance=tolerance, factor=factor
   if (pv lt n - 1L) then vt[*, k++] = vertices[*, n - 1L] ; finish at the end
 
   ; stage 2: Douglas-Peucker polyline simplification
-  
+
   ; Mark vertices that will be in the simplified polyline:
   ;   - step 1: initially mark v0 and vn
   ;   - step 2: recursively simplify by selecting vertex furthest away
-  
+
   ; mark the first and last vertices
   mk[0L] = 1B
-  mk[k - 1L] = 1B 
+  mk[k - 1L] = 1B
 
   mg_polyline_simplify_dp, tol2, vt, 0L, k - 1L, mk
 
@@ -263,7 +263,7 @@ plots, vertices, color=9
 
 ; distance between adjacent points
 d = (sqrt(total((vertices - shift(vertices, 0, 1))^2, 1)))[1:*]
-; this doesn't work so well if the scale of one dimension is much larger than 
+; this doesn't work so well if the scale of one dimension is much larger than
 ; another
 
 ; minimum distance in x or y.. between adjacent points
@@ -284,7 +284,7 @@ ta = systime(/seconds) - t
 t = systime(/seconds)
 for i = 0L, n - 1L do b = mg_polyline_simplify(vertices, tolerance=davg)
 tb = systime(/seconds) - t
-  
+
 t = systime(/seconds)
 for i=0,n-1 do c = mg_polyline_simplify(vertices, factor=factor)
 tc = systime(/seconds) - t
@@ -297,7 +297,7 @@ print, n_elements(vertices) / 2, $
 wait, 2.
 print, dmin, $
        format='(%"RED: After simplifying with tolerance: %f (minimum distance in x or y)")'
-print, n_elements(a) / 2, strtrim(ta / n), $       
+print, n_elements(a) / 2, strtrim(ta / n), $
        format='(%" number of output vertices: %d\n time: %f")'
 plots, a, psym=-4, color=2
 

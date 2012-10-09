@@ -4,7 +4,7 @@
 ; Widget program to browse the contents of a netCDF file and load the contents
 ; of variables into IDL variables a the main-level. Similar to `H5_BROWSER`.
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;-
 
@@ -18,7 +18,7 @@
 ;-
 pro mg_nc_browser_handleevents, event
   compile_opt strictarr
-  
+
   widget_control, event.top, get_uvalue=browser
   browser->handleEvents, event
 end
@@ -33,7 +33,7 @@ end
 ;-
 pro mg_nc_browser_cleanup, tlb
   compile_opt strictarr
-  
+
   widget_control, tlb, get_uvalue=browser
   browser->_cleanupWidgets
 end
@@ -63,14 +63,14 @@ end
 ;-
 pro mg_nc_browser::loadFiles, filenames
   compile_opt strictarr
-  
+
   self.nfiles += n_elements(filenames)
-  
+
   self->setTitle, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
-  
+
   ncbmp = read_bmp(filepath('netcdf.bmp', root=mg_src_root()), r, g, b)
   ncbmp = [[[r[ncbmp]]], [[g[ncbmp]]], [[b[ncbmp]]]]
-  
+
   foreach f, filenames do begin
     file = obj_new('MGffNCFile', filename=f)
     file_node = widget_tree(self.tree, /folder, value=f, bitmap=ncbmp, $
@@ -84,7 +84,7 @@ end
 ;-
 pro mg_nc_browser::_openFiles
   compile_opt strictarr
-  
+
   filenames = dialog_pickfile(group=self.tlb, /read, /multiple_files, $
                               filter='*.nc', $
                               title='Select netCDF files to open')
@@ -138,18 +138,18 @@ end
 ;-
 pro mg_nc_browser::_createWidgets
   compile_opt strictarr
-  
+
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb')
-  
+
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
   toolbar = widget_base(self.tlb, /toolbar, /row)
-  
+
   file_toolbar = widget_base(toolbar, /toolbar, /row)
   open_button = widget_button(file_toolbar, /bitmap, uname='open', $
                               tooltip='Open netCDF file', $
                               value=filepath('open.bmp', subdir=bitmapdir))
-  
+
   vis_toolbar = widget_base(toolbar, /toolbar, /nonexclusive, /row)
   display_button = widget_button(vis_toolbar, /bitmap, uname='display', $
                                  tooltip='Open netCDF file', $
@@ -166,19 +166,19 @@ pro mg_nc_browser::_createWidgets
 
   ; content row
   content_base = widget_base(self.tlb, /row)
-  
+
   ; tree
   self.tree = widget_tree(content_base, uname='browser', $
                           scr_xsize=300, scr_ysize=512)
-  
+
   ; details column
-  
+
   ; visualization
-  
+
   ; metadata
-  
+
   ; variable name for import
-  
+
   ; import, done buttons
 end
 
@@ -188,7 +188,7 @@ end
 ;-
 pro mg_nc_browser::_realizeWidgets
   compile_opt strictarr
-  
+
   widget_control, self.tlb, /realize
 end
 
@@ -198,7 +198,7 @@ end
 ;-
 pro mg_nc_browser::_startXManager
   compile_opt strictarr
-  
+
   xmanager, 'mg_nc_browser', self.tlb, /no_block, $
             event_handler='mg_nc_browser_handleevents', $
             cleanup='mg_nc_browser_cleanup'
@@ -210,7 +210,7 @@ end
 ;-
 pro mg_nc_browser::cleanup
   compile_opt strictarr
-  
+
 end
 
 
@@ -230,14 +230,14 @@ function mg_nc_browser::init, filenames=filenames, tlb=tlb
   compile_opt strictarr
 
   self.title = 'netCDF Browser'
-  
+
   self->_createWidgets
   tlb = self.tlb
   self->_realizeWidgets
   self->_startXManager
-  
+
   if (n_elements(filenames) gt 0L) then self->loadFiles, filenames
-  
+
   return, 1
 end
 
@@ -251,7 +251,7 @@ end
 ;-
 pro mg_nc_browser__define
   compile_opt strictarr
-  
+
   define = { mg_nc_browser, $
              tlb: 0L, $
              tree: 0L, $
@@ -280,13 +280,13 @@ end
 function mg_nc_browser, pfilenames, filenames=kfilenames
   compile_opt strictarr
 
-  ; parameter filename takes precedence (it clobbers keyword filename, if 
+  ; parameter filename takes precedence (it clobbers keyword filename, if
   ; both present)
-  if (n_elements(kfilenames) gt 0L) then _filenames = kfilenames 
+  if (n_elements(kfilenames) gt 0L) then _filenames = kfilenames
   if (n_elements(pfilenames) gt 0L) then _filenames = pfilenames
-  
+
   b = obj_new('mg_nc_browser', filenames=_filenames, tlb=tlb)
-  
+
   return, tlb
 end
 

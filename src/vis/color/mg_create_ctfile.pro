@@ -5,7 +5,7 @@
 ; `XLOADCT`, and `IDLgrPalette::loadCT`.
 ;
 ; :Examples:
-;    To create a new color table file, use `MG_CREATE_CTFILE` to create the 
+;    To create a new color table file, use `MG_CREATE_CTFILE` to create the
 ;    new file and `MODIFYCT` to add color tables to it. For example::
 ;
 ;       IDL> mg_create_ctfile, 'test.tbl'
@@ -21,10 +21,10 @@ pro mg_create_ctfile, filename
   compile_opt strictarr
 
   openw, lun, filename, /get_lun
-  
+
   writeu, lun, 1B
   writeu, lun, bytarr(3 * 256)
   writeu, lun, bytarr(32) + 32B
-  
+
   free_lun, lun
 end

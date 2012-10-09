@@ -68,10 +68,10 @@ end
 ;-
 pro mg_itbrowser_addids, ids, treeID, path=path, tool=otool
   compile_opt strictarr
-  
+
   oItem = otool->getByIdentifier(path + ids[0])
 
-  childIndices = where(strmatch(ids, ids[0] + '*'), nchildren, $ 
+  childIndices = where(strmatch(ids, ids[0] + '*'), nchildren, $
                        complement=siblingIndices, ncomplement=nsiblings)
 
   ; add yourself
@@ -83,7 +83,7 @@ pro mg_itbrowser_addids, ids, treeID, path=path, tool=otool
     childIDs = (strmid(ids[childIndices], strlen(ids[0])))[1:*]
     mg_itbrowser_addids, childIDs, id, path=path + ids[0], tool=otool
   endif
-  
+
   ; call again for siblings
   if (nsiblings gt 0) then begin
     mg_itbrowser_addids, ids[siblingIndices], treeID, path=path, tool=otool
@@ -126,9 +126,9 @@ pro mg_itbrowser, toolID
   ids = otool->findIdentifiers('*')
   ids = strlowcase(ids)
   path = strsplit(ids[0], '/', /extract)
-   
+
   toolsTree = widget_tree(tree, value=path[0], uname='tree', $
-                          /expanded, /folder, uvalue=otool)  
+                          /expanded, /folder, uvalue=otool)
   toolTree = widget_tree(toolsTree, value=path[1], uname='tree', $
                          /expanded, /folder, uvalue=otool)
 

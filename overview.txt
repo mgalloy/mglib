@@ -7,15 +7,15 @@ IDL library of Michael Galloy.
    BSD licensed
 
 :Dirs:
-  ./ 
+  ./
     Main utility routines
-  analysis/ 
+  analysis/
     Various algorithms (sorting, sampling, etc.) and math helper routines
-  animation/ 
+  animation/
     Classes to produce animations using object graphics.
   cmdline_tools/
     Routines useful at the IDL command line.
-  collection/ 
+  collection/
     Objects implementing various types of collections.
   cula/
     CULAtools bindings.
@@ -28,7 +28,7 @@ IDL library of Michael Galloy.
     a DLM in a quick and nearly automatic manner using the `MG_DLM` class.
   dist_tools/cidl
     Routines for creating hybrid C/IDL routines
-  envi/ 
+  envi/
     ENVI user routines.
   fileio/
     File input/output routines.
@@ -36,15 +36,15 @@ IDL library of Michael Galloy.
     Wrappers for GNU Scientific Library (GSL) routines.
   hdf/
     Routines for reading/writing/querying HDF files.
-  hdf5/ 
+  hdf5/
     Routines for reading/writing/querying HDF5 files.
-  indices/ 
+  indices/
     Routines for handling index arrays.
-  install_tools/ 
+  install_tools/
     Routines for installing new projects and their dependencies.
   introspection/
     Routines for inspecting variables and routines.
-  itools/ 
+  itools/
     iTools related helpers and components.
   markdown/
     Wrapper for a C implementation of John Gruber's markdown.
@@ -56,9 +56,9 @@ IDL library of Michael Galloy.
     Classes for doing object-oriented programming.
   strings/
     Routines for manipulating strings.
-  templating/ 
+  templating/
     Tools for using templated output.
-  textmarkup/ 
+  textmarkup/
     Classes for converting between text markup styles: rst, LaTex, and HTML.
   updater/
     Start of an automatic updater library.

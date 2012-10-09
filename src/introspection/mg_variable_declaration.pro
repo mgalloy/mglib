@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Returns a string that gives the IDL declaration for the type of the given 
+; Returns a string that gives the IDL declaration for the type of the given
 ; variable.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -19,10 +19,10 @@ function mg_variable_declaration, var
     catch, /cancel
     return, 'UNKNOWN'
   endif
-    
+
   ; get size/type information
   sz = size(var, /structure)
-    
+
   ; structures
   if (sz.type eq 8) then begin
     if (sz.n_elements gt 1) then begin
@@ -39,7 +39,7 @@ function mg_variable_declaration, var
       return, '{ ' + (structureName eq '' ? '' : (structureName + ', ')) + strjoin(tNames + ': ' + decls, ', ') + ' }'
     endelse
   endif
-  
+
   ; scalars
   if (sz.n_dimensions eq 0) then begin
     case sz.type of
@@ -66,23 +66,23 @@ function mg_variable_declaration, var
       else : return, 'unknown type'
     endcase
   endif
-    
+
   ; arrays
   declarations = ['---', 'bytarr', 'intarr', 'lonarr', 'fltarr', 'dblarr', $
                   'complexarr', 'strarr', '---', 'dcomplexarr', $
                   'ptrarr', 'objarr', 'uintarr', 'ulonarr', $
                   'lon64arr', 'ulon64arr']
-  
+
   ; print the values of the array out if only one dimension and a few elements
   if (sz.n_dimensions eq 1 && sz.dimensions[0] le 5) then begin
     results = strarr(sz.dimensions[0])
     for i = 0L, sz.dimensions[0] - 1L do begin
       results[i] = mg_variable_declaration(var[i])
     endfor
-    
-    return, '[' + strjoin(results, ', ') + ']'    
+
+    return, '[' + strjoin(results, ', ') + ']'
   endif
-  
+
   dims = strjoin(strtrim(sz.dimensions[0:sz.n_dimensions - 1L], 2), ', ')
   return, declarations[sz.type] + '(' + dims + ')'
 end

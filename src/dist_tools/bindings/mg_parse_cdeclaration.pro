@@ -21,7 +21,7 @@
 ; :Params:
 ;    decl : in, required, type=string
 ;       C declaration
-; 
+;
 ; :Keywords:
 ;    name : out, optional, type=string
 ;       routine/parameter name
@@ -32,7 +32,7 @@
 ;       pass a named variable to get whether the declaration is an array (but
 ;       not a pointer)
 ;    device : out, optional, type=boolean
-;       pass a named variable to get whether the declaration is a device 
+;       pass a named variable to get whether the declaration is a device
 ;       pointer/array
 ;-
 function mg_parse_cdeclaration, decl, name=name, $
@@ -43,17 +43,17 @@ function mg_parse_cdeclaration, decl, name=name, $
 
   loc = strsplit(_decl, ' *', count=ntokens, length=len)
   device = strmid(_decl, 0, len[0]) eq 'device'
-  
+
   type_start = device ? loc[1] : 0
   type_len = loc[ntokens - 1L] - (device ? loc[1] : 0)
   type = strtrim(strmid(_decl, type_start, type_len), 2)
   name = strmid(_decl, loc[ntokens - 1L])
-  
+
   pointer = 0B
   array = strmid(_decl, strlen(_decl) - 2) eq '[]'
-  
+
   ; TODO: handle case with no space between type and *, like "int*"
-  
+
   case type of
     'void': return, 0L
     'char': return, 1L

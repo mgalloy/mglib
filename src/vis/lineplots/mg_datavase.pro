@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Based on the paper "Data Vases: Plots for Visualizing Multiple Time Series" 
+; Based on the paper "Data Vases: Plots for Visualizing Multiple Time Series"
 ; by Sidharth Thakur and Theresa-Marie Rhyne.
 ;
 ; :Examples:
@@ -29,10 +29,10 @@ pro mg_datavase, x, data, $
 
   _xstyle = n_elements(xstyle) eq 0L ? 0B : xstyle
   _ystyle = n_elements(ystyle) eq 0L ? 0B : ystyle
-  
+
   _colors = n_elements(colors) eq 0L ? 'ffffff'x : colors
   ncolors = n_elements(colors)
-  
+
   _minimum = min(data)
   _maximum = max(data)
 
@@ -42,14 +42,14 @@ pro mg_datavase, x, data, $
   minx = min(x, max=maxx)
   xrange = [0, dims[0]]
   yrange = [minx, maxx]
-  
+
   plot, xrange, yrange, /nodata, xrange=xrange, yrange=yrange, $
         xstyle=1B or _xstyle, ystyle=1B or _ystyle, $
         color=axesColor, _extra=e
-        
+
   for d = 0L, nvases - 1L do begin
     dataset = reform(data[d, *]) / _maximum / 2.0
-    
+
     outline_x = [d + 0.5 + dataset, reverse(d + 0.5 - dataset)]
     outline_y = [x, reverse(x)]
     plots, outline_x, outline_y, color=_colors[d mod ncolors]

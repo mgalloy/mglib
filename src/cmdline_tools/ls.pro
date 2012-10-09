@@ -35,22 +35,22 @@ function ls_get_columns
     !quiet = oldQuiet
     return, 80L
   endif
-  
+
   oldQuiet = !quiet
   !quiet = 1
   columns = mg_termcolumns()
   !quiet = oldQuiet
-  
+
   return, columns
 end
 
 
 ;+
-; Returns the mode line for each file in the given list.    
-;     
+; Returns the mode line for each file in the given list.
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    `strarr`
 ;
 ; :Params:
@@ -63,13 +63,13 @@ end
 ;-
 function ls_permissions, files, info=info
   compile_opt strictarr, hidden
-  
+
   type = [['-', 'd'], ['l', 'l']]
   r = ['-', 'r']
   w = ['-', 'w']
   x = ['-', 'x']
   bits = ['400'o, '200'o, '100'o, '040o', '020'o, '010'o, '004'o, '002'o, '001'o]
-      
+
   nFiles = n_elements(files)
   permissions = strarr(nFiles)
   for f = 0L, nFiles - 1L do begin
@@ -81,18 +81,18 @@ function ls_permissions, files, info=info
       + r[ind[3]] + w[ind[4]] + x[ind[5]] $
       + r[ind[6]] + w[ind[7]] + x[ind[8]]
   endfor
-  
+
   return, permissions
 end
-   
-     
+
+
 ;+
 ; Return a human readable array of sizes using bytes, kilobytes, megabytes,
 ; gigabytes, terabytes, and petabytes (in powers of two).
-; 
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    `strarr`
 ;
 ; :Params:
@@ -114,7 +114,7 @@ function ls_human_size, sizes
     endwhile
     results[i] = strtrim(s, 2) + units[level]
   endfor
-  
+
   return, results
 end
 
@@ -124,10 +124,10 @@ end
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    `strarr`
 ;
-; :Params: 
+; :Params:
 ;    mtimes : in, required, type=lonarr
 ;       array of modification times
 ;-
@@ -135,7 +135,7 @@ function ls_modification_times, mtimes
   compile_opt strictarr, hidden
 
   currentYear = long(strmid(systime(), 3, 4, /reverse_offset))
-  
+
   nMTimes = n_elements(mtimes)
   results = strarr(nMTimes)
   for f = 0L, nMTimes - 1L do begin
@@ -143,24 +143,24 @@ function ls_modification_times, mtimes
     day = strmid(date, 4, 6)
     time = strmid(date, 11, 5)
     year = long(strmid(date, 3, 4, /reverse_offset))
-    
+
     results[f] = day $
       + (year eq currentYear $
         ? string(time, format='(A6)') $
         : string(year, format='(I6)'))
   endfor
-  
+
   return, results
 end
 
 
 ;+
 ; Substitute for UNIX `ls` command. Automatically uses `-hF` options.
-;    
+;
 ; :Params:
 ;    pattern : in, optional, type=string, default='*'
 ;       pattern to match filenames against
-; 
+;
 ; :Keywords:
 ;    all : in, optional, type=boolean
 ;       report all files (even hidden files like .*)
@@ -168,28 +168,28 @@ end
 ;       more information about each file is listed
 ;
 ; :Bugs:
-;    doesn't handle directories matching pattern the same as `ls` does; IDL 
-;    does not have a mechanism to get the owner for a file, so it is not 
+;    doesn't handle directories matching pattern the same as `ls` does; IDL
+;    does not have a mechanism to get the owner for a file, so it is not
 ;    displayed in the `/LONG` format
 ;-
 pro ls, pattern, all=all, long=long
   compile_opt strictarr, hidden
-  
+
   oldQuiet = !quiet
   !quiet = 1
   sep = path_sep()
   !quiet = oldQuiet
-  
+
   _pattern = n_elements(pattern) eq 0 ? '*' : pattern
-  
+
   files = file_search(_pattern, count=nFiles, $
                       match_all_initial_dot=keyword_set(all))
-  
+
   if (nFiles eq 0) then return
-  
+
   ; get info about each file
   info = file_info(files)
-  
+
   ; mark each filename with
   names = files
   for f = 0L, nFiles - 1L do begin
@@ -200,49 +200,49 @@ pro ls, pattern, all=all, long=long
       info[f].execute: names[f] = names[f] + '*'
       else:
     endcase
-    
+
     ; FIFO and whiteout can't be determined
   endfor
-  
+
   if (keyword_set(long)) then begin
     table = strarr(4, nFiles)
-    
+
     ; permissions
     table[0, *] = ls_permissions(files, info=info)
-    
+
     ; human readable sizes
     table[1, *] = ls_human_size(strtrim(info.size, 2))
-    
+
     ; modification times
     table[2, *] = ls_modification_times(info.mtime)
-    
+
     ind = where(info.symlink, nLinks)
     if (nLinks gt 0) then begin
       for f = 0L, nLinks - 1L do begin
         names[ind[f]] = names[ind[f]] + ' -> '+ file_readlink(files[ind[f]])
       endfor
     endif
-    
+
     ; filenames
     table[3, *] = names
-    
+
     print, table, format='(A-10, "  ", A5, "  ", A-12, " ", A)'
   endif else begin
     maxWidth = max(strlen(names)) + 1L
-  
+
     lineWidth = ls_get_columns()
-    
-    ; find a tentative number of columns, then find the correct number of 
+
+    ; find a tentative number of columns, then find the correct number of
     ; rows, then back to the minimum number of columns for that number of
     ; rows
     nColumns = lineWidth / maxWidth
     nRows = nFiles / nColumns + (nFiles mod nColumns ne 0)
     nColumns = nFiles / nRows + (nFiles mod nRows ne 0)
-    
+
     ; pad so can reform vector into 2D array
     padding = nColumns * nRows - nFiles
     if (padding gt 0) then names = [names, strarr(padding)]
-    
+
     ; print output
     format = '(' + strtrim(nColumns, 2) + 'A-' + strtrim(maxWidth, 2) + ')'
     print, transpose(reform(names, nRows, nColumns)), $

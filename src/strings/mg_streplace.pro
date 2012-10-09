@@ -4,21 +4,21 @@
 ; Handle string replacment with regular expressions.
 ;
 ; :Examples:
-;    The following example demonstrates basic operations of MG_STREPLACE, 
+;    The following example demonstrates basic operations of MG_STREPLACE,
 ;    simply replacing "was" with "was not" in the expression "Mike was here"::
 ;
 ;       IDL> print, mg_streplace('Mike was here', 'was', 'was not')
 ;       Mike was not here
 ;
-;    Meta-variables $1, $2, etc. represent matched values in parentheses. This 
+;    Meta-variables $1, $2, etc. represent matched values in parentheses. This
 ;    swaps the first two words in the string::
 ;
 ;       IDL> print, mg_streplace('Mike was here', '([^ ]*) ([^ ]*)', '$2 $1')
 ;       was Mike here
 ;
-;    Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all 
+;    Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all
 ;    patching expressions with an evaluated expression::
-; 
+;
 ;       IDL> s = 'MikeGeorgeHenryMikeBill'
 ;       IDL> re = 'Mike([A-Z][a-z]*)'
 ;       IDL> expr = '"Mike" + strupcase($1)'
@@ -41,22 +41,22 @@
 ;       IDL> print, str
 ;       1,874,382,735,872,851
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
-;    str : in, required, type=string 
+;    str : in, required, type=string
 ;       a string to search for expressions and replace them
 ;    pattern : in, required, type=string
-;       a regular expression possibly using subexpressions; see IDL's online 
+;       a regular expression possibly using subexpressions; see IDL's online
 ;       help for STREGEX for help on regular expressions
 ;    replacement : in, required, type=string
-;       the string to replace matches of the "pattern"; can use $1, $2, etc. 
+;       the string to replace matches of the "pattern"; can use $1, $2, etc.
 ;       to refer to subexpressions in "pattern"
 ;
 ; :Keywords:
 ;    evaluate : in, optional, type=boolean
-;       set to evaluate the "replacement" as a IDL expression instead of just 
+;       set to evaluate the "replacement" as a IDL expression instead of just
 ;       a string.
 ;    fold_case : in, optional, type=boolean
 ;       set to make a case insensitive match with "pattern"
@@ -65,7 +65,7 @@
 ;    start : out, optional, type=integral, default=0, private
 ;       index into string of where to start looking for the pattern
 ;
-; :Author: 
+; :Author:
 ;    Michael Galloy
 ;-
 function mg_streplace, str, pattern, replacement, $
@@ -111,7 +111,7 @@ function mg_streplace, str, pattern, replacement, $
 
   ; need to put quotes around evaluated variables to be legal IDL syntax
   evalDelim = keyword_set(evaluate) ? '''' : ''
-  
+
   ; $& -> pos[0], len[0]
   ; $1 -> pos[1], len[1]
   ; $2 -> pos[2], len[2]
@@ -131,10 +131,10 @@ function mg_streplace, str, pattern, replacement, $
           message, '$' + strtrim(var_no, 2) + ' undefined'
         endif
 
-        var = strmid(str, pos[var_no], len[var_no])        
+        var = strmid(str, pos[var_no], len[var_no])
         static_replacement += evalDelim + var + evalDelim + strmid(part, ppos + plen)
       endif else begin
-        if (rlen[0] eq 0) then message, 'illegal $, use \ to escape'       
+        if (rlen[0] eq 0) then message, 'illegal $, use \ to escape'
         static_replacement = strmid(replacement, rpos[0], rlen[0])
       endelse
     endfor
@@ -158,11 +158,11 @@ end
 ; replacing "was" with "was not" in the expression "Mike was here":
 print, mg_streplace('Mike was here', 'was', 'was not')
 
-; Meta-variables $1, $2, etc. represent matched values in parentheses. This 
+; Meta-variables $1, $2, etc. represent matched values in parentheses. This
 ; swaps the first two words in the string:
 print, mg_streplace('Mike was here', '([^ ]*) ([^ ]*)', '$2 $1')
 
-; Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all 
+; Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all
 ; patching expressions with an evaluated expression:
 s = 'MikeGeorgeHenryMikeBill'
 re = 'Mike([A-Z][a-z]*)'

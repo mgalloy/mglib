@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
 ;+
-; Creates a user-defined symbol for use in plotting in direct graphics via 
-; routines that accept the `PSYM` graphics keyword. All user symbols are scaled 
+; Creates a user-defined symbol for use in plotting in direct graphics via
+; routines that accept the `PSYM` graphics keyword. All user symbols are scaled
 ; to fill the -1 to 1 range (use `SYMSIZE` of the graphics routine to change
 ; the size of the symbol).
 ;
@@ -36,7 +36,7 @@
 ; Create a user symbol.
 ;
 ; :Returns:
-;    correct PSYM value for pre-defined types, 8 for the special symbols, 
+;    correct PSYM value for pre-defined types, 8 for the special symbols,
 ;    i.e. PSYM=8 means use the current user symbol
 ;
 ; :Params:
@@ -86,12 +86,12 @@
 ;    n_vertices : in, optional, type=long
 ;       number of vertices for a regular polygonal symbol
 ;    rotation : in, optional, type=float, default=0.0
-;       angle in degrees to rotate the symbol; 0 degrees places the first 
+;       angle in degrees to rotate the symbol; 0 degrees places the first
 ;       vertex at (1, 0) in user symbol coordinate space
 ;-
 function mg_usersym, x, y, $
                      color=color, fill=fill, thick=thick, $
-                     with_line=withLine, $                  
+                     with_line=withLine, $
                      none=none, $
                      plus_sign=plusSign, asterisk=asterisk, dot=dot, $
                      diamond=diamond, $
@@ -106,9 +106,9 @@ function mg_usersym, x, y, $
                      rotation=rotation
   compile_opt strictarr
   on_error, 2
-  
+
   _rotation = n_elements(rotation) eq 0L ? 0.0 : rotation
-  
+
   if (n_elements(x) gt 0L) then begin
     if (n_elements(y) gt 0L) then begin
       _x = x
@@ -130,7 +130,7 @@ function mg_usersym, x, y, $
       keyword_set(xSymbol): return, keyword_set(withLine) ? -7L : 7L
       keyword_set(userDefined): return, keyword_set(withLine) ? -8L : 8L
       keyword_set(histogram): return, keyword_set(withLine) ? -10L : 10L
-      
+
       ; user-defined symbols
       keyword_set(horizontalLine): begin
           _x = [-1, 1]
@@ -150,16 +150,16 @@ function mg_usersym, x, y, $
       n_elements(nVertices): n = nVertices
       else: message, 'no symbol defined'
     endcase
-    
+
     if (n gt 0L) then begin
       t = findgen(n + 1L) * 360. / n * !dtor + _rotation * !dtor
       _x = cos(t)
-      _y = sin(t)    
+      _y = sin(t)
     endif
   endelse
-  
+
   usersym, _x, _y, color=color, fill=fill, thick=thick
-  
+
   return, keyword_set(withLine) ? -8L : 8L
 end
 

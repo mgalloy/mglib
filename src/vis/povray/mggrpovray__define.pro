@@ -1,30 +1,30 @@
 ; docformat = 'rst'
 
 ;+
-; This class is a POV-Ray object graphics destination. Drawing to this 
-; destination will create one .inc file for every atom in the object graphics 
-; hierarchy, a `.pov` file with the scene setup, and a `.ini` file with some 
+; This class is a POV-Ray object graphics destination. Drawing to this
+; destination will create one .inc file for every atom in the object graphics
+; hierarchy, a `.pov` file with the scene setup, and a `.ini` file with some
 ; parameters like output dimensions.
 ;
 ; :Categories:
 ;    object graphics
-; 
+;
 ; :Examples:
 ;    To create a POV-Ray destination and drawing to it after creating an object
 ;    graphics hierarchy, view, just do the following::
-;    
+;
 ;       pov = obj_new('MGgrPOVRay', file_prefix='cow-output/cow', dimensions=dims)
 ;       pov->draw, view
-;       
-;    See the example attached to the end of this file as a main-level program 
+;
+;    See the example attached to the end of this file as a main-level program
 ;    (only available if you have the source code version of this routine)::
-; 
+;
 ;       IDL> .run mggrpovray__define
 ;
 ;    The example should produce a png file, cow.png::
 ;
 ;    .. image:: cow-example.png
-; 
+;
 ; :Properties:
 ;    file_prefix
 ;       prefix to add to all output files; final result will be::
@@ -41,9 +41,9 @@
 
 ;+
 ; Create a unique name for the given object's .inc file.
-; 
+;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    string filename for object
 ;
@@ -59,30 +59,30 @@ function mggrpovray::_getFilename, object, prefix
   object->getProperty, name=name
   name = (n_elements(name) eq 0 || strlen(name) eq 0) $
          ? strlowcase(obj_class(object)) $
-         : name  
-  
+         : name
+
   filename = prefix + '_' + name + '.inc'
-  
+
   i = 2L
   while (file_test(filename)) do begin
     filename = prefix + '_' + name + '-' + strtrim(i++, 2) + '.inc'
-  endwhile  
-  
+  endwhile
+
   return, filename
 end
 
 
 ;+
 ; Helper method to write the output for any of the `MGgrPOVRayXXXX` classes.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    povObject : in, required, type=object
 ;       `MGgrPOVRayXXXX` object with a write method
 ;    prefix : in, required, type=string
 ;       prefix (i.e. filename without the .inc extension) to write to
-;       
+;
 ; :Keywords:
 ;    includes : in, out, required, type=strarr
 ;       list of files to include in the .pov file; undefined to represent the
@@ -90,15 +90,15 @@ end
 ;-
 pro mggrpovray::_writePOVObject, povObject, prefix, includes=includes
   compile_opt strictarr
-  
+
   ; get a filename and add it to the includes list for the .pov file
   filename = self->_getFilename(povObject, prefix)
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
-  
+
   ; write the .inc file
   openw, lun, filename, /get_lun
   povObject->write, lun
-  free_lun, lun    
+  free_lun, lun
 end
 
 
@@ -106,7 +106,7 @@ end
 ; Writes output for a subclass of IDLgrSurface.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    surface : in, required, type=object
 ;       subclass of IDLgrSurface
@@ -120,29 +120,29 @@ end
 ;-
 pro mggrpovray::_writeSurface, surface, prefix, includes=includes
   compile_opt strictarr
-  
+
   surface->getProperty, data=data, color=color, style=style, $
                         shading=shading
 
   filename = self->_getFilename(surface, prefix)
-                        
-  ; write data out as a .png file, pull just the z-coordinates out of the 
+
+  ; write data out as a .png file, pull just the z-coordinates out of the
   ; data property
   pngFilename = file_basename(filename, '.inc') + '.png'
   write_png, pngFilename, bytscl(reform(data[2, *, *]))   ; 2 -> z-coords
-  
+
   ; write the .inc file
-  
+
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
-  
+
   openw, lun, filename, /get_lun
   printf, lun, 'height_field {'
   printf, lun, '  png "' + pngFilename + '"'
   printf, lun, '  smooth'
   printf, lun, '  pigment { ' + self->_getRgb(color) + ' }'
-  
+
   self->_writeTransform, lun, surface->getCTM()
-    
+
   printf, lun, '}'
   free_lun, lun
 end
@@ -152,7 +152,7 @@ end
 ; Writes output for a subclass of IDLgrPolygon.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    polygon : in, required, type=object
 ;       subclass of IDLgrPolygon
@@ -167,7 +167,7 @@ end
 pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
-  
+
   polygon->getProperty, data=vertices, normals=normals, polygons=polygons, $
                         color=color, shading=shading, $
                         texture_map=textureMap, texture_coord=textureCoord, $
@@ -178,38 +178,38 @@ pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
                         shininess=shininess, ambient=ambient, $
                         diffuse=diffuse, $
                         specular=specular, emission=emission
-  
-  hasVertColors = vertcolors[0] ne -1L  
+
+  hasVertColors = vertcolors[0] ne -1L
   hasTextureMap = obj_valid(textureMap)
 
   szVertices = size(vertices, /structure)
   nVertices = szVertices.dimensions[1]
-  
+
   if (polygons[0] eq -1L) then polygons = [nVertices, lindgen(nVertices)]
-  
+
   ntriangles = mesh_validate(vertices, polygons)
-  
+
   filename = self->_getFilename(polygon, prefix)
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
-  
+
   openw, lun, filename, /get_lun
   printf, lun, 'mesh2 {'
-  
+
   self->_writeVertices, lun, vertices, name='vertex_vectors'
-  
+
   case shading of
-    0: 
+    0:
     1: self->_writeVertices, lun, compute_mesh_normals(vertices, polygons), $
-                             name='normal_vectors'      
+                             name='normal_vectors'
     else: message, 'unknown shading method'
   endcase
 
   if (hasTextureMap) then begin
     ncoords = product((size(textureCoord, /dimensions))[1:*])
     tcoord = reform(textureCoord, 2, ncoords)
-    self->_writeVertices, lun, tcoord, name='uv_vectors'    
+    self->_writeVertices, lun, tcoord, name='uv_vectors'
   endif
-  
+
   ; write texture_list if polygon has vert_colors
   if (hasVertColors) then begin
     tSize = size(vertcolors, /structure)
@@ -224,7 +224,7 @@ pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
     printf, lun, '  }'
     printf, lun
   endif
-  
+
   ; count polygons
   nPolygons = 0L
   nPolyElements = n_elements(polygons)
@@ -240,8 +240,8 @@ pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
   p = 0L
   while (p lt nPolyElements) do begin
     poly = polygons[p + 1L: p + polygons[p]]
-    p += polygons[p] + 1L    
-    comma = p eq nPolyElements ? '' : ','    
+    p += polygons[p] + 1L
+    comma = p eq nPolyElements ? '' : ','
     coords = strjoin(strtrim(poly, 2), ',')
     printf, lun, '    <' + coords + '>' $               ; coords
               + (hasVertColors ? ',' + coords : '') $   ; vert colors
@@ -250,13 +250,13 @@ pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
   printf, lun, '  }'
 
   if (n_elements(clipPlanes) ne 1L) then begin
-    printf, lun, '  clipped_by { plane { <' + strjoin(strtrim(clipPlanes[0:2], 2), ', ') + '>, ' + strtrim(-clipPlanes[3], 2) + '}}'    
+    printf, lun, '  clipped_by { plane { <' + strjoin(strtrim(clipPlanes[0:2], 2), ', ') + '>, ' + strtrim(-clipPlanes[3], 2) + '}}'
   endif
-  
+
   self->_writeTransform, lun, polygon->getCTM()
-  
+
   ; TODO: use emission for radiosity
-  
+
   ; use image_map for texture maps
   if (hasTextureMap) then begin
     textureMap->getProperty, data=im, palette=palette, interleave=interleave, $
@@ -267,24 +267,24 @@ pro mggrpovray::_writePolygon, polygon, prefix, includes=includes
     endif else begin
       _im = im
     endelse
-    
+
     texFilename = strmid(filename, 0L, strlen(filename) - 4L) + '-texture.png'
     printf, lun
     printf, lun, '  uv_mapping'
     printf, lun, '  pigment { image_map { png "' + file_basename(texFilename) + '" }}'
     printf, lun
     write_png, texFilename, _im
-  endif else begin  
+  endif else begin
     printf, lun
     printf, lun, '   pigment { ' + self->_getRgb(color, alpha_channel=alphaChannel) + ' }'
   endelse
-  
+
   printf, lun, '   finish {'
   printf, lun, '      phong ' + strtrim(shininess / 128.0, 2)
-  printf, lun, '      phong_size ' + strtrim(shininess, 2)  
-  printf, lun, '   }'  
+  printf, lun, '      phong_size ' + strtrim(shininess, 2)
+  printf, lun, '   }'
   printf, lun, '}'
-  
+
   free_lun, lun
 end
 
@@ -293,7 +293,7 @@ end
 ; Writes output for a subclass of IDLgrPolyline.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    polyline : in, required, type=object
 ;       subclass of IDLgrPolygon
@@ -308,28 +308,28 @@ end
 pro mggrpovray::_writePolyline, polyline, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
-  
+
   polyline->getProperty, data=vertices, color=color, vert_colors=vertColors, $
                          symbol=symbol, linestyle=linestyle, $
                          xcoord_conv=xc, ycoord_conv=yc, zcoord_conv=zc
-  
+
   szVertices = size(vertices, /structure)
   nVertices = szVertices.dimensions[1]
-  
+
   filename = self->_getFilename(polyline, prefix)
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
-  
+
   openw, lun, filename, /get_lun
-  
+
   ; produce a warning if LINESTYLE not "no line"
   if (linestyle ne 6L) then begin
     message, 'ignoring IDLgrPolyline LINESTYLE, use MGgrPOVRayTubes instead', $
              /informational
   endif
-  
+
   ; draw symbols
   nsymbols = n_elements(symbol)
-  if (nsymbols gt 0L) then begin    
+  if (nsymbols gt 0L) then begin
     symsizes = fltarr(nsymbols)
     for i = 0L, nsymbols - 1L do begin
       if (obj_valid(symbol[i])) then begin
@@ -339,25 +339,25 @@ pro mggrpovray::_writePolyline, polyline, prefix, includes=includes
       endelse
       symsizes[i] = ssize[0]   ; only using x size if 2- or 3-dimensional size
     endfor
-    
+
     for v = 0L, nVertices - 1L do begin
       printf, lun, strjoin(strtrim(vertices[*, v], 2), ', '), $
                    symsizes[v mod nsymbols], $
                    format='(%"sphere { <%s>, %f")'
       self->_writeTransform, lun, polyline->getCTM()
       printf, lun
-    
+
       if (n_elements(vertColors) gt 1L) then begin
-        printf, lun, '  pigment { ' + self->_getRgb(vertColors[*, v]) + ' }'      
+        printf, lun, '  pigment { ' + self->_getRgb(vertColors[*, v]) + ' }'
       endif else begin
         printf, lun, '  pigment { ' + self->_getRgb(color) + ' }'
       endelse
-  
+
       printf, lun, '}'
       printf, lun
     endfor
   endif
-  
+
   free_lun, lun
 end
 
@@ -366,7 +366,7 @@ end
 ; Writes output for a subclass of IDLgrLight.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    light : in, required, type=object
 ;       subclass of IDLgrLight
@@ -381,41 +381,41 @@ end
 pro mggrpovray::_writeLight, light, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
-  
-  light->getProperty, type=type, intensity=intensity, color=color, $ 
+
+  light->getProperty, type=type, intensity=intensity, color=color, $
                       location=location
 
   intensity *= self.lightIntensityMultiplier
-                     
-  ; ambient light is special since it is handled in the "global_settings"     
+
+  ; ambient light is special since it is handled in the "global_settings"
   if (type eq 0L) then begin
     self.ambientIntensity = intensity
     return
   endif
-  
+
   self.hasLight = 1B
-  
+
   filename = self->_getFilename(light, prefix)
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
 
-  openw, lun, filename, /get_lun  
-  
+  openw, lun, filename, /get_lun
+
   ; TODO: handle positional lights and spotlights
   case type of
     0: ; ambient, already taken care of
     1: ; positional
     2: begin ; directional
         sLocation = strjoin(strtrim(location, 2), ',')
-        printf, lun, 'light_source {' 
-        printf, lun, ' <' +  sLocation + '> color ' + self->_getRGB(color) + ' * ' + strtrim(intensity, 2) 
+        printf, lun, 'light_source {'
+        printf, lun, ' <' +  sLocation + '> color ' + self->_getRGB(color) + ' * ' + strtrim(intensity, 2)
         self->_writeTransform, lun, light->getCTM()
-        printf, lun, '  }' 
+        printf, lun, '  }'
       end
     3: ; spotlight
     else: message, 'unknown light source type'
   endcase
-  
-  free_lun, lun  
+
+  free_lun, lun
 end
 
 
@@ -423,7 +423,7 @@ end
 ; Writes output for a subclass of IDLgrText.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    text : in, required, type=object
 ;       subclass of IDLgrText
@@ -440,29 +440,29 @@ pro mggrpovray::_writeText, text, prefix, includes=includes
   on_error, 2
 
   text->getProperty, strings=strings, color=color, font=font, locations=loc
-  
+
   if (obj_valid(font)) then begin
     font->getProperty, size=fontSize
   endif else fontSize = 12.0
-  
+
   ; find parent view
   parent = text
   while (~obj_isa(parent, 'IDLgrView')) do parent->getProperty, parent=parent
   parent->getProperty, viewplane_rect=vpr
-  
+
   htPixels = fontSize / 72.0 * !d.y_px_cm * 2.54
   scaleFactor = htPixels * vpr[2] / self.dimensions[1]
   scale = diag_matrix([fltarr(3) + scaleFactor, 1.0])
   ctm = text->getCTM() ## scale
-  
+
   filename = self->_getFilename(text, prefix)
   includes = n_elements(includes) eq 0 ? [filename] : [includes, filename]
 
-  openw, lun, filename, /get_lun  
-  
+  openw, lun, filename, /get_lun
+
   for s = 0L, n_elements(strings) - 1L do begin
     ctm[3, 0] = transpose(loc[*, s])
-    
+
     printf, lun, 'text {'
     printf, lun, '  ttf "timrom.ttf" "' + strings[s] + '" 0.01, 0'
     printf, lun, '  pigment { ' + self->_getRgb(color) + ' }'
@@ -470,7 +470,7 @@ pro mggrpovray::_writeText, text, prefix, includes=includes
     printf, lun, '}'
   endfor
 
-  free_lun, lun    
+  free_lun, lun
 end
 
 
@@ -478,7 +478,7 @@ end
 ; Write the .pov file.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    tree : in, required, type=object
 ;       object graphics tree to traverse
@@ -493,7 +493,7 @@ pro mggrpovray::_writePov, tree, includes=includes
 
   filename = self.filePrefix + '.pov'
   openw, lun, filename, /get_lun
-  
+
   for i = 0L, n_elements(includes) - 1L do begin
     printf, lun, '#include "' + file_basename(includes[i]) + '"'
   endfor
@@ -504,11 +504,11 @@ pro mggrpovray::_writePov, tree, includes=includes
     printf, lun, 'global_settings { ambient_light rgb <1.0, 1.0, 1.0> * ' $
                    + strtrim(intensity, 2) + ' }'
   endif
-  
+
   printf, lun, 'background { color ' + self->_getRGB(self.background) + ' }'
-  
+
   aspectRatio = float(self.dimensions[0]) / float(self.dimensions[1])
-  
+
   printf, lun
   printf, lun, 'camera {'
   printf, lun, '  location <' + strjoin(strtrim(self.location, 2), ', ') + '>'
@@ -518,28 +518,28 @@ pro mggrpovray::_writePov, tree, includes=includes
   if (self.aperture gt 0.0) then begin
     printf, lun, '  focal_point <' + strjoin(strtrim(self.focalPoint, 2), ', ') + '>'
     printf, lun, '  aperture ' + strtrim(self.aperture, 2)
-    printf, lun, '  blur_samples ' + strtrim(self.blurSamples, 2)        
+    printf, lun, '  blur_samples ' + strtrim(self.blurSamples, 2)
   endif
   printf, lun, '}'
-  
+
   free_lun, lun
 end
 
 
 ;+
 ; Write the .ini file.
-; 
+;
 ; :Private:
 ;-
 pro mggrpovray::_writeIni
   compile_opt strictarr
-  
+
   filename = self.filePrefix + '.ini'
   openw, lun, filename, /get_lun
-  
+
   printf, lun, 'Input_File_Name=' + file_basename(self.filePrefix) + '.pov'
   printf, lun, format='(%"+W%d +H%d")', self.dimensions
-  
+
   free_lun, lun
 end
 
@@ -548,10 +548,10 @@ end
 ; Traverse the object graphics hierarchy rooted from the given node.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    tree : in, required, type=object
-;       any node (including children) in the object graphics hierarchy to 
+;       any node (including children) in the object graphics hierarchy to
 ;       process
 ;    prefix : in, required, type=string
 ;       filename prefix to add to generated files
@@ -564,33 +564,33 @@ end
 pro mggrpovray::_traverse, tree, prefix, includes=includes
   compile_opt strictarr
   on_error, 2
-  
+
   tree->getProperty, hide=hide
   if (hide) then return
-  
-  switch 1 of 
+
+  switch 1 of
     ;obj_isa(tree, 'Orb'):
-    obj_isa(tree, 'MGgrPOVRayGrid'):    
+    obj_isa(tree, 'MGgrPOVRayGrid'):
     obj_isa(tree, 'MGgrPOVRayLight'):
-    obj_isa(tree, 'MGgrPOVRayPolygon'): 
+    obj_isa(tree, 'MGgrPOVRayPolygon'):
     obj_isa(tree, 'MGgrPOVRayTubes'): begin
         self->_writePOVObject, tree, prefix, includes=includes
         break
       end
-    
+
     obj_isa(tree, 'IDLgrScene'):
     obj_isa(tree, 'IDLgrView'):
     obj_isa(tree, 'IDLgrViewGroup'):
     obj_isa(tree, 'IDLgrModel'): begin
         tree->getProperty, name=name
-        
+
         myName = name eq '' ? strlowcase(obj_class(tree)) : name
         for c = 0L, tree->count() - 1L do begin
           self->_traverse, tree->get(position=c), $
                            prefix + '_' + myName, $
                            includes=includes
         endfor
-        
+
         if (obj_isa(tree, 'IDLgrView')) then begin
           self.nviews++
           tree->getProperty, viewplane_rect=vpr, zclip=zclip, eye=eye, $
@@ -602,7 +602,7 @@ pro mggrpovray::_traverse, tree, prefix, includes=includes
           self.background = color
           self.angle = 2.0 * atan(vpr[2] / 2.0 / eye) * !radeg
         endif
-        
+
         if (obj_isa(tree, 'MGgrPOVRayView')) then begin
           tree->getProperty, focal_point=focalPoint, aperture=aperture, $
                              blur_sample=blurSamples
@@ -610,10 +610,10 @@ pro mggrpovray::_traverse, tree, prefix, includes=includes
           self.aperture = aperture
           self.blurSamples = blurSamples
         endif
-        
+
         break
       end
-    
+
     obj_isa(tree, 'IDLgrPolygon'): begin
         self->_writePolygon, tree, prefix, includes=includes
         break
@@ -633,18 +633,18 @@ pro mggrpovray::_traverse, tree, prefix, includes=includes
         self->_writeLight, tree, prefix, includes=includes
         break
       end
-          
+
     obj_isa(tree, 'IDLgrText'): begin
         self->_writeText, tree, prefix, includes=includes
         break
       end
-    
+
     ; POV-Ray can't handle these types
     obj_isa(tree, 'IDLgrImage'):
     obj_isa(tree, 'IDLgrAxis'):
     obj_isa(tree, 'IDLgrVolume'):
     obj_isa(tree, 'IDLgrContour'): break
-    
+
     else: message, 'unknown atom type'
   endswitch
 end
@@ -652,7 +652,7 @@ end
 
 ;+
 ; Write the object graphics rooted at the specified scene or view.
-; 
+;
 ; :Params:
 ;    tree : in, optional, type=object
 ;       scene or view object
@@ -660,26 +660,26 @@ end
 pro mggrpovray::draw, tree
   compile_opt strictarr
   on_error, 2
-  
+
   ; if no tree argument, then use self.graphicsTree
   if (n_params() eq 0 && ~obj_valid(self.graphicsTree)) then begin
     message, 'GRAPHICS_TREE property must be set if no argument'
   endif
-  
+
   ; if arg is present, it must be a valid object
   if (n_params() gt 0 && ~obj_valid(tree)) then message, 'invalid tree object'
-  
+
   _tree = n_elements(tree) eq 0L ? self.graphicsTree : tree
-                    
+
   ; traverse the object graphics hierarchy and write a .inc file for each
   ; graphics atom; the filename should use the "name" property of each item,
   ; if present
   self->_traverse, _tree, self.filePrefix, includes=includes
-  
-  ; write the .pov file  
+
+  ; write the .pov file
   self->_writePov, _tree, includes=includes
 
-  ; write the .ini file  
+  ; write the .ini file
   self->_writeIni
 end
 
@@ -689,9 +689,9 @@ end
 ;-
 pro mggrpovray::setProperty, file_prefix=filePrefix, dimensions=dimensions
   compile_opt strictarr
-  
+
   if (n_elements(filePrefix) gt 0) then self.filePrefix = filePrefix
-  if (n_elements(dimensions) gt 0) then self.dimensions = dimensions  
+  if (n_elements(dimensions) gt 0) then self.dimensions = dimensions
 end
 
 
@@ -702,7 +702,7 @@ pro mggrpovray::getProperty, file_prefix=filePrefix, dimensions=dimensions
   compile_opt strictarr
 
   if (arg_present(filePrefix)) then filePrefix = self.filePrefix
-  if (arg_present(dimensions)) then dimensions = self.dimensions  
+  if (arg_present(dimensions)) then dimensions = self.dimensions
 end
 
 
@@ -721,7 +721,7 @@ end
 ;
 ; :Returns:
 ;    1 for success, 0 for failure
-; 
+;
 ; :Keywords:
 ;    file_prefix : in, optional, type=string, default='idlgr'
 ;       prefix to add to all output files; final result will be::
@@ -736,26 +736,26 @@ end
 function mggrpovray::init, file_prefix=filePrefix, dimensions=dimensions, $
                             graphics_tree=graphicsTree
   compile_opt strictarr
-  
+
   if (~self->MGgrPOVRayObject::init()) then return, 0
-  
+
   self.hasLight = 0B
   self.ambientIntensity = 0.0
-  
+
   self.filePrefix = n_elements(filePrefix) eq 0 ? 'mggrpovray' : filePrefix
-  self.dimensions = n_elements(dimensions) eq 0 ? [400, 400] : dimensions 
+  self.dimensions = n_elements(dimensions) eq 0 ? [400, 400] : dimensions
   self.graphicsTree = n_elements(graphicsTree) eq 0 ? obj_new() : graphicsTree
-  
+
   dir = file_dirname(filePrefix)
   if (~file_test(dir)) then file_mkdir, dir
-  
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
 ;    filePrefix
 ;       prefix for filename in output
@@ -790,17 +790,17 @@ pro mggrpovray__define
   compile_opt strictarr
 
   define = { MGgrPOVRay, inherits MGgrPOVRayObject, $
-  
+
              ; properties of the destination
              filePrefix: '', $
              dimensions: lonarr(2), $
              graphicsTree: obj_new(), $
-             
+
              ; properties of the scene
              hasLight: 0B, $
-             ambientIntensity: 0.0, $             
+             ambientIntensity: 0.0, $
              nviews: 0L, $
-             
+
              ; properties of the view
              location: fltarr(3), $
              look_at: fltarr(3), $

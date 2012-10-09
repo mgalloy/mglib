@@ -2,57 +2,57 @@
 
 function mgfffilename_ut::test_compose_allParts
   compile_opt strictarr
-  
+
   f = obj_new('MGffFilename', 'a', subdir=['b', 'c'], root='d')
   filename = f->toString()
   obj_destroy, f
-  
+
   assert, filename eq strjoin(['d', 'b', 'c', 'a'], path_sep()), $
           'incorrect filename: ' + filename
-  
+
   return, 1
 end
 
 
 function mgfffilename_ut::test_compose_fullFilename
   compile_opt strictarr
-  
+
   f = obj_new('MGffFilename', filepath(''))
   filename = f->toString()
   obj_destroy, f
-  
+
   assert, filename eq filepath(''), $
           'incorrect filename: ' + filename
-  
+
   return, 1
 end
 
 
 function mgfffilename_ut::test_compose_noBasename
   compile_opt strictarr
-  
+
   f = obj_new('MGffFilename', subdir=['b', 'c'])
   filename = f->toString()
   obj_destroy, f
-  
+
   assert, filename eq strjoin(['b', 'c'], path_sep()) + path_sep(), $
           'incorrect filename: ' + filename
-  
+
   return, 1
 end
 
 
 function mgfffilename_ut::test_compose_tmp
   compile_opt strictarr
-  
+
   f = obj_new('MGffFilename', 'a', subdir=['b', 'c'], /tmp)
   filename = f->toString()
   obj_destroy, f
-  
+
   tail = strjoin(['b', 'c', 'a'], path_sep())
   assert, strmid(filename, strlen(tail) - 1L, /reverse_offset) eq tail, $
           'incorrect filename: ' + filename
-  
+
   return, 1
 end
 
@@ -64,10 +64,10 @@ function mgfffilename_ut::test_setExtension_replace
   f->setProperty, extension='html'
   filename = f->toString()
   obj_destroy, f
-  
+
   assert, filename eq strjoin(['b', 'c', 'a'], path_sep()) + '.html', $
-          'incorrect filename: ' + filename  
-          
+          'incorrect filename: ' + filename
+
   return, 1
 end
 
@@ -79,10 +79,10 @@ function mgfffilename_ut::test_setExtension_add
   f->setProperty, extension='html'
   filename = f->toString()
   obj_destroy, f
-  
+
   assert, filename eq strjoin(['b', 'c'], path_sep()) + path_sep() + '.html', $
-          'incorrect filename: ' + filename  
-          
+          'incorrect filename: ' + filename
+
   return, 1
 end
 
@@ -94,7 +94,7 @@ function mgfffilename_ut::test_decompose_withSubdirs
   f = obj_new('MGffFilename', 'a.dat', subdir=subdirs)
   f->getProperty, extension=ext, basename=basename, dirname=dirname, directories=directories
   obj_destroy, f
-  
+
   assert, ext eq 'dat', $
           'incorrect extension: ' + ext
   assert, basename eq 'a.dat', $
@@ -103,7 +103,7 @@ function mgfffilename_ut::test_decompose_withSubdirs
           'incorrect dirname: ' + dirname
   assert, array_equal(directories, subdirs), $
           'incorrect directories: ' + strjoin(directories, ', ')
-          
+
   return, 1
 end
 
@@ -114,7 +114,7 @@ function mgfffilename_ut::test_decompose_noSubdirs
   f = obj_new('MGffFilename', 'a.dat')
   f->getProperty, extension=ext, basename=basename, dirname=dirname, directories=directories
   obj_destroy, f
-  
+
   assert, ext eq 'dat', $
           'incorrect extension: ' + ext
   assert, basename eq 'a.dat', $
@@ -123,7 +123,7 @@ function mgfffilename_ut::test_decompose_noSubdirs
           'incorrect dirname: ' + dirname
   assert, array_equal(directories, ['.']), $
           'incorrect directories: ' + strjoin(directories, ', ')
-          
+
   return, 1
 end
 
@@ -133,6 +133,6 @@ end
 ;-
 pro mgfffilename_ut__define
   compile_opt strictarr
-  
+
   define = { MGffFilename_ut, inherits MGutLibTestCase }
 end

@@ -9,7 +9,7 @@
 ;       tvscl, mg_pinknoise(512, 256)
 ;
 ;    Pink noise looks like:
-; 
+;
 ;    .. image:: pink-noise-1_0.png
 ;
 ;    Other 1/f^a noise can be generated using the POWER keyword::
@@ -42,16 +42,16 @@ function mg_pinknoise, m, n, power=p
 
   ; default power is 1.0 i.e. pink noise
   _p = n_elements(p) eq 0L ? 1.0D : p
-  
+
   r = fft(randomu(seed, m, n), /double)
-  
+
   ; apply filter
   f = r / (shift(dist(m, n), m / 2, n / 2) > 1d-4) ^ _p
-  
+
   f = abs(fft(f, /inverse, /double))
-  
+
   scaled = (f - min(f)) / (max(f) - min(f))
-  
+
   return, scaled
 end
 

@@ -18,13 +18,13 @@
 ;-
 pro mggrtransformanimator::animate, progress
   compile_opt strictarr
-  
+
   _progress = self.easing->ease(progress)
-  
+
   t = mg_expm((_progress - self.currentProgress) * mg_alogm(self.transform))
   self.target->getProperty, transform=orig_t
   self.target->setProperty, transform=orig_t # t
-  
+
   self.currentProgress = _progress
 end
 
@@ -45,23 +45,23 @@ function mggrtransformanimator::init, transform=transform, _extra=e
   compile_opt strictarr
 
   if (~self->mggranimator::init(_extra=e)) then return, 0
-  
+
   self.transform = n_elements(transform) eq 0L ? fltarr(3) + 1.0 : transform
-  
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-; 
+;
 ; :Fields:
 ;    transform
 ;       amount to scale each dimension
 ;-
 pro mggrtransformanimator__define
   compile_opt strictarr
-  
+
   define = { MGgrTransformAnimator, inherits MGgrAnimator, $
              transform: fltarr(4, 4) $
            }

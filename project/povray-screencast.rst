@@ -40,7 +40,7 @@ The POV-Ray destination cannot handle all graphics atoms. Currently, it only sup
 #. `IDLgrText`
 
 Also, only the most common properties of these classes are supported.
-   
+
 Advanced usage
 --------------
 

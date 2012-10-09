@@ -31,18 +31,18 @@
 ;-
 pro mg_bubblechart_overplot, x, y, size=size, color=color, _extra=e
   compile_opt strictarr
-  
+
   n = 20
   t = findgen(n) / (n - 1.) * 360. * !dtor
   dx = cos(t)
   dy = sin(t)
   nsize = n_elements(size)
   ncolor = n_elements(color)
-  
+
   npoints = n_elements(x)
   for p = 0L, npoints - 1L do begin
     polyfill, dx * size[p mod nsize] + x[p], dy * size[p mod nsize] + y[p], $
-              color=color[p mod ncolor], _extra=e 
+              color=color[p mod ncolor], _extra=e
   endfor
 end
 
@@ -54,24 +54,24 @@ pro mg_bubblechart, x, y, size=size, area=area, $
                     overplot=overplot, $
                     _extra=e
   compile_opt strictarr
-  
+
   if (~keyword_set(overplot)) then begin
     plot, x, y, color=axesColor, /nodata, _extra=e
   endif
-  
+
   if (n_elements(size) eq 0L) then begin
     minx = min(x, max=maxx)
     miny = min(y, max=maxy)
-    
+
     _size = ((maxx - minx) < (maxy - miny)) / 100.
   endif else begin
     _size = size
   endelse
-  
+
   if (keyword_set(area)) then _size = sqrt(_size / !pi)
-  
+
   _color = n_elements(color) eq 0L ? 'ffffff'x : color
-  
+
   mg_bubblechart_overplot, x, y, size=_size, color=_color, _extra=e
 end
 

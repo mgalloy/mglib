@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Create a LIC visualization where color denotes magnitude of the vector 
+; Create a LIC visualization where color denotes magnitude of the vector
 ; field.
 ;
 ; :Examples:
@@ -10,7 +10,7 @@
 ;       restore, filepath('globalwinds.dat', subdir=['examples','data'])
 ;       loadct, 3
 ;       mg_image, mg_colorlic(u, v, scale=4), /new_window, /no_axes
-; 
+;
 ;    This looks like:
 ;
 ;    .. image:: colorlic-example.png
@@ -29,7 +29,7 @@
 ;-
 function mg_colorlic, u, v, scale=scale, log=log, _extra=e
   compile_opt strictarr
-  
+
   _scale = n_elements(scale) eq 0L ? 1L : scale
   dims = size(u, /dimensions)
   _u = rebin(u, dims[0] * _scale, dims[1] * _scale)
@@ -37,12 +37,12 @@ function mg_colorlic, u, v, scale=scale, log=log, _extra=e
 
   im = mg_lic(_u, _v, _extra=e)
   mag = sqrt(_u * _u + _v * _v)
-  
+
   if (!d.name eq 'WIN' || !d.name eq 'X' || !d.name eq 'Z') then begin
     device, get_decomposed=dec
     device, decomposed=0
   endif
-  
+
   im *= mag
   if (keyword_set(log)) then im = alog10(im)
   trueIm = mg_maketrue(bytscl(im), true=1, _extra=e)
@@ -50,7 +50,7 @@ function mg_colorlic, u, v, scale=scale, log=log, _extra=e
   if (!d.name eq 'WIN' || !d.name eq 'X' || !d.name eq 'Z') then begin
     device, decomposed=dec
   endif
-  
+
   return, trueIm
 end
 

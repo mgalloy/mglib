@@ -1,8 +1,8 @@
 ; docformat = 'rst'
 
 ;+
-; A hash table which can hash any kind of IDL variables. To hash objects, 
-; simply make sure each object implements the hashCode method. See the help 
+; A hash table which can hash any kind of IDL variables. To hash objects,
+; simply make sure each object implements the hashCode method. See the help
 ; for the calcHashCode method for details.
 ;
 ; :Categories:
@@ -40,7 +40,7 @@ function mgcohashtable::_overloadBracketsRightSide, isRange, $
                                                     ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-      
+
   if (isRange[0]) then begin
     message, 'range not allowed'
   endif else begin
@@ -66,10 +66,10 @@ pro mgcohashtable::_overloadBracketsLeftSide, objref, value, isRange, $
                                               ss1, ss2, ss3, ss4, $
                                               ss5, ss6, ss7, ss8
   compile_opt strictarr
-  
+
   if (isRange[0]) then begin
     message, 'range not allowed'
-  endif else begin  
+  endif else begin
     self->put, ss1, value
   endelse
 end
@@ -84,10 +84,10 @@ end
 function mgcohashtable::_overloadPlus, left, right
   compile_opt strictarr
   on_error, 2
-  
+
   left->getProperty, key_type=leftKeyType, value_type=leftValueType
   right->getProperty, key_type=rightKeyType, value_type=rightValueType
-  
+
   if (leftKeyType ne rightKeyType) then begin
     message, 'cannot concatenate hash tables with different key types'
   endif
@@ -99,7 +99,7 @@ function mgcohashtable::_overloadPlus, left, right
   result = obj_new('MGcoHashTable', key_type=leftKeyType, value_type=leftValueType)
   result->update, left
   result->update, right
-  
+
   return, result
 end
 
@@ -122,15 +122,15 @@ pro mgcohashtable::_findKeyPos, key, hcode, keyIndex
   hcode = self->_calcHashCode(key) mod self.arraySize
 
   keyIndex = 0L
-  
+
   iter = (*self.keyArray)[hcode]->iterator()
   while (iter->hasNext()) do begin
     element = iter->next()
     if (element eq key) then break
     keyIndex++
   endwhile
-  
-  obj_destroy, iter  
+
+  obj_destroy, iter
 end
 
 
@@ -159,11 +159,11 @@ function mgcohashtable::_findNextKey, key, done=done
   endif else begin
     self->_findKeyPos, key, hcode, keyIndex
   endelse
-  
+
   ; find position of next key
   while (1B) do begin
     keyIndex++
-    
+
     if (~obj_valid((*self.keyArray)[hcode]) $
           || keyIndex ge ((*self.keyArray)[hcode])->count()) then begin
       hcode++
@@ -173,10 +173,10 @@ function mgcohashtable::_findNextKey, key, done=done
         done = 1B
         return, -1L
       endif
-            
+
       continue
     endif
-    
+
     done = 0
     return, ((*self.keyArray)[hcode])->get(position=keyIndex)
   endwhile
@@ -198,10 +198,10 @@ end
 ;-
 function mgcohashtable::_overloadForeach, value, key
   compile_opt strictarr
-  
+
   key = self->_findNextKey(key, done=done)
   if (done) then begin
-    return, 0 
+    return, 0
   endif else begin
     value = self->get(key)
     return, 1
@@ -210,7 +210,7 @@ end
 
 
 ;+
-; Returns the elements to print. Called by PRINT to determine what should be 
+; Returns the elements to print. Called by PRINT to determine what should be
 ; displayed.
 ;
 ; :Returns:
@@ -218,14 +218,14 @@ end
 ;-
 function mgcohashtable::_overloadPrint
   compile_opt strictarr
-  
+
   keys = self->keys(count=count)
   values = self->values()
-  
+
   if (count eq 0) then return, ''
-  
+
   output = strarr(1, count)
-  
+
   for i = 0L, count - 1L do begin
     if (size(values[i], /type) eq 11) then begin
       if (obj_isa(values[i], 'IDL_Object') && obj_hasmethod(values[i], '_overloadPrint')) then begin
@@ -246,7 +246,7 @@ function mgcohashtable::_overloadPrint
         _key = tokens[3]
       endelse
     endif else _key = keys[i]
-    
+
     output[i] = string(_key, _val, format='(%"%s -> %s")')
   endfor
 
@@ -256,7 +256,7 @@ end
 
 ;+
 ; Returns a string describing the array list. Called by the HELP routine.
-; 
+;
 ; :Returns:
 ;    string
 ;
@@ -266,7 +266,7 @@ end
 ;-
 function mgcohashtable::_overloadHelp, varname
   compile_opt strictarr
-  
+
   all_types = ['UNDEFINED', 'BYTE', 'INT', 'LONG', 'FLOAT', 'DOUBLE', $
                'COMPLEX', 'STRING', 'STRUCTURE', 'DCOMPLEX', 'POINTER', $
                'OBJREF', 'UINT', 'ULONG', 'LONG64', 'ULONG64']
@@ -274,7 +274,7 @@ function mgcohashtable::_overloadHelp, varname
   valueType = all_types[self.valueType]
   type = string(keyType, valueType, format='(%"%s->%s")')
   specs = string(self->count(), '(%"MGcoHashTable[%d]")')
-  return, string(varname, type, specs, format='(%"%-15s %-20s = %s")')  
+  return, string(varname, type, specs, format='(%"%-15s %-20s = %s")')
 end
 
 
@@ -287,7 +287,7 @@ end
 ;-
 function mgcohashtable::_overloadSize
   compile_opt strictarr
-  
+
   return, self->count()
 end
 
@@ -300,17 +300,17 @@ pro mgcohashtable::getProperty, key_type=keyType, value_type=valueType, $
   if (arg_present(valueType)) then valueType = self.valueType
   if (arg_present(count)) then count = self->count()
 end
-                                  
+
 
 ;+
 ; Returns an array with the same number of elements as the hash array.  The
 ; value each element of the array is the number of elements in that "bin" of
-; the mgcohashtable. This could be useful in determining the effectiveness of 
+; the mgcohashtable. This could be useful in determining the effectiveness of
 ; the hash code calculations.
 ;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    long array
 ;-
 function mgcohashtable::_getHistogram
@@ -354,7 +354,7 @@ end
 ;+
 ; Returns an array of the keys of the hash table.
 ;
-; :Returns: 
+; :Returns:
 ;    an array of the keys of the hash table or -1 if no keys
 ;
 ; :Keywords:
@@ -385,7 +385,7 @@ end
 ;+
 ; Returns an array of the values of the hash table.
 ;
-; :Returns: 
+; :Returns:
 ;    an array of the values of the hash table or -1 if no values
 ;
 ; :Keywords:
@@ -419,17 +419,17 @@ end
 ; size.
 ;
 ; If a hash tbale of object references is desired, then the objects should
-; implement the hashCode method.  This function should accept no parameters 
+; implement the hashCode method.  This function should accept no parameters
 ; and return an unsigned long.
 ;
 ; This method should not normally be called directly.
 ;
-; If the given default hash function is not doing well (use the _getHistogram 
-; method to find out how well it's spreading out the keys), subclass this 
+; If the given default hash function is not doing well (use the _getHistogram
+; method to find out how well it's spreading out the keys), subclass this
 ; class and implement a more appropriate hash function.
 ;
-; :Returns: 
-;    hash code (unsigned long integer); 0 if null pointer or object, undefined 
+; :Returns:
+;    hash code (unsigned long integer); 0 if null pointer or object, undefined
 ;    variable; or an object that does not implement hashCode
 ;
 ; :Params:
@@ -487,7 +487,7 @@ end
 ;+
 ; Finds the value associated with the given key.
 ;
-; :Returns: 
+; :Returns:
 ;    the value of the associated key or -1L if not found
 ;
 ; :Params:
@@ -512,7 +512,7 @@ function mgcohashtable::get, key, default=default, found=found
     found = 0B
     return, n_elements(default) eq 0L ? -1L : default
   endif
-  
+
   iter = (*self.keyArray)[hcode]->iterator()
   while (iter->hasNext()) do begin
     element = iter->next()
@@ -531,10 +531,10 @@ end
 
 
 ;+
-; Finds the value associated with the given key, but sets the value for the 
+; Finds the value associated with the given key, but sets the value for the
 ; key to `default` if the key is not found.
 ;
-; :Returns: 
+; :Returns:
 ;    the value of the associated key or -1L if not found
 ;
 ; :Params:
@@ -578,12 +578,12 @@ pro mgcohashtable::remove, key, all=all, found=found
         self->remove, keys[k]
       endfor
     endif
-    
+
     found = nkeys gt 0L
-    
+
     return
   endif
-  
+
   hcode = self->_calcHashCode(key) mod self.arraySize
 
   found = 0B
@@ -592,7 +592,7 @@ pro mgcohashtable::remove, key, all=all, found=found
     found = 0B
     return
   endif
-  
+
   iter = (*self.keyArray)[hcode]->iterator()
   while (iter->hasNext()) do begin
     element = iter->next()
@@ -604,7 +604,7 @@ pro mgcohashtable::remove, key, all=all, found=found
   endwhile
 
   obj_destroy, iter
-  
+
   if (found) then begin
     (*self.keyArray)[hcode]->remove, position=keyIndex
     (*self.valueArray)[hcode]->remove, position=keyIndex
@@ -622,7 +622,7 @@ end
 ;-
 pro mgcohashtable::update, hashtable
   compile_opt strictarr
-  
+
   keys = hashtable->keys(count=nkeys)
   for i = 0L, nkeys - 1L do self->put, keys[i], hashtable->get(keys[i])
 end
@@ -640,7 +640,7 @@ end
 ;
 ; :Keywords:
 ;    found : out, optional, type=boolean
-;       pass a named variable that is set to true if the key was already in 
+;       pass a named variable that is set to true if the key was already in
 ;       the table and is updated
 ;-
 pro mgcohashtable::put, key, value, found=found
@@ -648,7 +648,7 @@ pro mgcohashtable::put, key, value, found=found
   on_error, 2
 
   if (n_params() ne 2L) then message, 'put method requires key and value'
-  
+
   hcode = self->_calcHashCode(key) mod self.arraySize
   if (obj_valid((*self.keyArray)[hcode])) then begin
     found = 0B
@@ -700,7 +700,7 @@ end
 ;+
 ; Find the number of key-value pairs in the hash table
 ;
-; :Returns: 
+; :Returns:
 ;    the number of key-value pairs in the hash table
 ;-
 function mgcohashtable::count
@@ -722,7 +722,7 @@ end
 ;+
 ; Determines if the hash table is empty.
 ;
-; :Returns: 
+; :Returns:
 ;    0 if the table is empty, 1 if it contains any key-value pairs
 ;-
 function mgcohashtable::isEmpty
@@ -750,7 +750,7 @@ pro mgcohashtable::cleanup
 
   obj_destroy, [*self.keyArray, *self.valueArray]
   ptr_free, self.keyExample, self.valueExample, self.keyArray, self.valueArray
-  
+
   self->IDL_Object::cleanup
 end
 
@@ -758,7 +758,7 @@ end
 ;+
 ; Create a hash table.
 ;
-; :Returns: 
+; :Returns:
 ;    1 if successful; 0 otherwise
 ;
 ; :Keywords:
@@ -814,23 +814,23 @@ end
 ; Hash table implementation.
 ;
 ; :Fields:
-;    keyArray 
-;       pointer to array of keys; type of array is specified by KEY_TYPE field 
+;    keyArray
+;       pointer to array of keys; type of array is specified by KEY_TYPE field
 ;       for non-structures and by KEY_EXAMPLE field for structures
-;    valueArray 
-;       pointer to array of values; type of array is specified VALUE_TYPE 
+;    valueArray
+;       pointer to array of values; type of array is specified VALUE_TYPE
 ;       field for non-structures and by VALUE_EXAMPLE field for structures
-;    arraySize 
+;    arraySize
 ;       size of the key and value arrays
-;    keyType 
-;       SIZE type of keys; if 8 (structures), examine KEY_EXAMPLE to find type 
+;    keyType
+;       SIZE type of keys; if 8 (structures), examine KEY_EXAMPLE to find type
 ;       of structure
-;    valueType 
-;       SIZE type of keys; if 8 (structures), examine VALUE_EXAMPLE to find 
+;    valueType
+;       SIZE type of keys; if 8 (structures), examine VALUE_EXAMPLE to find
 ;       type of structure
-;    keyExample 
+;    keyExample
 ;       pointer to example structure defining the key type
-;    valueExample 
+;    valueExample
 ;       pointer to example structure defining the value type
 ;-
 pro mgcohashtable__define

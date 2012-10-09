@@ -19,7 +19,7 @@ end
 ;+
 ; Event handler for ENVI menu.
 ;
-; @file_comments For the current image in an ENVI display, show it's outline in 
+; @file_comments For the current image in an ENVI display, show it's outline in
 ;                Google Maps.
 ; @param event {in}{required}{type=event structure} event from ENVI
 ;-

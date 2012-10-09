@@ -5,13 +5,13 @@
 ; using the correspondences found in the provided hash or structure.
 ;
 ; :Examples:
-;   A single hash or structure can be created with all the possible values 
+;   A single hash or structure can be created with all the possible values
 ;   needed and then a template string can selectively access the desired
 ;   values. For example, create a hash of a couple values::
 ;
 ;      IDL> h = hash('name', 'Mike', 'height', 72)
 ;
-;   If desired, the `name` key can be used to access just one of the keys in 
+;   If desired, the `name` key can be used to access just one of the keys in
 ;   the hash::
 ;
 ;      IDL> print, mg_subs('Name: %(name)s', h)
@@ -46,7 +46,7 @@
 ; Perform a lookup in a hash or structure given a name of the key/field.
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    value of the key/field
 ;
@@ -57,51 +57,51 @@
 ;       method and allow hash lookup using overloaded `[]`s
 ;    name : in, required, type=string
 ;       name of key/field to lookup
-; 
+;
 ; :Keywords:
 ;    found : out, optional, type=boolean
-;       set to a named variable to get whether the `name` was found in the 
+;       set to a named variable to get whether the `name` was found in the
 ;       `hash`
 ;-
 function mg_subs_getvalue, hash, name, found=found
   compile_opt strictarr
   on_error, 2
-  
+
   case size(hash, /type) of
      8: begin
         ind = where(tag_names(hash) eq strupcase(name), found)
         return, found ? hash.(ind[0]) : -1L
       end
     11: begin
-        found = hash->hasKey(name)        
+        found = hash->hasKey(name)
         return, found ? hash[name] : -1L
       end
     else: message, 'unknown hash type'
   endcase
 end
 
-  
+
 ;+
 ; String substitution routine which substitutes values into a given string
 ; using the correspondences found in the provided hash or structure.
 ;
 ; :Returns:
 ;    string
-; 
+;
 ; :Params:
 ;    template : in, optional, type=string
 ;       string to substitute into
 ;    hash : in, required, type=hash/structure
-;       hash table or structure with key-value pairs to subsitute into the 
+;       hash table or structure with key-value pairs to subsitute into the
 ;       template
 ;-
 function mg_subs, template, hash
   compile_opt strictarr
   on_error, 2
-  
+
   result = ''
   re = '%\(([[:alnum:]_]+)\)([[:digit:].]*[[:alpha:]])'
-  
+
   cur = 0L
   while (cur lt strlen(template)) do begin
     pos = stregex(strmid(template, cur), re, length=len, /subexpr) + cur
@@ -110,10 +110,10 @@ function mg_subs, template, hash
       pos[0] = strlen(template)
       len[0] = 0
     endif
-    
+
     ; add normal string since last substitution
     result += strmid(template, cur, pos[0] - cur)
-    
+
     ; lookup key and substitute it
     if (pos[0] lt strlen(template)) then begin
       name = strmid(template, pos[1], len[1])
@@ -122,15 +122,15 @@ function mg_subs, template, hash
         message, string(name, $
                         format='(%"format key error: key \"%s\" not found")')
       endif
-      
+
       format = string('%' + strmid(template, pos[2], len[2]), $
                       format='(%"(\%\"%s\")")')
       result += string(value, format=format)
     endif
-  
+
     cur = pos[0] + len[0]
   endwhile
-  
+
   return, result
 end
 

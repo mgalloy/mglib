@@ -2,7 +2,7 @@
 
 pro mggrsquarifiedtreemaplayout::getProperty, name=name, description=description
   compile_opt strictarr
-  
+
   if (arg_present(name)) then name = 'Squarified'
   if (arg_present(description)) then description = 'Algorithm used by J.J. van Wijk'
 end
@@ -10,29 +10,29 @@ end
 
 pro mggrsquarifiedtreemaplayout::setProperty
   compile_opt strictarr
-  
+
 end
 
 
 pro mggrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
   compile_opt strictarr
-  
+
   ; done
   if (startPos gt endPos) then return
-  
+
   ; use slice layout if only 2 or fewer items
   if (endPos - startPos lt 2L) then begin
     mggrslicetreemaplayout__layoutBest, items, startPos, endPos, bounds
     return
   endif
-  
+
   bounds->getProperty, x=x, y=y, width=w, height=h
   totalsize = self->sum(items, startPos, endPos)
   midPos = startPos
   (items->get(position=startPos))->getProperty, size=itemSize
   a = itemSize / totalSize
   b = a
-  
+
   if (w lt h) then begin
     while (midPos le endPos) do begin
       aspect = self->normAspect(h, w, a, b)
@@ -55,7 +55,7 @@ pro mggrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
       if (self->normAspect(h, w, a, b + q) gt aspect) then break
       midPos++
       b += q
-    endwhile    
+    endwhile
 
     mggrslicetreemaplayout__layoutBest, items, startPos, midPos, $
                                         obj_new('MGgrRect', x=x, y=y, width=w * b, height=h)
@@ -67,7 +67,7 @@ end
 
 function mggrsquarifiedtreemaplayout::aspect, big, small, a, b
   compile_opt strictarr
-  
+
   return, (big * b) / (small * a / b)
 end
 
@@ -88,28 +88,28 @@ function mggrsquarifiedtreemaplayout::sum, items, startPos, endPos
     (items->get(position=i))->getProperty, size=itemSize
     totalSize += itemSize
   endfor
-  
-  return, totalSize  
+
+  return, totalSize
 end
 
 
 pro mggrsquarifiedtreemaplayout::cleanup
   compile_opt strictarr
-  
+
   self->mggrabstracttreemaplayout::cleanup
 end
 
 
 function mggrsquarifiedtreemaplayout::init
   compile_opt strictarr
-  
+
   return, 1
 end
 
 
 pro mggrsquarifiedtreemaplayout__define
   compile_opt strictarr
-  
+
   define = { MGgrSquarifiedTreemapLayout, $
              inherits MGgrAbstractTreemapLayout $
            }

@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Get `nIndices` random indices for an array of size `nValues` (without 
+; Get `nIndices` random indices for an array of size `nValues` (without
 ; repeating an index).
 ;
 ; :Examples:
@@ -18,7 +18,7 @@
 ;       IDL> print, r[ind]
 ;            0.250856     0.135338    0.0753110
 ;
-; :Returns: 
+; :Returns:
 ;    lonarr(`nIndices`)
 ;
 ; :Params:
@@ -29,17 +29,17 @@
 ;
 ; :Keywords:
 ;    seed : in, out, optional, type=integer or lonarr(36)
-;       seed to use for random number generation, leave undefined to use a 
+;       seed to use for random number generation, leave undefined to use a
 ;       seed generated from the system clock; new seed will be output
 ;-
 function mg_sample, nValues, nIndices, seed=seed
   compile_opt strictarr
-  
-  ; get random nIndices by finding the indices of the smallest nIndices in a 
+
+  ; get random nIndices by finding the indices of the smallest nIndices in a
   ; array of random values
   values = randomu(seed, nValues)
-  
-  ; our random values are uniformly distributed, so ideally the nIndices 
+
+  ; our random values are uniformly distributed, so ideally the nIndices
   ; smallest values are in the first bin of the below histogram
   nBins = nValues / nIndices
   h = histogram(values, nbins=nBins, reverse_indices=ri)
@@ -48,7 +48,7 @@ function mg_sample, nValues, nIndices, seed=seed
   nCandidates = 0L
   for bin = 0L, nBins - 1L do begin
     nCandidates += h[bin]
-    if (nCandidates ge nIndices) then break    
+    if (nCandidates ge nIndices) then break
   endfor
 
   ; get the candidates and sort them
@@ -62,7 +62,7 @@ end
 
 ; main-level example program
 
-r = randomu(seed, 10)            
+r = randomu(seed, 10)
 print, r
 ind = mg_sample(10, 3, seed=seed)
 print, ind

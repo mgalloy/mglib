@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Prints the IDL's current directory to the output log like the UNIX command 
+; Prints the IDL's current directory to the output log like the UNIX command
 ; of the same name.
 ;
 ; :Examples:

@@ -16,7 +16,7 @@
 ;
 ;   This produces the following (although the following has been enhanced by
 ;   creating PostScript output and converted to an image with `MG_CONVERT`):
-; 
+;
 ;   .. image:: vel-random.png
 ;
 ;   To use a grid of slightly jittered starting points use something like::
@@ -33,7 +33,7 @@
 ;
 ; :Returns:
 ;    fltarr(m * n)
-; 
+;
 ; :Params:
 ;    a : in, required, type="fltarr(m, n)"
 ;       vector
@@ -44,11 +44,11 @@
 ;-
 function mg_vel_interpolate, a, x, y
   compile_opt idl2, hidden
-  on_error, 2   
+  on_error, 2
 
   sa = size(a, /dimensions)
   nx = sa[0]
-  
+
   i = long(x) + nx * long(y)
 
   p = x - long(x)
@@ -61,14 +61,14 @@ function mg_vel_interpolate, a, x, y
            + p * q1 * a[i + 1] $
            + q * p1 * a[i + nx] $
            + p * q * a[i + nx + 1]
-  
+
   return, res
 end
 
 
 ;+
 ; Add the heads to the arrows.
-; 
+;
 ; :Params:
 ;    s : in, out, required, type=fltarr
 ;       array of streamlines
@@ -88,9 +88,9 @@ pro mg_vel_arrowhead, s
   ; find vectors whose last segment has zero length
   xlastlen = s[*, n - 4, 0] - s[*, n - 5, 0]
   ylastlen = s[*, n - 4, 1] - s[*, n - 5, 1]
-  lastlen = sqrt(xlastlen^2 + ylastlen^2)  
+  lastlen = sqrt(xlastlen^2 + ylastlen^2)
   whereLastlenZero = where(lastlen eq 0.0, nzero, complement=whereLastlenNotZero)
-  
+
   len  = scale * tant * lastlen[whereLastlenNotZero] / np
 
   dx = len * (s[whereLastlenNotZero, n - 4, 1] $
@@ -114,7 +114,7 @@ pro mg_vel_arrowhead, s
   s[whereLastlenNotZero, n - 1, 1] = ym - dy
 
   ; no head for 0 length
-  if (nzero ge 1) then begin  
+  if (nzero ge 1) then begin
     s[whereLastlenZero, n - 3, 0] = s[whereLastlenZero, n - 4, 0]
     s[whereLastlenZero, n - 2, 0] = s[whereLastlenZero, n - 4, 0]
     s[whereLastlenZero, n - 1, 0] = s[whereLastlenZero, n - 4, 0]
@@ -137,7 +137,7 @@ end
 ; :Params:
 ;    u : in, required, type="fltarr(m, n)"
 ;       x component at each point of the vector field; must be a 2D array
-;    v : in, required, type="fltarr(m, n)"  
+;    v : in, required, type="fltarr(m, n)"
 ;       y component at each point of the vector field; must be a 2D array
 ;
 ; :Keywords:
@@ -168,7 +168,7 @@ function mg_vel_streamlines, u, v, $
 
   maxlen = sqrt(max(u^2 + v^2, /nan))   ; max vector length
   dt = 1. * length / maxlen /nsteps
-  
+
   if (keyword_set(grid)) then begin
     ; set sizes, accounting for stride
     _nx = nx / stride
@@ -178,52 +178,52 @@ function mg_vel_streamlines, u, v, $
     ; create grid
     xt = reform(findgen(_nx) # (fltarr(_ny) + 1.0) / (_nx - 1L), _nx * _ny)
     yt = reform((fltarr(_nx) + 1.0) # findgen(_ny) / (_ny - 1L), _nx * _ny)
-    
+
     ; create jittter
     xjitter = randomu(seed, _nx * _ny)
-    yjitter = randomu(seed, _nx * _ny)    
-    
+    yjitter = randomu(seed, _nx * _ny)
+
     ; add jitter to grid
     xt += jitter * xjitter / (_nx - 1L)
-    yt += jitter * yjitter / (_ny - 1L)   
+    yt += jitter * yjitter / (_ny - 1L)
   endif else begin
     xt = randomu(seed, nvecs)
     yt = randomu(seed, nvecs)
   endelse
-  
+
   ; vectors, steps + arrow, components (x and y)
   s = fltarr(nvecs, nsteps + 3, 2)
-  
+
   ; initial streamlines are the starting points
   s[0, 0, 0] = xt
   s[0, 0, 1] = yt
-  
+
   ; add a segment to the streamlines each loop through
   for i = 1L, nsteps - 1L do begin
     xt[0] = (nx - 1L) * s[*, i - 1L, 0L]
     yt[0] = (ny - 1L) * s[*, i - 1L, 1L]
-    
+
     ut = mg_vel_interpolate(u, xt, yt)
     vt = mg_vel_interpolate(v, xt, yt)
-    
+
     ; go from last step
     s[0L, i, 0L] = s[*, i - 1L, 0L] + ut * dt
     s[0L, i, 1L] = s[*, i - 1L, 1L] + vt * dt
   end
-  
+
   ; add the arrowheads
   mg_vel_arrowhead, s
-  
+
   return, s < 1.0 > 0.0   ; must between 0.0 and 1.0
 end
 
 
 ;+
-; Draw a velocity (flow) field with streamlines following the field 
+; Draw a velocity (flow) field with streamlines following the field
 ; proportional in length to the vector field magnitude.
-; 
+;
 ; A random number of starting points can be picked (with NVECS=n) or a grid
-; of starting points jittered slightly to eliminate linear patterns (with 
+; of starting points jittered slightly to eliminate linear patterns (with
 ; /GRID, STRIDE=3, and JITTER=jit).
 ;
 ; NVECS random points within the (u,v) arrays are selected.
@@ -234,7 +234,7 @@ end
 ; :Params:
 ;    u : in, required, type="fltarr(m, n)"
 ;       x component at each point of the vector field; must be a 2D array
-;    v : in, required, type="fltarr(m, n)"  
+;    v : in, required, type="fltarr(m, n)"
 ;       y component at each point of the vector field; must be a 2D array
 ;    x : in, optional, type=fltarr(m)
 ;       x axis values
@@ -245,11 +245,11 @@ end
 ;    overplot : in, optional, type=boolean
 ;       set to not erase current display before making plot
 ;    nvecs : in, optional, type=long, default=200L
-;       number of vectors (arrows) to draw 
+;       number of vectors (arrows) to draw
 ;    length : in, optional, type=float, default=0.1
-;       the length of each arrow line segment expressed as a fraction of the 
+;       the length of each arrow line segment expressed as a fraction of the
 ;       longest vector divided by the number of steps
-;    nsteps : in, optional, type=long, default=10L 
+;    nsteps : in, optional, type=long, default=10L
 ;       number of shoots or line segments for each arrow
 ;    grid : in, optional, type=boolean
 ;       set to jitter a regular grid of starting points instead of choosing
@@ -260,11 +260,11 @@ end
 ;       amount to jitter elements in the grid; as a fraction of the distance
 ;       between grid elements
 ;    max_thick : in, optional, type=float, default=3.0
-;       maximum thickness to use for streamlines; ignored if THICK keyword is 
+;       maximum thickness to use for streamlines; ignored if THICK keyword is
 ;       present
 ;    thick : in, optional, type=float, default=1.0
 ;       set to a constant to use that thickness for streamlines instead of
-;       thicknesses set to values proportional to the magnitude of the 
+;       thicknesses set to values proportional to the magnitude of the
 ;       vector field at the point of the beginning of the streamline
 ;    color : in, optional, type=color
 ;       color of streamlines
@@ -297,14 +297,14 @@ pro mg_vel, u, v, x, y, $
 
   _u = reform(u)
   _v = reform(v)
-  
+
   if (n_elements(xmax) gt 0L) then begin
     message, 'XMAX keyword obsolete', /informational
   endif
-  
+
   su = size(_u, /structure)
   sv = size(_v, /structure)
-  
+
   if ((su.n_dimensions ne 2) or (sv.n_dimensions ne 2)) then begin
     message, 'U, V must be 2-dimensional arrays'
     return
@@ -316,14 +316,14 @@ pro mg_vel, u, v, x, y, $
                            nvecs=_nvecs, length=_length, nsteps=_nsteps, $
                            grid=grid, stride=_stride, jitter=_jitter)
   endif
-  
+
   if (arg_present(s)) then return
-  
+
   _x = n_elements(x) eq 0L ? findgen(su.dimensions[0]) : x
   _y = n_elements(y) eq 0L ? findgen(su.dimensions[1]) : y
   xmin = min(_x, max=xmax)
   ymin = min(_y, max=ymax)
-  
+
   ; setup coordinate system
   if (~keyword_set(overplot)) then begin
     plot, [xmin, xmax, xmax, xmin, xmin], $
@@ -336,7 +336,7 @@ pro mg_vel, u, v, x, y, $
                   : color, $
           _extra=e
   endif
-  
+
   mag = alog10(sqrt(_u^2 + _v^2))
   maxmag = max(mag)
 
@@ -398,7 +398,7 @@ tvlct, r, g, b
 window, /free, title='Global winds - jittered grid', xsize=500, ysize=300
 mg_vel, u, v, x, y, $
         /grid, stride=3, jitter=0.75, $
-        max_thick=2.1, $         
+        max_thick=2.1, $
         xstyle=1, ystyle=1, $
         xticks=4, xtickv=[-180, -90, 0, 90, 180], $
         yticks=4, ytickv=[-90, -45, 0, 45, 90]

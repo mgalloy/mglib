@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper for CONTOUR that handles the NLEVELS keyword better: if LEVELS is 
+; Wrapper for CONTOUR that handles the NLEVELS keyword better: if LEVELS is
 ; not specified then NLEVELS contour levels are created equally spaced between
 ; the minimum and maximum values of z. The levels used can also be returned
 ; to the caller by passing a named variable to LEVELS.
@@ -11,7 +11,7 @@
 ;
 ; :Examples:
 ;    Try the main-level example program at the end of this file::
-; 
+;
 ;       IDL> .run mg_contour
 ;
 ;    This should produce something like:
@@ -51,16 +51,16 @@
 pro mg_contour, z, x, y, nlevels=nlevels, levels=levels, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   _nlevels = n_elements(nlevels) gt 0L ? nlevels : 6
-  
+
   ; if LEVELS is not specified, use _nlevels to compute them
   if (n_elements(levels) eq 0) then begin
     step = (float(max(z)) - float(min(z))) / float(_nlevels)
     levels = findgen(_nlevels) * step + min(z)
   endif
-  
-  case n_params() of 
+
+  case n_params() of
     1: contour, z, levels=levels, _extra=e
     3: contour, z, x, y, levels=levels, _extra=e
     else: message, 'incorrect number of arguments'

@@ -8,7 +8,7 @@ function mg_makect_ut::test1
           'invalid green colors'
   assert, array_equal(ct1[*, 2], bindgen(256)), $
           'invalid blue colors'
-          
+
   ct2 = mg_makect(mg_color('yellow'), mg_color('blue'), ncolors=16)
   ct3 = mg_makect([255, 255, 255], [255, 0, 0])
   ct4 = mg_makect(mg_color('red'), $
@@ -18,14 +18,14 @@ function mg_makect_ut::test1
   ct5 = mg_makect(mg_color('powderblue'), $
                   mg_color('ivory'), $
                   mg_color('sienna'), $
-                  ncolors=16)                  
-                   
+                  ncolors=16)
+
   return, 1
 end
 
 
 pro mg_makect_ut__define
   compile_opt strictarr
-  
+
   define = { mg_makect_ut, inherits MGutLibTestCase }
 end

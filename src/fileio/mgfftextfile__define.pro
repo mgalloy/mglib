@@ -5,7 +5,7 @@
 
 function mgfftextfile::_overloadHelp, varname
   compile_opt strictarr
-  
+
   format = '(%"%-15s %-9s = TextFile <%s>")'
   return, string(varname, 'ASCII', self.filename, format=format)
 end
@@ -30,7 +30,7 @@ function mgfftextfile::_overloadBracketsRightSide, isRange, ss1
 
   ; read data up to the last line required
   data = strarr(max(ss1) + 1L)
-  
+
   point_lun, self.lun, 0
   readf, self.lun, data
 
@@ -47,9 +47,9 @@ pro mgfftextfile::_overloadBracketsLeftSide, objref, value, isRange, $
                                              ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-  
+
   if (~self.write) then message, 'file not opened for writing'
-  
+
   ; TODO: implement
   message, 'not implemented'
 end
@@ -58,21 +58,21 @@ end
 function mgfftextfile::_overloadForeach, line, file_ptr
   compile_opt strictarr
   on_error, 2
-  
+
   ; start 0 bytes into the file
   file_ptr = n_elements(file_ptr) eq 0L ? 0L : file_ptr
   point_lun, self.lun, file_ptr
-  
+
   ; return if we're at the end of the file
   if (eof(self.lun)) then return, 0
-  
+
   ; read the line at that location
   line = ''
   readf, self.lun, line
-  
+
   ; remember the current file pointer
   point_lun, - self.lun, file_ptr
-  
+
   return, 1
 end
 
@@ -87,9 +87,9 @@ pro mgfftextfile::setProperty, filename=filename, read=read, write=write
 
   if (n_elements(filename) gt 0L) then begin
     self.filename = filename
-    
+
     if (self.lun gt 0L) then free_lun, self.lun
-    
+
     case 1 of
       self.read && self.write: openu, lun, self.filename, /get_lun
       self.write: openw, lun, self.filename, /get_lun
@@ -98,7 +98,7 @@ pro mgfftextfile::setProperty, filename=filename, read=read, write=write
           openr, lun, self.filename, /get_lun
         end
     endcase
-    
+
     self.lun = lun
   endif
 end
@@ -106,7 +106,7 @@ end
 
 pro mgfftextfile::getProperty
   compile_opt strictarr
-  
+
 end
 
 
@@ -116,16 +116,16 @@ function mgfftextfile::init, _extra=e
   compile_opt strictarr
 
   if (~self->IDL_Object::init()) then return, 0
-  
+
   self->setProperty, _extra=e
 
-  return, 1  
+  return, 1
 end
 
 
 pro mgfftextfile__define
   compile_opt strictarr
-  
+
   define = { MGffTextFile, inherits IDL_Object, $
              filename:'', $
              lun: 0L, $

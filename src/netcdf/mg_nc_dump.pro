@@ -5,12 +5,12 @@
 ; not read any data, it simply finds the names and datatypes of variables
 ; and groups.
 ;
-; :Categories: 
+; :Categories:
 ;    file i/o, netcdf, sdf
 ;
 ; :Examples:
 ;    See the attached main-level program for a simple example::
-; 
+;
 ;       IDL> .run mg_nc_dump
 ;
 ; :Author:
@@ -28,7 +28,7 @@
 pro mg_nc_dump, filename
   compile_opt strictarr
   on_error, 2
-  
+
   f = obj_new('MGffNCFile', filename=filename)
   print, f->dump()
   obj_destroy, f

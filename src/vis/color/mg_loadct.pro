@@ -1,18 +1,18 @@
 ; docformat = 'rst'
 
 ;+
-; Load a color table by index. This routine is directly analogous to `LOADCT`, 
-; but with more color table options. 
+; Load a color table by index. This routine is directly analogous to `LOADCT`,
+; but with more color table options.
 ;
 ; The default color tables:
 ;
 ; .. image:: default-colors.png
-; 
+;
 ; The Brewer color tables are split into three types: sequential, diverging,
-; and qualitative. Sequential color tables are simple sequences from white to 
-; a given color. The diverging color tables have white in the middle of the 
+; and qualitative. Sequential color tables are simple sequences from white to
+; a given color. The diverging color tables have white in the middle of the
 ; color table and progress in each direction towards two different colors. The
-; qualitative color tables contain only a few colors for labeling purposes. 
+; qualitative color tables contain only a few colors for labeling purposes.
 ; The qualitative color tables are expanded to take up the same space of the
 ; other color tables in the graphic below:
 ;
@@ -24,28 +24,28 @@
 ;
 ; The Yorick/Gist color tables:
 ;
-; .. image:: gist-colors.png 
+; .. image:: gist-colors.png
 ;
 ; The matplotlib color tables:
 ;
 ; .. image:: mpl-colors.png
-; 
+;
 ; :Categories:
 ;    direct graphics
 ;
 ; :Copyright:
-;    Color tables accessed with `VIS_LOADCT` and `VIS_XLOADCT` are provided 
-;    courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org, 
+;    Color tables accessed with `VIS_LOADCT` and `VIS_XLOADCT` are provided
+;    courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org,
 ;    accessed 20 October 2007.
 ;
-;    Apache-Style Software License for ColorBrewer software and ColorBrewer 
+;    Apache-Style Software License for ColorBrewer software and ColorBrewer
 ;    Color Schemes
 ;
-;    Copyright (c) 2002 Cynthia Brewer, Mark Harrower, and The Pennsylvania 
+;    Copyright (c) 2002 Cynthia Brewer, Mark Harrower, and The Pennsylvania
 ;    State University.
 ;
-;    Licensed under the Apache License, Version 2.0 (the "License"); you may 
-;    not use this file except in compliance with the License. You may obtain 
+;    Licensed under the Apache License, Version 2.0 (the "License"); you may
+;    not use this file except in compliance with the License. You may obtain
 ;    a copy of the License at::
 ;
 ;       http://www.apache.org/licenses/LICENSE-2.0
@@ -53,12 +53,12 @@
 ;    Unless required by applicable law or agreed to in writing, software
 ;    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 ;    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-;    License for the specific language governing permissions and limitations 
+;    License for the specific language governing permissions and limitations
 ;    under the License.
 ;-
 
 ;+
-; Helper routine to determine the number of columns in the terminal window. 
+; Helper routine to determine the number of columns in the terminal window.
 ; Returns 80 if it can't find `MG_TERMCOLUMNS`.
 ;
 ; :Private:
@@ -74,7 +74,7 @@ function mg_loadct_termcolumns
     catch, /cancel
     return, 80L
   endif
-  
+
   return, mg_termcolumns()
 end
 
@@ -83,7 +83,7 @@ end
 ; Routine to print the color table names.
 ;
 ; :Private:
-; 
+;
 ; :Params:
 ;    ctnames : in, required, type=strarr
 ;       names of the color tables
@@ -92,20 +92,20 @@ pro mg_loadct_showtables, ctnames
   compile_opt strictarr
 
   if (n_elements(ctnames) eq 1L) then begin
-    print, 0, ctnames, format='(%"%1d. %-0s")' 
+    print, 0, ctnames, format='(%"%1d. %-0s")'
     return
   endif
-  
+
   ndigits = long(alog10(n_elements(ctnames) - 1L) + 1L)
   indexFormat = string(ndigits, format='(%"(\%\"\%%dd. \")")')
   indices = string(indgen(n_elements(ctnames)), format=indexFormat)
   entries = indices + ctnames
-  
+
   ntermcols = mg_loadct_termcolumns()
   width = max(strlen(entries) + 3L)
   ncols = ntermcols / width
   widthFormat = string(width, format='(%"\%-%ds")')
-  
+
   format = string(strjoin(strarr(ncols) + widthFormat, ''), $
                   format='(%"(\%\"%s\")")')
 
@@ -146,9 +146,9 @@ end
 ;    show_tables : in, optional, type=boolean
 ;       set to print a listing of the available color tables
 ;    cpt_filename : in, optional, type=string
-;       filename of `.cpt` file to load a color table from; the `.cpt` 
-;       filename extension is optional; the filename given can be absolute, 
-;       relative from the current working directory, or relative from the 
+;       filename of `.cpt` file to load a color table from; the `.cpt`
+;       filename extension is optional; the filename given can be absolute,
+;       relative from the current working directory, or relative from the
 ;       `cpt-city` directory in the VIS library; see `cptcity_catalog.idldoc`
 ;       for a listing of the `.cpt` files provided with the VIS library
 ;    _ref_extra : in, out, optional, type=keyword
@@ -163,41 +163,41 @@ pro mg_loadct, table, file=file, $
                _ref_extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   if (n_elements(cptFilename) gt 0L) then begin
     if (strmid(cptFilename, 3, /reverse_offset) ne '.cpt') then begin
       _cptFilename = cptFilename + '.cpt'
     endif else _cptFilename = cptFilename
-    
+
     if (~file_test(_cptFilename)) then begin
       _cptFilename = filepath(_cptFilename, $
                               subdir=['cpt-city'], $
                               root=mg_src_root())
     endif
-    
+
     if (~file_test(_cptFilename)) then begin
       message, '.cpt file not found, ' + cptFilename
     endif
-    
+
     rgb = mg_cpt2ct(_cptFilename, name=ctnames)
-    
+
     if (keyword_set(showTables)) then begin
       mg_loadct_showtables, ctnames
-      
+
       return
     endif
-    
+
     if (keyword_set(reverse)) then rgb = reverse(rgb, 1)
-    
+
     if (arg_present(rgbTable)) then begin
       rgbTable = rgb
     endif else begin
       tvlct, rgb
     endelse
-    
+
     return
   endif
-  
+
   case 1 of
     keyword_set(brewer): ctfilename = filepath('brewer.tbl', root=mg_src_root())
     keyword_set(gmt): ctfilename = filepath('gmt.tbl', root=mg_src_root())
@@ -208,19 +208,19 @@ pro mg_loadct, table, file=file, $
     n_elements(file) gt 0L: ctfilename = file
     else:
   endcase
-  
+
   if (arg_present(get_names)) then begin
     loadct, get_names=get_names, file=ctfilename
-    
+
     return
   endif
-  
+
   if (keyword_set(showTables)) then begin
     loadct, get_names=ctnames, file=ctfilename
     mg_loadct_showtables, ctnames
     return
   endif
-  
+
   ; search for color table name if it is specified as a string
   if (size(table, /type) eq 7L) then begin
     loadct, get_names=ctnames, file=ctfilename
@@ -235,13 +235,13 @@ pro mg_loadct, table, file=file, $
   endif else begin
     if (n_elements(table) gt 0L) then _table = table
   endelse
-  
+
   loadct, _table, rgb_table=rgbTable, file=ctfilename, _strict_extra=e
-  
+
   if (keyword_set(reverse)) then begin
     rgbTable = reverse(rgbTable, 1)
-  endif 
-  
+  endif
+
   if (~arg_present(rgbTable)) then tvlct, rgbTable
 end
 

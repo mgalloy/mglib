@@ -9,7 +9,7 @@
 ;       IDL> .run mg_psbegin
 ;
 ;    Should produce the following image:
-; 
+;
 ;    .. image:: maroonbells.png
 ;
 ; :Keywords:
@@ -30,11 +30,11 @@ pro mg_psbegin, image=image, $
                 _extra=e
   compile_opt strictarr
   common _$mg_ps, origdev, _image, psconfig
-  
+
   if (!d.name ne 'PS') then origdev = !d.name
   _image = keyword_set(image)
   set_plot, 'PS', /copy
-  
+
   ; set some default settings if the intent is to produce postscript simply
   ; to convert to an image format later
   if (_image) then begin
@@ -45,7 +45,7 @@ pro mg_psbegin, image=image, $
                  zthick: !z.thick, $
                  psymsize: !p.symsize, $
                  pfont: !p.font }
-                 
+
     !p.charsize = n_elements(charsize) eq 0 ? 1. : charsize
     !p.thick    = n_elements(thick) eq 0    ? 1. : thick
     !x.thick    = n_elements(thick) eq 0    ? 1. : thick
@@ -53,15 +53,15 @@ pro mg_psbegin, image=image, $
     !z.thick    = n_elements(thick) eq 0    ? 1. : thick
     !p.symsize  = n_elements(symsize) eq 0  ? 1. : symsize
     !p.font = 0
-    
+
     device, /helvetica
   endif
-  
+
   device, /color, bits_per_pixel=8, _extra=e
 end
 
 
-; main-level example of using `MG_PSBEGIN`, in this case to ultimately create a 
+; main-level example of using `MG_PSBEGIN`, in this case to ultimately create a
 ; PNG file
 
 ; read in example data

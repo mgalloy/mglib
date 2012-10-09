@@ -12,7 +12,7 @@
 ;
 ; :Returns:
 ;    2-dimensional fltarr
-; 
+;
 ; :Params:
 ;    s : in, required, type=fltarr
 ;       input time series
@@ -23,12 +23,12 @@ function mg_spectrogram, s, windowSize
   compile_opt strictarr
 
   result = fltarr(n_elements(s) - windowSize + 1L, windowSize)
-  
+
   for w = 0L, n_elements(s) - windowSize do begin
     result[w, *] = abs(fft(s[w:w + windowSize - 1L])) ^ 2
   endfor
-  
-  return, result   
+
+  return, result
 end
 
 

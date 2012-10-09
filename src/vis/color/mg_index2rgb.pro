@@ -4,8 +4,8 @@
 ; Converts color indices to RGB coordinates. Color indices are long integers
 ; used in decomposed color in direct graphics where the lowest order byte
 ; value is the red value, the next byte is the green value, the next byte is
-; the blue value, and the highest order byte value is unused. 
-; 
+; the blue value, and the highest order byte value is unused.
+;
 ; :Categories:
 ;    direct graphics
 ;
@@ -34,16 +34,16 @@
 ;
 ; :Keywords:
 ;    hex : in, optional, type=boolean
-;       set to return a string instead of a `bytarr(3)`; string formatted 
+;       set to return a string instead of a `bytarr(3)`; string formatted
 ;       according to HTML/CSS conventions: `#RRGGBB`
 ;-
 function mg_index2rgb, indices, hex=hex
   compile_opt strictarr
-  
+
   r = indices and 255B
   g = ishft(indices, -8) and 255B
   b = ishft(indices, -16) and 255B
-  
+
   if (keyword_set(hex)) then begin
     return, string(transpose([[r], [g], [b]]), format='("#", 3Z02)')
   endif else begin

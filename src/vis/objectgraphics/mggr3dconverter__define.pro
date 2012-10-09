@@ -6,9 +6,9 @@
 ; This is not done the "correct" way i.e. as described in::
 ;
 ;    http://www.triplespark.net/render/stereo/create.html
-; 
+;
 ; Better results were achieved with a simple rotation.
-; 
+;
 ; :Categories:
 ;    object graphics
 ;
@@ -16,8 +16,8 @@
 ;    color : type=boolean
 ;       set to create color anaglyphs
 ;    eye_separation : type=float
-;       number of degrees of the cone formed by drawing lines from each eye to 
-;       the origin     
+;       number of degrees of the cone formed by drawing lines from each eye to
+;       the origin
 ;    dimensions : type=intarr(2)
 ;       dimensions of the window
 ;    _extra : type=keywords
@@ -32,14 +32,14 @@
 ; left eye is "shaded" red and the right eye is "shaded" blue.
 ;
 ; :Private:
-; 
+;
 ; :Returns:
 ;    bytarr(3, xsize, ysize)
 ;
 ; :Params:
-;    leftImage : in, optional, type="bytarr(3, xsize, ysize)" 
+;    leftImage : in, optional, type="bytarr(3, xsize, ysize)"
 ;       image from left eye
-;    rightImage : in, optional, type="bytarr(3, xsize, ysize)" 
+;    rightImage : in, optional, type="bytarr(3, xsize, ysize)"
 ;       image from right eye
 ;-
 function mggr3dconverter::_combineImages, leftImage, rightImage
@@ -80,7 +80,7 @@ end
 ;-
 pro mggr3dconverter::_rotateModels, picture, degrees
   compile_opt strictarr
-  
+
   ; if picture is a model then rotate it, but don't rotate models inside it
   if (obj_isa(picture, 'IDLgrModel')) then begin
     picture->rotate, [0, 1, 0], degrees
@@ -90,7 +90,7 @@ pro mggr3dconverter::_rotateModels, picture, degrees
   if (obj_isa(picture, 'IDL_Container')) then begin
     items = picture->get(/all, count=count)
     for i = 0L, count - 1 do begin
-      self->_rotateModels, items[i], degrees        
+      self->_rotateModels, items[i], degrees
     endfor
   endif
 end
@@ -99,18 +99,18 @@ end
 ;+
 ; Converts a standard object graphics picture to a view containing a 3D image.
 ;
-; :Returns: 
+; :Returns:
 ;    IDLgrView object reference
-; 
+;
 ; :Params:
 ;    picture : in, optional, type=object
-;       the view, viewgroup, or scene to be drawn; if the GRAPHICS_TREE 
-;       property is set to a valid picture, then this argument must *not* be 
+;       the view, viewgroup, or scene to be drawn; if the GRAPHICS_TREE
+;       property is set to a valid picture, then this argument must *not* be
 ;       given
 ;-
 function mggr3dconverter::convert, picture
   compile_opt strictarr
-  
+
   ; rotate "top-level" models for left eye
   self->_rotateModels, picture, self.eyeSeparation / 2.
 
@@ -155,7 +155,7 @@ pro mggr3dconverter::getProperty, eye_separation=eyeSeparation, $
   if (arg_present(color)) then begin
     color = self.color
   endif
-  
+
   if (arg_present(eyeSeparation)) then begin
     eyeSeparation = self.eyeSeparation
   endif
@@ -163,7 +163,7 @@ pro mggr3dconverter::getProperty, eye_separation=eyeSeparation, $
   if (arg_present(dimensions)) then begin
     self.buffer->getProperty, dimensions=dimensions
   endif
-  
+
   if (n_elements(e) gt 0L) then begin
     self.buffer->getProperty, _extra=e
   endif
@@ -181,7 +181,7 @@ pro mggr3dconverter::setProperty, eye_separation=eyeSeparation, $
   if (n_elements(color) gt 0L) then begin
     self.color = color
   endif
-  
+
   if (n_elements(eye_separation) gt 0L) then begin
     self.eyeSeparation = eyeSeparation
   endif
@@ -190,7 +190,7 @@ pro mggr3dconverter::setProperty, eye_separation=eyeSeparation, $
     self.view->setProperty, viewplace_rect=[0, 0, dimensions]
     self.buffer->setProperty, dimensions=dimensions
   endif
-  
+
   if (n_elements(e) gt 0L) then begin
     self.buffer->setProperty, _extra=e
   endif
@@ -210,7 +210,7 @@ end
 ;+
 ; Initialize Window3D.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, o/w for failure
 ;
 ; :Keywords:
@@ -245,14 +245,14 @@ end
 ; :Fields:
 ;    color
 ;       set to produce color anaglyphs
-;    eyeSeparation 
-;       number of degrees of the cone formed by drawing lines from each eye to 
+;    eyeSeparation
+;       number of degrees of the cone formed by drawing lines from each eye to
 ;       the origin
-;    buffer 
+;    buffer
 ;       IDLgrBuffer to send left and right eye images to and extract
-;    view 
+;    view
 ;       IDLgrView to contain the 3D image
-;    image 
+;    image
 ;       IDLgrImage actually being displayed
 ;-
 pro mggr3dconverter__define

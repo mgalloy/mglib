@@ -14,13 +14,13 @@ pro mg_checkeasing, easing
   n = 1000L
   t = findgen(n) / (n - 1L)
   p = fltarr(n)
-  
+
   e = obj_new(easing)
-  
+
   for i = 0L, n - 1L do p[i] = e->ease(t[i])
-  
+
   window, title='Easing function: ' + easing, /free, xsize=400, ysize=400
   plot, t, p
-  
+
   obj_destroy, e
 end

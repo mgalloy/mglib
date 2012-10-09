@@ -2,17 +2,17 @@
 
 ;+
 ; Returns a nice string name for the given type code.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    string
 ;
-; :Params: 
+; :Params:
 ;    code : in, required, type=int
 ;       type code as given by the `SIZE` function
 ;-
 function mg_typename, code
   compile_opt strictarr
-  
+
   case code of
     0 : return, 'undefined'
     1 : return, 'byte'

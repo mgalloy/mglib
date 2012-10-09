@@ -13,13 +13,13 @@ function mg_loadct_ut::test1
   mg_loadct, get_names=names, /mpl, silent
   assert, n_elements(names) eq 16, $
           'correct number of names in matplotlib color tables'
-    
+
   return, 1
 end
 
 
 pro mg_loadct_ut__define
   compile_opt strictarr
-  
+
   define = { mg_loadct_ut, inherits MGutLibTestCase }
 end

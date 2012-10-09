@@ -16,7 +16,7 @@
 
 pro mgffxmlparser::startElement, uri, local, name, attName, attValue
   compile_opt strictarr
-  
+
   if (n_elements(*self.struct) eq 0L) then begin
     if (n_elements(attName) eq 0L) then begin
       atts = ''
@@ -29,7 +29,7 @@ pro mgffxmlparser::startElement, uri, local, name, attName, attValue
         endelse
       endfor
     endelse
-    
+
     *self.struct = create_struct(name, atts)
   endif else begin
   endelse
@@ -38,26 +38,26 @@ end
 
 pro mgffxmlparser::endElement, uri, local, name
   compile_opt strictarr
-  
+
 end
 
 
 pro mgffxmlparser::characters, chars
   compile_opt strictarr
-  
+
 end
 
 
 function mgffxmlparser::getResult
   compile_opt strictarr
-  
+
   return, *self.struct
 end
 
 
 pro mgffxmlparser::cleanup
   compile_opt strictarr
-  
+
   self->idlffxmlsax::cleanup
   ptr_free, self.struct
 end
@@ -67,16 +67,16 @@ function mgffxmlparser::init, _extra=e
   compile_opt strictarr
 
   if (~self->idlffxmlsax::init(_extra=e)) then return, 0
-  
+
   self.struct = ptr_new(/allocate_heap)
-  
+
   return, 1
 end
 
 
 pro mgffxmlparser__define
   compile_opt strictarr
-  
+
   define = { MGffXMLParser, inherits IDLffXMLSAX, $
              currentPath: '', $
              struct: ptr_new() $
@@ -102,7 +102,7 @@ end
 ;-
 function mg_xml_parse, input, url=url, xml_string=xmlString
   compile_opt strictarr
-  
+
   parser = obj_new('MGffXMLParser')
   parser->parseFile, input, url=url, xml_string=xmlString
   result = parser->getResult()

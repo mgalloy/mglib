@@ -3,7 +3,7 @@
 
 pro mggrtreemaplayout::getProperty, name=name, description=description
   compile_opt strictarr
-  
+
 end
 
 
@@ -16,13 +16,13 @@ end
 ;-
 pro mggrtreemaplayout::layout, model, bounds
   compile_opt strictarr
-  
+
 end
 
 
 pro mggrtreemaplayout__define
   compile_opt strictarr
-  
+
   define = { MGgrTreemapLayout, $
              name: '', $
              description: '' $

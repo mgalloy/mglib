@@ -14,11 +14,11 @@
 ;             F2              FLOAT     =       0.00000
 ;             S2: ** Structure <21063e8>, 1 tags, length=4, data length=4, refs=2:
 ;                F3              FLOAT     =       0.00000
-;         
+;
 ; :Params:
 ;    var : in, required, type=any
 ;       variable to print information about
-; 
+;
 ; :Keywords:
 ;    indent : in, optional, type=string
 ;       spaces to indent output
@@ -30,12 +30,12 @@ pro mg_help, var, indent=indent, tag_name=tagname
 
   maxVarnameLen = 16
   format = '(A-' + strtrim(maxVarnameLen, 2) + ', A-10, "= ", A)'
-  
+
   varname = arg_present(var) ? scope_varname(var, level=-1) : '<Expression>'
 
-  _indent = n_elements(indent) eq 0 ? '' : indent 
+  _indent = n_elements(indent) eq 0 ? '' : indent
   _tagname = n_elements(tagname) eq 0 ? '' : tagname
-  
+
   type = size(var, /type)
 
   if (type eq 8L) then begin
@@ -65,14 +65,14 @@ pro mg_help, var, indent=indent, tag_name=tagname
       11: value = size(var, /n_dimensions) eq 0L ? tokens[3] : strjoin(tokens[3:*], ' ')
       else: value = size(var, /n_dimensions) eq 0L  && type ne 0 ? (type eq 7 ? '''' + var + '''' : string(var)) : strjoin(tokens[3:*], ' ')
     endcase
-                                       
+
     if (n_elements(tagname) gt 0) then begin
       desc = string(_tagname, tokens[1], value, format=format)
       print, _indent + desc
     endif else begin
       if (strlen(varname) gt maxVarnameLen) then begin
         print, varname
-        print, string('', tokens[1], value, format=format)        
+        print, string('', tokens[1], value, format=format)
       endif else begin
         print, string(varname, tokens[1], value, format=format)
       endelse

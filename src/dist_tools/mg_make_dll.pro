@@ -14,9 +14,9 @@
 ;-
 pro mg_make_dll, cfile, _extra=e
   compile_opt strictarr
- 
+
   srcdir = file_dirname(file_expand_path(cfile))
-  
+
   if (mg_idlversion(require='7.1')) then begin
     make_dll, file_basename(cfile, '.c'), 'IDL_Load', $
               input_directory=srcdir, $

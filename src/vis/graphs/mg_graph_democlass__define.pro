@@ -17,7 +17,7 @@ end
 
 pro mg_graph_democlass::setProperty, name=name, color=color
   compile_opt strictarr
-  
+
   if (n_elements(name) gt 0L) then self.name = name
   if (n_elements(color) gt 0L) then self.color = color
 end
@@ -25,7 +25,7 @@ end
 
 pro mg_graph_democlass::addChild, node
   compile_opt strictarr
-  
+
   self.children->add, node
 end
 
@@ -41,9 +41,9 @@ function mg_graph_democlass::init, _extra=e
   compile_opt strictarr
 
   self.children = obj_new('IDL_Container')
-  
+
   self->setProperty, _extra=e
-  
+
   return, 1
 end
 

@@ -12,7 +12,7 @@
 ;
 ; :Properties:
 ;    size : type=float
-;       sizes of bubble; size of radius unless AREA is set, in which case it 
+;       sizes of bubble; size of radius unless AREA is set, in which case it
 ;       is the size of the area of the bubble
 ;    area : type=boolean
 ;       set to specify SIZE as areas instead of radii
@@ -31,7 +31,7 @@
 ; Helper routine to calculate the bubble's border.
 ;
 ; :Private:
-; 
+;
 ; :Keywords:
 ;    x : out, optional, type=fltarr
 ;       x-coordinates of bubble border
@@ -40,7 +40,7 @@
 ;-
 pro mggrbubble::_calculate, x=_x, y=_y
   compile_opt strictarr
-  
+
   t = findgen(self.n) / (self.n - 1.) * 360. * !dtor
   r = self.area ? sqrt(self.size / !pi) : self.size
 
@@ -56,13 +56,13 @@ pro mggrbubble::getProperty, size=size, area=area, $
                              color=color, border_color=borderColor, $
                              _ref_extra=e
   compile_opt strictarr
-  
+
   polygon = self->getByName('polygon')
   polyline = self->getByName('polyline')
-  
+
   if (arg_present(size)) then size = self.size
   if (arg_present(area)) then area = self.area
-  
+
   if (arg_present(color)) then begin
     self.polygon->getProperty, color=color
   endif
@@ -70,7 +70,7 @@ pro mggrbubble::getProperty, size=size, area=area, $
   if (arg_present(borderColor)) then begin
     self.polyline->getProperty, color=borderColor
   endif
-  
+
   if (n_elements(e) gt 0L) then begin
     polygon->getProperty, _extra=e
     polyline->getProperty, _extra=e
@@ -86,10 +86,10 @@ pro mggrbubble::setProperty, size=size, area=area, $
                              color=color, border_color=borderColor, $
                              _extra=e
   compile_opt strictarr
-  
+
   polygon = self->getByName('polygon')
   polyline = self->getByName('polyline')
-  
+
   if (n_elements(size) gt 0L) then begin
     self.size = size
     self->_calculate, x=_x, y=_y
@@ -99,7 +99,7 @@ pro mggrbubble::setProperty, size=size, area=area, $
     polygon->setProperty, data=data
     polyline->setProperty, data=data
   endif
-  
+
   if (n_elements(area)) then begin
     self.area = keyword_set(area)
     self->_calculate, x=_x, y=_y
@@ -109,12 +109,12 @@ pro mggrbubble::setProperty, size=size, area=area, $
     polygon->setProperty, data=data
     polyline->setProperty, data=data
   endif
-  
+
   if (n_elements(color) gt 0L) then self.polygon->setProperty, color=color
   if (n_elements(borderColor) gt 0L) then begin
     self.polyline->setProperty, color=borderColor
   endif
-  
+
   if (n_elements(e) gt 0L) then begin
     polygon->setProperty, _extra=e
     polyline->setProperty, _extra=e
@@ -136,7 +136,7 @@ end
 ;
 ; :Keywords:
 ;    size : in, optional, type=float/fltarr
-;       sizes of bubble; size of radius unless AREA is set, in which case it 
+;       sizes of bubble; size of radius unless AREA is set, in which case it
 ;       is the size of the area of the bubble
 ;    area : in, optional, type=boolean
 ;       set to specify SIZE as areas instead of radii
@@ -153,18 +153,18 @@ function mggrbubble::init, x, y, z, size=size, area=area, $
 
   self.size = n_elements(size) eq 0L ? 1.0 : size
   self.area = keyword_set(area)
-  
+
   _color = n_elements(color) eq 0L ? 0B : color
   _borderColor = n_elements(borderColor) eq 0L ? 0B : borderColor
-  
+
   self.n = 36
-  
+
   self.x = x
   self.y = y
-  
+
   self->_calculate, x=_x, y=_y
   _z = fltarr(self.n) + (n_elements(z) eq 0L ? 1.0 : z)
-  
+
   polygon = obj_new('IDLgrPolygon', _x, _y, _z, name='polygon', color=color, $
                     depth_offset=1, _extra=e)
   self->add, polygon
@@ -172,7 +172,7 @@ function mggrbubble::init, x, y, z, size=size, area=area, $
   polyline = obj_new('IDLgrPolyline', _x, _y, _z, name='polyline', $
                      color=_borderColor, _extra=e)
   self->add, polyline
-  
+
   return, 1
 end
 
@@ -194,7 +194,7 @@ end
 ;-
 pro mggrbubble__define
   compile_opt strictarr
-  
+
   define = { MGgrBubble, inherits IDLgrModel, $
              n: 0L, $
              x: 0.0, $

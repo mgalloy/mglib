@@ -1,12 +1,12 @@
 ; docformat = 'rst'
 
 ;+
-; Returns a string that gives the IDL declaration for the type of the given 
+; Returns a string that gives the IDL declaration for the type of the given
 ; variable.
-; 
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -18,10 +18,10 @@ function mg_helpdef_getdef, var
 
   maxElementsLength = 30
   maxStringLength = 60
-  
+
   ; get size/type information
   sz = size(var, /structure)
-    
+
   ; structures
   if (sz.type eq 8) then begin
     if (sz.n_elements gt 1) then begin
@@ -39,7 +39,7 @@ function mg_helpdef_getdef, var
       return, '{ ' + _structureName + strjoin(tNames + ': ' + decls, ', ') + ' }'
     endelse
   endif
-  
+
   ; scalars
   if (sz.n_dimensions eq 0) then begin
     case sz.type of
@@ -66,31 +66,31 @@ function mg_helpdef_getdef, var
       else : return, 'unknown type'
     endcase
   endif
-    
+
   ; arrays
   declarations = ['---', 'bytarr', 'intarr', 'lonarr', 'fltarr', 'dblarr', $
                   'complexarr', 'strarr', '---', 'dcomplexarr', $
                   'ptrarr', 'objarr', 'uintarr', 'ulonarr', $
                   'lon64arr', 'ulon64arr']
-  
+
   ; print the values of the array out if only one dimension and a few elements
   if (sz.n_dimensions eq 1 && sz.dimensions[0] le 5) then begin
     results = strarr(sz.dimensions[0])
     for i = 0L, sz.dimensions[0] - 1L do begin
       results[i] = mg_helpdef_getdef(var[i])
     endfor
-    
-    elements = '[' + strjoin(results, ', ') + ']'    
+
+    elements = '[' + strjoin(results, ', ') + ']'
     if (strlen(elements) lt maxElementsLength) then return, elements
   endif
-  
+
   dims = strjoin(strtrim(sz.dimensions[0:sz.n_dimensions - 1L], 2), ', ')
   return, declarations[sz.type] + '(' + dims + ')'
 end
 
 
 ;+
-; Print the declaration string for a variable. 
+; Print the declaration string for a variable.
 ;
 ; :Examples:
 ;   For example, try::
@@ -108,7 +108,7 @@ end
 ;
 ; :Keywords:
 ;    output : out, optional, type=string
-;       set to a named variable to receive the declaration string for the 
+;       set to a named variable to receive the declaration string for the
 ;       given variable, does not print the output to standard output in this
 ;       case
 ;-
@@ -119,7 +119,7 @@ pro mg_helpdef, var, output=output
               ? strlowcase(scope_varname(var, level=-1)) $
               : '<Expression>'
   output = varname + ' = ' + mg_helpdef_getdef(var)
-  
+
   if (~arg_present(output)) then print, output
 end
 

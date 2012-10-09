@@ -63,13 +63,13 @@ function mg_ascii_template, data_start=dataStart, $
                             delimiter=delimiter, $
                             missing_value=missingValue
   compile_opt strictarr
-  
+
   _dataStart = n_elements(dataStart) eq 0L ? 0L : long(dataStart)
   _delimiter = n_elements(delimiter) eq 0L ? 44B : byte(delimiter)
   _missingValue = n_elements(missingValue) eq 0L ? !values.f_nan : missingValue
-  
+
   ; TODO: finish adding the other fields
-  
+
   return, { version: 1.0, $
             datastart: _dataStart, $
             delimiter: _delimiter $

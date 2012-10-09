@@ -30,7 +30,7 @@ function mg_escape_latex, line, code=code
       '}': output += keyword_set(code) ? '}' : '\}'
       else: output += ch
      endcase
-  endfor 
-  
-  return, output 
+  endfor
+
+  return, output
 end

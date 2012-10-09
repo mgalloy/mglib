@@ -5,7 +5,7 @@
 ;-
 pro mg_options_ut::setup
   compile_opt strictarr
-  
+
 end
 
 
@@ -14,13 +14,13 @@ end
 ;-
 pro mg_options_ut::teardown
   compile_opt strictarr
-  
+
 end
 
 
 function mg_options_ut::test_longForms
   compile_opt strictarr
-  
+
   ; create options object
   opts = obj_new('mg_options')
 
@@ -32,11 +32,11 @@ function mg_options_ut::test_longForms
 
   ; parse the options
   opts->parseArgs, ['--verbose']
-  
+
   assert, opts->get('verbose'), 'verbose should be set'
-  
+
   obj_destroy, opts
-  
+
   return, 1
 end
 
@@ -46,6 +46,6 @@ end
 ;-
 pro mg_options_ut__define
   compile_opt strictarr
-  
+
   define = { mg_options_ut, inherits MGutLibTestCase }
 end

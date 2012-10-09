@@ -14,7 +14,7 @@
 ;    produces:
 ;
 ;    .. image:: profiles_piechart.png
-; 
+;
 ; :Returns:
 ;    bytarr(3, xsize, ysize)
 ;
@@ -40,7 +40,7 @@ function mg_gc_piechart, slices, dimensions=dimensions, threed=threed, $
                          title=title, label=label, color=color, $
                          url=url
   compile_opt strictarr
-  
+
   return, mg_gc_base(data=slices, $
                      type=keyword_set(threed) ? 'p3' : 'p', $
                      dimensions=dimensions, $

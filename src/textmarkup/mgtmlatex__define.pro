@@ -7,17 +7,17 @@
 
 ;+
 ; Text to include afer a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
-; :Keywords: 
+; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
 ;       set to a named variable to get whether a newline should be added
 ;       at the given node
@@ -34,7 +34,7 @@ function mgtmlatex::_preTag, type, newline=newline, tag=tag
         src = tag->getAttribute('source')
 
         return, '\hspace{0.5em}' + string([13B, 10B, 13B, 10B]) + '\includegraphics[scale=0.6]{' + location + src + '}'
-      end    
+      end
     'embed': begin
         location = tag->getAttribute('location')
         src = tag->getAttribute('source')
@@ -42,7 +42,7 @@ function mgtmlatex::_preTag, type, newline=newline, tag=tag
         ext = strmid(src, dotpos + 1L)
         if (strlowcase(ext) eq 'svg') then src = strmid(src, 0, dotpos) + '.pdf'
         return, '\hspace{0.5em}' + string([13B, 10B, 13B, 10B]) + '\includegraphics[scale=0.6]{' + location + src + '}'
-      end    
+      end
     'link': return, ''
     'listing': return, '\begin{verbatim}'
     'heading1': return, '\subsection{'
@@ -58,13 +58,13 @@ end
 
 ;+
 ; Text to include after a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
-; :Params: 
+; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
@@ -80,18 +80,18 @@ function mgtmlatex::_postTag, type, newline=newline, tag=tag
     '' : return, ''
     'bold' : return, '}'
     'code': return, '}'
-    'image': return, string([13B, 10B, 13B, 10B]) + '\hspace{0.5em}' 
-    'embed': return, string([13B, 10B, 13B, 10B]) + '\hspace{0.5em}' 
+    'image': return, string([13B, 10B, 13B, 10B]) + '\hspace{0.5em}'
+    'embed': return, string([13B, 10B, 13B, 10B]) + '\hspace{0.5em}'
     'link': begin
         href = tag->getAttribute('reference')
         return, href eq '' ? '' : ' ({\tt ' + mg_escape_latex(href) + '})'
-      end 
+      end
     'listing': return, '\end{verbatim}'
     'heading1': return, '}'
     'paragraph': begin
         newline = 1
         return, ''
-      end        
+      end
     'newline' : return, ''
     else : return, ''
   endcase

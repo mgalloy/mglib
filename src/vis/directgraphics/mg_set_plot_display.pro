@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Sets the direct graphics device to the "display", i.e., 'X' on Unix-based 
+; Sets the direct graphics device to the "display", i.e., 'X' on Unix-based
 ; systems or 'WIN' on Windows systems.
 ;
 ; :Keywords:
@@ -10,7 +10,7 @@
 ;-
 pro mg_set_plot_display, original_device=original_device
   compile_opt strictarr
-  
+
   original_device = !d.name
   case !version.os_family of
     'unix': set_plot, 'X'

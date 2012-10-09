@@ -19,7 +19,7 @@ function mgffserialvtk_ut::_test_polygon, name, polygon=p, _extra=e
   assert, isPolyline, 'not an IDLgrPolyline'
 
   return, 1
-  
+
 end
 
 

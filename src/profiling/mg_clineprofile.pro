@@ -4,7 +4,7 @@
 ; Creates color coded HTML output of line profiling output.
 ;
 ; :Examples:
-;   For example, to profile the results output by `grof` in the file 
+;   For example, to profile the results output by `grof` in the file
 ;   `profile_results/profile.aasquare_PlateRad000.txt`, where the source code
 ;   files are in the current directory, use::
 ;
@@ -27,28 +27,28 @@
 pro mg_clineprofile, profile_file, output_directory=output_dir, $
                      files=output_files, all_files=all_files
   compile_opt strictarr
-  
+
   if (n_elements(output_dir) gt 0L && ~file_test(output_dir, /directory)) then begin
     file_mkdir, output_dir
   endif
-  
+
   ; read/parse profile file
   nlines = file_lines(profile_file)
   profile_output = strarr(nlines)
   openr, lun, profile_file, /get_lun
   readf, lun, profile_output
   free_lun, lun
-  
+
   ndigits = floor(alog10(nlines) + 1L)
   line_format = '(%"        <p class=\"self color-%d\">%0' + strtrim(ndigits, 2) + 'd<span>%s</span></p>")'
-  
+
   for blank_line_number = 5L, nlines - 1L do begin
     if (profile_output[blank_line_number] eq '') then break
   endfor
 
   line_profile = profile_output[5L:blank_line_number - 1L]
   self_times = float(strmid(line_profile, 16, 9))
-  
+
   line_info = strmid(line_profile, 54)
   tokens = strsplit(line_info, /extract)
 
@@ -56,31 +56,31 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
   routines = strarr(nlines)
   files = strarr(nlines)
   line_numbers = lonarr(nlines)
-  
+
   foreach line, tokens, i do begin
     routines[i] = line[0]
-    
-    if (n_elements(line) lt 4L) then continue    
+
+    if (n_elements(line) lt 4L) then continue
 
     parts = strsplit(strmid(line[1], 1), ':', /extract)
     files[i] = parts[0]
     line_numbers[i] = parts[1]
   endforeach
-  
+
   ; normalize by the largest time
   self_percentages = self_times / self_times[0]
-  
+
   ; foreach file: create HTML output
-  
+
   if (keyword_set(all_files)) then begin
     output_files = files[mg_setintersection(uniq(files, sort(files)), where(files ne ''))]
   endif
-    
+
   for f = 0L, n_elements(output_files) - 1L do begin
     file_code = strarr(file_lines(output_files[f]))
-    
+
     matching_files_ind = where(files eq output_files[f], n_matching_files)
-    
+
     openr, lun, output_files[f], /get_lun
     readf, lun, file_code
     free_lun, lun
@@ -88,7 +88,7 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
     if (n_elements(output_dir) gt 0L) then begin
       _output_file = filepath(file_basename(output_files[f]), root=output_dir)
     endif else _output_file = output_files[f]
-        
+
     openw, lun, _output_file + '.html', /get_lun
     printf, lun, '<html>'
     printf, lun, '  <head>'
@@ -101,15 +101,15 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
     printf, lun, '      p.self { padding: 0; margin: 0; font: 0.4em Helvetica; height: 22px; color: #666; }'
     printf, lun, '      p.self span { display: inline; float: right; color: #000; }'
     printf, lun, '      pre { font: 10pt Monaco; padding: 0; margin: 0; height: 22px; }'
-    
+
     for c = 0L, 255L do begin
       printf, lun, c, $
               string(reform(rebin(reform(byte(string(255L - c, format='(z02)')), 2, 1), 2, 2), 4)), $
               format='(%"      .color-%d { background-color: #ff%s; }")'
     endfor
-    
-    printf, lun, '    </style>'    
-    printf, lun, '  </head>'    
+
+    printf, lun, '    </style>'
+    printf, lun, '  </head>'
     printf, lun, '  <body>'
 
     printf, lun, '    <div class="main">'
@@ -130,8 +130,8 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
               format=line_format
     endforeach
     printf, lun, '      </div>'
-    
-    printf, lun, '      <div class="right">'    
+
+    printf, lun, '      <div class="right">'
     foreach line, file_code, line_no do begin
       if (n_matching_files gt 0L) then begin
         ind = where(line_numbers[matching_files_ind] eq (line_no + 1L), n)
@@ -143,18 +143,18 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
       endif else begin
         color = 0L
       endelse
-      
+
       printf, lun, mg_streplace(line, '<', '&lt;'), $
               format='(%"        <pre>%s </pre>")'
     endforeach
     printf, lun, '      </div>'
     printf, lun, '    </div>'
-    
-    printf, lun, '  </body>'    
+
+    printf, lun, '  </body>'
     printf, lun, '</html>'
     free_lun, lun
   endfor
-  
+
   ; create index
   if (n_elements(output_dir) gt 0L) then begin
     index_filename = filepath('index.html', root=output_dir)
@@ -168,7 +168,7 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
   printf, lun, '    <title>Index of profile results</title>'
   printf, lun, '  </head>'
   printf, lun, '  <body>'
-  
+
   printf, lun, '    <ol>'
   for f = 0L, n_elements(output_files) - 1L do begin
     matching_files_ind = where(files eq output_files[f], n_matching_files)
@@ -188,7 +188,7 @@ pro mg_clineprofile, profile_file, output_directory=output_dir, $
     endelse
   endfor
   printf, lun, '    </ol>'
-  
+
   printf, lun, '    <pre>'
   printf, lun, transpose(mg_file(profile_file, /readf))
   printf, lun, '    </pre>'

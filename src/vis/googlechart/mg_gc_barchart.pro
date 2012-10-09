@@ -14,7 +14,7 @@
 ;    produces:
 ;
 ;    .. image:: profiles_barchart.png
-; 
+;
 ; :Returns:
 ;    bytarr(3, xsize, ysize)
 ;
@@ -45,13 +45,13 @@ function mg_gc_barchart, data, dimensions=dimensions, title=title, $
                          group_spacing=groupSpacing, $
                          url=url
   compile_opt strictarr
-  
-  ; TODO: should calculate default values based on number of bars and 
+
+  ; TODO: should calculate default values based on number of bars and
   ; dimensions of the graphics (which defaults to 200 x 100)
   sizes = [n_elements(barWidth) eq 0L ? 10L : barWidth, $
            n_elements(barSpacing) eq 0L ? 5L : barSpacing, $
            n_elements(groupSpacing) eq 0L ? 10L : groupSpacing]
-           
+
   return, mg_gc_base(data=data, $
                      type=keyword_set(horizontal) ? 'bhs' : 'bvs', $
                      dimensions=dimensions, $

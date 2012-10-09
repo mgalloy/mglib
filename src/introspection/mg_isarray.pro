@@ -12,6 +12,6 @@
 ;-
 function mg_isarray, arg
   compile_opt strictarr
-  
+
   return, size(arg, /n_dimensions) ne 0
 end

@@ -2,13 +2,13 @@
 
 ;+
 ; Parallel coordinates implementation. For more information about parallel
-; coordinates, see `Eager Eyes' <http://eagereyes.org/parallel-sets>` 
+; coordinates, see `Eager Eyes' <http://eagereyes.org/parallel-sets>`
 ; description.
 ;
 ; :Examples:
 ;    Try the main-level program at the end of this file to show an example of
 ;    parallel coordinates::
-; 
+;
 ;       IDL> .run mg_parallel_coords
 ;
 ;    This should produce something like:
@@ -18,7 +18,7 @@
 
 ;+
 ; Display a parallel coordinate graph.
-; 
+;
 ; :Params:
 ;    data : in, required, type="fltarr(m, n)"
 ;       data to plot: m dimensions by n data elements
@@ -52,10 +52,10 @@ pro mg_parallel_coords, data, $
                         color=color, psym=psym, linestyle=linestyle, $
                         overplot=overplot, nodata=nodata, _extra=e
   compile_opt strictarr
-  
+
   dims = size(data, /dimensions)
   range = mg_range(data)
-  
+
   _color = n_elements(color) eq 0L ? 255B : color
   ncolors = n_elements(_color)
 
@@ -64,7 +64,7 @@ pro mg_parallel_coords, data, $
 
   _psym = n_elements(psym) eq 0L ? 0B : psym
   npsym = n_elements(_psym)
-  
+
   ; plot axes
   if (~keyword_set(overplot)) then begin
     plot, [0, dims[0] - 1L], range, /nodata, $
@@ -112,7 +112,7 @@ ages = strarr(8)
 for row = 0L, 7L do begin
   lineTokens = strsplit(lines[row + 1L], ',', /preserve_null, /extract)
   ages[row] = lineTokens[0]
-  
+
   missingDataInd = where(lineTokens eq '', count)
   data[*, row] = float(lineTokens[1:*])
   if (count gt 0L) then data[missingDataInd + row * 8L - 1L] = !values.f_nan
@@ -127,7 +127,7 @@ device, set_font='Helvetica', /tt_font
 mg_parallel_coords, data, /nodata, $
                     position=[0.1, 0.1, 0.9, 0.85], $
                     thick=0.5, ticklen=0, charsize=0.9, $
-                    axes_color=mg_rgb2index([200, 200, 200]), $                     
+                    axes_color=mg_rgb2index([200, 200, 200]), $
                     dimension_titles=ages, data_title='% obese'
 
 xyouts, 0.5, 0.925, '% obese by age cohort', /normal, alignment=0.5
@@ -140,7 +140,7 @@ mg_parallel_coords, data, /overplot, $
                     thick=10, $
                     color=colors, $
                     psym=[1, 0, 0, 0, 0, 0, 0, 0]
-                     
+
 cohorts = ['1996-2005', '1986-1995', '1976-1985', '1966-1975', '1956-1965', $
            '1946-1955', '1936-1945', '1926-1935']
 tvlct, r, g, b, /get
@@ -163,4 +163,3 @@ mg_convert, 'obesity', max_dimensions=[800, 600], output=im
 mg_image, im, /new_window
 
 end
-                         

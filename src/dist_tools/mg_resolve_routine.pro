@@ -10,7 +10,7 @@
 ;       IDL> help, resolved
 ;       RESOLVED        BYTE      =    1
 ;       IDL> mg_resolve_routine, 'mg_fake_routine', resolved=resolved, /either
-;       IDL> help, resolved                                                         
+;       IDL> help, resolved
 ;       RESOLVED        BYTE      =    0
 ;
 ;    Note that `RESOLVE_ROUTINE` would have crashed in the second call to
@@ -31,23 +31,23 @@ pro mg_resolve_routine, routine, resolved=resolved, _extra=e
 
   oldQuiet = !quiet
   !quiet = 1
-  
+
   resolved = 0B
-    
+
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
     !quiet = oldQuiet
     return
   endif
-  
+
   ; resolving the currently executing routine is a problem, but if you are
   ; executing the routine it has already been resolved
   if (strlowcase(routine) ne 'mg_resolve_routine') then begin
     resolve_routine, routine, _extra=e
   endif
-  
+
   resolved = 1B
-  
+
   !quiet = oldQuiet
 end

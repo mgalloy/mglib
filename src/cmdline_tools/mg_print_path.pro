@@ -22,13 +22,13 @@
 ;
 ; :Params:
 ;    path : in, optional, type=string, default=!path
-;       list of directories concatented using the system OS separator 
+;       list of directories concatented using the system OS separator
 ;       character, as in `!path` or `!dlm_path`
 ;-
 pro mg_print_path, path
   compile_opt strictarr
-  
+
   _path = n_elements(path) eq 0L ? !path : path
-  
+
   print, transpose(strsplit(_path, path_sep(/search_path), /extract))
 end

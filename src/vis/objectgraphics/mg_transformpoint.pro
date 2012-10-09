@@ -7,7 +7,7 @@
 ;    object graphics
 ;
 ; :Examples:
-;    For example, let's rotate a point 90 degrees about the x-axis. The 
+;    For example, let's rotate a point 90 degrees about the x-axis. The
 ;    easiest way to specify the transformation matrix is with an IDLgrModel::
 ;
 ;       IDL> model = obj_new('IDLgrModel')
@@ -38,9 +38,9 @@
 ;-
 function mg_transformpoint, point, ctm
   compile_opt strictarr
-  
+
   _ctm = size(ctm, /type) eq 11 ? ctm->getCTM() : ctm
-  
+
   tPoint = _ctm ## [point, 1.0]
   return, reform(tPoint[0:2])
 end
@@ -52,5 +52,5 @@ model = obj_new('IDLgrModel')
 model->rotate, [1, 0, 0], 90
 print, mg_transformpoint([0, 1, 0], model)
 obj_destroy, model
-       
+
 end

@@ -2,7 +2,7 @@
 
 ;+
 ; Make a random (but smoothed) background texture.
-; 
+;
 ; :Params:
 ;   xsize : in, required, type=long
 ;     width of image

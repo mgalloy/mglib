@@ -22,7 +22,7 @@ function mg_urlquote, s, safe=safe, unquote=unquote, plus=plus
   compile_opt strictarr
 
   quoter = obj_new('MGnetURLQuoter', safe=safe)
-  
+
   case keyword_set(unquote) of
     0: case keyword_set(plus) of
          0: _result = quoter->quote(s)
@@ -33,8 +33,8 @@ function mg_urlquote, s, safe=safe, unquote=unquote, plus=plus
          1: _result = quoter->unquotePlus(s)
        endcase
   endcase
-  
+
   obj_destroy, quoter
-  
+
   return, _result
 end

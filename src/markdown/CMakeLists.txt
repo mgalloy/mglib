@@ -6,9 +6,9 @@ if (MARKDOWN_INCLUDE_DIR AND MARKDOWN_LIBRARY)
 
   add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 
-  if (APPLE) 
-    set_target_properties("${DLM_NAME}" 
-      PROPERTIES 
+  if (APPLE)
+    set_target_properties("${DLM_NAME}"
+      PROPERTIES
         PREFIX ""
         SUFFIX ".so"
     )
@@ -19,7 +19,7 @@ if (MARKDOWN_INCLUDE_DIR AND MARKDOWN_LIBRARY)
   install(TARGETS ${DLM_NAME}
     RUNTIME DESTINATION lib/${DIRNAME}
     LIBRARY DESTINATION lib/${DIRNAME}
-  )  
+  )
   install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
 

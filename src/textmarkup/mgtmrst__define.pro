@@ -7,13 +7,13 @@
 
 ;+
 ; Text to include afer a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
-; :Params: 
+; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
@@ -36,8 +36,8 @@ function mgtmrst::_preTag, type, newline=newline, tag=tag
         newline = 1
         return, ''
       end
-    'paragraph': return, ''     
-    'preformatted': return, ''     
+    'paragraph': return, ''
+    'preformatted': return, ''
     else: return, ''
   endcase
 end
@@ -45,17 +45,17 @@ end
 
 ;+
 ; Text to include after a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
 ;    type : in, required, type=string
 ;       type of `MGtmNode`
 ;
-; :Keywords: 
+; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
 ;       set to a named variable to get whether a newline should be added
 ;       at the given node

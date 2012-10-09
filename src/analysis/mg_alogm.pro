@@ -14,7 +14,7 @@ function mg_alogm, m
   compile_opt strictarr
 
   eigenvals = la_eigenproblem(m, eigenvectors=evecs)
-  logm = evecs # diag_matrix(alog(eigenvals)) # invert(evecs)  
-  
+  logm = evecs # diag_matrix(alog(eigenvals)) # invert(evecs)
+
   return, logm
 end

@@ -11,7 +11,7 @@
 ;    This should output something like:
 ;
 ;    .. image:: plots.png
-;    
+;
 ; :Categories:
 ;    direct graphics
 ;-
@@ -22,7 +22,7 @@
 ;
 ; :Params:
 ;    x : in, required, type="fltarr(n)/fltarr(2, n)/fltarr(3, n)"
-;       x-coordinates of points or alternatively a 2 by n or 3 by n array with 
+;       x-coordinates of points or alternatively a 2 by n or 3 by n array with
 ;       all the point data
 ;    y : in, optional, type=fltarr(n)
 ;       y-coordinates of points
@@ -40,13 +40,13 @@
 pro mg_plots, x, y, z, thick=thick, color=color, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   _thick = n_elements(thick) eq 0L ? 1.0 : thick
   _color = n_elements(color) eq 0L ? 'ffffff'x : color
 
   ncolors = n_elements(_color)
   nthick = n_elements(_thick)
-    
+
   case n_params() of
     0: message, 'incorrect number of parameters'
     1: begin
@@ -63,13 +63,13 @@ pro mg_plots, x, y, z, thick=thick, color=color, _extra=e
         for s = 0L, n_elements(x) - 2L do begin
           plots, [x[s], x[s+1]], [y[s], y[s+1]], $
                  color=_color[s mod ncolors], thick=_thick[s mod nthick]
-        endfor          
+        endfor
       end
     3: begin
         for s = 0L, n_elements(x) - 2L do begin
           plots, [x[s], x[s+1]], [y[s], y[s+1]], [z[s], z[s+1]], $
                  color=_color[s mod ncolors], thick=_thick[s mod nthick]
-        endfor          
+        endfor
       end
   endcase
 end

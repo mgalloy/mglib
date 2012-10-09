@@ -1,6 +1,6 @@
 ;+
 ; Reads connectivity list section and returns the connectivity list.
-; 
+;
 ; :Returns:
 ;    `lonarr`
 ;
@@ -46,18 +46,18 @@ end
 ;+
 ; Reads the sections of a POLYDATA dataset.
 ;
-; :Returns: 
+; :Returns:
 ;    object
 ;-
 pro mgffserialvtk::readPolydataDataset
   compile_opt strictarr, logical_predicate
-  
+
   done = 0B
 
   while (~eof(self.lun) && ~done) do begin
     sectionLine = self->getLine()
     sectionTokens = strsplit(sectionLine, /extract)
-    
+
     case strlowcase(sectionTokens[0]) of
       'points' : begin
         nPoints = long(sectionTokens[1])
@@ -67,7 +67,7 @@ pro mgffserialvtk::readPolydataDataset
       'vertices' : begin
         nVertices = long(sectionTokens[1])
         size = long(sectionTokens[2])
-        vertices = self->readConnectivityListSection(nVertices, size)        
+        vertices = self->readConnectivityListSection(nVertices, size)
       end
       'lines' :  begin
         nLines = long(sectionTokens[1])
@@ -150,7 +150,7 @@ pro readScalarsAttribute, nPoints, dataName, dataType, numComp
 
   lookupTableLine = self->getLine()
   lookupTableTokens = strsplit(lookupTableLine, /extract)
-  
+
   if (strlowcase(lookupTableTokens[0]) eq 'lookup_table') then begin
     tableName = lookupTableTokens[1]
     lookupTable = make_array(nPoints, type=dataType)
@@ -208,12 +208,12 @@ pro mgffserialvtk::readPointData, nPoints
   while (~eof(self.lun) && ~done) do begin
     attributeLine = self->getLine()
     attributeTokens = strsplit(attributeLine, /extract)
-    
+
     case strlowcase(attributeTokens[0]) of
       'scalars' : begin
         dataName = attributeTokens[1]
         dataType = self->convertVtkTypeToIdlType(attributeTokens[2])
-        numComp = n_elements(attributeTokens) gt 3 $                  
+        numComp = n_elements(attributeTokens) gt 3 $
                   ? long(attributeTokens[3]) $
                   : 1L
         self->readScalarsAttribute, nPoints, dataName, dataType, numComp
@@ -272,7 +272,7 @@ pro mgffserialvtk::readTopLevelLine
     'dataset' : self->readDataset, lineTokens[1]
     'point_data' : self->readPointData, long(lineTokens[1])
     'cell_data' : self->readCellData, long(lineTokens[1])
-    '' :   ; ignore blank lines 
+    '' :   ; ignore blank lines
     else :   ; error
   endcase
 end
@@ -375,8 +375,8 @@ end
 
 ;+
 ; Reads any already dimensioned variable.
-; 
-; :Params: 
+;
+; :Params:
 ;    data : in, out, required, type=any
 ;       IDL variable type to be used with READU or READF
 ;-
@@ -387,13 +387,13 @@ pro mgffserialvtk::getData, data
     readu, self.lun, data
   endif else begin
     readf, self.lun, data
-  endelse  
+  endelse
 end
 
 
 ;+
 ; Get properties of the object.
-; 
+;
 ; :Keywords:
 ;    version : out, optional, type=string
 ;       version of the VTK data file
@@ -429,7 +429,7 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;
-; :Params: 
+; :Params:
 ;    filename : in, required, type=string
 ;       filename of VTK serial data file
 ;-
@@ -449,7 +449,7 @@ end
 ; Define member variables for the class.
 ;
 ; :Fields:
-;    version 
+;    version
 ;       VTK data file version
 ;-
 pro mgffserialvtk__define

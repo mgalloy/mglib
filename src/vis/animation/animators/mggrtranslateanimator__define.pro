@@ -17,13 +17,13 @@
 ;-
 pro mggrtranslateanimator::animate, progress
   compile_opt strictarr
-  
+
   _progress = self.easing->ease(progress)
-  
+
   trans = (_progress - self.currentProgress) * self.translation
   self.target->translate, trans[0], trans[1], trans[2]
-  
-  self.currentProgress = _progress  
+
+  self.currentProgress = _progress
 end
 
 
@@ -43,10 +43,10 @@ function mggrtranslateanimator::init, translation=translation, _extra=e
   compile_opt strictarr
 
   if (~self->mggranimator::init(_extra=e)) then return, 0
-  
+
   self.translation = n_elements(translation) eq 0L ? fltarr(3) + 1.0 : translation
   self.currentProgress = 0.0
-  
+
   return, 1
 end
 

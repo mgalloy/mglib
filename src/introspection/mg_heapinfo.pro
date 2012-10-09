@@ -17,7 +17,7 @@ pro mg_heapinfo, n_pointers=nPointers, n_objects=nObjects
   if (arg_present(nPointers)) then begin
     nPointers = long(strmid(output[1], strpos(output[1], ':') + 1))
   endif
-    
+
   if (arg_present(nObjects)) then begin
     nObjects = long(strmid(output[2], strpos(output[2], ':') + 1))
   endif

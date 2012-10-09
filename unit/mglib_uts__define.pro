@@ -2,11 +2,11 @@
 
 ;+
 ; Initialize object, adding all test cases.
-; 
-; :Returns: 
+;
+; :Returns:
 ;    1 for success, 0 for failure
 ;
-; :Keywords: 
+; :Keywords:
 ;    _extra : in, optional, type=keywords
 ;       keywords to `MGutTestSuite::init`
 ;-

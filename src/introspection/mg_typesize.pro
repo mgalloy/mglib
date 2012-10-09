@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Returns the size in bytes of a variable of the given type code. Types which 
+; Returns the size in bytes of a variable of the given type code. Types which
 ; don't have a fixed size like strings, pointers, and objects return `-1L`.
 ;
 ; :Returns:
@@ -14,9 +14,9 @@
 function mg_typesize, type_code
   compile_opt strictarr
   on_error, 2
-  
+
   undefined = 0B
-  
+
   case type_code of
     0: return, 0L
     1: return, 1L

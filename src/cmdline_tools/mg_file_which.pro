@@ -22,7 +22,7 @@
 ;    path : in, optional, type=string
 ;       path to search, delimited by `path_sep(/search_path)`
 ;    file : in, required, type=string
-;       file to search for, may include wildcards 
+;       file to search for, may include wildcards
 ;
 ; :Keywords:
 ;    include_current_dir : in, optional, type=boolean
@@ -57,7 +57,7 @@ function mg_file_which, path, file, include_current_dir=includeCurrentDir, $
   endif
 
   files = file_search(strsplit(_path, path_sep(/search_path), /extract), _file)
-  
+
   ; for some reason, some results are returned multiple times from FILE_SEARCH
   return, files[uniq(files)]
 end

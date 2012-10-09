@@ -7,17 +7,17 @@
 
 ;+
 ; Do the easing. Default is linear transition.
-; 
+;
 ; :Returns:
 ;    the correct value
-; 
+;
 ; :Params:
 ;    t : in, required, type=float
 ;      animation progress, 0 to 1.
 ;-
 function mggreasing::ease, t
   compile_opt strictarr
-  
+
   return, t
 end
 
@@ -31,6 +31,6 @@ end
 ;-
 pro mggreasing__define
   compile_opt strictarr
-  
+
   define = { MGgrEasing, _dummy: 0B }
 end

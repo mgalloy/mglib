@@ -6,7 +6,7 @@
 ;
 ; If trying to erase previous content, make sure to print the previous content
 ; using the `$` format code which indicates to not move to a new line.
-; 
+;
 ; Note that this routine will not work in terminals that don't understand
 ; ANSI escape codes, i.e., the Workbench command line.
 ;
@@ -22,9 +22,9 @@
 ;-
 pro mg_backspace, nchars
   compile_opt strictarr
-  
+
   _nchars = n_elements(nchars) eq 0L ? 1L : nchars
-  
+
   esc = string(27B)
   print, esc + '[' + strtrim(_nchars, 2) + 'D' + esc + '[K', format='(A, $)'
 end

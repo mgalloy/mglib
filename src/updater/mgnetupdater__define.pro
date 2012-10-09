@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 
-                  
+
 
 ; main-level example program
 
@@ -17,10 +17,10 @@ if (needsUpdating) then begin
     print, releases[r].description
     print
   endfor
-  
+
   ; get most recent update
   updater->update(version=releases[0].version)
-endif 
+endif
 
 obj_destroy, updater
 

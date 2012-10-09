@@ -37,13 +37,13 @@
 ;
 ; :Uses:
 ;    `MGcoHashTable`
-; 
+;
 ; :Requires:
 ;    IDL 6.2
 ;-
 
 
-; Class definition for a helper object representing individual option 
+; Class definition for a helper object representing individual option
 ; definitions.
 
 ;+
@@ -53,7 +53,7 @@
 ;-
 pro mg_opt::setProperty, short_name=shortName
   compile_opt strictarr
-  
+
   if (n_elements(shortName) gt 0L) then begin
     self.shortName = shortName
   endif
@@ -70,33 +70,33 @@ pro mg_opt::getProperty, long_name=longName, short_name=shortName, $
                          key_column_width=keyColumnWidth, $
                          help_header=helpHeader
   compile_opt strictarr
-  
+
   if (arg_present(longName)) then longName = self.longName
   if (arg_present(shortName)) then shortName = self.shortName
   if (arg_present(boolean)) then boolean = self.boolean
   if (arg_present(metavar)) then metavar = self.metavar
-  
+
   if (arg_present(keyColumnWidth) || arg_present(helpHeader)) then begin
     helpHeader = '--' + self.longName
     helpText = self.metavar eq '' ? strupcase(self.longName) : self.metavar
-    
+
     if (~self.boolean) then begin
       helpHeader += '=' + helpText
     endif
-    
+
     if (self.shortName ne '') then begin
       helpHeader += ', -' + self.shortName
-      
+
       if (~self.boolean) then helpHeader += ' ' + helpText
     endif
-    
+
     keyColumnWidth = strlen(helpHeader)
   endif
 end
 
 
 ;+
-; Returns whether the option has had a value set i.e. it is present on the 
+; Returns whether the option has had a value set i.e. it is present on the
 ; current command line.
 ;
 ; :Private:
@@ -106,7 +106,7 @@ end
 ;-
 function mg_opt::isPresent
   compile_opt strictarr
-  
+
   return, self.present
 end
 
@@ -121,13 +121,13 @@ end
 ;-
 function mg_opt::getHelp
   compile_opt strictarr
-  
+
   return, self.help
 end
 
 
 ;+
-; Get value of the option. 
+; Get value of the option.
 ;
 ; :Private:
 ;
@@ -142,7 +142,7 @@ function mg_opt::getValue, present=present
   compile_opt strictarr
 
   present = self.present
-  
+
   if (self.boolean) then begin
     return, self.present ? 1B : 0B
   endif else begin
@@ -163,7 +163,7 @@ end
 pro mg_opt::setValue, value
   compile_opt strictarr
   on_error, 2
-  
+
   self.present = 1B
   if (n_elements(value) gt 0L) then begin
     self.value = value
@@ -199,13 +199,13 @@ end
 function mg_opt::init, long_name=longName, boolean=boolean, $
                        help=help, default=default, metavar=metavar
   compile_opt strictarr
-  
+
   self.longName = longName
   self.boolean = keyword_set(boolean)
   self.help = n_elements(help) gt 0L ? help : ''
   self.default = n_elements(default) gt 0L ? default : ''
   self.metavar = n_elements(metavar) gt 0L ? metavar : ''
-  
+
   return, 1
 end
 
@@ -235,7 +235,7 @@ end
 ;-
 pro mg_opt__define
   compile_opt strictarr
-  
+
   define = { mg_opt, $
              longName: '', $
              shortName: '', $
@@ -259,7 +259,7 @@ end
 ; :Params:
 ;    optname : in, required, type=string
 ;       long name of option
-; 
+;
 ; :Keywords:
 ;    params : in, optional, type=boolean
 ;       set to return parameters
@@ -272,9 +272,9 @@ function mg_options::get, optname, params=params, n_params=nparams, $
                           present=present
   compile_opt strictarr
   on_error, 2
-  
+
   if (keyword_set(params)) then return, self.params->get(/all, count=nparams)
-  
+
   opt = self.longOptions->get(optname, found=found)
   if (~found) then message, string(optname, format='(%"option %s not found")')
   return, opt->getValue(present=present)
@@ -292,12 +292,12 @@ pro mg_options::_displayHelp
 
   keys = self.longOptions->keys(count=nkeys)
   shortNames = self.shortOptions->keys(count=nshortNames)
-  
+
   args = ''
   if (self.nparamsAccepted[0] gt 0L) then begin
     args += strjoin('arg' + strtrim(indgen(self.nparamsAccepted[0]) + 1, 2), ' ')
   endif
-  
+
   case 1 of
     self.nParamsAccepted[1] lt 0L: args += '...'
     self.nParamsAccepted[1] eq 0L:
@@ -307,14 +307,14 @@ pro mg_options::_displayHelp
             = indgen(self.nparamsAccepted[1] - self.nparamsAccepted[0]) $
                 + self.nparamsAccepted[0]
           if (args ne '') then args += ' '
-          args += strjoin('[arg' + strtrim(optionalArgIndices, 2) + ']', ' ')      
-        endif        
+          args += strjoin('[arg' + strtrim(optionalArgIndices, 2) + ']', ' ')
+        endif
       end
-  endcase 
-  
+  endcase
+
   print, self.appname, args, format='(%"usage: %s [options] %s")'
-  print 
-  
+  print
+
   keyColumnWidth = 2L
   maxKeyColumnWidth = 24L
   for k = 0L, nkeys - 1L do begin
@@ -322,14 +322,14 @@ pro mg_options::_displayHelp
     opt->getProperty, key_column_width=keyWidth
     keyColumnWidth >= keyWidth
   endfor
-  
+
   keyColumnWidth = keyColumnWidth < maxKeyColumnWidth
   combinedFormat = '(%"  %-' + strtrim(keyColumnWidth, 2L) + 's  %s")'
   splitFormat1 = '(%"  %-0s")'
   splitFormat2 = '(%"' + strjoin((strarr(maxKeyColumnWidth + 4L) + ' ')) + '%s")'
-  
+
   print, 'options:'
-  keyind = sort(keys)  
+  keyind = sort(keys)
   for k = 0L, nkeys - 1L do begin
     opt = self.longOptions->get(keys[keyind[k]])
     opt->getProperty, help_header=helpHeader
@@ -370,22 +370,22 @@ end
 ;-
 pro mg_options::parseArgs, args, error_message=errorMsg
   compile_opt strictarr
-  
+
   errorMsg = ''
-  
+
   _args = n_elements(args) eq 0L ? command_line_args(count=nargs) : args
   _nargs = n_elements(nargs) eq 0L ? n_elements(args) : nargs
-  
+
   argumentExpected = 0B
-  
+
   for a = 0L, _nargs - 1L do begin
-    ; set an option value from the last token in the argument list 
+    ; set an option value from the last token in the argument list
     if (argumentExpected) then begin
       opt->setValue, _args[a]
       argumentExpected = 0B
       continue
     endif
-    
+
     ; long form
     if (strpos(_args[a], '--') eq 0L) then begin
       equalpos = strpos(_args[a], '=')
@@ -394,15 +394,15 @@ pro mg_options::parseArgs, args, error_message=errorMsg
       endif else begin
         optname = strmid(_args[a], 2L, equalpos - 2L)
       endelse
-      
+
       opt = self.longOptions->get(optname, found=found)
       opt->getProperty, boolean=boolean
-      
+
       if (~found) then begin
         errorMsg = string(optname, format='(%"unknown option: --%s")')
         return
       endif
-      
+
       if (boolean) then begin
         opt->setValue
       endif else begin
@@ -412,16 +412,16 @@ pro mg_options::parseArgs, args, error_message=errorMsg
           opt->setValue, strmid(_args[a], equalpos + 1L)
         endelse
       endelse
-      
+
       continue
     endif
-    
+
     ; short form
     if (strpos(_args[a], '-') eq 0L) then begin
       for sf = 1L, strlen(_args[a]) - 1L do begin
         shortName = strmid(_args[a], sf, 1)
         opt = self.shortOptions->get(shortName, found=found)
-        
+
         if (~found) then begin
           errorMsg = string(shortName, format='(%"unknown option: -%s")')
           return
@@ -440,10 +440,10 @@ pro mg_options::parseArgs, args, error_message=errorMsg
           argumentExpected = 1B
         endelse
       endfor
-      
+
       continue
     endif
-    
+
     ; argument
     self.params->add, _args[a]
   endfor
@@ -455,19 +455,19 @@ pro mg_options::parseArgs, args, error_message=errorMsg
 
   helpOpt = self.longOptions->get('help')
   if (helpOpt->isPresent()) then self->_displayHelp
-  
+
   versionOpt = self.longOptions->get('version', found=versionFound)
-  if (versionFound && versionOpt->isPresent()) then self->_displayVersion  
-  
+  if (versionFound && versionOpt->isPresent()) then self->_displayVersion
+
   if (helpOpt->isPresent() || (versionFound && versionOpt->isPresent())) then return
-  
+
   nparams = self.params->count()
   if (nparams lt self.nParamsAccepted[0]) then begin
     errorMsg = string(self.nParamsAccepted[0], nparams, $
                       format='(%"%d parameters required, %d given")')
     return
   endif
-  
+
   if (self.nParamsAccepted[1] ge 0L && nparams gt self.nParamsAccepted[1]) then begin
     errorMsg = string(self.nParamsAccepted[1], nparams, $
                       format='(%"%d parameters allowed, %d given")')
@@ -498,7 +498,7 @@ end
 pro mg_options::addOption, longForm, shortForm, help=help, default=default, $
                            boolean=boolean, metavar=metavar
   compile_opt strictarr
-  
+
   opt = obj_new('mg_opt', $
                 long_name=longForm, $
                 boolean=boolean, help=help, default=default, metavar=metavar)
@@ -521,15 +521,15 @@ end
 pro mg_options::addParams, nparamsRange
   compile_opt strictarr
   on_error, 2
-  
+
   if (nparamsRange[0] lt 0L) then begin
     message, 'minimum number of params must be positive'
   endif
-  
+
   if (nparamsRange[1] gt 0L && (nparamsRange[1] lt nparamsRange[0])) then begin
     message, 'maximum number of params must be greater than minimum number'
   endif
-  
+
   self.nParamsAccepted = nparamsRange
 end
 
@@ -543,7 +543,7 @@ pro mg_options::cleanup
   ; free individual options objects
   opts = self.longOptions->values(count=count)
   if (count gt 0L) then obj_destroy, opts
-  
+
   ; free hash tables of options
   obj_destroy, [self.longOptions, self.shortOptions, self.params]
 end
@@ -563,19 +563,19 @@ end
 ;-
 function mg_options::init, app_name=appname, version=version
   compile_opt strictarr
-  
+
   self.appname = n_elements(appname) eq 0L ? 'app' : appname
   self.version = n_elements(version) eq 0L ? '' : version
-  
+
   self.longOptions = obj_new('MGcoHashTable', key_type=7, value_type=11)
   self.shortOptions = obj_new('MGcoHashTable', key_type=7, value_type=11)
   self.params = obj_new('MGcoArrayList', type=7)
-  
+
   self->addOption, 'help', 'h', /boolean, help='display this help'
   if (self.version ne '') then begin
     self->addOption, 'version', /boolean, help='display version information'
   endif
-  
+
   return, 1
 end
 
@@ -591,7 +591,7 @@ end
 ;-
 pro mg_options__define
   compile_opt strictarr
-  
+
   define = { mg_options, $
              appname: '', $
              version: '', $

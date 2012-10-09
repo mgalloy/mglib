@@ -5,7 +5,7 @@
 ;
 ; :Bugs:
 ;    very simple implementation
-; 
+;
 ; :Categories:
 ;    graphics computation
 ;-
@@ -28,26 +28,26 @@
 ;-
 function mg_force, data, min_distance=minDistance, n_rounds=nrounds
   compile_opt strictarr
-  
+
   ndata = n_elements(data)
   result = data
-  
+
   _nrounds = n_elements(nrounds) eq 0L ? 20L : nrounds
   maxValue = max(data, min=minValue)
   inc = (maxValue - minValue ) / ndata / 10.0
-  
+
   for r = 0L, _nrounds - 1L do begin
     for item = 0L, ndata - 1L do begin
       for otherItem = 0L, ndata - 1L do begin
         if (item eq otherItem) then continue
-        
+
         if ((result[item] ge result[otherItem]) $
               and (result[item] - result[otherItem] lt minDistance)) then begin
           result[item] += inc
           result[otherItem] -= inc
         endif
       endfor
-    endfor 
+    endfor
   endfor
 
   return, result

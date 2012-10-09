@@ -17,7 +17,7 @@
 function mg_gradient, arr, dx, dy
   compile_opt strictarr
   on_error, 2
-  
+
   ndims = size(arr, /n_dimensions)
   dims = size(arr, /dimensions)
 
@@ -30,18 +30,18 @@ function mg_gradient, arr, dx, dy
       end
     else: message, 'invalid number of dimensions for input array'
   endswitch
-  
+
   case ndims of
     1: return, deriv(findgen(dims[0]) * _dx, arr)
-    2: begin        
+    2: begin
         grad_x = (shift(arr, -1, 0) - shift(arr, 1, 0)) / (2. * _dx)
         grad_y = (shift(arr, 0, -1) - shift(arr, 0, 1)) / (2. * _dy)
-        
+
         grad = make_array(dimension=[2, dims], type=size(arr, /type))
 
         grad[0, *, *] = grad_x
         grad[1, *, *] = grad_y
-        
+
         return, grad
       end
     else:

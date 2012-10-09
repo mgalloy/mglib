@@ -1,6 +1,6 @@
 ;+
 ; Computes a transformation matrix representing a rotation.
-; 
+;
 ; @returns fltarr(4, 4)
 ; @param axis {in}{required}{type=fltarr(3)} axis to rotate about
 ; @param angle {in}{required}{type=float} angle to rotate about axis

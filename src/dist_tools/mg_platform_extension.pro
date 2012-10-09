@@ -21,7 +21,7 @@
 ;-
 function mg_platform_extension, extension=extension
   compile_opt strictarr
-  
+
   ext = !version.os_family eq 'unix' ? '.so' : '.dll'
   platform = strmid(expand_path('<IDL_BIN_DIRNAME>'), 4)   ; remove "bin."
   return, platform + (keyword_set(extension) ? ext : '')

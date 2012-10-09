@@ -17,7 +17,7 @@
 ; Create a legend.
 ;
 ; :Todo:
-;    LINE_LENGTH and GAP should be specified in something besides normal 
+;    LINE_LENGTH and GAP should be specified in something besides normal
 ;    coords
 ;
 ; :Keywords:
@@ -57,12 +57,12 @@ pro mg_legend, background=background, $
                frame=frame, line_height=lineHeight, $
                _extra=e
   compile_opt strictarr
-  
+
   _lineLength = n_elements(lineLength) eq 0L ? 0.4 : lineLength
   _gap = n_elements(gap) eq 0L ? 0.2 : gap
   _frame = keyword_set(frame) ? 0B : 4B
   _lineHeight = n_elements(lineHeight) eq 0L ? 0.0 : lineHeight
-  
+
   nitems = max([n_elements(itemColor), n_elements(itemLinestyle), $
                 n_elements(itemName), n_elements(itemPsym)])
 
@@ -71,7 +71,7 @@ pro mg_legend, background=background, $
         xticks=1, xtickname=strarr(2) + ' ', $
         yticks=1, ytickname=strarr(2) + ' ', $
         xstyle=1B or _frame, ystyle=1B or _frame, _extra=e
-        
+
   if (n_elements(background) gt 0L) then begin
     polyfill, [0., 1., 1., 0., 0.], [0., 0., nitems, nitems, 0.], $
               color=background
@@ -82,7 +82,7 @@ pro mg_legend, background=background, $
         xticks=1, xtickname=strarr(2) + ' ', $
         yticks=1, ytickname=strarr(2) + ' ', $
         xstyle=1B or _frame, ystyle=1B or _frame, _extra=e
-          
+
   for i = 0L, nitems - 1L do begin
     icolor = n_elements(itemColor) eq 0L $
                ? 'ffffff'x $
@@ -92,19 +92,19 @@ pro mg_legend, background=background, $
               : itemName[i mod n_elements(itemName)]
     ipsym = n_elements(itemPsym) eq 0L $
               ? 0L $
-              : itemPsym[i mod n_elements(itemPsym)]    
+              : itemPsym[i mod n_elements(itemPsym)]
     ilinestyle = n_elements(itemLinestyle) eq 0L $
                    ? 0L $
-                   : itemLinestyle[i mod n_elements(itemLinestyle)]   
+                   : itemLinestyle[i mod n_elements(itemLinestyle)]
     iSymsize = n_elements(itemSymsize) eq 0L $
                  ? 1.0 $
                  : itemSymsize[i mod n_elements(itemSymsize)]
     iThick = n_elements(itemThick) eq 0L $
                  ? 1.0 $
                  : itemThick[i mod n_elements(itemThick)]
-                                                     
-    ipsym = n_elements(itemLinestyle) eq 0L ? ipsym : -ipsym  
-    
+
+    ipsym = n_elements(itemLinestyle) eq 0L ? ipsym : -ipsym
+
     if (n_elements(itemLinestyle) ge 0L) then begin
       x = [0., _lineLength]
       y = fltarr(2) + nitems - i - 1L
@@ -147,8 +147,8 @@ d = randomu(seed, 100, 5)
 plot, findgen(100),  1.5 * findgen(100) / 99., /nodata, xstyle=9, ystyle=9
 
 for i = 0, 4 do begin
-  d[*, i] = smooth(d[*, i], 5., /edge_truncate)  
-  
+  d[*, i] = smooth(d[*, i], 5., /edge_truncate)
+
   oplot, reform(d[*, i]), $
          color=colors[i mod n_elements(colors)], $
          psym=-psyms[i mod n_elements(psyms)], $

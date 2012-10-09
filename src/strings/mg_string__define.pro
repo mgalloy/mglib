@@ -2,9 +2,9 @@
 
 ;+
 ; Class representing a string and an example of using operator overloading
-; available in IDL 8.0. 
+; available in IDL 8.0.
 
-; This class does not require IDL 8.0 to compile because an IDL_Object class 
+; This class does not require IDL 8.0 to compile because an IDL_Object class
 ; (which this class inherits from) is provided. Operator overloading will not
 ; be available when using IDL versions before 8.0, but the methods could be
 ; called directly.
@@ -27,7 +27,7 @@
 ;-
 pro mg_string::getProperty, length=length
   compile_opt strictarr
-  
+
   if (arg_present(length)) then length = strlen(self.s)
 end
 
@@ -40,20 +40,20 @@ end
 ;-
 function mg_string::toString
   compile_opt strictarr
-  
+
   return, self.s
 end
 
 
 ;+
-; Called when a string object is accessed with the square brackets, i.e., 
+; Called when a string object is accessed with the square brackets, i.e.,
 ; `[]`.
-; 
+;
 ; :Examples:
 ;    For example::
 ;
 ;       IDL> s = mg_string('Hello, World!')
-;       IDL> print, s[0]                   
+;       IDL> print, s[0]
 ;       H
 ;       IDL> print, s[0:4]
 ;       Hello
@@ -63,7 +63,7 @@ end
 ;
 ; :Params:
 ;    isRange : in, required, type=lonarr(1..8)
-;       array of the same length as the number of dimensions indexed in the 
+;       array of the same length as the number of dimensions indexed in the
 ;       bracket expression
 ;    ss1 : in, required, type=long or lonarr(3)
 ;       index or range of characters to extract
@@ -120,7 +120,7 @@ function mg_string::_overloadPound, left, right
 
   _left = obj_valid(left) ? left->toString() : left
   _right = obj_valid(right) ? right->toString() : right
-     
+
   return, mg_string(_right, format='(%"' + _left + '")')
 end
 
@@ -132,7 +132,7 @@ end
 ; :Examples:
 ;    For example::
 ;
-;       IDL> s1 = mg_string('Hello')       
+;       IDL> s1 = mg_string('Hello')
 ;       IDL> s2 = mg_string('World!')
 ;       IDL> print, s1 + s2
 ;       HelloWorld!
@@ -147,13 +147,13 @@ end
 ;       string on the left of the + operator
 ;    right : in, required, type=string or string object
 ;       string on the right of the + operator
-;-                                                  
+;-
 function mg_string::_overloadPlus, left, right
   compile_opt strictarr
 
   _left = obj_valid(left) ? left->toString() : left
   _right = obj_valid(right) ? right->toString() : right
-  
+
   return, mg_string(_left + _right)
 end
 
@@ -179,7 +179,7 @@ function mg_string::_overloadHelp, varname
   compile_opt strictarr
 
   return, string(varname, 'MG_STRING', self->toString(), $
-                 format='(%"%-15s %-9s = ''%s''")')  
+                 format='(%"%-15s %-9s = ''%s''")')
 end
 
 
@@ -190,7 +190,7 @@ end
 ;    For example::
 ;
 ;       IDL> s = mg_string('Hello, World!')
-;       IDL> print, s                      
+;       IDL> print, s
 ;       Hello, World!
 ;
 ; :Returns:
@@ -198,7 +198,7 @@ end
 ;-
 function mg_string::_overloadPrint
   compile_opt strictarr
-  
+
   return, self->toString()
 end
 
@@ -244,9 +244,9 @@ end
 ;-
 function mg_string::init, str, format=format
   compile_opt strictarr
-  
+
   self.s = string(str, format=format)
-  
+
   return, 1
 end
 
@@ -260,7 +260,7 @@ end
 ;-
 pro mg_string__define
   compile_opt strictarr
-  
+
   define = { MG_String, inherits IDL_Object, s: '' }
 end
 

@@ -6,7 +6,7 @@
 ; :Examples:
 ;    Run the main-level program at the end of this file::
 ;
-;       IDL> .run mg_lineplot 
+;       IDL> .run mg_lineplot
 ;
 ; :Categories:
 ;    direct graphics
@@ -31,10 +31,10 @@
 pro mg_lineplot, x, y, thick=thick, color=color, _extra=e
   compile_opt strictarr
   on_error, 2
-  
+
   _thick = n_elements(thick) eq 0L ? 1.0 : thick
   _color = n_elements(color) eq 0L ? 'ffffff'x : color
-  
+
   case n_params() of
     0: message, 'incorrect number of parameters'
     1: begin
@@ -46,9 +46,9 @@ pro mg_lineplot, x, y, thick=thick, color=color, _extra=e
         _y = y
       end
   endcase
-  
+
   plot, _x, _y, /nodata, _extra=e
-  
+
   ncolors = n_elements(_color)
   nthick = n_elements(_thick)
   for s = 0L, n_elements(_x) - 2L do begin

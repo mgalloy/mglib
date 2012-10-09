@@ -16,9 +16,9 @@
 ;                       atitle='aerosol single scattering albedo', $
 ;                       btitle='Angstrom exponent', $
 ;                       ctitle='back-scattering fraction'
-; 
+;
 ;    This should produce the following:
-; 
+;
 ;    .. image:: ternary_data.png
 ;
 ;    The next example does::
@@ -35,7 +35,7 @@
 ;       mg_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
 ;       mg_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
 ;       mg_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
-; 
+;
 ;    It should produce the following:
 ;
 ;    .. image:: ternary_sample.png
@@ -44,7 +44,7 @@
 
 ;+
 ; Create a ternary plot.
-; 
+;
 ; :Params:
 ;    a : in, required, type=fltarr
 ;       closer to lower left indicates higher `a` value
@@ -82,7 +82,7 @@ pro mg_ternaryplot, a, b, c, $
   orig_t3d = !p.t
   orig_xmargin = !x.margin
   orig_ymargin = !y.margin
-  
+
   margin = 1.5 ; cm
   !x.margin = n_elements(xmargin) eq 0L $
                 ? (fltarr(2) + margin * !d.x_px_cm / !d.x_ch_size) $
@@ -90,7 +90,7 @@ pro mg_ternaryplot, a, b, c, $
   !y.margin = n_elements(ymargin) eq 0L $
                 ? (fltarr(2) + margin * !d.y_px_cm / !d.y_ch_size) $
                 : ymargin
-  
+
   if (~keyword_set(overplot)) then begin
     plot, [0., 1.], [0., 1.], xstyle=9, ystyle=5, /nodata, /isotropic, _extra=e
 
@@ -114,33 +114,33 @@ pro mg_ternaryplot, a, b, c, $
 
     ; convert character heights to data coordinates
     charheight = (1.0 * !d.y_ch_size / !d.y_size) / !y.s[1]
-    
+
     if (n_elements(atitle) gt 0L) then begin
       xyouts, 0., 0. - 3. * charheight, atitle, alignment=0., _extra=e
     endif
-    
+
     if (n_elements(btitle) gt 0L) then begin
       xyouts, 0.5, sqrt(3) / 2. + 2. * charheight, btitle, alignment=0.5, _extra=e
     endif
-    
+
     if (n_elements(ctitle) gt 0L) then begin
       xyouts, 1., 0. - 3. * charheight, ctitle, alignment=1., _extra=e
     endif
-  endif  
-  
+  endif
+
   if (~keyword_set(nodata)) then begin
     constant = a + b + c
-  
+
     _a = a / constant
     _b = b / constant
     _c = c / constant
-    
+
     x = _b + _c / 2.
     y = sqrt(3) / 2. * _c
-    
+
     plots, x, y, psym=4, _extra=e
   endif
-  
+
   ; restore system variables
   !p.t = orig_t3d
   !x.margin = orig_xmargin

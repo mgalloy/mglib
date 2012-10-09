@@ -2,12 +2,12 @@
 
 ;+
 ; Class representing a wrapper for a routine.
-; 
+;
 ; :Private:
 ;
 ; :Properties:
 ;    name
-;       name of routine to wrap 
+;       name of routine to wrap
 ;    prefix
 ;       prefix to add to routine for name of wrapper routine
 ;    prototype
@@ -30,7 +30,7 @@ pro mg_routinebinding::setProperty, name=name, $
                                     return_type=returnType, $
                                     prototype=prototype
   compile_opt strictarr
-  
+
   if (n_elements(name) gt 0L) then self.name = name
   if (n_elements(prefix) gt 0L) then self.prefix = prefix
   if (n_elements(cprefix) gt 0L) then self.cprefix = cprefix
@@ -71,11 +71,11 @@ function mg_routinebinding::output
   compile_opt strictarr
 
   output = ''
-  
+
   if (self.prototype ne '') then begin
     output += string(self.prototype, mg_newline(), format='(%"// %s%s")')
   endif
-  
+
   case size(*self.returnType, /type) of
     3: returnTypeStr = *self.returnType eq 0L ? 'void' : 'IDL_VPTR'
     7: returnTypeStr = 'IDL_VPTR'
@@ -84,13 +84,13 @@ function mg_routinebinding::output
                    self.cprefix, $
                    self.name, $
                    format='(%"static %s %s_%s(int argc, IDL_VPTR *argv, char *argk) {")')
-                   
+
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
                      mg_idltype(*self.returnType, /declaration), $
                      format='(%"%s  %s result;")')
   endif
-  
+
   if (n_elements(self.parameters) gt 0L) then begin
     foreach p, self.parameters, i do begin
       output += string(mg_newline(), $
@@ -115,31 +115,31 @@ function mg_routinebinding::output
       endelse
     endforeach
   endif
-  
+
   output += mg_newline() + '  '
   indent_len = 2L  ; start with two space indent from above line
-  
+
   if (returnTypeStr ne 'void') then begin
     r = string(mg_idltype(*self.returnType, /declaration), $
                format='(%"result = (%s) ")')
     output += r
     indent_len += strlen(r)
   endif
-  
+
   routine_call = string(self.name, format='(%"%s(")')
   output += routine_call
   indent_len += strlen(routine_call)
   indent = string(bytarr(indent_len) + 32B)
 
-  if (n_elements(self.parameters) gt 0L) then begin                    
-    foreach p, self.parameters, i do begin    
+  if (n_elements(self.parameters) gt 0L) then begin
+    foreach p, self.parameters, i do begin
       if (p.array) then begin
         if (p.device) then begin
           param = string(mg_idltype(p.type, /declaration), i, $
                          format='(%"(%s *) argv[%d]->value.ptrint")')
         endif else begin
           param = string(mg_idltype(p.type, /declaration), i, $
-                         format='(%"(%s *) argv[%d]->value.arr->data")')          
+                         format='(%"(%s *) argv[%d]->value.arr->data")')
         endelse
       endif else begin
         if (p.type eq 7L) then begin
@@ -157,7 +157,7 @@ function mg_routinebinding::output
                        format='(%"%s%s%s  // %s")')
     endforeach
   endif else output += ');'
-                       
+
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
                      mg_idltype(*self.returnType, /declaration), $
@@ -165,7 +165,7 @@ function mg_routinebinding::output
   endif
 
   output += string(mg_newline(), format='(%"%s}")')
-  
+
   return, output
 end
 
@@ -184,7 +184,7 @@ end
 ;       set to indicate this parameter is a pointer to an array
 ;    device : in, optional, type=boolean
 ;       set to indicate this parameter is a device pointer
-;    
+;
 ;-
 pro mg_routinebinding::addParameter, type=type, $
                                      prototype=prototype, $
@@ -192,7 +192,7 @@ pro mg_routinebinding::addParameter, type=type, $
                                      array=array, $
                                      device=device
   compile_opt strictarr
-  
+
   self.parameters->add, { type: type, $
                           pointer: keyword_set(pointer), $
                           array: keyword_set(array), $
@@ -206,7 +206,7 @@ end
 ;-
 pro mg_routinebinding::cleanup
   compile_opt strictarr
-  
+
   ptr_free, self.returnType
   obj_destroy, [self.parameters, self.parameter_prototypes]
 end
@@ -214,30 +214,30 @@ end
 
 ;+
 ; Create routine binding.
-; 
+;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
 function mg_routinebinding::init, _extra=e
   compile_opt strictarr
-  
+
   self.parameters = list()
   self.parameter_prototypes = list()
-  
+
   self.prefix = ''
   self.cprefix = 'IDL'
   self.returnType = ptr_new(/allocate_heap)
   self->setProperty, _extra=e
-  
+
   return, 1
 end
 
 
 ;+
 ; Defines instance variables.
-; 
+;
 ; :Fields:
-;    name 
+;    name
 ;       name of the routine to call
 ;    prefix
 ;       prefix to add to routine for name of wrapper routine
@@ -248,7 +248,7 @@ end
 ;-
 pro mg_routinebinding__define
   compile_opt strictarr
-  
+
   define = { mg_routinebinding, $
              name: '', $
              prototype: '', $

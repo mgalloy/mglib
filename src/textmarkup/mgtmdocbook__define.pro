@@ -7,10 +7,10 @@
 
 ;+
 ; Text to include afer a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -19,7 +19,7 @@
 ;
 ; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added at 
+;       set to a named variable to get whether a newline should be added at
 ;       the given node
 ;    tag : in, required, type=object
 ;       tag's object reference
@@ -31,7 +31,7 @@ function mgtmdocbook::_preTag, type, newline=newline, tag=tag
     '': return, ''
     'bold': return, '<bold>'
     'bullet_list': return, '<ul>'
-    'code': return, '<code>'    
+    'code': return, '<code>'
     'comments': return, '<span class="comments">'
     'emphasis': return, '<emphasis>'
     'image': begin
@@ -51,7 +51,7 @@ function mgtmdocbook::_preTag, type, newline=newline, tag=tag
         return, '<inlinemediaobject><imageobject>' $
                   + '<imagedata scale="75" fileref="' + location + src + '" format="' + ext + '"/>' $
                   + '</imageobject></inlinemediaobject>'
-      end      
+      end
     'link': begin
         href = tag->getAttribute('reference')
         return, '<a href="' + href + '">'
@@ -72,10 +72,10 @@ end
 
 ;+
 ; Text to include after a markup node of the given type.
-;     
+;
 ; :Private:
 ;
-; :Returns: 
+; :Returns:
 ;    string
 ;
 ; :Params:
@@ -84,7 +84,7 @@ end
 ;
 ; :Keywords:
 ;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added at the 
+;       set to a named variable to get whether a newline should be added at the
 ;       given node
 ;    tag : in, required, type=object
 ;       tag's object reference

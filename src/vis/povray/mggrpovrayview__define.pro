@@ -7,34 +7,34 @@
 ;    object graphics
 ;
 ; :Examples:
-;    Focal blur can be set up by setting the APERTURE and BLUR_SAMPLES 
+;    Focal blur can be set up by setting the APERTURE and BLUR_SAMPLES
 ;    keywords when creating the view::
-;    
+;
 ;       view = obj_new('MGgrPOVRayView', name='view', color=[200, 200, 255], $
-;                      aperture=0.4, blur_samples=20L) 
-;               
+;                      aperture=0.4, blur_samples=20L)
+;
 ;    The FOCAL_POINT can be set later when the coordinate transformations are
 ;    known since the coordinates of the FOCAL_POINT are in view coordinates,
-;    not data coordinates:: 
-;               
+;    not data coordinates::
+;
 ;       view->setProperty, focal_point=mg_transformpoint([0.52, 0.317, 0.0], cow)
-;                
-;    See the example attached to the end of this file as a main-level program 
+;
+;    See the example attached to the end of this file as a main-level program
 ;    (only available if you have the source code version of this routine)::
-;       
+;
 ;       IDL> .run mggrpovrayview__define
-;        
-;    This should produce output with a focal blur (focus is on the cow's 
+;
+;    This should produce output with a focal blur (focus is on the cow's
 ;    head):
-;    
+;
 ;    .. image:: view.png
-;    
+;
 ; :Properties:
 ;    focal_point
-;       point which the camera focuses in view coordinates (not data 
+;       point which the camera focuses in view coordinates (not data
 ;       coordinates)
 ;    aperture
-;       aperature of camera (small aperature value gives a larger depth of 
+;       aperature of camera (small aperature value gives a larger depth of
 ;       field)
 ;    blur_samples
 ;      number of rays used to sample each pixel in POV-Ray
@@ -48,11 +48,11 @@ pro mggrpovrayview::getProperty, focal_point=focalPoint, $
                                  blur_samples=blurSamples, $
                                  _ref_extra=e
   compile_opt strictarr
-  
+
   if (arg_present(focalPoint)) then focalPoint = self.focalPoint
   if (arg_present(aperture)) then aperture = self.aperture
   if (arg_present(blurSamples)) then blurSamples = self.blurSamples
-  
+
   if (n_elements(e) gt 0L) then begin
     self->idlgrview::getProperty, _extra=e
   endif
@@ -67,11 +67,11 @@ pro mggrpovrayview::setProperty, focal_point=focalPoint, $
                                  blur_samples=blurSamples, $
                                  _extra=e
   compile_opt strictarr
-  
+
   if (n_elements(focalPoint) gt 0L) then self.focalPoint = focalPoint
   if (n_elements(aperture) gt 0L) then self.aperture = aperture
   if (n_elements(blurSamples) gt 0L) then self.blurSamples = blurSamples
-  
+
   if (n_elements(e) gt 0L) then begin
     self->idlgrview::setProperty, _extra=e
   endif
@@ -87,24 +87,24 @@ end
 function mggrpovrayview::init, focal_point=focalPoint, $
                                aperture=aperture, $
                                blur_samples=blurSamples, $
-                               _extra=e 
-                                  
+                               _extra=e
+
   if (~self->idlgrview::init(_extra=e)) then return, 0
-                                  
+
   if (n_elements(focalPoint) gt 0L) then self.focalPoint = focalPoint
   if (n_elements(aperture) gt 0L) then self.aperture = aperture
   if (n_elements(blurSamples) gt 0L) then self.blurSamples = blurSamples
-  
+
   return, 1
 end
 
 
 ;+
 ; Define instance variables.
-;-                                  
+;-
 pro mggrpovrayview__define
   compile_opt strictarr
-  
+
   define = { MGgrPOVRayView, inherits IDLgrView, $
              focalPoint: fltarr(3), $
              aperture: 0.0, $
@@ -117,7 +117,7 @@ end
 
 ; the `FOCAL_POINT` can't be set until the transforms of the scene are defined
 view = obj_new('MGgrPOVRayView', name='view', color=[200, 200, 255], $
-               aperture=0.4, blur_samples=20L)               
+               aperture=0.4, blur_samples=20L)
 
 model = obj_new('IDLgrModel', name='model')
 view->add, model
@@ -156,9 +156,9 @@ model->add, alight
 
 ; The focal point is not in data coords. It is necessary to calculate where the
 ; data coords of the focal point are transformed to, in this case:
-; 
+;
 ;   print, cow->getCTM() ## [0.52, 0.317, 0.0, 0.0]
-; 
+;
 ; where [0.52, 0.317, 0.0] are the data coords of the cow's head. Here
 ; `MG_TRANSFORMPOINT` does this calculation for us.
 view->setProperty, focal_point=mg_transformpoint([0.52, 0.317, 0.0], cow)

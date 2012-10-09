@@ -2,7 +2,7 @@
 
 ;+
 ; Generic event handler for writing object widget programs. XMANAGER will not
-; allow methods to be called via the EVENT_HANDLER keyword. To get around 
+; allow methods to be called via the EVENT_HANDLER keyword. To get around
 ; this:
 ;
 ;   * Specify EVENT_HANDLER='mg_object_event_handler' as a keyword to XMANAGER

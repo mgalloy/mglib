@@ -2,7 +2,7 @@
 
 ;+
 ; Determine if the file is a netCDF file.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -20,17 +20,17 @@ function mg_sdf_type_is_ncdf, filename
     catch, /cancel
     return, 0B
   endif
-  
+
   id = ncdf_open(filename, /nowrite)
   ncdf_close, id
-  
+
   return, 1B
 end
 
 
 ;+
 ; Determine if the file is a save file.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
@@ -48,11 +48,11 @@ function mg_sdf_type_is_save, filename
     catch, /cancel
     return, 0B
   endif
-  
+
   save_file = obj_new('IDL_Savefile', filename)
   obj_destroy, save_file
-  
-  return, 1B  
+
+  return, 1B
 end
 
 
@@ -60,17 +60,17 @@ end
 ; Determine the type of scientific data format file given by the filename.
 ;
 ; :Returns:
-;    string, returns empty string if file format is not found, otherwise 
+;    string, returns empty string if file format is not found, otherwise
 ;    returns appropriate extension for file, i.e., `.nc`, `.h5`, `.hdf`, or
 ;    `.sav`
-; 
+;
 ; :Params:
 ;    filename : in, required, type=string
 ;       filename to examine
-; 
+;
 ; :Keywords:
 ;    found : out, optional, type=boolean
-;       set to a named variable to retrieve whether a format was found for the 
+;       set to a named variable to retrieve whether a format was found for the
 ;       file
 ;-
 function mg_sdf_type, filename, found=found
@@ -83,10 +83,10 @@ function mg_sdf_type, filename, found=found
     is_ncdf = mg_sdf_type_is_ncdf(filename)
     if (is_ncdf) then return, '.nc'
   endif
-  
+
   ; get extension
   ext =  strmid(filename, strpos(filename, '.', /reverse_search))
-  
+
   ; test type given by extension, if it matches known extensions
   case ext of
     '.nc': begin
@@ -107,10 +107,10 @@ function mg_sdf_type, filename, found=found
       end
     else:
   endcase
-  
-  ; if not known extension or does not match its extension, try all known 
+
+  ; if not known extension or does not match its extension, try all known
   ; types
-  
+
   is_ncdf = mg_sdf_type_is_ncdf(filename)
   if (is_ncdf) then return, '.nc'
 
@@ -139,5 +139,5 @@ for f = 0L, n_elements(files) - 1L do begin
   print, files[f], type eq '' ? 'unknown type' : type, $
          format='(%"%s: type = %s")'
 endfor
-                      
+
 end

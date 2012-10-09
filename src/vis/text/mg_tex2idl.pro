@@ -5,7 +5,7 @@
 ; Only handles subscripts, superscripts, and sequences listed below.
 ;
 ; :Todo:
-;    should be able to handle fractions too, use 190 (276 octal) to draw 
+;    should be able to handle fractions too, use 190 (276 octal) to draw
 ;    fraction bars, and !A/!B to go above/below the bar; decide whether to
 ;    use \frac{1}{2}
 ;-
@@ -27,7 +27,7 @@
 function mg_subsuper, token, level=level
   compile_opt strictarr
   on_error, 2
-  
+
   case token of
     '^': return, (['!U', '!E'])[[level]]
     '_': return, (['!D', '!I'])[[level]]   ; '!D', '!L', '!I' to get 3 levels
@@ -37,7 +37,7 @@ end
 
 
 ;+
-; Returns the position in the input string of the closing curly brace that 
+; Returns the position in the input string of the closing curly brace that
 ; matches the first open curly brace, -1L if not found.
 ;
 ; :Returns:
@@ -52,7 +52,7 @@ function mg_matchdelim, input
   on_error, 2
 
   ; make sure there are at least two characters in the input string
-  length = strlen(input) 
+  length = strlen(input)
   if (length lt 1) then return, -1L
 
   ; find the opening curly brace
@@ -65,17 +65,17 @@ function mg_matchdelim, input
   bInput = fix(byte(strmid(input, openPos, length)))
 
   bInput = fix(bInput eq bOpenDelim) - fix(bInput eq bCloseDelim)
-  length = n_elements(bInput) 
+  length = n_elements(bInput)
 
   braceCnt = 1L   ; one open brace has already been found
   closePos = 0L
   while (braceCnt gt 0) && (closePos lt length - 1L) do begin
     braceCnt += bInput[++closePos]
   endwhile
-  
+
   closePos += openPos
   if (braceCnt gt 0L) then return, -1L
-  
+
   return, closePos
 end
 
@@ -94,26 +94,26 @@ function mg_strcnt, input, substr
   on_error, 2
 
   ;  can't search for a null string
-  if (strlen(substr) eq 0L) then begin 
+  if (strlen(substr) eq 0L) then begin
     message, 'cannot count occurances of null string', /informational
     return, -1L
   endif
-  
+
   ; for a single character, use the ASCII value of the character
   if (strlen(substr) eq 1L) then begin
     bInput = byte(input)
     ind = where(bInput eq (byte(substr))[0], count)
-  endif else begin 
+  endif else begin
     count = 0L
     pos = strpos(input, substr, /reverse_search)
     while (pos ge 0L) do begin
       count++
       pos = strpos(input, substr, pos, /reverse_search)
     endwhile
-  endelse 
+  endelse
 
   return, count
-end 
+end
 
 
 ;+
@@ -137,25 +137,25 @@ function mg_nexttoken, str, tokens, position=position
 
   bStr = byte(str)
   bTokens = byte(tokens)
-  nTokens = n_elements(bTokens) 
+  nTokens = n_elements(bTokens)
 
   ; initialize these arrays with a dummy element
   matchIndices = [0L]
   allMatches = [0L]
-  
-  for j = 0L, nTokens - 1L do begin 
+
+  for j = 0L, nTokens - 1L do begin
     match = where(bStr eq bTokens[j], count)
     if (count gt 0L) then begin
       matchIndices = [matchIndices, replicate(j, count)]
       allMatches = [allMatches, match]
-    endif 
-  endfor 
+    endif
+  endfor
 
   ; if no matches found
-  if (n_elements(matchIndices) eq 1L) then begin 
+  if (n_elements(matchIndices) eq 1L) then begin
     position = -1L
     return, ''
-  endif 
+  endif
 
   ; remove the dummy elements
   matchIndices = matchIndices[1:*]
@@ -170,7 +170,7 @@ end
 
 ;+
 ; Find a substring in an input string, return the portion of the input string
-; before the substring, and modify the input string to contain only the 
+; before the substring, and modify the input string to contain only the
 ; portion of the string after the token.
 ;
 ; :Returns:
@@ -185,13 +185,13 @@ end
 ;-
 function mg_token, str, token
   on_error, 2
-  
+
   pos = strpos(str, token)
 
   if (pos ge 0L) then begin
-    front = strmid(str, 0L, pos) 
+    front = strmid(str, 0L, pos)
     str = strmid(str, pos + strlen(token))
-  endif else begin    
+  endif else begin
     front = str
     str = ''
   endelse
@@ -201,7 +201,7 @@ end
 
 
 ;+
-; Convert TeX superscripts and subscripts in a given string to IDL format 
+; Convert TeX superscripts and subscripts in a given string to IDL format
 ; codes.
 ;
 ; :Returns:
@@ -210,26 +210,26 @@ end
 ; :Params:
 ;    input : in, required, type=string
 ;       input string to process
-; 
+;
 ; :Keywords:
 ;    level : in, optional, type=long
-;       set to subscript/superscipt level to indicate which format code is 
+;       set to subscript/superscipt level to indicate which format code is
 ;       used to format it (and hence !E and !I are used instead of !U and !D)
 ;-
 function mg_convert_subsuper, input, level=level
   on_error, 2
-  
+
   _level = n_elements(level) eq 0 ? 0L : level
-  
+
   fontRestore = _level gt 0L ? '' : '!N'
 
   bSpace = (byte(' '))[0]   ; ASCII value for a space
-  
+
   _input = input   ; portion of the input that hasn't been handled yet
 
   savePos = ''
   restorePos = ''
-  
+
   lenLastScript = 0L
 
   ; find subscript/superscript location
@@ -245,11 +245,11 @@ function mg_convert_subsuper, input, level=level
     script = strmid(_input, 0L, 1L)
     endOfScript = 0L
     if (script eq '{') then begin
-      endOfScript = mg_matchdelim(_input)      
+      endOfScript = mg_matchdelim(_input)
       script = mg_convert_subsuper(strmid(_input, 1L, endOfScript - 1L), $
                                    level=_level + 1L)
     endif
-    
+
     ; get substring after the end of the script
     _input = strmid(_input, endOfScript + 1L, strlen(_input) - endOfScript - 1L)
 
@@ -273,18 +273,18 @@ function mg_convert_subsuper, input, level=level
         restorePos = '!R'
         lenLastScript = strlen(script) - 2 * mg_strcnt(script, '!')
       endif
-    endelse  
+    endelse
 
     ; add on the just processed script
     phrase += savePos + fontChange + script + restorePos + fontRestore
 
-    if (pos ne -1L) then begin   
-      phrase += mg_token(_input, token)   
+    if (pos ne -1L) then begin
+      phrase += mg_token(_input, token)
     endif else begin
       phrase += _input
       _input = ''
     endelse
-  endwhile 
+  endwhile
 
   return, phrase
 end
@@ -306,13 +306,13 @@ end
 ;-
 function mg_convert_fraction, input, postscript=postscript
   compile_opt strictarr
-  
+
   bar = keyword_set(postscript) ? 190B : (byte('L'))[0]
-  
-  
+
+
   ; TODO: fix this to find correct matching {}'s
   pattern = '\\frac{(.*)}{(.*)}'
-  
+
   ; TODO: not sure how to compute the number of bar characters to use
   ; TODO: 190B is only correct for postscript
   replace = '!S!S!A$1!R!B$2!N!R!9' + string(bytarr(6) + bar) + '!X'
@@ -321,7 +321,7 @@ end
 
 
 ;+
-; Returns table containing allowable TeX sequences and their translation to 
+; Returns table containing allowable TeX sequences and their translation to
 ; IDL.
 ;
 ; :Returns:
@@ -333,7 +333,7 @@ end
 ;-
 function mg_textable, postscript=postscript
   on_error, 2
-  
+
   ; 1 => vector font, 2 => postscript font
   col = keyword_set(postscript) ? 2 : 1
 
@@ -369,7 +369,7 @@ function mg_textable, postscript=postscript
     ['\varepsilon', 'e',     'e'     ], $
     ['\varphi',     '!MP!X', 'j'     ], $
     ['\vartheta',   '!Mt!X', 'J'     ]]
-    
+
   uppercase = [ $
     ['\Gamma',   'C', 'G'         ], $
     ['\Delta',   'D', 'D'         ], $
@@ -382,7 +382,7 @@ function mg_textable, postscript=postscript
     ['\Phi',     'U', 'F'         ], $
     ['\Psi',     'W', 'Y'         ], $
     ['\Omega',   'X', 'W'         ]]
-    
+
   symbols = [ $
     ['\aleph',      '@',   string(192B)], $
     ['\ast',        '*',   '*'         ], $
@@ -418,14 +418,14 @@ function mg_textable, postscript=postscript
     ['\arcdeg',     '%',   string(176B)], $
     ['\arcmin',     '''',  string(162B)], $
     ['\arcsec',     '"'  , string(178B)]]
-  
+
   accents = [ $
     ['\AA', string(197B)], $
     ['\"{A}', string(196B)], $
     ['\"{E}', string(203B)], $
     ['\"{I}', string(207B)], $
     ['\"{O}', string(214B)], $
-    ['\"{U}', string(220B)], $  
+    ['\"{U}', string(220B)], $
     ['\"{a}', string(228B)], $
     ['\"{e}', string(235B)], $
     ['\"{i}', string(239B)], $
@@ -435,18 +435,18 @@ function mg_textable, postscript=postscript
     ['\\^{E}', string(202B)], $
     ['\\^{I}', string(206B)], $
     ['\\^{O}', string(212B)], $
-    ['\\^{U}', string(219B)], $  
+    ['\\^{U}', string(219B)], $
     ['\\^{a}', string(226B)], $
     ['\\^{e}', string(234B)], $
     ['\\^{i}', string(238B)], $
     ['\\^{o}', string(244B)], $
     ['\\^{u}', string(251B)], $
-    ['\\^{y}', string(255B)], $    
+    ['\\^{y}', string(255B)], $
     ['\`{A}', string(192B)], $
     ['\`{E}', string(200B)], $
     ['\`{I}', string(204B)], $
     ['\`{O}', string(210B)], $
-    ['\`{U}', string(217B)], $  
+    ['\`{U}', string(217B)], $
     ['\`{a}', string(224B)], $
     ['\`{e}', string(232B)], $
     ['\`{i}', string(236B)], $
@@ -456,33 +456,33 @@ function mg_textable, postscript=postscript
     ['\''{E}', string(201B)], $
     ['\''{I}', string(205B)], $
     ['\''{O}', string(211B)], $
-    ['\''{U}', string(218B)], $  
+    ['\''{U}', string(218B)], $
     ['\''{Y}', string(221B)], $
     ['\''{a}', string(225B)], $
     ['\''{e}', string(233B)], $
     ['\''{i}', string(237B)], $
     ['\''{o}', string(243B)], $
     ['\''{u}', string(250B)], $
-    ['\''{y}', string(253B)], $    
+    ['\''{y}', string(253B)], $
     ['\~{A}', string(195B)], $
     ['\~{N}', string(209B)], $
     ['\~{O}', string(213B)], $
     ['\~{a}', string(227B)], $
     ['\~{n}', string(241B)], $
     ['\~{o}', string(245B)]]
-  
+
   lowercase = lowercase[[0, col], *]
   uppercase = uppercase[[0, col], *]
   symbols   = symbols[[0, col], *]
-  
+
   lowercase[1, *] = toGreekFont[col]  + lowercase[1, *] + toPreviousFont[col]
   uppercase[1, *] = toGreekFont[col]  + uppercase[1, *] + toPreviousFont[col]
   symbols[1, *]   = toSymbolFont[col] + symbols[1, *]   + toPreviousFont[col]
-  
+
   table = [[accents], [lowercase], [uppercase], [symbols]]
-    
+
   return, table
-end 
+end
 
 
 ;+
@@ -490,7 +490,7 @@ end
 ;
 ; :Returns:
 ;    string or strarr
-; 
+;
 ; :Params:
 ;    input : in, required, type=string/strarr
 ;       input TeX string or strarr
@@ -502,7 +502,7 @@ end
 function mg_tex2idl, input, font=font
   compile_opt strictarr
   on_error, 2
-  
+
   ; postscript = 0 means use vector
   postscript = 0
   if (n_elements(font) eq 0) then begin
@@ -512,23 +512,23 @@ function mg_tex2idl, input, font=font
   endelse
 
   ; done if the user wants non-Postscript hardware font
-  if (postscript eq 1) and (!d.name ne 'PS') then begin   
+  if (postscript eq 1) and (!d.name ne 'PS') then begin
     message, 'no translation for device: ' + !d.name, /informational
-    return, input               
-  endif 
-    
+    return, input
+  endif
+
   table = mg_textable(postscript=postscript)
 
   ; translate TeX sequences
-  sequences = reform(table[0, *])  
+  sequences = reform(table[0, *])
   results = reform(table[1, *])
   output = input
-    
+
   for s = 0L, n_elements(sequences) - 1L do begin
     ; need an extra \ to escape the \ symbol
     output = mg_streplace(output, '\' + sequences[s], results[s], /global)
   endfor
-    
+
   ; place {}'s around TeX sequences in subscripts or superscripts
   for s = 0L, n_elements(sequences) - 1L do begin
     output = mg_streplace(output, $
@@ -543,14 +543,14 @@ function mg_tex2idl, input, font=font
 
   ; take care of subscripts and superscripts
   for i = 0L, n_elements(output) - 1L do begin
-    output[i] = mg_convert_subsuper(output[i]) 
+    output[i] = mg_convert_subsuper(output[i])
   endfor
 
   ; take care of fractions
   for i = 0L, n_elements(output) - 1L do begin
-    output[i] = mg_convert_fraction(output[i], postscript=postscript) 
+    output[i] = mg_convert_fraction(output[i], postscript=postscript)
   endfor
-  
+
   return, output
 end
 
@@ -575,7 +575,7 @@ xyouts, 0.5, 0.60, 'a!Db!Lc!N', /normal, $
 
 xyouts, 0.5, 0.50, mg_tex2idl('a_{b_c}'), /normal, $
         charsize=2.0, alignment=0.5
-        
+
 xyouts, 0.5, 0.40, mg_tex2idl('a^{b^c}'), /normal, $
         charsize=2.0, alignment=0.5
 
@@ -585,18 +585,18 @@ partialSol = '_{Lower_{Index}^{Exponent}}Normal' $
 xyouts, 0.5, 0.30, mg_tex2idl(partialSol), /normal, $
         charsize=2.0, alignment=0.5
 
-; "complex equation" from online help about formatting codes translated to 
+; "complex equation" from online help about formatting codes translated to
 ; TeX code
 xyouts, 0.5, 0.20, mg_tex2idl('\int_p^x \rho_iU_i^2dx'), /normal, $
         charsize=2.0, alignment=0.5
 
 equation = '\nablax\arcsec \propto \frac{-b \pm \sqrt b^2 - 4ac}{         2a}'
 xyouts, 0.5, 0.10, mg_tex2idl(equation), /normal, $
-        charsize=2.0, alignment=0.5                
+        charsize=2.0, alignment=0.5
 
-if (keyword_set(ps)) then begin                
+if (keyword_set(ps)) then begin
   mg_psend
-  mg_convert, 'tex', /from_ps, /to_png, max_dim=[700, 700], output=im                            
+  mg_convert, 'tex', /from_ps, /to_png, max_dim=[700, 700], output=im
   file_delete, 'tex.ps'
   file_delete, 'tex.png'
   window, xsize=700, ysize=500
@@ -604,4 +604,4 @@ if (keyword_set(ps)) then begin
 endif
 
 end
- 
+

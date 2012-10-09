@@ -4,9 +4,9 @@ set(DLM_NAME mg_${DIRNAME})
 
 add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 
-if (APPLE) 
-  set_target_properties("${DLM_NAME}" 
-    PROPERTIES 
+if (APPLE)
+  set_target_properties("${DLM_NAME}"
+    PROPERTIES
       PREFIX ""
       SUFFIX ".so"
   )

@@ -3,7 +3,7 @@
 ;+
 ; Determine if the underlying collection has another element to retrieve.
 ;
-; :Returns: 
+; :Returns:
 ;    1 if underlying collection has another element, 0 otherwise
 ;-
 function mgcoabstractiterator::hasNext
@@ -15,7 +15,7 @@ end
 ;+
 ; Return the next item in the underlying collection.
 ;
-; :Returns: 
+; :Returns:
 ;    list item
 ;-
 function mgcoabstractiterator::next
@@ -45,7 +45,7 @@ end
 ;+
 ; Initialize an iterator.
 ;
-; :Returns: 
+; :Returns:
 ;    1 for success, 0 otherwise
 ;-
 function mgcoabstractiterator::init
@@ -59,7 +59,7 @@ end
 ; Define member variables.
 ;
 ; :Fields:
-;    version 
+;    version
 ;       used to compare to the version of the underlying collection to
 ;       determine if the underlying collection has changed
 ;-

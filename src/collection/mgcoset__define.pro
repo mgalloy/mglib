@@ -20,7 +20,7 @@
 ;-
 function mgcoset::_overloadForeach, value, key
   compile_opt strictarr
-  
+
   status = (self.hash)->_overloadForeach(value, key)
   if (n_elements(key) gt 0L) then value = key
 
@@ -36,7 +36,7 @@ end
 ;-
 function mgcoset::_overloadSize
   compile_opt strictarr
-  
+
   return, n_elements(self.hash)
 end
 
@@ -55,12 +55,12 @@ end
 ;-
 function mgcoset::_overloadMinus, left, right
   compile_opt strictarr
-  
+
   s = mg_set()
-  
+
   foreach el, left do s->add, el
   foreach el, right do if (s[el]) then s->remove, el
-  
+
   return, s
 end
 
@@ -79,12 +79,12 @@ end
 ;-
 function mgcoset::_overloadPlus, left, right
   compile_opt strictarr
-  
+
   s = mg_set()
-  
+
   foreach el, left do s->add, el
   foreach el, right do s->add, el
-  
+
   return, s
 end
 
@@ -103,7 +103,7 @@ end
 ;-
 function mgcoset::_overloadOr, left, right
   compile_opt strictarr
-  
+
   return, self->_overloadPlus(left, right)
 end
 
@@ -122,12 +122,12 @@ end
 ;-
 function mgcoset::_overloadAnd, left, right
   compile_opt strictarr
-  
+
   s = mg_set()
-  
+
   nleft = n_elements(left)
   nright = n_elements(right)
-  
+
   if (nleft gt nright) then begin
     first = right
     second = left
@@ -135,9 +135,9 @@ function mgcoset::_overloadAnd, left, right
     first = left
     second = right
   endelse
-  
+
   foreach el, first do if (second[el]) then s->add, el
-  
+
   return, s
 end
 
@@ -147,7 +147,7 @@ function mgcoset::_overloadBracketsRightSide, isRange, $
                                               ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
-  
+
   if (isRange[0]) then message, 'range not allowed'
 
   return, (self.hash)->hasKey(ss1)
@@ -163,25 +163,25 @@ end
 
 function mgcoset::_overloadPrint
   compile_opt strictarr
-  
+
   return, ((self.hash)->keys())->_overloadPrint()
 end
 
 
 function mgcoset::_overloadHelp, varname
   compile_opt strictarr
-  
+
   return, string(varname, $
                  'SET', $
                  obj_valid(self, /get_heap_identifier), $
                  n_elements(self.hash), $
-                 format='(%"%-15s %-5s <ID=%d  NELEMENTS=%d>")') 
+                 format='(%"%-15s %-5s <ID=%d  NELEMENTS=%d>")')
 end
 
 
 function mgcoset::contains, el
   compile_opt strictarr
-  
+
   return, self.hash->hasKey(el)
 end
 
@@ -195,7 +195,7 @@ end
 
 pro mgcoset::add, elements
   compile_opt strictarr
-  
+
   if (n_elements(elements) eq 0L) then return
   foreach el, elements do (self.hash)[el] = 1B
 end
@@ -203,7 +203,7 @@ end
 
 pro mgcoset::cleanup
   compile_opt strictarr
-  
+
   obj_destroy, self.hash
 end
 
@@ -213,13 +213,13 @@ function mgcoset::init, elements
 
   self.hash = hash()
   self->add, elements
-  
+
   return, 1
 end
 
 
 pro mgcoset__define
   compile_opt strictarr
-  
+
   define = { MGcoSet, inherits IDL_Object, hash: obj_new() }
 end

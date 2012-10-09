@@ -15,11 +15,11 @@
 ;-
 function mg_arclength, x, y
   compile_opt strictarr
-  
+
   _x = [shift(x, -1), 0.]
   _y = [shift(y, -1), 0.]
   d = sqrt((x - _x) * (x - _x) + (y - _y) * (y - _y))
-  
+
   return, total(d[0:n_elements(d) - 2L])
 end
 

@@ -2,11 +2,11 @@
 
 function mg_strwrap_ut::test_basic
   compile_opt strictarr
-  
+
   result = mg_strwrap('Mike wasn''t here', width=4)
-  
+
   assert, n_elements(result) eq 3L, 'incorrect number of lines'
-  
+
   assert, result[0] eq 'Mike', 'incorrect first line'
   assert, result[1] eq 'wasn''t', 'incorrect second line'
   assert, result[2] eq 'here', 'incorrect third line'
@@ -17,10 +17,10 @@ end
 
 function mg_strwrap_ut::test_indenting
   compile_opt strictarr
-  
+
   s = 'The string to have leading and/or trailing blanks removed'
   result = mg_strwrap(s, width=12, indent=2, first_indent=0)
-  
+
   assert, n_elements(result) eq 7L, 'incorrect number of lines'
 
   assert, result[0] eq 'The string', 'incorrect first line'
@@ -39,4 +39,4 @@ pro mg_strwrap_ut__define
   compile_opt strictarr
 
   define = { mg_strwrap_ut, inherits MGutLibTestCase }
-end  
+end

@@ -8,12 +8,12 @@
 ;
 ; :Examples:
 ;    To create some tubes to visualize streamlines of a vector field::
-;    
+;
 ;       streamlines = obj_new('MGgrPOVRayTubes', data=verts, polylines=conn, $
 ;                             /open, radius=0.5 - 0.5 / (findgen(nverts) + 1.1), $
 ;                             color=[r[mag], g[mag], b[mag]])
-;                          
-;    See the example attached to the end of this file as a main-level program 
+;
+;    See the example attached to the end of this file as a main-level program
 ;    (only available if you have the source code version of this routine)::
 ;
 ;       IDL> .run mggrpovraytubes__define
@@ -21,21 +21,21 @@
 ;    This should produce:
 ;
 ;    .. image:: tubes.png
-; 
+;
 ; :Properties:
 ;    open
 ;       set to control whether the ends are open or closed
-;    radius 
-;       radius of the cones; either a scalar or a fltarr(n) where there are n 
+;    radius
+;       radius of the cones; either a scalar or a fltarr(n) where there are n
 ;       points in the polyline; default value is 1.0
 ;-
 
 
 ;+
 ; Write POV-Ray description of the tubes.
-; 
+;
 ; :Private:
-; 
+;
 ; :Params:
 ;    lun : in, required, type=long
 ;       logical unit number of file to write to
@@ -58,40 +58,40 @@ pro mggrpovraytubes::write, lun
     printf, lun, '#include "textures.inc"'
     printf, lun
   endif
-    
+
   pos = 0L
   npolylines = n_elements(_polylines)
   while (pos lt npolylines) do begin
     ntubes = _polylines[pos] - 1L
-    
+
     for t = pos + 1L, pos + ntubes - 1L do begin
-      d = verts[*, _polylines[t]] - verts[*, _polylines[t + 1L]] 
+      d = verts[*, _polylines[t]] - verts[*, _polylines[t + 1L]]
       if (total(abs(d / verts[*, _polylines[t]])) lt 1e-3) then continue
-    
+
       printf, lun, 'cone {'
       printf, lun, '  <' +  strjoin(strtrim(verts[*, _polylines[t]], 2), ', ') + '>, ' $
-                     + strtrim((*self.radius)[_polylines[t] mod nradii], 2) 
+                     + strtrim((*self.radius)[_polylines[t] mod nradii], 2)
       printf, lun, '  <' +  strjoin(strtrim(verts[*, _polylines[t + 1L]], 2), ', ') + '>, ' $
-                     + strtrim((*self.radius)[_polylines[t + 1] mod nradii], 2)   
- 
+                     + strtrim((*self.radius)[_polylines[t + 1] mod nradii], 2)
+
       if (self.open) then printf, lun, '  open'
       if (self.noShadow) then printf, lun, '  no_shadow'
 
       printf, lun, '  texture { pigment { ' $
                      + self->_getRGB(color, alpha_channel=alphaChannel) $
                      + ' }}'
-    
+
       self->_writeTransform, lun, self->getCTM()
 
       if (obj_valid(self.finish)) then begin
         printf, lun
         self.finish->write, lun
       endif
-    
+
       printf, lun, '}'
       printf, lun
     endfor
-    
+
     pos += ntubes + 2L
   endwhile
 end
@@ -104,11 +104,11 @@ pro mggrpovraytubes::getProperty, open=open, radius=radius, finish=finish, $
                                   no_shadow=noShadow, $
                                   _ref_extra=e
   compile_opt strictarr
-  
+
   if (arg_present(open)) then open = self.open
-  if (arg_present(radius)) then radius = *self.radius  
-  if (arg_present(finish)) then finish = self.finish  
-  if (arg_present(noShadow)) then noShadow = self.noShadow  
+  if (arg_present(radius)) then radius = *self.radius
+  if (arg_present(finish)) then finish = self.finish
+  if (arg_present(noShadow)) then noShadow = self.noShadow
 
   if (n_elements(e) gt 0L) then begin
     self->idlgrpolyline::getProperty, _extra=e
@@ -123,12 +123,12 @@ pro mggrpovraytubes::setProperty, open=open, radius=radius, finish=finish, $
                                   no_shadow=noShadow, $
                                   _extra=e
   compile_opt strictarr
-  
+
   if (n_elements(open) gt 0L) then self.open = open
-  if (n_elements(radius) gt 0L) then *self.radius = radius  
+  if (n_elements(radius) gt 0L) then *self.radius = radius
   if (n_elements(finish) gt 0L) then self.finish = finish
   if (n_elements(noShadow) gt 0L) then self.noShadow = noShadow
-  
+
   if (n_elements(e) gt 0L) then begin
     self->idlgrpolyline::setProperty, _extra=e
   endif
@@ -140,7 +140,7 @@ end
 ;-
 pro mggrpovraytubes::cleanup
   compile_opt strictarr
-  
+
   self->idlgrpolyline::cleanup
   ptr_free, self.radius
 end
@@ -154,16 +154,16 @@ end
 ;-
 function mggrpovraytubes::init, open=open, radius=radius, finish=finish, $
                                 no_shadow=noShadow, $
-                                _extra=e 
-                                  
+                                _extra=e
+
   if (~self->idlgrpolyline::init(_extra=e)) then return, 0
   if (~self->MGgrPOVRayObject::init()) then return, 0
-                                  
+
   if (n_elements(open) gt 0L) then self.open = open
   if (n_elements(finish) gt 0L) then self.finish = finish
   self.radius = ptr_new(n_elements(radius) gt 0L ? radius : 1.0)
   self.noShadow = keyword_set(noShadow)
-  
+
   return, 1
 end
 
@@ -183,7 +183,7 @@ pro mggrpovraytubes__define
   define = { MGgrPOVRayTubes, $
              inherits IDLgrPolyline, inherits MGgrPOVRayObject, $
              open: 0B, $
-             radius: ptr_new(), $ 
+             radius: ptr_new(), $
              finish: obj_new(), $
              noShadow: 0B $
            }
@@ -227,17 +227,17 @@ for x = 0, 127, 4 do begin
   for y = 0, 63, 4 do begin
     particle_trace, f, [x, y, 5], verts, conn, max_iterations=1200
     nverts = n_elements(verts) / 3
-      
+
     if (nverts le 3L) then continue
-    
+
     mag = m[x, y, 5]
-    
+
     streamlines = obj_new('MGgrPOVRayTubes', data=verts, polylines=conn, $
                           /open, radius=0.5 - 0.5 / (findgen(nverts) + 1.1), $
                           color=[r[mag], g[mag], b[mag]], finish=finish)
     model->add, streamlines
 
-    streamlines->setProperty, xcoord_conv=xc, ycoord_conv=yc, zcoord_conv=zc    
+    streamlines->setProperty, xcoord_conv=xc, ycoord_conv=yc, zcoord_conv=zc
   endfor
 endfor
 

@@ -7,7 +7,7 @@
 ;
 ; :Examples:
 ;    Try the main-level example at the end of this file::
-; 
+;
 ;       IDL> .run mg_savefile__define
 ;-
 
@@ -28,7 +28,7 @@ function mg_savefile::_overloadHelp, varname
   typenames = ['UNDEFINED', 'BYTE', 'INT', 'LONG', 'FLOAT', 'DOUBLE', $
                'STRING', 'STRUCTURE', 'DCOMPLEX', 'POINTER', 'OBJREF', $
                'UINT', 'ULONG', 'LONG64', 'ULONG64']
-               
+
   varnames = self->names(count=nvars)
   for v = 0L, nvars - 1L do begin
     type = self->size(varnames[v], /type)
@@ -52,7 +52,7 @@ function mg_savefile::_overloadHelp, varname
   ; remove the last (extra) newline
   result = strmid(result, 0, strlen(result) - strlen(mg_newline()))
   if (result eq '') then result = 'no regular IDL variables'
-  
+
   return, result
 end
 
@@ -106,7 +106,7 @@ function mg_savefile::_overloadPrint
                      mg_newline(), $
                      format=format)
   endelse
-  
+
   ptrnames = self->names(count=nptrs, /pointer_heapvar)
   if (nptrs eq 0L) then begin
     result += string('Pointer heap variables', mg_newline(), format=noneformat)
@@ -125,7 +125,7 @@ function mg_savefile::_overloadPrint
                      mg_newline(), $
                      format=format)
   endelse
-      
+
   functionnames = self->names(count=nfunction, /function)
   if (nfunction eq 0L) then begin
     result += string('Functions', mg_newline(), format=noneformat)
@@ -134,7 +134,7 @@ function mg_savefile::_overloadPrint
                      mg_newline(), $
                      format=format)
   endelse
-  
+
   procedurenames = self->names(count=nprocedures, /procedure)
   if (nprocedures eq 0L) then begin
     result += string('Procedures', mg_newline(), format=noneformat)
@@ -143,7 +143,7 @@ function mg_savefile::_overloadPrint
                      mg_newline(), $
                      format=format)
   endelse
-        
+
   result = strmid(result, 0, strlen(result) - strlen(mg_newline()))
 
   return, result
@@ -167,7 +167,7 @@ function mg_savefile::_overloadBracketsRightSide, isRange, ss1
   on_error, 2
 
   if (isRange[0] gt 0) then message, 'ranges not allowed'
-  
+
   return, self->get(ss1)
 end
 
@@ -184,14 +184,14 @@ end
 ;-
 function mg_savefile::get, saveitem, _ref_extra=e
   compile_opt strictarr
-  
+
   self->restore, saveitem, _extra=e
-  
+
   isVar = 1B
   for el = 0L, n_elements(e) - 1L do begin
     if (e[el] ne 'COUNT') then isVar = 0B
   endfor
-  
+
   return, isVar ? scope_varfetch(saveitem) : !null
 end
 
@@ -210,10 +210,10 @@ end
 ;-
 function mg_savefile::init, filename, _extra=e
   compile_opt strictarr
-  
+
   if (~self->IDL_Object::init()) then return, 0
   if (~self->IDL_Savefile::init(filename, _extra=e)) then return, 0
-  
+
   return, 1
 end
 
@@ -223,7 +223,7 @@ end
 ;-
 pro mg_savefile__define
   compile_opt strictarr
-  
+
   define = { MG_Savefile, inherits IDL_Object, inherits IDL_Savefile }
 end
 
