@@ -8,62 +8,67 @@ IDL library of Michael Galloy.
 
 :Dirs:
   ./
-    Main utility routines
+    startup file
   analysis/
-    Various algorithms (sorting, sampling, etc.) and math helper routines
+    various algorithms (sorting, sampling, etc.) and math helper routines
   animation/
-    Classes to produce animations using object graphics.
+    classes to produce animations using object graphics
   cmdline_tools/
-    Routines useful at the IDL command line.
+    routines useful at the IDL command line
   collection/
-    Objects implementing various types of collections.
+    objects implementing various types of collections
   cula/
-    CULAtools bindings.
+    CULAtools bindings
   dist_tools/
-    This directory contains the main `dist_tools` package routines for
-    logging, preferences, and other miscellaneous routines useful in
-    distributing applications.
+    routines for logging, preferences, and other miscellaneous routines useful 
+    in distributing applications
   dist_tools/bindings/
-    The `bindings` directory provides a method for wrapping C routines with
-    a DLM in a quick and nearly automatic manner using the `MG_DLM` class.
+    routines for wrapping C routines with a DLM in a quick and nearly an
+    automatic manner using the `MG_DLM` class
   dist_tools/cidl
-    Routines for creating hybrid C/IDL routines
+    routines for creating hybrid C/IDL routines
   envi/
-    ENVI user routines.
+    ENVI user routines
   fileio/
-    File input/output routines.
+    file input/output routines
+  googlevoice/
+    class for connecting to Google Voice
   gsl/
-    Wrappers for GNU Scientific Library (GSL) routines.
+    wrappers for GNU Scientific Library (GSL) routines
   hdf/
-    Routines for reading/writing/querying HDF files.
+    routines for reading/writing/querying HDF files
   hdf5/
-    Routines for reading/writing/querying HDF5 files.
+    routines for reading/writing/querying HDF5 files
   indices/
-    Routines for handling index arrays.
+    routines for handling index arrays
   install_tools/
-    Routines for installing new projects and their dependencies.
+    routines for installing new projects and their dependencies
   introspection/
-    Routines for inspecting variables and routines.
+    routines for inspecting variables and routines
   itools/
-    iTools related helpers and components.
+    iTools related helpers and components
   markdown/
-    Wrapper for a C implementation of John Gruber's markdown.
+    wrapper for a C implementation of John Gruber's markdown
   misc/
-    Miscellaneous routines.
+    miscellaneous routines
   net/
-    Routines for handling network communication.
+    routines for handling network communication
   objects/
-    Classes for doing object-oriented programming.
+    classes for doing object-oriented programming
+  profiling/
+    helper routines for profiling code and processing the output
+  save/
+    routines for reading/writing/querying save files
   strings/
-    Routines for manipulating strings.
+    routines for manipulating strings
   templating/
-    Tools for using templated output.
+    tools for using templated output
   textmarkup/
-    Classes for converting between text markup styles: rst, LaTex, and HTML.
+    classes for converting between text markup styles: rst, LaTex, and HTML
   updater/
-    Start of an automatic updater library.
+    skeleton of an automatic updater library
   vis/
-    Visualization routines.
+    visualization routines
   vis/animation/
     routines and classes for creating animations
   vis/animation/animators/
@@ -71,6 +76,8 @@ IDL library of Michael Galloy.
   vis/animation/easing/
     classes representing easing functions i.e. functions that control the
     rate of an animator
+  vis/animation/utils/
+    convenience routines for doing various animations
   vis/color/
     routines for dealing with specifying colors and color tables
   vis/directgraphics/
@@ -107,7 +114,7 @@ IDL library of Michael Galloy.
     utility routines for other routines
   vis/vtk/
     VTK file access library
-  vis/x3dom/
+  vis/x3d/
     x3dom output from IDL object graphics
   widgets/
-    Routines and objects for doing widget programming.
+    routines and objects for doing widget programming

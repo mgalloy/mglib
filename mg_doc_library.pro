@@ -12,7 +12,7 @@ pro mg_doc_library
           output=filepath('api-docs', root=root), $
           overview=filepath('overview.txt', root=root), $
           footer=filepath('footer.html', root=root), $
-          title='idllib', $
+          title='mglib', $
           subtitle='Personal IDL library for M. Galloy', $
           /statistics, /embed, index_level=1, format_style='rst', /use_latex
 end

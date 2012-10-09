@@ -13,7 +13,7 @@ pro mg_userdoc_library
           /user, $
           overview=filepath('overview.txt', root=root), $
           footer=filepath('footer.html', root=root), $
-          title='idllib', $
+          title='mglib', $
           subtitle='Personal IDL library for M. Galloy', $
           /embed, index_level=1, format_style='rst', /use_latex
 end
