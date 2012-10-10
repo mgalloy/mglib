@@ -11,6 +11,10 @@ function mg_get_idl_routine_names, root
 
   basenames = file_basename(files, '.html')
 
+  ; add routines that are bundled with other routines' help
+  not_included = ['OPENR', 'OPENU', 'OPENW', 'PRINTF', 'READF']
+  basenames = [basenames, not_included]
+
   ; eliminate [A-Z]_list
   barr = stregex(basenames, '^[A-Z]_list', /boolean)
   ind = where(barr eq 0L, count)
@@ -31,7 +35,7 @@ function mg_get_idl_routine_names, root
 
   ; eliminate duplicates (because there are functions and procedures with the
   ; the names and now that we have eliminated "_Procedure" they have the same
-  ; names
+  ; names); also sorts
   basenames = basenames[uniq(basenames, sort(basenames))]
 
   ; eliminate names that start with "_"
