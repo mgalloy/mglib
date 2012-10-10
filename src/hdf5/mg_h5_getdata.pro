@@ -92,6 +92,7 @@
 ;    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;-
 
+;= Helper routines
 
 ;+
 ; Convert string bounds like `0:*` to a 3-element bounds specification::
@@ -400,6 +401,8 @@ function mg_h5_getdata_getattribute, fileId, variable, error=error
   return, result
 end
 
+
+;= Main routine
 
 ;+
 ; Pulls out a section of a HDF5 variable.
