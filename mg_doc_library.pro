@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Make the documentation for the library.
+; Make the developer API documentation for the library.
 ;-
 pro mg_doc_library
   compile_opt strictarr

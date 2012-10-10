@@ -1,11 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Make the documentation for the library.
+; Make the Doc Center API documentation for the library.
 ;-
 pro mg_dcdoc_library
   compile_opt strictarr
-  
+
   root = mg_src_root()   ; location of this file
 
   idldoc, root=filepath('src', root=root), $
