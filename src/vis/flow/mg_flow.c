@@ -12,7 +12,8 @@
 
 // forward/backward streamlines
 int nfwd, nbwd;
-float fwd[2][N_SEGMENTS], bwd[2][N_SEGMENTS];
+float fwd_float[2][N_SEGMENTS], bwd_float[2][N_SEGMENTS];
+double fwd_double[2][N_SEGMENTS], bwd_double[2][N_SEGMENTS];
 
 // vector field
 IDL_VPTR u, v;
@@ -28,88 +29,96 @@ IDL_VPTR u, v;
 
   Uses the u and v file variables to lookup vector field values.
 */
-static int mg_lic_rk(float x, float y, float step, float seg[]) {
-  float *udata = (float *)u->value.arr->data, *vdata = (float *)v->value.arr->data;
-  float k[2][4], coef[] = { 0.0, 0.5, 0.5, 1.0 };
-  int c;
-  float mag;
-  float uv[2], xy[2] = { x, y };
-  int ind;
-  int size = u->value.arr->dim[0] * u->value.arr->dim[1];
-
-  for (c = 0; c < 4; c++) {
-    xy[0] = x + k[0][0] * coef[c];
-    xy[1] = y + k[1][0] * coef[c];
-
-    ind = (int) xy[0] + (int) xy[1] * u->value.arr->dim[0];
-    if (ind < 0 || ind >= size) return 0;
-    uv[0] = udata[ind];
-    uv[1] = vdata[ind];
-
-    mag = sqrt(uv[0] * uv[0] + uv[1] * uv[1]);
-    if (mag != 0) {
-      uv[0] /= mag;
-      uv[1] /= mag;
-    }
-
-    k[0][c] = uv[0] * step;
-    k[1][c] = uv[1] * step;
-  }
-
-  seg[0] = x + k[0][0] / 6.0 + k[0][1] / 3.0 + k[0][2] / 3.0 + k[0][3] / 6.0;
-  seg[1] = y + k[1][0] / 6.0 + k[1][1] / 3.0 + k[1][2] / 3.0 + k[1][3] / 6.0;
-
-  return 1;
+#define MG_LIC_RK(TYPE) \
+static int mg_lic_rk_ ## TYPE(TYPE x, TYPE y, TYPE step, TYPE seg[]) { \
+  TYPE *udata = (TYPE *)u->value.arr->data, *vdata = (TYPE *)v->value.arr->data; \
+  TYPE k[2][4], coef[] = { 0.0, 0.5, 0.5, 1.0 }; \
+  int c; \
+  TYPE mag; \
+  TYPE uv[2], xy[2] = { x, y }; \
+  int ind; \
+  int size = u->value.arr->dim[0] * u->value.arr->dim[1]; \
+ \
+  for (c = 0; c < 4; c++) { \
+    xy[0] = x + k[0][0] * coef[c]; \
+    xy[1] = y + k[1][0] * coef[c]; \
+ \
+    ind = (int) xy[0] + (int) xy[1] * u->value.arr->dim[0]; \
+    if (ind < 0 || ind >= size) return 0; \
+    uv[0] = udata[ind]; \
+    uv[1] = vdata[ind]; \
+ \
+    mag = sqrt(uv[0] * uv[0] + uv[1] * uv[1]); \
+    if (mag != 0) { \
+      uv[0] /= mag; \
+      uv[1] /= mag; \
+    } \
+ \
+    k[0][c] = uv[0] * step; \
+    k[1][c] = uv[1] * step; \
+  } \
+ \
+  seg[0] = x + k[0][0] / 6.0 + k[0][1] / 3.0 + k[0][2] / 3.0 + k[0][3] / 6.0; \
+  seg[1] = y + k[1][0] / 6.0 + k[1][1] / 3.0 + k[1][2] / 3.0 + k[1][3] / 6.0; \
+ \
+  return 1; \
 }
+
+MG_LIC_RK(float);
+MG_LIC_RK(double);
 
 
 /*
   Compute streamline forward and backward for the element at the given row
   and column.
 */
-static void mg_lic_streamline(float row, float col, int nrows, int ncols) {
-  int fwdValid = 1;
-  int bwdValid = 1;
-  int k;
-  float seg[2];
-
-  nfwd = 0;
-  nbwd = 0;
-
-  fwdValid = mg_lic_rk(col + 0.5, row + 0.5, STEP_SIZE, seg);
-  if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0;
-  if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0;
-  fwd[0][0] = seg[0];
-  fwd[1][0] = seg[1];
-  if (fwdValid) nfwd++;
-
-  bwdValid = mg_lic_rk(col + 0.5, row + 0.5, - STEP_SIZE, seg);
-  if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0;
-  if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0;
-  bwd[0][0] = seg[0];
-  bwd[1][0] = seg[1];
-  if (bwdValid) nbwd++;
-
-  for (k = 1; k < N_SEGMENTS; k++) {
-    if (fwdValid) {
-      fwdValid = mg_lic_rk(fwd[0][k-1], fwd[1][k-1], STEP_SIZE, seg);
-      if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0;
-      if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0;
-      fwd[0][k] = seg[0];
-      fwd[1][k] = seg[1];
-      if (fwdValid) nfwd++;
-    }
-
-    if (bwdValid) {
-      bwdValid = mg_lic_rk(bwd[0][k-1], bwd[1][k-1], - STEP_SIZE, seg);
-      if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0;
-      if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0;
-      bwd[0][k] = seg[0];
-      bwd[1][k] = seg[1];
-      if (bwdValid) nbwd++;
-    }
-  }
+#define MG_LIC_STREAMLINE(TYPE) \
+static void mg_lic_streamline_ ## TYPE(TYPE row, TYPE col, int nrows, int ncols) { \
+  int fwdValid = 1; \
+  int bwdValid = 1; \
+  int k; \
+  TYPE seg[2]; \
+ \
+  nfwd = 0; \
+  nbwd = 0; \
+ \
+  fwdValid = mg_lic_rk_ ## TYPE(col + 0.5, row + 0.5, STEP_SIZE, seg); \
+  if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0; \
+  if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0; \
+  fwd_ ## TYPE[0][0] = seg[0]; \
+  fwd_ ## TYPE[1][0] = seg[1]; \
+  if (fwdValid) nfwd++; \
+ \
+  bwdValid = mg_lic_rk_ ## TYPE(col + 0.5, row + 0.5, - STEP_SIZE, seg); \
+  if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0; \
+  if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0; \
+  bwd_ ## TYPE[0][0] = seg[0]; \
+  bwd_ ## TYPE[1][0] = seg[1]; \
+  if (bwdValid) nbwd++; \
+ \
+  for (k = 1; k < N_SEGMENTS; k++) { \
+    if (fwdValid) { \
+      fwdValid = mg_lic_rk_ ## TYPE(fwd_ ## TYPE[0][k-1], fwd_ ## TYPE[1][k-1], STEP_SIZE, seg); \
+      if (seg[0] < 0 || seg[0] >= ncols) fwdValid = 0; \
+      if (seg[1] < 0 || seg[1] >= nrows) fwdValid = 0; \
+      fwd_ ## TYPE[0][k] = seg[0]; \
+      fwd_ ## TYPE[1][k] = seg[1]; \
+      if (fwdValid) nfwd++; \
+    } \
+ \
+    if (bwdValid) { \
+      bwdValid = mg_lic_rk_ ## TYPE(bwd_ ## TYPE[0][k-1], bwd_ ## TYPE[1][k-1], - STEP_SIZE, seg); \
+      if (seg[0] < 0 || seg[0] >= ncols) bwdValid = 0; \
+      if (seg[1] < 0 || seg[1] >= nrows) bwdValid = 0; \
+      bwd_ ## TYPE[0][k] = seg[0]; \
+      bwd_ ## TYPE[1][k] = seg[1]; \
+      if (bwdValid) nbwd++; \
+    } \
+  } \
 }
+
+MG_LIC_STREAMLINE(float);
+MG_LIC_STREAMLINE(double);
 
 
 /*
@@ -185,11 +194,6 @@ static IDL_VPTR IDL_mg_lic(int argc, IDL_VPTR *argv, char *argk) {
                 "u and v parameters must have the same dimensions");
   }
 
-  if (u->type != IDL_TYP_FLOAT || v->type != IDL_TYP_FLOAT) {
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-                "u and v parameters must be type float");
-  }
-
   // variable to return result in
   result_data = (unsigned char *) IDL_MakeTempArray(IDL_TYP_BYTE,
                                                     u->value.arr->n_dim,
@@ -222,16 +226,24 @@ static IDL_VPTR IDL_mg_lic(int argc, IDL_VPTR *argv, char *argk) {
   for (row = 0; row < nrows; row++) {
     for (col = 0; col < ncols; col++) {
       // compute streamline
-      mg_lic_streamline((float) row, (float) col, nrows, ncols);
+      if (u->type == IDL_TYP_FLOAT) {
+        mg_lic_streamline_float((float) row, (float) col, nrows, ncols);
+      } else {
+        mg_lic_streamline_double((double) row, (double) col, nrows, ncols);
+      }
 
       // compute I: average of texture at fwd/bwd indices
       sum = (int) *(tex_data + col + row * ncols);
       for (f = 0; f < nfwd; f++) {
-        sum += (int) *(tex_data + (int) fwd[0][f] + (int) fwd[1][f] * ncols);
+        sum += (int) *(tex_data
+                        + (int) (u->type == IDL_TYP_FLOAT ? fwd_float[0][f] : fwd_double[0][f])
+                        + (int) (u->type == IDL_TYP_FLOAT ? fwd_float[1][f] : fwd_double[1][f]) * ncols);
       }
 
       for (b = 0; b < nbwd; b++) {
-        sum += (int) *(tex_data + (int) bwd[0][b] + (int) bwd[1][b] * ncols);
+        sum += (int) *(tex_data
+                         + (int) (u->type == IDL_TYP_FLOAT ? bwd_float[0][b] : bwd_double[0][b])
+                         + (int) (u->type == IDL_TYP_FLOAT ? bwd_float[1][b] : bwd_double[1][b]) * ncols);
       }
 
       *(integral_data + col + row * ncols) = sum / (nfwd + nbwd + 1);
