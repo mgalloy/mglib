@@ -194,6 +194,24 @@ static IDL_VPTR IDL_mg_lic(int argc, IDL_VPTR *argv, char *argk) {
                 "u and v parameters must have the same dimensions");
   }
 
+  if (kw.texture_present) {
+    IDL_ENSURE_SIMPLE(kw.texture);
+    IDL_ENSURE_ARRAY(kw.texture);
+    if (kw.texture->type != IDL_TYP_BYTE ) {
+      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                  "TEXTURE must be of type byte");
+    }
+    if (kw.texture->value.arr->n_dim !=2) {
+      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                  "TEXTURE must be 2 dimensional");
+    }
+    if (u->value.arr->dim[0] != kw.texture->value.arr->dim[0]
+          || u->value.arr->dim[1] != kw.texture->value.arr->dim[1]) {
+      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                  "TEXTURE must have the same dimensions as parameters");
+    }
+  }
+
   // variable to return result in
   result_data = (unsigned char *) IDL_MakeTempArray(IDL_TYP_BYTE,
                                                     u->value.arr->n_dim,
