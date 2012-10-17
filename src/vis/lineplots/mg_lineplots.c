@@ -85,42 +85,41 @@
 //}
 
 
-static IDL_VPTR IDL_mg_rasterpolyline_(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_mg_rasterpolyline(int argc, IDL_VPTR *argv) {
   IDL_VPTR x, y, polylines, dims, xrange, yrange, result;
   int *result_data;
-  
+
   x = argv[0];
   y = argv[1];
   polylines = argv[2];
   dims = argv[3];
   xrange = argv[4];
   yrange = argv[5];
-  
+
   printf("dims[0] = %d\n", x->value.arr->dim[0]);
   printf("dims[1] = %d\n", x->value.arr->dim[1]);
   printf("dims[2] = %d\n", x->value.arr->dim[2]);
-  
+
   // variable to return result in
-  result_data = (int *) IDL_MakeTempArray(IDL_TYP_LONG, 
+  result_data = (int *) IDL_MakeTempArray(IDL_TYP_LONG,
                                           x->value.arr->n_dim,
                                           x->value.arr->dim,
-                                          IDL_ARR_INI_ZERO, 
+                                          IDL_ARR_INI_ZERO,
                                           &result);
-  return result;                                                      
+  return result;
 }
 
 
 /*
   Register the routines available for IDL; they must be specified exactly as 
   in mg_lineplots.dlm.
-*/
-
+  */
 int IDL_Load(void) {
-  
+
   // functions to register
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { IDL_mg_rasterpolyline_,     "MG_RASTERPOLYLINE_",     6, 6, 0, 0 },
+    { IDL_mg_rasterpolyline,     "MG_RASTERPOLYLINE",     6, 6, 0, 0 },
   };
-  
+
   return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));  
 }
