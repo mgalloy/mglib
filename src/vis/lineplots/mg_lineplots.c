@@ -96,9 +96,9 @@ static IDL_VPTR IDL_mg_rasterpolyline(int argc, IDL_VPTR *argv) {
   xrange = argv[4];
   yrange = argv[5];
 
-  printf("dims[0] = %d\n", x->value.arr->dim[0]);
-  printf("dims[1] = %d\n", x->value.arr->dim[1]);
-  printf("dims[2] = %d\n", x->value.arr->dim[2]);
+  printf("dims[0] = %lld\n", x->value.arr->dim[0]);
+  printf("dims[1] = %lld\n", x->value.arr->dim[1]);
+  printf("dims[2] = %lld\n", x->value.arr->dim[2]);
 
   // variable to return result in
   result_data = (int *) IDL_MakeTempArray(IDL_TYP_LONG,
