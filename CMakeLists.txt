@@ -8,10 +8,20 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 cmake_minimum_required(VERSION 2.8.3)
 
 set(CMAKE_MODULE_PATH
-    ${CMAKE_SOURCE_DIR}/mgcmake/Modules
-    ${CMAKE_ROOT}/Modules
-    ${CMAKE_MODULE_PATH}
-    )
+  ${CMAKE_SOURCE_DIR}/mgcmake/Modules
+  ${CMAKE_ROOT}/Modules
+  ${CMAKE_MODULE_PATH}
+)
+
+find_package(Git)
+if (GIT_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h
+    OUTPUT_VARIABLE REVISION
+  )
+else ()
+  set(REVISION "")
+endif ()
 
 find_package(IDL REQUIRED)
 
