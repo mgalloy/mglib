@@ -11,7 +11,6 @@ pro mg_dcdoc_library
   idldoc, root=filepath('src', root=root), $
           output=filepath('api-dcdocs', root=root), $
           overview=filepath('overview.txt', root=root), $
-          footer=filepath('footer.html', root=root), $
           title='mglib', $
           subtitle='Personal IDL library for M. Galloy', $
           index_level=1, format_style='rst', $
