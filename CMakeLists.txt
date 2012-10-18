@@ -38,28 +38,28 @@ file(GLOB_RECURSE IDLDOC_FILES "src/*.idldoc")
 
 add_custom_command(
   OUTPUT api-docs/index.html
-  COMMAND idl -e mg_doc_library
+  COMMAND ${Idl_EXECUTABLE} -e mg_doc_library
   DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
 )
 add_custom_target(doc DEPENDS api-docs/index.html)
 
 add_custom_command(
   OUTPUT api-userdocs/index.html
-  COMMAND idl -e mg_userdoc_library
+  COMMAND ${Idl_EXECUTABLE} -e mg_userdoc_library
   DEPENDS ${PRO_FILES} ${DLM_FILES} ${SAV_FILES} ${IDLDOC_FILES}
 )
 add_custom_target(userdoc DEPENDS api-userdocs/index.html)
 
 add_custom_command(
   OUTPUT api-dcdocs/idldoc-index.csv
-  COMMAND idl -e mg_dcdoc_library
+  COMMAND ${Idl_EXECUTABLE} -e mg_dcdoc_library
   DEPENDS ${PRO_FILES} ${DLM_FILES}
 )
 add_custom_target(dcdoc DEPENDS api-dcdocs/idldoc-index.csv)
 
 add_custom_command(
  OUTPUT mglib-test-results.html
- COMMAND idl -quiet -IDL_QUIET 1 -e mg_run_unittests 2> /dev/null
+ COMMAND ${Idl_EXECUTABLE} -quiet -IDL_QUIET 1 -e mg_run_unittests 2> /dev/null
  DEPENDS ${PRO_FILES} ${C_FILES} ${DLM_FILES}
 )
 add_custom_target(unit DEPENDS mglib-test-results.html)
