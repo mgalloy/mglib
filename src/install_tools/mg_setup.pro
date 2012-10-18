@@ -1,20 +1,22 @@
+; docformat = 'rst'
+
 ;+
-; install_tools should have ways to:
+; `install_tools` should have ways to:
 ;   * install dependencies of a project
 ;   * handle path, DLM path, and compiling DLMs
 ;-
 
 ;+
+; Setup an installation.
 ;
-;
-; @keyword name {in}{required}{type=string}
-;          name of the package
-; @keyword version {in}{required}{type=string}
-;          version of the package in the format "1.5.2alpha1"
-;
-; @keyword version_check {out}{optional}{type=string}
-;          returns the version passed in (used by packages installing this
-;          package as a requirement to find its version)
+; :Keywords:
+;   name : in, required, type=string
+;     name of the package
+;   version : in, required, type=string
+;     version of the package in the format "1.5.2alpha1"
+;   version_check : out, optional, type=string
+;     returns the version passed in (used by packages installing this package as
+;     as a requirement to find its version)
 ;-
 pro mg_setup, name=name, $
               version=version, $
