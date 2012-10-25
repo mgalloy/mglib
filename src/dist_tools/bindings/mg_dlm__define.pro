@@ -665,19 +665,26 @@ end
 
 ; main-level example
 
-; This example creates a DLM to access a few internal routines:
+; This example creates a DLM to access a few internal routines::
 ;
 ;   char *IDL_OutputFormatFunc(int type)
 ;   int IDL_OutputFormatLenFunc(int type)
 ;   int IDL_TypeSizeFunc(int type)
 ;   char *IDL_TypeNameFunc(int type)
 ;   void IDL_TTYReset(void)
+;   IDL_LONG64 IDL_SysRtnNumEnabled(int is_function, int enabled)
+;
+; and a `#define` value::
+;
+;   #define IDL_TYP_UNDEF 0
 
 f = mg_dlm(basename='format_example', $
            name='FORMAT_EXAMPLE', $
            description='Example of using dist_tools bindings', $
            version='1.0', source='dist_tools')
 
+; these definitions could also be put into a file and added via the
+; `addRoutinesFromHeaderFile` method instead
 f->addRoutineFromPrototype, 'char *IDL_OutputFormatFunc(int type)'
 f->addRoutineFromPrototype, 'int IDL_OutputFormatLenFunc(int type)'
 f->addRoutineFromPrototype, 'int IDL_TypeSizeFunc(int type)'
@@ -687,22 +694,20 @@ f->addRoutineFromPrototype, 'IDL_LONG64 IDL_SysRtnNumEnabled(int is_function, in
 
 f->addPoundDefineAccessor, 'IDL_TYP_UNDEF', type=3L
 
-;f->addInclude, 'curl.h', header_directory='/usr/include/curl', lib_file='/usr/lib/libcurl.dylib'
-;f->addRoutineFromPrototype, 'void *curl_easy_init(void)'
-
 f->write
 f->build, /show_all_output
 f->register
 
 obj_destroy, f
 
-; normally, the routines in the DLM can't be called until IDL returns to the
-; command line, but EXECUTE, CALL_PROCEDURE, and CALL_FUNCTION can be used
-; to get around this
+; normally, the routines in just compiled DLM can't be called until IDL returns
+; to the command line, but EXECUTE, CALL_PROCEDURE, and CALL_FUNCTION can be
+; used to get around this
 print, 'Calling a routine from the created DLM...'
-status = execute('print, IDL_OutputFormatFunc(5L), format=''(%"Default double format: %s")''')
+print, call_function('IDL_OutputFormatFunc', 5L), $
+       format='(%"Default double format: %s")'
 
 print, 'Accessing a #define from idl_export.h...'
-status = execute('print, get_idl_typ_undef(), format=''(%"#define IDL_TYP_UNDEF %d")''')
+print, call_function('idl_typ_undef'), format='(%"#define IDL_TYP_UNDEF %d")'
 
 end
