@@ -6,7 +6,7 @@
 ; :Examples:
 ;    To run a simple example::
 ;
-;       IDL> .run vis_strwrap
+;       IDL> .run mg_grstrwrap
 ;
 ; :Returns:
 ;    string array
@@ -25,8 +25,8 @@
 ;    font : in, optional, type=integer
 ;       FONT keyword to XYOUTS
 ;-
-function vis_strwrap, text, width, $
-                      charsize=charsize, charthick=charthick, font=font
+function mg_grstrwrap, text, width, $
+                       charsize=charsize, charthick=charthick, font=font
   compile_opt strictarr
 
   wordstart = strsplit(text, count=nwords, length=wordlength)
@@ -75,9 +75,9 @@ charsize = 2.0
 erase
 
 text = 'This  is a rather long line,  but  something  that wraps is needed to ' $
-         + 'demonstrate the capabilities of VIS_STRWRAP.'
-v1 = vis_strwrap(text, width, font=font, charsize=charsize)
-v2 = vis_strwrap(text, width / 2, font=font, charsize=charsize)
+         + 'demonstrate the capabilities of mg_grstrwrap.'
+v1 = mg_grstrwrap(text, width, font=font, charsize=charsize)
+v2 = mg_grstrwrap(text, width / 2, font=font, charsize=charsize)
 print, 'ORIGINAL LINE:'
 print, '"' + text + '"'
 print
@@ -96,7 +96,7 @@ xyouts, 0.05, 0.45, $
         /normal, font=font, charsize=charsize
 
 tvlct, 255, 255, 0, 0
-;vis_ps_ctswap
+
 plots, coords[0, 0:1], coords[1, 0:1], /device, color='00ffff'x
 plots, coords[0, 0:1] + width, coords[1, 0:1], /device, color='00ffff'x
 plots, coords[0, 0:1] + width / 2, coords[1, 0:1], /device, color='00ffff'x

@@ -61,13 +61,13 @@ function mg_gc_barchart, data, dimensions=dimensions, title=title, $
                      url=url)
 end
 
-; main-level example of VIS_GC_PIECHART
+; main-level example of MG_GC_PIECHART
 
 data = fix(randomu(seed, 20) * 100)
 im = mg_gc_barchart(data, $
                     bar_width=15, bar_spacing=4, $
                     dimensions=[395, 175], label=strtrim(data, 2), $
-                    color=vis_color('slateblue', /index), $
+                    color=mg_color('slateblue', /index), $
                     url=url, /vertical, title='A nice bar chart')
 window, /free, xsize=395, ysize=175, title=url
 tv, im, true=1

@@ -181,7 +181,7 @@ title = 'Current Receipts of Goverment as a Percentage of GDP'
 startValues = reform(receipts[0, *])
 endValues = reform(receipts[1, *])
 
-title = strjoin(vis_strwrap(title, 200), '!C')
+title = strjoin(mg_grstrwrap(title, 200), '!C')
 
 if (keyword_set(png)) then begin
   mg_psbegin, /image, filename='receipts.ps', xsize=4.5, ysize=8, /inches

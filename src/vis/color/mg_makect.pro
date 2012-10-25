@@ -115,7 +115,7 @@ free_lun, lun
 tvlct, mg_makect(mg_color(['white','green','yellow','blue','red']), partition=[0.2, 0.3, 0.5, 0.8])
 mg_image, convec, /new_window
 
-vis_decomposed, odec
+mg_decomposed, odec
 tvlct, oldRGB
 
 end

@@ -49,7 +49,7 @@ function mg_gc_piechart, slices, dimensions=dimensions, threed=threed, $
                      url=url)
 end
 
-; main-level example of VIS_GC_PIECHART
+; main-level example of MG_GC_PIECHART
 
 ; get directories in IDL_DIR/lib
 lib = filepath('', subdir=['lib'])

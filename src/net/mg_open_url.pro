@@ -4,13 +4,13 @@
 ; Open an URL in the default web browser. On Windows and Mac there is a
 ; standard method for doing this. On UNIX platforms, the first time this
 ; routine is called it will ask for the location of your preferred web browser
-; and save this location in the APP_USER_DIR for `MG_OPEN_URL`.
+; and save this location in the `APP_USER_DIR` for `MG_OPEN_URL`.
 ;
 ; :Examples:
-;    For example to open the IDL page on ITT VIS' website in the default web
+;    For example to open the IDL page on Exelis VIS' website in the default web
 ;    browser, do::
 ;
-;       IDL> mg_open_url, 'http://ittvis.com/IDL'
+;       IDL> mg_open_url, 'http://exelisvis.com/IDL'
 ;
 ; :Params:
 ;    url : in, required, type=string

@@ -43,7 +43,7 @@
 ;
 ;       xyouts, 3., 5., 'Sun symbol: \tex[bl][bl][3.0]{$M_\odot$}', font=0
 ;
-;    Then run `VIS_PSFRAG` on the output::
+;    Then run `MG_PSFRAG` on the output::
 ;
 ;       mg_psfrag, 'figure.eps', 'figure-subs.eps'
 ;

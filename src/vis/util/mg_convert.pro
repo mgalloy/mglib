@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-; The vis library is released under a BSD-type license.
+; The mglib library is released under a BSD-type license.
 ;
 ; Copyright (c) 2007-2009, Michael Galloy <mgalloy@idldev.com>
 ;

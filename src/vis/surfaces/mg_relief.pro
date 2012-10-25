@@ -26,7 +26,7 @@
 ;    color_table : in, optional, type=long
 ;       color table number
 ;    _extra : in, optional, type=keywords
-;       keywords to `VISgrPalette::loadct`
+;       keywords to `MGgrPalette::loadct`
 ;-
 function mg_relief, elevation, dimensions=dims, color_table=color_table, $
                     _extra=e
@@ -41,7 +41,7 @@ function mg_relief, elevation, dimensions=dims, color_table=color_table, $
   model = obj_new('IDLgrModel')
   view->add, model
 
-  palette = obj_new('VISgrPalette')
+  palette = obj_new('MGgrPalette')
   palette->loadct, _color_table, _extra=e
   texture = obj_new('IDLgrImage', bytscl(elevation), palette=palette)
 

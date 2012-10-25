@@ -56,16 +56,16 @@ d = dist(100L)
 
 g = mg_gradient(d)
 
-vis_decomposed, 0, old_decomposed=old_dec
+mg_decomposed, 0, old_decomposed=old_dec
 
 window, xsize=600, ysize=600, /free
 
-vis_loadct, 17, /brewer
-vis_image, d, /axes, ticklen=-0.01
+mg_loadct, 17, /brewer
+mg_image, d, /axes, ticklen=-0.01
 
-vis_loadct, 9, /brewer
-vis_vel, g[0, *, *], g[1, *, *], /overplot, nvecs=500, thick=2
+mg_loadct, 9, /brewer
+mg_vel, g[0, *, *], g[1, *, *], /overplot, nvecs=500, thick=2
 
-vis_decomposed, old_dec
+mg_decomposed, old_dec
 
 end

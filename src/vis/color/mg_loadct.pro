@@ -34,7 +34,7 @@
 ;    direct graphics
 ;
 ; :Copyright:
-;    Color tables accessed with `VIS_LOADCT` and `VIS_XLOADCT` are provided
+;    Color tables accessed with `MG_LOADCT` and `MG_XLOADCT` are provided
 ;    courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org,
 ;    accessed 20 October 2007.
 ;
@@ -123,7 +123,7 @@ end
 ;
 ; :Keywords:
 ;    file : in, optional, type=string, default=colors.tbl
-;       filename of color table file; this is present to make `VIS_LOADCT`
+;       filename of color table file; this is present to make `MG_LOADCT`
 ;       completely implement `LOADCT`'s interface, it would normally not be used
 ;    brewer : in, optional, type=boolean
 ;       set to use the Brewer color tables
@@ -149,8 +149,8 @@ end
 ;       filename of `.cpt` file to load a color table from; the `.cpt`
 ;       filename extension is optional; the filename given can be absolute,
 ;       relative from the current working directory, or relative from the
-;       `cpt-city` directory in the VIS library; see `cptcity_catalog.idldoc`
-;       for a listing of the `.cpt` files provided with the VIS library
+;       `cpt-city` directory in the mglib library; see `cptcity_catalog.idldoc`
+;       for a listing of the `.cpt` files provided with the mglib library
 ;    _ref_extra : in, out, optional, type=keyword
 ;       keywords to `LOADCT`
 ;-

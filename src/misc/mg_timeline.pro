@@ -642,7 +642,7 @@ pro mg_timeline, filename, outputFilename
                         fltarr(2) + eventDate, $
                         0.9 - [10 * ygap, level] / 10., $
                         thick=0.5, $
-                        color=vis_color(color), $
+                        color=mg_color(color), $
                         xcoord_conv=xc)
 
     model->add, obj_new('IDLgrText', eventText, font=font, $
@@ -669,7 +669,7 @@ pro mg_timeline, filename, outputFilename
                         [intervalStartDate, intervalEndDate], $
                         fltarr(2) + 0.9 - level / 10., $
                         thick=2.5, $
-                        color=vis_color(color), $
+                        color=mg_color(color), $
                         xcoord_conv=xc)
     model->add, obj_new('IDLgrText', name, font=font, $
                         location=[(intervalStartDate + intervalEndDate) / 2.0, 0.9 - (6. * ygap + level) / 10.], $
@@ -730,7 +730,7 @@ pro mg_timeline, filename, outputFilename
                         fltarr(2) + now, $
                         [0.1, 0.9], $
                         thick=0.25, $
-                        color=vis_color(nowColor), $
+                        color=mg_color(nowColor), $
                         xcoord_conv=xc)
   endif
 

@@ -132,7 +132,7 @@ end
 
 ;+
 ;
-; `VIS_POLYLINE_SIMPLIFY` uses the Douglas-Peucker (DP) approximation
+; `MG_POLYLINE_SIMPLIFY` uses the Douglas-Peucker (DP) approximation
 ; algorithm that is used extensively for both computer graphics and geographic
 ; information systems. See `geometryalgorithms.com <geometryalgorithms.com>`.
 ;
