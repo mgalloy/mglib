@@ -78,7 +78,8 @@ function mgtmhtml::_preTag, type, newline=newline, tag=tag
     'heading6': return, '<h6>'
     'image': begin
         src = tag->getAttribute('source')
-        return, '<img src="' + src + '"/>'
+        loc = tag->getAttribute('location')
+        return, '<img src="' + loc + src + '"/>'
       end
     'embed': begin
         src = tag->getAttribute('source')
