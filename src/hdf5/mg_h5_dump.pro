@@ -19,7 +19,7 @@
 ; :Copyright:
 ;    This library is released under a BSD-type license.
 ;
-;    Copyright (c) 2007-2010, Michael Galloy <mgalloy@idldev.com>
+;    Copyright (c) 2007-2012, Michael Galloy <mgalloy@idldev.com>
 ;
 ;    All rights reserved.
 ;

@@ -2,7 +2,7 @@
 
 ; The mglib library is released under a BSD-type license.
 ;
-; Copyright (c) 2007-2009, Michael Galloy <mgalloy@idldev.com>
+; Copyright (c) 2007-2012, Michael Galloy <mgalloy@idldev.com>
 ;
 ; All rights reserved.
 ;
@@ -34,9 +34,9 @@
 ; of the convert command from the ImageMagick utilities, do one of the
 ; following:
 ;
-;    1. set the CONVERT_LOCATION keyword
-;    2. set the !convert_location system variable
-;    3. place convert in the OS PATH
+;    1. set the `CONVERT_LOCATION` keyword
+;    2. set the `!convert_location` system variable
+;    3. place `convert` in the OS `PATH`
 ;
 ; :Examples:
 ;    Try the main-level program at the end of this file::
