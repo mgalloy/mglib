@@ -102,15 +102,15 @@ plot, x, sin(x), $
       title='Cool xkcd-style plot!', $
       xstyle=5, ystyle=4, $
       color=0, background=1, font=1
-plots, yaxis, thick=4, color=0, /data
-plots, xaxis, thick=4, color=0, /data
-plots, sin_res, thick=16, color=1, /data
-plots, sin_res, thick=4, color=2, /data
-plots, cos_res, thick=16, color=1, /data
-plots, cos_res, thick=4, color=3, /data
+plots, yaxis, thick=6, color=0, /data
+plots, xaxis, thick=6, color=0, /data
+plots, sin_res, thick=24, color=1, /data
+plots, sin_res, thick=6, color=2, /data
+plots, cos_res, thick=24, color=1, /data
+plots, cos_res, thick=6, color=3, /data
 
 mg_psend
-mg_convert, basename, max_dimensions=[500, 500], output=im, /cleanup
+mg_convert, basename, max_dimensions=[400, 400], output=im, /cleanup
 mg_image, im, /new_window
 
 end
