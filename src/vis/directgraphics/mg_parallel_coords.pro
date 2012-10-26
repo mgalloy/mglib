@@ -122,15 +122,16 @@ data = transpose(data)
 
 mg_psbegin, filename='obesity.ps', xsize=6, ysize=4, /inches, /image
 mg_decomposed, 1, old_decomposed=old_decomposed
+
 device, set_font='Helvetica', /tt_font
 
 mg_parallel_coords, data, /nodata, $
                     position=[0.1, 0.1, 0.9, 0.85], $
                     thick=0.5, ticklen=0, charsize=0.9, $
                     axes_color=mg_rgb2index([200, 200, 200]), $
-                    dimension_titles=ages, data_title='% obese'
+                    dimension_titles=ages, data_title='% obese', font=1
 
-xyouts, 0.5, 0.925, '% obese by age cohort', /normal, alignment=0.5
+xyouts, 0.5, 0.925, '% obese by age cohort', /normal, alignment=0.5, font=1
 
 mg_decomposed, 0
 mg_loadct, cpt_filename='cw/2/cw2-066.cpt'
@@ -139,7 +140,8 @@ colors = bytscl(bindgen(8))
 mg_parallel_coords, data, /overplot, $
                     thick=10, $
                     color=colors, $
-                    psym=[1, 0, 0, 0, 0, 0, 0, 0]
+                    psym=[1, 0, 0, 0, 0, 0, 0, 0], $
+                    font=1
 
 cohorts = ['1996-2005', '1986-1995', '1976-1985', '1966-1975', '1956-1965', $
            '1946-1955', '1936-1945', '1926-1935']
@@ -154,7 +156,7 @@ mg_legend, position=[0.685, 0.2, 0.885, 0.6], $
            line_length=0.15, $
            item_color=colors, $
            gap=0.2, $
-           background='f0f0f0'x
+           background='f0f0f0'x, font=1
 
 mg_decomposed, old_decomposed
 mg_psend
