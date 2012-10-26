@@ -34,17 +34,17 @@
 ; of the convert command from the ImageMagick utilities, do one of the
 ; following:
 ;
-;    1. set the `CONVERT_LOCATION` keyword
-;    2. set the `!convert_location` system variable
-;    3. place `convert` in the OS `PATH`
+;   1. set the `CONVERT_LOCATION` keyword
+;   2. set the `!convert_location` system variable
+;   3. place `convert` in the OS `PATH`
 ;
 ; :Examples:
-;    Try the main-level program at the end of this file::
+;   Try the main-level program at the end of this file::
 ;
-;       IDL> .run mg_convert
+;     IDL> .run mg_convert
 ;
 ; :Categories:
-;    system utility
+;   system utility
 ;-
 
 
@@ -52,11 +52,11 @@
 ; Attempt to read an image file.
 ;
 ; :Returns:
-;    image or -1L if format not supported
+;   image or `-1L` if format not supported
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of file to read
+;   filename : in, required, type=string
+;     filename of file to read
 ;-
 function mg_convert_read_image, filename
   compile_opt strictarr
@@ -75,38 +75,43 @@ end
 ; Use ImageMagick to convert a file between formats.
 ;
 ; :Params:
-;    basename : in, optional, type=string
-;       basename of file to convert (used for output name as well)
+;   basename : in, optional, type=string
+;     basename of file to convert (used for output name as well)
 ;
 ; :Keywords:
-;    density : in, optional, type=long, default=300
-;       density of output image in dots per inch
-;    scale : in, optional, type=long, default=100
-;       scale percentage to use
-;    from_extension : in, optional, type=string
-;       extension to use for input file
-;    from_eps : in, optional, type=boolean
-;       if set, indicates the input is a Encapsulated PostScript file
-;    from_png : in, optional, type=boolean
-;       if set, indicates the input is a PNG file
-;    from_ps : in, optional, type=boolean
-;       if set, indicates the input is a PostScript file
-;    max_dimensions : in, optional, type=lonarr(2)
-;       maximum dimensions for the output image in pixels
-;    to_extension : in, optional, type=string
-;       extension to use for output file
-;    to_eps : in, optional, type=boolean
-;       if set, indicates the output should a Encapsulated Postscript file
-;    to_png : in, optional, type=boolean
-;       if set, indicates the output should a PNG image file
-;    to_ps : in, optional, type=boolean
-;       if set, indicates the output should a Postscript file
-;    command : out, optional, type=string
-;       convert command
-;    output : out, optional, type=bytarr
-;       output image if output format is an image type
-;    convert_location : in, optional, type=string
-;       location of the convert command
+;   density : in, optional, type=long, default=300
+;     density of output image in dots per inch
+;   scale : in, optional, type=long, default=100
+;     scale percentage to use
+;   from_extension : in, optional, type=string
+;     extension to use for input file
+;   from_eps : in, optional, type=boolean
+;     if set, indicates the input is a Encapsulated PostScript file
+;   from_png : in, optional, type=boolean
+;     if set, indicates the input is a PNG file
+;   from_ps : in, optional, type=boolean
+;     if set, indicates the input is a PostScript file
+;   max_dimensions : in, optional, type=lonarr(2)
+;     maximum dimensions for the output image in pixels
+;   to_extension : in, optional, type=string
+;     extension to use for output file
+;   to_eps : in, optional, type=boolean
+;     if set, indicates the output should a Encapsulated Postscript file
+;   to_png : in, optional, type=boolean
+;     if set, indicates the output should a PNG image file
+;   to_ps : in, optional, type=boolean
+;     if set, indicates the output should a Postscript file
+;   command : out, optional, type=string
+;     convert command
+;   output : out, optional, type=bytarr
+;     output image if output format is an image type, output image file is
+;     automatically removed if this is present
+;   convert_location : in, optional, type=string
+;     location of the convert command
+;   keep_output : in, optional, type=boolean
+;     set to keep output file even if `OUTPUT` is present
+;   cleanup : in, optional, type=boolean
+;     set to remove input file
 ;-
 pro mg_convert, basename, $
                 density=density, $
@@ -122,7 +127,9 @@ pro mg_convert, basename, $
                 to_ps=toPs, $
                 command=cmd, $
                 output=output, $
-                convert_location=convertLocation
+                convert_location=convertLocation, $
+                keep_output=keep_output, $
+                cleanup=cleanup
   compile_opt strictarr
   on_error, 2
 
@@ -176,6 +183,13 @@ pro mg_convert, basename, $
   ; send output back if requested
   if (arg_present(output)) then begin
     output = mg_convert_read_image(basename + '.' + outputExtension)
+    if (~keyword_set(keep_output)) then begin
+      file_delete, basename + '.' + outputExtension
+    endif
+  endif
+
+  if (keyword_set(cleanup)) then begin
+    file_delete, basename + '.' + inputExtension
   endif
 end
 
