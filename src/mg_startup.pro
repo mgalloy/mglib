@@ -29,7 +29,7 @@ commentPos = strpos(pathDirs, ';')
 pathDirInds = where(commentPos ne 0, nPathDirs)
 if (nPathDirs gt 0) then mg_set_path, pathDirs[pathDirInds], /dlm
 
-; quietly load mglib constnants
+; quietly load mglib constants
 oldQuiet = !quiet
 !quiet = 1
 mg_constants
