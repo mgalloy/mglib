@@ -48,6 +48,9 @@
 pro mg_constants
   compile_opt strictarr
 
+  defsysv, '!mg', exists=exists
+  if (exists) then return
+
   defsysv, '!mg', { linestyle: { solid: 0, $
                                  dotted: 1, $
                                  dashed: 2, $
