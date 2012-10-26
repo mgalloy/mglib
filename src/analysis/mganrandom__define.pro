@@ -187,6 +187,8 @@ end
 
 ; main-level example program
 
+mg_constants
+
 r = obj_new('MGanRandom')
 
 d = r->getIntegers(100, error=error)
@@ -207,7 +209,7 @@ if (error eq 0L) then begin
   window, /free
   plot, 4. * findgen(nbins) / (nbins - 1.) - 2., $
         histogram(d, nbins=nbins, min=-2, max=2.), $
-        psym=10
+        psym=!mg.psym.histogram
 endif else print, 'Error generating gaussians'
 
 obj_destroy, r

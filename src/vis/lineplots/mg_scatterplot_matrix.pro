@@ -44,6 +44,8 @@ end
 
 ; main-level example program
 
+mg_constants
+
 m = 4
 n = 20
 
@@ -52,7 +54,7 @@ mg_window, xsize=4, ysize=4, /inches
 
 data = randomu(seed, m, n)
 
-mg_scatterplot_matrix, data, psym=4, charsize=0.6, symsize=0.5
+mg_scatterplot_matrix, data, psym=!mg.psym.diamond, charsize=0.6, symsize=0.5
 
 mg_psend
 mg_convert, 'scatterplot_matrix', max_dimension=[500, 500], output=im

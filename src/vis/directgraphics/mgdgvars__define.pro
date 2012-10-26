@@ -94,6 +94,8 @@ end
 
 ; main-level example program
 
+mg_constants
+
 ; do it incorrectly without `MGdgVars`
 window, 0
 plot, findgen(10)
@@ -103,7 +105,7 @@ plot, 2 * findgen(10)
 
 wset, 0
 coords = convert_coord([5], [5], /data, /to_normal)
-plots, coords[0], coords[1], /normal, psym=7
+plots, coords[0], coords[1], /normal, psym=!mg.psym.x
 
 
 ; do it correctly with `MGdgVars`
@@ -120,7 +122,7 @@ wset, 2
 vars->restore
 
 coords = convert_coord([5], [5], /data, /to_normal)
-plots, coords[0], coords[1], /normal, psym=7
+plots, coords[0], coords[1], /normal, psym=!mg.psym.x
 
 obj_destroy, vars
 

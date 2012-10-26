@@ -11,7 +11,7 @@
 ;    The first example does::
 ;
 ;       d = read_csv(filepath('ternary_data.txt', root=mg_src_root()))
-;       mg_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
+;       mg_ternaryplot, d.field2, d.field3, d.field4, psym=!mg.psym.triangle, $
 ;                       color='000000'x, background='ffffff'x, $
 ;                       atitle='aerosol single scattering albedo', $
 ;                       btitle='Angstrom exponent', $
@@ -29,12 +29,18 @@
 ;       c = randomu(seed, n)
 ;       mg_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
 ;                       atitle='A', btitle='B', ctitle='C'
-;       mg_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
-;       mg_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
-;       mg_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
-;       mg_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
-;       mg_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
-;       mg_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
+;       mg_ternaryplot, a + 2., b, c, psym=!mg.psym.plussign, symsize=0.5, $
+;                       color=rgb[0], /overplot
+;       mg_ternaryplot, a, b + 2., c, psym=!mg.psym.plussign, symsize=0.5, $
+;                       color=rgb[1], /overplot
+;       mg_ternaryplot, a, b, c + 2., psym=!mg.psym.plussign, symsize=0.5, $
+;                       color=rgb[2], /overplot
+;       mg_ternaryplot, a + 1., b, c + 2., psym=!mg.psym.plussign, $
+;                       symsize=0.5, color=rgb[3], /overplot
+;       mg_ternaryplot, a, b + 2., c + 1., psym=!mg.psym.plussign, $
+;                       symsize=0.5, color=rgb[4], /overplot
+;       mg_ternaryplot, a + 2., b + 1., c, psym=!mg.psym.plussign, $
+;                       symsize=0.5, color=rgb[5], /overplot
 ;
 ;    It should produce the following:
 ;
@@ -150,6 +156,8 @@ end
 
 ; main-level program
 
+mg_constants
+
 d = read_csv(filepath('ternary_data.txt', root=mg_src_root()))
 
 if (keyword_set(ps)) then mg_psbegin, filename='ternary_data.ps', /image
@@ -157,7 +165,7 @@ if (keyword_set(ps)) then mg_psbegin, filename='ternary_data.ps', /image
 mg_decomposed, 1, old_decomposed=old_dec
 
 mg_window, xsize=14, ysize=14, /free
-mg_ternaryplot, d.field2, d.field3, d.field4, psym=5, $
+mg_ternaryplot, d.field2, d.field3, d.field4, psym=!mg.psym.triangle, $
                 color='000000'x, background='ffffff'x, $
                 atitle='aerosol single scattering albedo', $
                 btitle='Angstrom exponent', $
@@ -186,12 +194,18 @@ mg_decomposed, 1, old_decomposed=old_dec
 mg_window, xsize=14, ysize=14, /free
 mg_ternaryplot, color='000000'x, background='ffffff'x, /nodata, $
                 atitle='A', btitle='B', ctitle='C'
-mg_ternaryplot, a + 2., b, c, psym=1, symsize=0.5, color=rgb[0], /overplot
-mg_ternaryplot, a, b + 2., c, psym=1, symsize=0.5, color=rgb[1], /overplot
-mg_ternaryplot, a, b, c + 2., psym=1, symsize=0.5, color=rgb[2], /overplot
-mg_ternaryplot, a + 1., b, c + 2., psym=1, symsize=0.5, color=rgb[3], /overplot
-mg_ternaryplot, a, b + 2., c + 1., psym=1, symsize=0.5, color=rgb[4], /overplot
-mg_ternaryplot, a + 2., b + 1., c, psym=1, symsize=0.5, color=rgb[5], /overplot
+mg_ternaryplot, a + 2., b, c, $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[0], /overplot
+mg_ternaryplot, a, b + 2., c, $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[1], /overplot
+mg_ternaryplot, a, b, c + 2., $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[2], /overplot
+mg_ternaryplot, a + 1., b, c + 2., $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[3], /overplot
+mg_ternaryplot, a, b + 2., c + 1., $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[4], /overplot
+mg_ternaryplot, a + 2., b + 1., c, $
+                psym=!mg.psym.plussign, symsize=0.5, color=rgb[5], /overplot
 
 mg_decomposed, old_dec
 

@@ -238,6 +238,8 @@ end
 
 ; main-level example program
 
+mg_constants
+
 mg_decomposed, 0, old_decomposed=oldDecomposed
 
 red   = [0, 220, 255, 255, 255,   0,   0, 255, 160, 255]
@@ -299,21 +301,21 @@ print, dmin, $
        format='(%"RED: After simplifying with tolerance: %f (minimum distance in x or y)")'
 print, n_elements(a) / 2, strtrim(ta / n), $
        format='(%" number of output vertices: %d\n time: %f")'
-plots, a, psym=-4, color=2
+plots, a, psym=-!mg.psym.diamond, color=2
 
 wait, 2.
 print, davg, $
        format='(%"GREEN: After simplifying with tolerance: %f (lesser of the average distace in x or y)")'
 print, n_elements(b) / 2, strtrim(tb / n), $
        format='(%" number of output vertices: %d\n time: %f")'
-plots, b, psym=-4, color=5
+plots, b, psym=-!mg.psym.diamond, color=5
 
 wait, 2.
 print, factor, $
        format='(%"BLUE:  After simplifying with factor: %d")'
 print, n_elements(c) / 2, strtrim(tc / n), $
        format='(%" number of output vertices: %d\n time: %f")'
-plots, c, psym=-4, color=6
+plots, c, psym=-!mg.psym.diamond, color=6
 
 mg_decomposed, oldDecomposed
 
