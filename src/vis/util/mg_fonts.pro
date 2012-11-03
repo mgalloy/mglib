@@ -65,7 +65,7 @@ pro mg_fonts, install=install, tt_available=tt_available
                     file_basename(install[i].filename), $
                     install[i].direct_size, $
                     install[i].object_size, $
-                    format='(%"\"%s\"   %s   %f   %f")'
+                    format='(%"\n\"%s\"   %s   %f   %f")'
             free_lun, lun
             file_copy, install[i].filename, $
                        filepath('', subdir=['resource', 'fonts', 'tt']), $
