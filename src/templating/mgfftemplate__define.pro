@@ -32,7 +32,7 @@
 ;    IDL 6.1
 ;
 ; :Uses:
-;    `MGffTokenizer` class
+;    `MGffTokenizer`
 ;
 ; :Categories:
 ;    input/output
