@@ -123,6 +123,17 @@ function mgfftextfile::init, _extra=e
 end
 
 
+;+
+; :Fields:
+;   filename
+;     filename of text file
+;   lun
+;     logical unit number for text file
+;   read
+;     set if file open for reading
+;   write
+;     set if file open for writing
+;-
 pro mgfftextfile__define
   compile_opt strictarr
 
