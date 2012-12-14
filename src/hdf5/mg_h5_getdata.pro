@@ -270,8 +270,14 @@ function mg_h5_getdata_getvariable, fileId, variable, bounds=bounds, $
   variableId = h5d_open(fileId, variable)
   variableSpace = h5d_get_space(variableId)
 
-  fullBounds = h5s_get_select_bounds(variableSpace)
   nPoints = h5s_get_select_npoints(variableSpace)
+
+  if (nPoints eq 1L) then begin
+    fullBounds = [[0], [0]] 
+    nPoints = 1L
+  endif else begin
+    fullBounds = h5s_get_select_bounds(variableSpace)
+  endelse
 
   if (nPoints gt 0L) then begin
     empty = 0B
@@ -289,13 +295,17 @@ function mg_h5_getdata_getvariable, fileId, variable, bounds=bounds, $
       ; TODO: implement
       message, 'single-dimension indices not implemented yet'
     endif else begin
-      mg_h5_getdata_computeslab, _bounds, $
-                                 start=start, count=count, $
-                                 block=block, stride=stride
-      resultSpace = h5s_create_simple(count)
+      if (nPoints eq 1L) then begin
+        resultSpace = h5s_create_simple(1L)
+      endif else begin
+        mg_h5_getdata_computeslab, _bounds, $
+                                   start=start, count=count, $
+                                   block=block, stride=stride
+        resultSpace = h5s_create_simple(count)
 
-      h5s_select_hyperslab, variableSpace, start, count, $
-                            block=block, stride=stride, /reset
+        h5s_select_hyperslab, variableSpace, start, count, $
+                              block=block, stride=stride, /reset
+      endelse
     endelse
 
     data = h5d_read(variableId, $
