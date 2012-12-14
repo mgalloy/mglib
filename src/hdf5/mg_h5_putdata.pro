@@ -57,6 +57,40 @@
 ;    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;-
 
+;+
+; Create a reference given a string to the reference object.
+;
+; :Private:
+;
+; :Returns:
+;    reference identifier
+;
+; :Params:
+;   file_id : in, required, type=ulong64
+;     file identifier
+;   attvalue : in, required, type=string
+;     string specifying object to reference
+;
+; :Keywords:
+;   rgroup : out, optional, type=ulong64
+;     identifier for group containing reference object, must be closed by caller
+;-
+function mg_h5_putdata_getreference, file_id, attvalue, rgroup=rgroup
+  compile_opt strictarr
+
+  group_slash_pos = strpos(attvalue, '/', /reverse_search)
+  rgroup = h5g_open(file_id, $
+                    group_slash_pos eq -1L $
+                      ? '/' $
+                      : strmid(attvalue, 0, group_slash_pos))
+  attvalue = h5r_create(rgroup, $
+                        group_slash_pos eq -1L $
+                          ? attvalue $
+                          : strmid(attvalue, group_slash_pos + 1L))
+
+  return, attvalue
+end
+
 
 ;+
 ; Determines if an object with a given name exists at a given location.
@@ -71,6 +105,11 @@
 ;       file or group identifier
 ;    name : in, required, type=string
 ;       name of object to check
+;
+; :Keywords:
+;   reference : in, optional, type=boolean
+;     set to indicate that `data` is a reference to an attribute/variable in the
+;     file instead of actual data
 ;-
 function mg_h5_putdata_varexists, loc, name
   compile_opt strictarr
@@ -96,12 +135,17 @@ end
 ;       name of variable in HDF5 file
 ;    data : in, optional, type=any
 ;       IDL variable to write
+;
+; :Keywords:
+;   reference : in, optional, type=boolean
+;     set to indicate that `data` is a reference to an attribute/variable in the
+;     file instead of actual data
 ;-
-pro mg_h5_putdata_putvariable, filename, name, data
+pro mg_h5_putdata_putvariable, filename, name, data, reference=reference
   compile_opt strictarr
 
-	if (file_test(filename)) then begin
-	  fileId = h5f_open(filename, /write)
+  if (file_test(filename)) then begin
+    fileId = h5f_open(filename, /write)
   endif else begin
     fileId = h5f_create(filename)
   endelse
@@ -121,9 +165,17 @@ pro mg_h5_putdata_putvariable, filename, name, data
     groups[t] = loc
   endfor
 
+  if (keyword_set(reference)) then begin
+    attvalue = mg_h5_putdata_getreference(fileId, data, rgroup=rgroup)
+  endif
+  
   if (tokens[ntokens - 1L] ne '') then begin
     ; get the HDF5 type from the IDL variable
-    datatypeId = h5t_idl_create(data)
+    if (keyword_set(reference)) then begin
+      datatypeId = h5t_reference_create()
+    endif else begin
+      datatypeId = h5t_idl_create(data)
+    endelse
 
     ; scalars and arrays are created differently
     if (size(data, /n_dimensions) eq 0L) then begin
@@ -146,7 +198,7 @@ pro mg_h5_putdata_putvariable, filename, name, data
   endif
 
   for t = ntokens - 2L, 0L, -1L do h5g_close, groups[t]
-
+  if (keyword_set(reference)) then h5g_close, rgroup
   h5f_close, fileId
 end
 
@@ -163,11 +215,21 @@ end
 ;       name of attribute to write
 ;    attvalue : in, required, type=any
 ;       value of attribute to write
+;
+; :Keywords:
+;   reference : in, optional, type=boolean
+;     set to indicate that `data` is a reference to an attribute/variable in the
+;     file instead of actual data
 ;-
-pro mg_h5_putdata_putattributedata, id, attname, attvalue
+pro mg_h5_putdata_putattributedata, id, attname, attvalue, $
+                                    reference=reference
   compile_opt strictarr
 
-  datatypeId = h5t_idl_create(attvalue)
+  if (keyword_set(reference)) then begin
+    datatypeId = h5t_reference_create()
+  endif else begin
+    datatypeId = h5t_idl_create(attvalue)
+  endelse
 
   ; scalars and arrays are created differently
   if (size(data, /n_dimensions) eq 0L) then begin
@@ -197,38 +259,52 @@ end
 ;       name of attribute to write
 ;    attvalue : in, optional, type=any
 ;       IDL variable to write
+;
+; :Keywords:
+;   reference : in, optional, type=boolean
+;     set to indicate that `data` is a reference to an attribute/variable in the
+;     file instead of actual data
 ;-
-pro mg_h5_putdata_putattribute, filename, loc, attname, attvalue
+pro mg_h5_putdata_putattribute, filename, loc, attname, attvalue, $
+                                reference=reference
   compile_opt strictarr
   on_error, 2
 
-	if (file_test(filename)) then begin
-	  fileId = h5f_open(filename, /write)
+  if (file_test(filename)) then begin
+    fileId = h5f_open(filename, /write)
   endif else begin
     fileId = h5f_create(filename)
   endelse
+
+  if (keyword_set(reference)) then begin
+    attvalue = mg_h5_putdata_getreference(fileId, attvalue, rgroup=rgroup)
+  endif
 
   objInfo = h5g_get_objinfo(fileId, loc)
   case objInfo.type of
     'LINK': message, 'Cannot handle an attribute of a reference'
     'GROUP': begin
-        group = h5g_open(fileId, loc)
-        mg_h5_putdata_putattributedata, group, attname, attvalue
-        h5g_close, group
+        group_id = h5g_open(fileId, loc)
+        mg_h5_putdata_putattributedata, group_id, attname, attvalue, $
+                                        reference=reference
+        h5g_close, group_id
       end
     'DATASET': begin
         dataset = h5d_open(fileId, loc)
-        mg_h5_putdata_putattributedata, dataset, attname, attvalue
+        mg_h5_putdata_putattributedata, dataset, attname, attvalue, $
+                                        reference=reference
         h5d_close, dataset
       end
     'TYPE': begin
         type = h5t_open(fileId, loc)
-        mg_h5_putdata_putattributedata, type, attname, attvalue
+        mg_h5_putdata_putattributedata, type, attname, attvalue, $
+                                        reference=reference
         h5t_close, type
       end
     'UNKNOWN': message, 'Unknown item'
   endcase
 
+  if (keyword_set(reference)) then h5g_close, rgroup
   h5f_close, fileId
 end
 
@@ -237,40 +313,67 @@ end
 ; Write data to a file.
 ;
 ; :Params:
-;    filename : in, required, type=long
-;       HDF5 filename to write variable into
-;    name : in, required, type=string
-;       name of variable in HDF5 file
-;    data : in, optional, type=any
-;       IDL variable to write
+;   filename : in, required, type=long
+;     HDF5 filename to write variable into
+;   name : in, required, type=string
+;     name of variable in HDF5 file
+;   data : in, optional, type=any
+;     IDL variable to write
+;
+; :Keywords:
+;   groups : in, required, type=hash
+;     hash of all open groups
+;   reference : in, optional, type=boolean
+;     set to indicate that `data` is a reference to an attribute/variable in the
+;     file instead of actual data
 ;-
-pro mg_h5_putdata, filename, name, data
-	compile_opt strictarr
-	on_error, 2
+pro mg_h5_putdata, filename, name, data, reference=reference
+  compile_opt strictarr
+  on_error, 2
 
   dotPos = strpos(name, '.', /reverse_search)
   if (dotPos eq -1L) then begin
     ; write variable
-    mg_h5_putdata_putvariable, filename, name, data
+    mg_h5_putdata_putvariable, filename, name, data, $
+                               reference=reference
   endif else begin
     ; write attribute
     path = strmid(name, 0, dotPos)
     attname = strmid(name, dotPos + 1L)
-    mg_h5_putdata_putattribute, filename, path, attname, data
+    mg_h5_putdata_putattribute, filename, path, attname, data, $
+                                reference=reference
   endelse
 end
 
 
 ; main-level example program
 
+; simple example
 filename = 'test.h5'
+if (file_test(filename)) then file_delete, filename
 
 mg_h5_putdata, filename, 'scalar', 1.0
 mg_h5_putdata, filename, 'array', findgen(10)
+mg_h5_putdata, filename, 'reference', 'scalar', /reference
 mg_h5_putdata, filename, 'group/another_scalar', 1.0
 mg_h5_putdata, filename, 'group/another_array', findgen(10)
 mg_h5_putdata, filename, 'array.attribute', 'Attribute of an array'
+mg_h5_dump, filename
 
-mg_h5_dump, 'test.h5'
+; example with reference
+infile = file_which('avhrr.png')
+im = read_png(infile, r, g, b)
+palette = transpose([[r], [g], [b]])
+
+filename = 'image_and_palette_example.h5'
+if (file_test(filename)) then file_delete, filename
+
+mg_h5_putdata, filename, 'AVHRR image/image data', reverse(im, 2)
+mg_h5_putdata, filename, 'AVHRR image/image palette', palette
+mg_h5_putdata, filename, 'AVHRR image/image palette.CLASS', 'PALETTE'
+mg_h5_putdata, filename, 'AVHRR image/image data.CLASS', 'IMAGE'
+mg_h5_putdata, filename, 'AVHRR image/image data.PALETTE', $
+               'AVHRR image/image palette', /reference
+mg_h5_dump, filename
 
 end
