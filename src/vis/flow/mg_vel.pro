@@ -244,6 +244,8 @@ end
 ; :Keywords:
 ;    overplot : in, optional, type=boolean
 ;       set to not erase current display before making plot
+;    nodata : in, optional, type=boolean
+;       set to display only axes
 ;    nvecs : in, optional, type=long, default=200L
 ;       number of vectors (arrows) to draw
 ;    length : in, optional, type=float, default=0.1
@@ -279,7 +281,7 @@ end
 ;       keywords to PLOT and PLOTS routines that plot the streamlines
 ;-
 pro mg_vel, u, v, x, y, $
-            overplot=overplot, $
+            overplot=overplot, nodata=nodata, $
             nvecs=nvecs, length=length, nsteps=nsteps, xmax=xmax, $
             grid=grid, stride=stride, jitter=jitter, thick=thick, $
             max_thick=maxThick, color=color, axes_color=axesColor, $
@@ -341,23 +343,25 @@ pro mg_vel, u, v, x, y, $
   maxmag = max(mag)
 
   ; write each streamline
-  for i = 0L, _nvecs - 1L do begin
-    smag = mag[(su.dimensions[0] - 1) * s[i, 0, 0], $
-               (su.dimensions[1] - 1) * s[i, 0, 1]] / maxmag
-    _thick = n_elements(thick) eq 0L ? _maxThick * smag : thick
-    _color = n_elements(color) eq 0L $
-               ? (!d.name eq 'PS' $
-                    ? byte(255 * smag) $
-                    : mg_rgb2index(bytarr(3) + byte(255 * smag))) $
-               : color
-    plots, (xmax - xmin) * s[i, *, 0] + xmin, $
-           (ymax - ymin) * s[i, *, 1] + ymin, $
-           thick=_thick, $
-           clip=[!x.crange[0], !y.crange[0], !x.crange[1], !y.crange[1]], $
-           noclip=0, $
-           color=_color, $
-           _extra=e
-  endfor
+  if (~keyword_set(nodata)) then begin
+    for i = 0L, _nvecs - 1L do begin
+      smag = mag[(su.dimensions[0] - 1) * s[i, 0, 0], $
+                 (su.dimensions[1] - 1) * s[i, 0, 1]] / maxmag
+      _thick = n_elements(thick) eq 0L ? _maxThick * smag : thick
+      _color = n_elements(color) eq 0L $
+                 ? (!d.name eq 'PS' $
+                      ? byte(255 * smag) $
+                      : mg_rgb2index(bytarr(3) + byte(255 * smag))) $
+                 : color
+      plots, (xmax - xmin) * s[i, *, 0] + xmin, $
+             (ymax - ymin) * s[i, *, 1] + ymin, $
+             thick=_thick, $
+  ;           clip=[!x.crange[0], !y.crange[0], !x.crange[1], !y.crange[1]], $
+  ;           noclip=0, $
+             color=_color, $
+             _extra=e
+    endfor
+  endif
 end
 
 
