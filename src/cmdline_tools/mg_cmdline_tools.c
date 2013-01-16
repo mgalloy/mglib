@@ -6,9 +6,9 @@
 
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_MG_WRONG_TYPE       0  
-  {  "M_MG_WRONG_TYPE",   "%NInput must be of type pointer or object." }, 
+  {  "M_MG_WRONG_TYPE",   "%NInput must be of type pointer or object." },
   };
-static IDL_MSG_BLOCK msg_block; 
+static IDL_MSG_BLOCK msg_block;
 
 
 #ifdef WIN32
@@ -86,7 +86,7 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
     free(cformat);
   }
   
-  IDL_KW_FREE; 
+  IDL_KW_FREE;
 }
 
 
@@ -99,22 +99,22 @@ int IDL_Load(void) {
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_mg_termlines,     "MG_TERMLINES",     0, 0, 0, 0 },
     { IDL_mg_termcolumns,   "MG_TERMCOLUMNS",   0, 0, 0, 0 },
-    { IDL_mg_termistty,     "MG_TERMISTTY",     0, 0, 0, 0 },   
-    { IDL_mg_heapid,        "MG_HEAPID",        1, 1, 0, 0 },   
+    { IDL_mg_termistty,     "MG_TERMISTTY",     0, 0, 0, 0 },
+    { IDL_mg_heapid,        "MG_HEAPID",        1, 1, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC) IDL_mg_print,    "MG_PRINT",    0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },   
-  }; 
+  };
 
-  if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM", 
-                                           IDL_CARRAY_ELTS(msg_arr),  
-                                           msg_arr))) return IDL_FALSE;  
-                                              
+  if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM",
+                                           IDL_CARRAY_ELTS(msg_arr),
+                                           msg_arr))) return IDL_FALSE;
+
   /*
      Register our routines. The routines must be specified exactly the same
      as in cmdline_tools.dlm.
   */
   return IDL_SysRtnAdd(procedure_addr, FALSE, IDL_CARRAY_ELTS(procedure_addr))
-      && IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));  
+      && IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));
 }
