@@ -105,11 +105,6 @@ end
 ;       file or group identifier
 ;    name : in, required, type=string
 ;       name of object to check
-;
-; :Keywords:
-;   reference : in, optional, type=boolean
-;     set to indicate that `data` is a reference to an attribute/variable in the
-;     file instead of actual data
 ;-
 function mg_h5_putdata_varexists, loc, name
   compile_opt strictarr
@@ -321,8 +316,6 @@ end
 ;     IDL variable to write
 ;
 ; :Keywords:
-;   groups : in, required, type=hash
-;     hash of all open groups
 ;   reference : in, optional, type=boolean
 ;     set to indicate that `data` is a reference to an attribute/variable in the
 ;     file instead of actual data
