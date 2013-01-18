@@ -21,7 +21,7 @@
 // because they are redundant.
 //
 
-//int idx, dupe; // declared external 
+//int idx, dupe; // declared external
 
 //void line(int x0, int y0, int x1, int y1) {
 //    int x, cx, deltax, xstep,
@@ -111,7 +111,7 @@ static IDL_VPTR IDL_mg_rasterpolyline(int argc, IDL_VPTR *argv) {
 
 
 /*
-  Register the routines available for IDL; they must be specified exactly as 
+  Register the routines available for IDL; they must be specified exactly as
   in mg_lineplots.dlm.
   */
 int IDL_Load(void) {
@@ -121,5 +121,5 @@ int IDL_Load(void) {
     { IDL_mg_rasterpolyline,     "MG_RASTERPOLYLINE",     6, 6, 0, 0 },
   };
 
-  return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));  
+  return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));
 }

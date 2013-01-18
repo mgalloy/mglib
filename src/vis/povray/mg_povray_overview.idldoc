@@ -1,35 +1,35 @@
 .. title:: POV-Ray overview
 
-POV-Ray is an open source ray tracing tool capable of making high quality 
-images of 3-dimensional scenes. See `povray.org <povray.org>` for more 
+POV-Ray is an open source ray tracing tool capable of making high quality
+images of 3-dimensional scenes. See `povray.org <povray.org>` for more
 information and examples of POV-Ray generated scenes.
 
-The POV-Ray destination class `MGgrPOVRay` is an object graphics destination 
-class. Object graphics views can be drawn by it in the same way `IDLgrWindow` 
+The POV-Ray destination class `MGgrPOVRay` is an object graphics destination
+class. Object graphics views can be drawn by it in the same way `IDLgrWindow`
 or other destinations are used::
 
   pov = obj_new('MGgrPOVRay', file_prefix='halfcell')
   pov->draw, view
-  
+
 This will produce an `.ini` file, a `.pov` file, and one `.inc` file for every
 graphics atom in the object graphics hierarchy. These files are meant to be
-input files for the povray command line utility, which can be executed from 
+input files for the povray command line utility, which can be executed from
 within IDL via the `MG_POVRAY` routine.
 
-Many object graphics scenes can be drawn in this manner with no extra work or 
-knowledge of POV-Ray. IDLgrView, IDLgrModel, IDLgrPolygon, IDLgrSurface, 
-IDLgrPolyline, and IDLgrLight currently supported (though not all of their 
+Many object graphics scenes can be drawn in this manner with no extra work or
+knowledge of POV-Ray. IDLgrView, IDLgrModel, IDLgrPolygon, IDLgrSurface,
+IDLgrPolyline, and IDLgrLight currently supported (though not all of their
 properties are currently used when rendering the POV-Ray input files).
 
-Other classes are provided, like `MGgrPOVRayView` (a subclass of IDLgrView), 
+Other classes are provided, like `MGgrPOVRayView` (a subclass of IDLgrView),
 `MGgrPOVRayGrid` (a subclass of `IDLgrPoygon`), `MGgrPOVRayLight` (a subclass of
-`IDLgrLight`), and `MGgrPOVRayTubes` (a subclass of `IDLgrPolyline`), to attain 
-functionality supported by POV-Ray, but not IDL. These classes will render 
-normally under IDL using the standard properties of their parent class, but 
+`IDLgrLight`), and `MGgrPOVRayTubes` (a subclass of `IDLgrPolyline`), to attain
+functionality supported by POV-Ray, but not IDL. These classes will render
+normally under IDL using the standard properties of their parent class, but
 will provide additional functionality when rendered with POV-Ray.
 
-The `MG_XPOVRAY` GUI utility provides a convenient way to interactively 
+The `MG_XPOVRAY` GUI utility provides a convenient way to interactively
 position a view/model for rendering with POV-Ray. A view to render and a model
-to rotate are passed into the utility. The scene can then be viewed and 
-manipulated until the desired orientation is achieved, at which point the 
+to rotate are passed into the utility. The scene can then be viewed and
+manipulated until the desired orientation is achieved, at which point the
 view can then be rendered with the POV-Ray destination.

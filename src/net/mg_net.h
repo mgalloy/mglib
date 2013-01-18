@@ -24,7 +24,7 @@
 extern IDL_MSG_BLOCK msg_block;
 
 /* variable encapsulation and manipulation */
-/* 
+/*
  * Define the token value which leads up the var header.  Its form
  * on a read determines if byteswapping is necessary on the
  * read data.  ('IDLV')

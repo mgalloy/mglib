@@ -108,32 +108,32 @@ MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, labs)
 
 IDL_VPTR IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
   int is_equal, nargs;
-    
-  typedef struct {  
+
+  typedef struct {
     IDL_KW_RESULT_FIRST_FIELD;
-    IDL_LONG no_typeconv;    
-    IDL_VPTR tolerance; 
+    IDL_LONG no_typeconv;
+    IDL_VPTR tolerance;
     int tolerance_present;
-  } KW_RESULT;  
-  
-  static IDL_KW_PAR kw_pars[] = {  
-    { "NO_TYPECONV", IDL_TYP_LONG, 1, IDL_KW_ZERO,  
-      0, IDL_KW_OFFSETOF(no_typeconv) },   
-    { "TOLERANCE", IDL_TYP_UNDEF, 1, IDL_KW_VIN | IDL_KW_OUT,  
-      IDL_KW_OFFSETOF(tolerance_present), IDL_KW_OFFSETOF(tolerance) },   
-    { NULL }  
-  };  
-  
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "NO_TYPECONV", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(no_typeconv) },
+    { "TOLERANCE", IDL_TYP_UNDEF, 1, IDL_KW_VIN | IDL_KW_OUT,
+      IDL_KW_OFFSETOF(tolerance_present), IDL_KW_OFFSETOF(tolerance) },
+    { NULL }
+  };
+
   KW_RESULT kw;
 
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SIMPLE(argv[1]);
-  
-  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); 
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
 
   if (kw.no_typeconv && (argv[0]->type != argv[1]->type)) {
     IDL_KW_FREE;
-    return IDL_GettmpByte(0); 
+    return IDL_GettmpByte(0);
   }
 
   if (argv[0]->type != argv[1]->type) {
@@ -141,25 +141,25 @@ IDL_VPTR IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
     IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
                 "input parameters must be of the same type");
   }
-  
-  // tolerance must be the same type, but complex tolerance should be float 
+
+  // tolerance must be the same type, but complex tolerance should be float
   // and double complex tolerance should be double
-  if (kw.tolerance_present && (kw.tolerance->type != argv[0]->type) 
+  if (kw.tolerance_present && (kw.tolerance->type != argv[0]->type)
         && (kw.tolerance->type != 4 || argv[0]->type != 6)
         && (kw.tolerance->type != 5 || argv[0]->type != 9)) {
     IDL_KW_FREE;
     IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
                 "TOLERANCE and input parameters must be of the same type");
   }
-  
+
   // TODO: conversion between two different types
-  
+
   if (argv[0]->flags & IDL_V_ARR && argv[1]->flags & IDL_V_ARR) {
     if (argv[0]->value.arr->n_elts != argv[1]->value.arr->n_elts) {
       IDL_KW_FREE;
       return IDL_GettmpByte(0);
     }
-        
+
     switch (argv[0]->type) {
       MG_ARRAY_EQUAL_ARR2ARR_CASE(1, UCHAR, UCHAR, c, 0)
       MG_ARRAY_EQUAL_ARR2ARR_CASE(2, IDL_INT, IDL_INT, i, 0)
@@ -218,7 +218,7 @@ IDL_VPTR IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
   }
 
   IDL_KW_FREE;
-                                                                                        
+
   return IDL_GettmpByte(is_equal);
 }
 
@@ -305,9 +305,9 @@ IDL_VPTR IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
     case IDL_TYP_DOUBLE:
       return(IDL_mg_total_Double(argv[0]));
     case IDL_TYP_COMPLEX:
-      return(IDL_mg_total_Complex(argv[0]));      
+      return(IDL_mg_total_Complex(argv[0]));
     case IDL_TYP_DCOMPLEX:
-      return(IDL_mg_total_DComplex(argv[0]));      
+      return(IDL_mg_total_DComplex(argv[0]));
     case IDL_TYP_UINT:
       return(IDL_mg_total_UInt(argv[0]));
     case IDL_TYP_ULONG:
@@ -317,12 +317,12 @@ IDL_VPTR IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
     case IDL_TYP_ULONG64:
       return(IDL_mg_total_ULong64(argv[0]));
     default:
-      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "unknown type");    
+      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "unknown type");
   }
 }
 
 
-int IDL_Load(void) {  
+int IDL_Load(void) {
   /*
    * These tables contain information on the functions and procedures
    * that make up the cmdline_tools DLM. The information contained in these
@@ -332,10 +332,10 @@ int IDL_Load(void) {
     { IDL_mg_array_equal, "MG_ARRAY_EQUAL", 2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_mg_total,       "MG_TOTAL",       1, 1, 0, 0 },
   };
-  
+
   /*
    * Register our routines. The routines must be specified exactly the same
    * as in mg_introspection.dlm.
    */
-  return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));  
+  return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));
 }

@@ -111,7 +111,7 @@ function mg_streplace, str, pattern, replacement, $
 
   ; need to put quotes around evaluated variables to be legal IDL syntax
   evalDelim = keyword_set(evaluate) ? '''' : ''
-  
+
   ; $& -> pos[0], len[0]
   ; $1 -> pos[1], len[1]
   ; $2 -> pos[2], len[2]
@@ -131,10 +131,10 @@ function mg_streplace, str, pattern, replacement, $
           message, '$' + strtrim(var_no, 2) + ' undefined'
         endif
 
-        var = strmid(str, pos[var_no], len[var_no])        
+        var = strmid(str, pos[var_no], len[var_no])
         static_replacement += evalDelim + var + evalDelim + strmid(part, ppos + plen)
       endif else begin
-        if (rlen[0] eq 0) then message, 'illegal $, use \ to escape'       
+        if (rlen[0] eq 0) then message, 'illegal $, use \ to escape'
         static_replacement = strmid(replacement, rpos[0], rlen[0])
       endelse
     endfor
@@ -158,11 +158,11 @@ end
 ; replacing "was" with "was not" in the expression "Mike was here":
 print, mg_streplace('Mike was here', 'was', 'was not')
 
-; Meta-variables $1, $2, etc. represent matched values in parentheses. This 
+; Meta-variables $1, $2, etc. represent matched values in parentheses. This
 ; swaps the first two words in the string:
 print, mg_streplace('Mike was here', '([^ ]*) ([^ ]*)', '$2 $1')
 
-; Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all 
+; Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace all
 ; patching expressions with an evaluated expression:
 s = 'MikeGeorgeHenryMikeBill'
 re = 'Mike([A-Z][a-z]*)'

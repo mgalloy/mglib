@@ -19,13 +19,13 @@ if (~file_test('lic_movie', /directory)) then file_mkdir, 'lic_movie'
 for i = 0, 299 do begin
   u = rebin(reform(ye[0, *, *, i]), 300, 300)
   v = rebin(reform(ye[1, *, *, i]), 300, 300)
-  
+
   im = mg_lic(u, v, texture=tex)
-  
+
   lic_im[0, *, *] = im
   lic_im[1, *, *] = im
   lic_im[2, *, *] = im
-      
+
   mag = sqrt(u * u + v *v)
   m = mag / max(mag)
 
@@ -39,7 +39,7 @@ for i = 0, 299 do begin
 
   ind = where(u eq 0 and v eq 0, count)
   if (count gt 0) then im2[[3 * ind, 3 * ind + 1, 3 * ind + 2]] = 255B
-  
+
   tv, im2, true=1
   write_png, filepath('ye' + strtrim(i, 2) + '.png', $
                       subdir='lic_movie', $

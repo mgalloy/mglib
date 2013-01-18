@@ -59,7 +59,7 @@ pro mg_cubehelix, start=start, rotations=rotations, hue=hue, gamma=gamma, $
   r = fract + amp * (-0.14861 * cos(angle) + 1.78277 * sin(angle))
   g = fract + amp * (-0.29227 * cos(angle) - 0.90649 * sin(angle))
   b = fract + amp * ( 1.97294 * cos(angle))
-  
+
   nhi = total(b gt 1) + total(g gt 1) + total(r gt 1)
   nlo = total(b lt 0) + total(g lt 0) + total(r lt 0)
 
@@ -94,7 +94,7 @@ end
 
 ; main-level example program
 
-mg_cubehelix           
+mg_cubehelix
 device, decomposed=0
 tv, bindgen(256) # (bytarr(10) + 1B)
 

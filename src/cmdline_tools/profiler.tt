@@ -20,9 +20,9 @@
   </head>
 
   <body>
-    
+
     <p>[% n_elements(name) %] routines profiled</p>
-    
+
     <table>
       <tr class="header">
         <th>Routine</th>

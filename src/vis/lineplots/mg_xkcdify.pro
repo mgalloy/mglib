@@ -23,7 +23,7 @@
 ;-
 function mg_xkcdify, x, y
   compile_opt strictarr
-  
+
   mag = 1.0
   f1 = 30L
   f2 = 0.05

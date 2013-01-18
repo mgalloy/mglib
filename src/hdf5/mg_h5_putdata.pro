@@ -168,7 +168,7 @@ pro mg_h5_putdata_putvariable, filename, name, data, reference=reference
   if (keyword_set(reference)) then begin
     attvalue = mg_h5_putdata_getreference(fileId, data, rgroup=rgroup)
   endif
-  
+
   if (tokens[ntokens - 1L] ne '') then begin
     ; get the HDF5 type from the IDL variable
     if (keyword_set(reference)) then begin

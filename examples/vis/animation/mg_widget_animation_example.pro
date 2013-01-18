@@ -12,7 +12,7 @@ pro mg_widget_animation_example_event, event
 
   widget_control, event.top, get_uvalue=pstate
   uname = widget_info(event.id, /uname)
-  
+
   case uname of
     'animate' : (*pstate).oanimation->draw, (*pstate).oview
   endcase
@@ -38,19 +38,19 @@ pro mg_widget_animation_example
   compile_opt strictarr
 
   oview = obj_new('IDLgrView')
-  
+
   omodel = obj_new('IDLgrModel')
   oview->add, omodel
-  
+
   oorb = obj_new('orb', radius=0.9, color=[0, 0, 255])
   omodel->add, oorb
 
   olightmodel = obj_new('IDLgrModel')
   oview->add, olightmodel
-  
+
   olight = obj_new('IDLgrLight', type=2, location=[1, 1, 1])
   olightmodel->add, olight
-  
+
   tlb = widget_base(title='MGgrWindowAnimation in a draw widget', /column)
   controls = widget_base(tlb, /row, space=0)
   animateButton = widget_button(controls, $
@@ -67,11 +67,11 @@ pro mg_widget_animation_example
   oanimation->addAnimator, oanimator1
   for i = 0, 20 do oanimator1->addScale, 0.97, 0.97, 0.97
   for i = 0, 20 do oanimator1->addScale, 1/0.97, 1/0.97, 1/0.97
-  
+
   oanimator2 = obj_new('MGgrTransformAnimator', target=olightmodel)
   oanimation->addAnimator, oanimator2
   for i = 0, 44 do oanimator2->addRotate, [0, 1, 0], 8
-  
+
   oanimation->idlgrwindow::draw, oview
 
   state = { oview : oview, $

@@ -4,8 +4,8 @@
 #include "idl_export.h"
 
 
-static IDL_MSG_DEF msg_arr[] = {  
-#define M_MG_WRONG_TYPE       0  
+static IDL_MSG_DEF msg_arr[] = {
+#define M_MG_WRONG_TYPE       0
   {  "M_MG_WRONG_TYPE",   "%NInput must be of type pointer or object." },
   };
 static IDL_MSG_BLOCK msg_block;
@@ -22,28 +22,28 @@ int MG_FileTermIsTty(void) {
 #endif
 
 
-static IDL_VPTR IDL_CDECL IDL_mg_termlines(int argc, IDL_VPTR *argv) {                                 
+static IDL_VPTR IDL_CDECL IDL_mg_termlines(int argc, IDL_VPTR *argv) {
   return IDL_GettmpLong(IDL_FileTermLines());
 }
 
 
-static IDL_VPTR IDL_CDECL IDL_mg_termcolumns(int argc, IDL_VPTR *argv) {                                 
+static IDL_VPTR IDL_CDECL IDL_mg_termcolumns(int argc, IDL_VPTR *argv) {
   return IDL_GettmpLong(IDL_FileTermColumns());
 }
 
 
-static IDL_VPTR IDL_CDECL IDL_mg_termistty(int argc, IDL_VPTR *argv) {                                 
+static IDL_VPTR IDL_CDECL IDL_mg_termistty(int argc, IDL_VPTR *argv) {
   return IDL_GettmpLong(MG_FileTermIsTty());
 }
 
 
 static IDL_VPTR IDL_CDECL IDL_mg_heapid(int argc, IDL_VPTR *argv) {
   IDL_ENSURE_SCALAR(argv[0]);
-  
+
   if (argv[0]->type != IDL_TYP_PTR && argv[0]->type != IDL_TYP_OBJREF) {
     IDL_MessageFromBlock(msg_block, M_MG_WRONG_TYPE, IDL_MSG_RET);
   }
-  
+
   return IDL_GettmpULong(argv[0]->value.hvid);
 }
 
@@ -52,23 +52,23 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
   int nargs;
   char *format, *cformat;
   IDL_VPTR origFormat, vcformat;
-  
+
   typedef struct {
     IDL_KW_RESULT_FIRST_FIELD;
     IDL_VPTR format;
     int format_present;
   } KW_RESULT;
-  
+
   static IDL_KW_PAR kw_pars[] = {
     { "FORMAT", IDL_TYP_STRING, 1, IDL_KW_VIN,
       IDL_KW_OFFSETOF(format_present), IDL_KW_OFFSETOF(format) },
     { NULL }
   };
-  
+
   KW_RESULT kw;
 
   nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, NULL, 1, &kw);
-    
+
   if (kw.format_present) {
     origFormat = argv[argc - 1];
     format = IDL_VarGetString(origFormat);
@@ -77,20 +77,20 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
     vcformat = IDL_StrToSTRING(cformat);
     argv[argc - 1] = vcformat;
   }
-  
+
   IDL_Print(argc, argv, argk);
-  
+
   if (kw.format_present) {
     argv[argc - 1] = origFormat;
     IDL_Deltmp(vcformat);
     free(cformat);
   }
-  
+
   IDL_KW_FREE;
 }
 
 
-int IDL_Load(void) {  
+int IDL_Load(void) {
   /*
      These tables contain information on the functions and procedures
      that make up the cmdline_tools DLM. The information contained in these
@@ -104,7 +104,7 @@ int IDL_Load(void) {
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
-    { (IDL_SYSRTN_GENERIC) IDL_mg_print,    "MG_PRINT",    0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },   
+    { (IDL_SYSRTN_GENERIC) IDL_mg_print,    "MG_PRINT",    0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM",

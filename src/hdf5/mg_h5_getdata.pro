@@ -273,7 +273,7 @@ function mg_h5_getdata_getvariable, fileId, variable, bounds=bounds, $
   nPoints = h5s_get_select_npoints(variableSpace)
 
   if (nPoints eq 1L) then begin
-    fullBounds = [[0], [0]] 
+    fullBounds = [[0], [0]]
     nPoints = 1L
   endif else begin
     fullBounds = h5s_get_select_bounds(variableSpace)

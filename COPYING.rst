@@ -1,4 +1,5 @@
-This library, except the mg_net DLM and various color tables included in modified form, is released under a BSD-type license.
+This library, except the mg_net DLM and various color tables included in
+modified form, is released under a BSD-type license.
 
 Copyright (c) 2007-2010, Michael Galloy <mgalloy@idldev.com>
 

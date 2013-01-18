@@ -9,7 +9,7 @@ BUILD_DATE 19 June 2009
 #
 # :Returns:
 #    `lonarr(n1, n2)`
-# 
+#
 # :Params:
 #    x : in, required, type=`fltarr(n)`
 #       x-coordinates of polyline

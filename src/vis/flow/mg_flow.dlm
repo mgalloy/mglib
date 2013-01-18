@@ -9,7 +9,7 @@ BUILD_DATE Apr 7 2008
 #
 # :Returns:
 #    `bytarr(m, n)`
-# 
+#
 # :Params:
 #    u : in, required, type="fltarr(m, n), dblarr(m, n)"
 #       x-coordinates of vector field

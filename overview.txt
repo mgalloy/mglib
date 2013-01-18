@@ -20,7 +20,7 @@ IDL library of Michael Galloy.
   cula/
     CULAtools bindings
   dist_tools/
-    routines for logging, preferences, and other miscellaneous routines useful 
+    routines for logging, preferences, and other miscellaneous routines useful
     in distributing applications
   dist_tools/bindings/
     routines for wrapping C routines with a DLM in a quick and nearly an

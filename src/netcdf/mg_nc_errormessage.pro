@@ -12,7 +12,7 @@
 function mg_nc_errormessage, code
   compile_opt strictarr
   on_error, 2
-  
+
   case code of
       0: m = 'No error'
     -33: m = 'Not a netcdf id'
