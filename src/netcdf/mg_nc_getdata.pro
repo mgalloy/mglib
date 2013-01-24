@@ -150,8 +150,8 @@ function mg_nc_getdata_convertbounds, sbounds, dimensions=dimensions, $
   case ndims of
     1: begin
         single = 1B
-        result[0, *] = tx_nc_getdata_convertbounds_1dim(dimIndices[0],$
-                                                        product(dimensions))
+        result[0, *] = mg_nc_getdata_convertbounds_1d(dimIndices[0],$
+                                                      product(dimensions))
       end
     n_elements(dimensions): begin
         single = 0B
@@ -366,10 +366,11 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
 
   fileId = ncdf_open(filename, /nowrite)
 
-  tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null)
+  tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
   ndots = ntokens - 1L
 
-  _variable = strpos(variable, '/') eq 0L ? strmid(variable, 1) : variable
+  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens[0], '.')
+  _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
 
   if (ndots eq 0L) then begin
     ; variable
