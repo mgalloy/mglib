@@ -272,10 +272,6 @@ function mgffncfile::init, filename=filename
 
   if (n_elements(filename) eq 0L) then message, 'filename must be provided'
 
-  if (~file_test(filename)) then begin
-    message, string(filename, format='(%"filename %s does not exist")')
-  endif
-
   self.filename = filename
   self.id = ncdf_open(self.filename)
 
