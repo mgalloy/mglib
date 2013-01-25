@@ -1,3 +1,3 @@
 [submodule "mgcmake"]
 	path = mgcmake
-	url = https://github.com/mgalloy/mgcmake.git
+	url = git@github.com:mgalloy/mgcmake.git
