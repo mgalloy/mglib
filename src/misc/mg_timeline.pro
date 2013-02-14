@@ -601,10 +601,10 @@ pro mg_timeline, filename, outputFilename
                        xcoord_conv=xc)
   model->add, bottomaxis
 
-  font = obj_new('IDLgrFont', size=6.)
+  font = obj_new('IDLgrFont', size=8.)
   viewgroup->add, font
 
-  smallfont = obj_new('IDLgrFont', size=4.)
+  smallfont = obj_new('IDLgrFont', size=6.)
   viewgroup->add, smallfont
 
   bigfont = obj_new('IDLgrFont', size=14.)
@@ -615,7 +615,7 @@ pro mg_timeline, filename, outputFilename
   bottomaxis->getProperty, ticktext=ticktext
   ticktext->setProperty, font=font
 
-  xgap = 0
+  xgap = 1.
   ygap = 0.01
 
   ; add vertical bars
@@ -646,7 +646,7 @@ pro mg_timeline, filename, outputFilename
                         xcoord_conv=xc)
 
     model->add, obj_new('IDLgrText', eventText, font=font, $
-                        location=[eventDate + xgap, 0.9 - (4. * ygap + level) / 10.], $
+                        location=[eventDate, 0.9 - (4. * ygap + level) / 10.], $
                         vertical_alignment=1.0, $
                         /enable_formatting, $
                         xcoord_conv=xc)
