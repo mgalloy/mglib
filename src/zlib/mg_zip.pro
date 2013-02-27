@@ -1,6 +1,8 @@
 ; docformat = 'rst'
 
 ;+
+; Extract header/trailer structures from a compressed buffer.
+;
 ; :Private:
 ;
 ; :Returns:
@@ -78,7 +80,7 @@ end
 ;     trailer structure
 ;   comp_size : in, required, type=long
 ;     compressed size
-;   filename : in required, type=string
+;   filename : in, required, type=string
 ;     filename of file to zip
 ;
 ; :Keywords:
@@ -302,8 +304,8 @@ pro mg_zip, zipfile, files, delete=delete, error=error
   compressed_size = lonarr(nfiles)
 
   if (nfiles ne 0L) then begin
-    localheader_offsets = lonarr(n_elements(files))
-    for i = 0L, n_elements(files) - 1L do begin
+    localheader_offsets = lonarr(nfiles)
+    for i = 0L, nfiles - 1L do begin
       openr, lun, files[i], /get_lun, delete=delete
       file_buffer = bytarr((file_info(files[i])).size)
       readu, lun, file_buffer
@@ -346,31 +348,29 @@ pro mg_zip, zipfile, files, delete=delete, error=error
 
   combined_centralDir = !null
   centralDir_offset = n_elements(supp_zipdata) + n_elements(centralDir)
-  if (n_elements(files) ne 0L) then begin
-    for i = 0L, n_elements(files) - 1L do begin
-      res = mg_zip_centralheader(headers[i], $
-                                 trailers[i], $
-                                 compressed_size[i], $
-                                 files[i], $
-                                 localheader_offsets[i], $
-                                 n_elements(files), $
-                                 central_dir=centralDir)
-      if (res eq 0) then begin
-        error = 1L
-        return
-      endif
+  for i = 0L, nfiles - 1L do begin
+    status = mg_zip_centralheader(headers[i], $
+                                  trailers[i], $
+                                  compressed_size[i], $
+                                  files[i], $
+                                  localheader_offsets[i], $
+                                  nfiles, $
+                                  central_dir=centralDir)
+    if (status eq 0) then begin
+      error = 1L
+      return
+    endif
 
-      centralDir_offset = centralDir_offset + n_elements(centralDir)
-      combined_centralDir = [combined_centralDir, centralDir]
-    endfor
-  endif
+    centralDir_offset = centralDir_offset + n_elements(centralDir)
+    combined_centralDir = [combined_centralDir, centralDir]
+  endfor
 
   ; create end cenral directory header
-  res = mg_zip_endcentralheader(n_elements(combined_centralDir), $
-                                n_elements(zip_data), $
-                                n_elements(files), $
-                                end_central_dir=endCentralDir)
-  if (res eq 0) then begin
+  status = mg_zip_endcentralheader(n_elements(combined_centralDir), $
+                                   n_elements(zip_data), $
+                                   nfiles, $
+                                   end_central_dir=endCentralDir)
+  if (status eq 0) then begin
     error = 1L
     return
   endif
