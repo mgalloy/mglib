@@ -91,8 +91,8 @@ install(
     mg_userdoc_library.pro
   DESTINATION .
 )
-install(DIRECTORY api-docs DESTINATION api-docs)
-install(DIRECTORY api-userdocs DESTINATION api-userdocs)
+install(DIRECTORY api-docs DESTINATION .)
+install(DIRECTORY api-userdocs DESTINATION .)
 
 
 add_custom_target(dist
