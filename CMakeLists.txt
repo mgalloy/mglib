@@ -68,12 +68,34 @@ add_custom_target(unit DEPENDS mglib-test-results.html)
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
 
-install(FILES COPYING INSTALL README DESTINATION .)
+
+# setup installer
+
+if (WIN32)
+  set(CPACK_GENERATOR ZIP)
+else ()
+  set(CPACK_GENERATOR TGZ)
+endif ()
+
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" MGLIB_SYSTEM_NAME)
+set(MGLIB_PACKAGE_VERSION "${VERSION}.${REVISION}")
+set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${MGLIB_PACKAGE_VERSION}-${MGLIB_SYSTEM_NAME}")
+
+include(CPack)
+
+
+install(FILES COPYING.rst INSTALL.rst README.rst DESTINATION .)
 install(
   FILES
     mg_doc_library.pro
-    mg_doc_userlibrary.pro
+    mg_userdoc_library.pro
   DESTINATION .
 )
 install(DIRECTORY api-docs DESTINATION api-docs)
 install(DIRECTORY api-userdocs DESTINATION api-userdocs)
+
+
+add_custom_target(dist
+  COMMAND ${CMAKE_MAKE_PROGRAM} package
+  COMMENT "custom target to create distribution")
+add_dependencies(dist doc userdoc)
