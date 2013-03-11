@@ -7,3 +7,8 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 mglib-test-results.html
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages/
+install_manifest.txt
+mglib-*.tar.gz
