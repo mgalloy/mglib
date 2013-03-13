@@ -12,10 +12,10 @@ pro mg_make_cula_bindings
   cuda_root = '/usr/local/cuda-4.1' ; '~/software/cula'
   cula_root = '~/software/cula'
   dlm->addInclude, 'cula.h', $
-                   header_directory=filepath('include', root=cula_root), $
+                   header_directory=filepath('include', root=cula_root)
+  dlm->addLibrary, ['cula_core', 'cula_lapack', 'cublas', 'cudart'], $
                    lib_directory=[filepath('lib64', root=cula_root), $
-                                  filepath('lib', root=cuda_root)], $
-                   lib_files=['cula_core', 'cula_lapack', 'cublas', 'cudart']
+                                  filepath('lib', root=cuda_root)]
 
   dlm->addRoutinesFromHeaderFile, filepath('idlcula_bindings.h', root=mg_src_root())
   dlm->addRoutinesFromHeaderFile, filepath('idlcula_lapack_bindings.h', root=mg_src_root())

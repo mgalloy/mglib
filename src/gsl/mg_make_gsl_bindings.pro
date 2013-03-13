@@ -19,10 +19,10 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
                source='Michael Galloy')
 
   dlm->addInclude, ['gsl_math.h', 'gsl_sf_zeta.h', 'gsl_sf_ellint.h'], $
-                   header_directory=_header_directory, $
+                   header_directory=_header_directory
+  dlm->addLibrary, 'libgsl.a', $
                    lib_directory=_lib_directory, $
-                   lib_files='gsl'
-
+                   /static
   dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_sf_ellint_bindings.h', $
                                            root=mg_src_root())
   dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_sf_zeta_bindings.h', $

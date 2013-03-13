@@ -376,17 +376,21 @@ pro mg_dlm::build, _extra=e
     includes = strjoin('-I"' + self.includeDirs->toArray() + '"', ' ')
   endif else includes = ''
 
-  if (n_elements(self.libFiles) gt 0L) then begin
+  libs = ''
+
+  if (n_elements(self.sharedLibFiles) gt 0L) then begin
     if (n_elements(self.libDirs) gt 0L) then begin
-      libs = strjoin('-L' + self.libDirs->toArray(), ' ')
-    endif else libs = ''
-
-    libs += ' '
-
-    if (n_elements(self.libFiles) gt 0L) then begin
-      libs += strjoin('-l' + self.libFiles->toArray(), ' ')
+      libs += strjoin('-L' + self.libDirs->toArray(), ' ') + ' '
     endif
-  endif else libs = ''
+
+    if (n_elements(self.sharedLibFiles) gt 0L) then begin
+      libs += strjoin('-l' + self.sharedLibFiles->toArray(), ' ') + ' '
+    endif
+  endif
+
+  if (n_elements(self.staticLibFiles) gt 0L) then begin
+    libs += strjoin(self.staticLibFiles->toArray(), ' ') + ' '
+  endif
 
   mg_make_dll, self.basename, $
                extra_cflags=includes, extra_lflags=libs, $
@@ -427,14 +431,9 @@ end
 ;       there should be <>'s around the name instead of ""'s
 ;    header_directory : in, optional, type=string
 ;       filepath to include file, if not in a standard location
-;    lib_directory : in, optional, type=string
-;       directory of lib files
-;    lib_files : in, optional, type=strarr
-;       library files
 ;-
 pro mg_dlm::addInclude, name, system=system, $
-                        header_directory=headerDir, $
-                        lib_directory=libDir, lib_files=libFiles
+                        header_directory=headerDir
   compile_opt strictarr
 
   if (keyword_set(system)) then begin
@@ -451,15 +450,39 @@ pro mg_dlm::addInclude, name, system=system, $
 
     if (~found) then begin
       if (n_elements(headerDir) gt 0L) then self.includeDirs->add, expand_path(headerDir)
-      if (n_elements(libDir) gt 0L) then begin
-        _libDir = libDir
-        for d = 0L, n_elements(libDir) - 1L do begin
-          _libDir[d] = expand_path(libDir[d])
-        endfor
-        self.libDirs->add, _libDir, /extract
-      endif
-      if (n_elements(libFiles) gt 0L) then self.libFiles->add, libFiles, /extract
     endif
+  endelse
+end
+
+
+;+
+; Add a library to the link line.
+;
+; :Params:
+;    lib_files : in, optional, type=strarr
+;       library files
+;
+; :Keywords:
+;    lib_directory : in, optional, type=string
+;       directory of lib files
+;-
+pro mg_dlm::addLibrary, libFiles, lib_directory=libDirs, static=static
+  compile_opt strictarr
+
+  if (n_elements(libFiles) eq 0L) then return
+
+  if (n_elements(libDirs) gt 0L) then begin
+    _libDirs = libDirs
+    for d = 0L, n_elements(libDirs) - 1L do begin
+      _libDirs[d] = filepath(path_sep(), root=file_expand_path(libDirs[d]))
+    endfor
+  endif else _libDirs = ''
+
+  if (keyword_set(static)) then begin
+    self.staticLibFiles->add, _libDirs + libFiles, /extract
+  endif else begin
+    if (n_elements(libDirs) gt 0L) then self.libDirs->add, _libDirs, /extract
+    self.sharedLibFiles->add, libFiles, /extract
   endelse
 end
 
@@ -575,7 +598,8 @@ pro mg_dlm::cleanup
 
   obj_destroy, [self.routines, $
                 self.systemIncludes, self.userIncludes, $
-                self.includeDirs, self.libDirs, self.libFiles]
+                self.includeDirs, self.libDirs, $
+                self.staticLibFiles, self.staticLibFiles]
 end
 
 
@@ -590,7 +614,8 @@ function mg_dlm::init, _extra=e
   self.routines = list()
   self.includeDirs = list()
   self.libDirs = list()
-  self.libFiles = list()
+  self.sharedLibFiles = list()
+  self.staticLibFiles = list()
 
   ; required include files
   self.systemIncludes->add, 'stdio.h'
@@ -637,8 +662,10 @@ end
 ;       `LIST` of include directories
 ;    libDirs
 ;       `LIST` of lib directories
-;    libFiles
-;       `LIST` of lib files
+;    sharedLibFiles
+;       `LIST` of shared lib files
+;    staticLibFiles
+;       `LIST` of static lib files
 ;-
 pro mg_dlm__define
   compile_opt strictarr
@@ -658,7 +685,8 @@ pro mg_dlm__define
              userIncludes: obj_new(), $
              includeDirs: obj_new(), $
              libDirs: obj_new(), $
-             libFiles: obj_new() $
+             sharedLibFiles: obj_new(), $
+             staticLibFiles: obj_new() $
            }
 end
 
