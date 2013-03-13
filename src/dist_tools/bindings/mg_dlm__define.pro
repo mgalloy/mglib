@@ -459,12 +459,15 @@ end
 ; Add a library to the link line.
 ;
 ; :Params:
-;    lib_files : in, optional, type=strarr
-;       library files
+;   lib_files : in, optional, type=string/strarr
+;     library files
 ;
 ; :Keywords:
-;    lib_directory : in, optional, type=string
-;       directory of lib files
+;   lib_directory : in, optional, type=string/strarr
+;     directory of lib files, either a scalar string or an array the same
+;     length as `lib_files`
+;   static : in, optional, type=boolean
+;     set to indicate libraries are to be statically linked
 ;-
 pro mg_dlm::addLibrary, libFiles, lib_directory=libDirs, static=static
   compile_opt strictarr
