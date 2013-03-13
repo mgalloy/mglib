@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_markdown.so
-mg_markdown.dll
+mg_markdown.*.so
+mg_markdown.*.dll

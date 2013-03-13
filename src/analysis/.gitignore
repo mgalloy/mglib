@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_analysis.so
-mg_analysis.dll
+mg_analysis.*.so
+mg_analysis.*.dll

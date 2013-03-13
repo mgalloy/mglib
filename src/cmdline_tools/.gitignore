@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_cmdline_tools.so
-mg_cmdline_tools.dll
+mg_cmdline_tools.*.so
+mg_cmdline_tools.*.dll

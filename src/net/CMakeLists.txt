@@ -7,7 +7,7 @@ set(DLM_NAME mg_${DIRNAME})
 #   set_target_properties("${DLM_NAME}"
 #     PROPERTIES
 #       PREFIX ""
-#       SUFFIX ".so"
+#       SUFFIX ".${Idl_PLATFORM_EXT}.so"
 #   )
 # endif ()
 #

@@ -10,7 +10,7 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
     set_target_properties("${DLM_NAME}"
       PROPERTIES
         PREFIX ""
-        SUFFIX ".so"
+        SUFFIX ".${Idl_PLATFORM_EXT}.so"
     )
   endif ()
 

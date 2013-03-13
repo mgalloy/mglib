@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_introspection.so
-mg_introspection.dll
+mg_introspection.*.so
+mg_introspection.*.dll

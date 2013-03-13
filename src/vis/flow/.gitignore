@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_flow.so
-mg_flow.dll
+mg_flow.*.so
+mg_flow.*.dll

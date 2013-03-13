@@ -1,1 +1,3 @@
-mg_zlib.so
+mg_zlib.*.so
+mg_zlib.*.dll
+

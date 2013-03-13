@@ -1,5 +1,5 @@
 CMakefiles
 Makefile
 cmake_install.cmake
-mg_dist_tools.so
-mg_dist_tools.dll
+mg_dist_tools.*.so
+mg_dist_tools.*.dll
