@@ -8,10 +8,14 @@ add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 if (APPLE)
   set_target_properties("${DLM_NAME}"
     PROPERTIES
-      PREFIX ""
       SUFFIX ".${Idl_PLATFORM_EXT}.so"
   )
 endif ()
+
+set_target_properties("${DLM_NAME}"
+  PROPERTIES
+    PREFIX ""
+)
 
 find_library(ZLIB_LIBRARY
   NAMES z
