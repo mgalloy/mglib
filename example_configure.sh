@@ -9,7 +9,7 @@ cmake \
   -DMARKDOWN_LIBRARY=/usr/local/lib/libmarkdown.a \
   -DTRE_INCLUDE_DIR=/usr/local/include \
   -DTRE_LIBRARY=/usr/local/lib/libtre.a \
-  -DGSL_INCLUDE_DIR=/usr/local/include/gsl \
+  -DGSL_INCLUDE_DIR=/usr/local/include \
   -DGSL_LIBRARY_DIR=/usr/local/lib \
   .
 

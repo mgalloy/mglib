@@ -18,7 +18,7 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
                version='1.0', $
                source='Michael Galloy')
 
-  dlm->addInclude, ['gsl_math.h', 'gsl_sf_zeta.h', 'gsl_sf_ellint.h'], $
+  dlm->addInclude, ['gsl/gsl_math.h', 'gsl/gsl_sf_zeta.h', 'gsl/gsl_sf_ellint.h'], $
                    header_directory=_header_directory
   dlm->addLibrary, 'libgsl.a', $
                    lib_directory=_lib_directory, $
