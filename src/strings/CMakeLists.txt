@@ -9,10 +9,14 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   if (APPLE)
     set_target_properties("${DLM_NAME}"
       PROPERTIES
-        PREFIX ""
         SUFFIX ".${Idl_PLATFORM_EXT}.so"
     )
   endif ()
+
+  set_target_properties("${DLM_NAME}"
+    PROPERTIES
+      PREFIX ""
+  )
 
   target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY} ${TRE_LIBRARY})
 
