@@ -459,7 +459,7 @@ end
 ; Add a library to the link line.
 ;
 ; :Params:
-;   lib_files : in, optional, type=string/strarr
+;   libFiles : in, optional, type=string/strarr
 ;     library files
 ;
 ; :Keywords:
