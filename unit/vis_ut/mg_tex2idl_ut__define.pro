@@ -2,7 +2,7 @@ function mg_tex2idl_ut::test1
   compile_opt strictarr
 
   tex = 'a^{b^c}'
-  idl = ''
+  idl = 'a!Ub!Ec!N'
 
   assert, mg_tex2idl(tex) eq idl, 'incorrect result for %s', tex
 
@@ -14,7 +14,7 @@ function mg_tex2idl_ut::test2
   compile_opt strictarr
 
   tex = 'a_{b_c}'
-  idl = ''
+  idl = 'a!Db!Ic!N'
 
   assert, mg_tex2idl(tex) eq idl, 'incorrect result for %s', tex
 
@@ -27,7 +27,7 @@ function mg_tex2idl_ut::test3
   compile_opt strictarr
 
   tex = 'a^5_b'
-  idl = ''
+  idl = 'a!S!U5!R!N!Db !N'
 
   assert, mg_tex2idl(tex) eq idl, 'incorrect result for %s', tex
 
@@ -39,7 +39,7 @@ function mg_tex2idl_ut::test4
   compile_opt strictarr
 
   tex = 'R_{0^{-}_{\delta F}1}'
-  idl = 'R!D0!S!E-!R!I!7d!XF!N!D1!N'
+  idl = 'R!D0!S!E-!R!I!7d!X F1!N'
 
   assert, mg_tex2idl(tex) eq idl, 'incorrect result for %s', tex
 
