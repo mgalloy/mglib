@@ -8,4 +8,5 @@ pro mg_run_unittests
           ntest=ntest, npass=npass, nfail=nfail, nskip=nskip
   print, ntest, npass, nfail, nskip, $
          format='(%"%d tests: %d passed, %d failed, %d skipped")'
+  print, filename, format='(%"Full results in %s")'
 end
