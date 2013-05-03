@@ -213,7 +213,7 @@ function mgffserialvtk_ut::test_francut
   obj_destroy, [o, oVtk]
   if obj_valid(oImage) then obj_destroy, oImage
 
-  assert, isPolyline, 'not an IDLgrPolyline'
+  assert, isPolygon, 'not an IDLgrPolygon'
 
   return, 1
 end
