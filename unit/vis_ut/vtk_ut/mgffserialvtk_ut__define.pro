@@ -16,7 +16,7 @@ function mgffserialvtk_ut::_test_polygon, name, polygon=p, _extra=e
 
   obj_destroy, [p, oVtk]
 
-  assert, isPolyline, 'not an IDLgrPolyline'
+  assert, isPolygon, 'not an IDLgrPolygon'
 
   return, 1
 
@@ -106,7 +106,7 @@ end
 function mgffserialvtk_ut::test_qualityEx
   compile_opt strictarr
 
-  pass = self->_test_polygon('qualtiyEx.vtk')
+  pass = self->_test_polygon('qualityEx.vtk')
   return, pass
 end
 
