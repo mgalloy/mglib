@@ -23,7 +23,7 @@ function mgffserialvtk_ut::_test_polygon, name, polygon=p, _extra=e
 end
 
 
-function mgffserialvtk_ut::test_office
+function mgffserialvtk_ut::_test_office
   compile_opt strictarr
 
   pass = self->_test_polygon('office.binary.vtk')
@@ -31,7 +31,7 @@ function mgffserialvtk_ut::test_office
 end
 
 
-function mgffserialvtk_ut::test_track1
+function mgffserialvtk_ut::_test_track1
   compile_opt strictarr
 
   pass = self->_test_polygon('track1.binary.vtk')
@@ -39,7 +39,7 @@ function mgffserialvtk_ut::test_track1
 end
 
 
-function mgffserialvtk_ut::test_track2
+function mgffserialvtk_ut::_test_track2
   compile_opt strictarr
 
   pass = self->_test_polygon('track2.binary.vtk')
@@ -47,7 +47,7 @@ function mgffserialvtk_ut::test_track2
 end
 
 
-function mgffserialvtk_ut::test_track3
+function mgffserialvtk_ut::_test_track3
   compile_opt strictarr
 
   pass = self->_test_polygon('track3.binary.vtk')
@@ -55,7 +55,7 @@ function mgffserialvtk_ut::test_track3
 end
 
 
-function mgffserialvtk_ut::test_ironProt
+function mgffserialvtk_ut::_test_ironProt
   compile_opt strictarr
 
   pass = self->_test_polygon('ironProt.vtk')
@@ -63,7 +63,7 @@ function mgffserialvtk_ut::test_ironProt
 end
 
 
-function mgffserialvtk_ut::test_faults
+function mgffserialvtk_ut::_test_faults
   compile_opt strictarr
 
   pass = self->_test_polygon('faults.vtk', /swap_if_little_endian)
@@ -71,7 +71,7 @@ function mgffserialvtk_ut::test_faults
 end
 
 
-function mgffserialvtk_ut::test_uGridEx
+function mgffserialvtk_ut::_test_uGridEx
   compile_opt strictarr
 
   pass = self->_test_polygon('uGridEx.vtk')
@@ -79,7 +79,7 @@ function mgffserialvtk_ut::test_uGridEx
 end
 
 
-function mgffserialvtk_ut::test_texThres2
+function mgffserialvtk_ut::_test_texThres2
   compile_opt strictarr
 
   pass = self->_test_polygon('texThres2.vtk')
@@ -87,7 +87,7 @@ function mgffserialvtk_ut::test_texThres2
 end
 
 
-function mgffserialvtk_ut::test_tetraMesh
+function mgffserialvtk_ut::_test_tetraMesh
   compile_opt strictarr
 
   pass = self->_test_polygon('tetraMesh.vtk')
@@ -95,7 +95,7 @@ function mgffserialvtk_ut::test_tetraMesh
 end
 
 
-function mgffserialvtk_ut::test_matrix
+function mgffserialvtk_ut::_test_matrix
   compile_opt strictarr
 
   pass = self->_test_polygon('matrix.vtk')
@@ -103,7 +103,7 @@ function mgffserialvtk_ut::test_matrix
 end
 
 
-function mgffserialvtk_ut::test_qualityEx
+function mgffserialvtk_ut::_test_qualityEx
   compile_opt strictarr
 
   pass = self->_test_polygon('qualityEx.vtk')
@@ -111,7 +111,7 @@ function mgffserialvtk_ut::test_qualityEx
 end
 
 
-function mgffserialvtk_ut::test_tensors
+function mgffserialvtk_ut::_test_tensors
   compile_opt strictarr
 
   pass = self->_test_polygon('tensors.vtk')
@@ -119,7 +119,7 @@ function mgffserialvtk_ut::test_tensors
 end
 
 
-function mgffserialvtk_ut::test_fieldFile
+function mgffserialvtk_ut::_test_fieldFile
   compile_opt strictarr
 
   pass = self->_test_polygon('fieldfile.vtk')
@@ -127,7 +127,7 @@ function mgffserialvtk_ut::test_fieldFile
 end
 
 
-function mgffserialvtk_ut::test_financial
+function mgffserialvtk_ut::_test_financial
   compile_opt strictarr
 
   pass = self->_test_polygon('financial.vtk')
@@ -135,7 +135,7 @@ function mgffserialvtk_ut::test_financial
 end
 
 
-function mgffserialvtk_ut::test_blowAttr
+function mgffserialvtk_ut::_test_blowAttr
   compile_opt strictarr
 
   pass = self->_test_polygon('blowAttr.vtk')
@@ -143,7 +143,7 @@ function mgffserialvtk_ut::test_blowAttr
 end
 
 
-function mgffserialvtk_ut::test_blow
+function mgffserialvtk_ut::_test_blow
   compile_opt strictarr
 
   pass = self->_test_polygon('blow.vtk')
@@ -151,7 +151,7 @@ function mgffserialvtk_ut::test_blow
 end
 
 
-function mgffserialvtk_ut::test_blowGeom
+function mgffserialvtk_ut::_test_blowGeom
   compile_opt strictarr
 
   pass = self->_test_polygon('blowGeom.vtk')
@@ -159,7 +159,7 @@ function mgffserialvtk_ut::test_blowGeom
 end
 
 
-function mgffserialvtk_ut::test_rectGrid2
+function mgffserialvtk_ut::_test_rectGrid2
   compile_opt strictarr
 
   pass = self->_test_polygon('RectGrid2.vtk')
@@ -167,7 +167,7 @@ function mgffserialvtk_ut::test_rectGrid2
 end
 
 
-function mgffserialvtk_ut::test_pentaHexa
+function mgffserialvtk_ut::_test_pentaHexa
   compile_opt strictarr
 
   pass = self->_test_polygon('PentaHexa.vtk')
@@ -175,7 +175,7 @@ function mgffserialvtk_ut::test_pentaHexa
 end
 
 
-function mgffserialvtk_ut::test_brainImageSmooth
+function mgffserialvtk_ut::_test_brainImageSmooth
   compile_opt strictarr
 
   pass = self->_test_polygon('brainImageSmooth.vtk', polygons=p)
@@ -219,7 +219,7 @@ function mgffserialvtk_ut::test_francut
 end
 
 
-function mgffserialvtk_ut::test_plate
+function mgffserialvtk_ut::_test_plate
   compile_opt strictarr
 
   pass = self->_test_polygon('plate.vtk')
@@ -229,7 +229,7 @@ function mgffserialvtk_ut::test_plate
 end
 
 
-function mgffserialvtk_ut::test_polyex
+function mgffserialvtk_ut::_test_polyex
   compile_opt strictarr
 
   pass = self->_test_polygon('polyEx.vtk')
@@ -239,7 +239,7 @@ function mgffserialvtk_ut::test_polyex
 end
 
 
-function mgffserialvtk_ut::test_bore
+function mgffserialvtk_ut::_test_bore
   compile_opt strictarr
 
   pass = self->_test_polygon('bore.vtk')
@@ -247,7 +247,7 @@ function mgffserialvtk_ut::test_bore
 end
 
 
-function mgffserialvtk_ut::test_vtk
+function mgffserialvtk_ut::_test_vtk
   compile_opt strictarr
 
   pass = self->_test_polygon('vtk.vtk')
@@ -263,7 +263,7 @@ function mgffserialvtk_ut::test_usa
 end
 
 
-function mgffserialvtk_ut::test_hello
+function mgffserialvtk_ut::_test_hello
   compile_opt strictarr
 
   pass = self->_test_polygon('hello.vtk')
