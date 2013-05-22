@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Calculate a "cube helix" color table. Based on the FORTRAN 77 code provided
-; in D.A. Green, 2011, BASI, 39, 289::
-;
-;   http://adsabs.harvard.edu/abs/2011arXiv1108.5083G
+; Calculate a "cube helix" color table and set the current direct graphics
+; color table (unless `RGB_TABLE` is present). Based on the FORTRAN 77 code
+; provided in
+; `D.A. Green, 2011, BASI, 39, 289 <http://adsabs.harvard.edu/abs/2011arXiv1108.5083G>`.
 ;
 ; From the example code in the paper: "Calculates a 'cube helix' colour table.
 ; The colors are a tapered helix around the diagonal of the [R, G, B] color
@@ -14,11 +14,15 @@
 ;
 ; With the defaults, the cube helix color table looks like:
 ;
-; .. image:: cubehelix.png
+; .. image:: cubehelix-default.png
+;
+; With `ROTATIONS=-1.`, the cube helix color table looks like:
+;
+; .. image:: cubehelix-1rot.png
 ;
 ; :Keywords:
 ;   start : in, optional, type=float, default=0.5
-;     color (1=red, 2=green, 3=blue), e.g.  0.5=purple
+;     start color (1=red, 2=green, 3=blue), e.g., 0.5=purple
 ;   rotations : in, optional, type=float, default=-1.5
 ;     rotations in color, typically -1.5 to 1.5, e.g., -1.0 is one blue to green
 ;     to red cycle
@@ -26,7 +30,7 @@
 ;     set the gamma correction for intensity
 ;   hue : in, optional, type=float, default=1.0
 ;     hue intensity scaling, in the range 0 (BW) to 1; to be strictly correct,
-;     larger values may be OK with particular star/end colors
+;     larger values may be OK with particular start/end colors
 ;   ncolors : in, optional, type=int, default=!d.table_size
 ;     number of colors to output
 ;   rgb_table : out, optional, type="bytarr(256, 3)"
@@ -98,9 +102,10 @@ end
 
 ; main-level example program
 
-mg_cubehelix
-device, decomposed=0
+mg_cubehelix, rotations=-1, rgb_table=rgb
 height = 40L
-tv, bindgen(256) # (bytarr(height) + 1B)
+ct_image = rebin(bindgen(256), 256*2) # (bytarr(height) + 1B)
+im = mg_maketrue(ct_image, rgb_table=rgb)
+mg_image, im, /new_window, title='Cube helix color table'
 
 end
