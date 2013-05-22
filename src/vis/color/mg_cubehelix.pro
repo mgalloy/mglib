@@ -27,7 +27,7 @@
 ;     number of colors to output
 ;   rgb_table : out, optional, type="bytarr(256, 3)"
 ;     set to a named variable to retrieve the color table as an array containing
-;     the color table values
+;     the color table values instead of setting the current color table
 ;
 ; :Examples:
 ;   Create the default cube helix color table and display it in a direct
@@ -45,11 +45,11 @@ pro mg_cubehelix, start=start, rotations=rotations, hue=hue, gamma=gamma, $
   compile_opt strictarr
 
   ; use defaults from the paper if not otherwise set
-  _ncolors = n_elements(ncolors) eq 0L ? !d.table_size : n_colors
-  _start = n_elements(start) eq 0L ? 0.5 : start   ; purple
-  _rotations = n_elements(rotations) eq 0L ? -1.5 : rotations
-  _gamma = n_elements(gamma) eq 0L ? 1.0 : gamma
-  _hue = n_elements(hue) eq 0L ? 1.0 : hue
+  _ncolors   = n_elements(ncolors) eq 0L   ? !d.table_size : n_colors
+  _start     = n_elements(start) eq 0L     ? 0.5           : start   ; purple
+  _rotations = n_elements(rotations) eq 0L ? -1.5          : rotations
+  _gamma     = n_elements(gamma) eq 0L     ? 1.0           : gamma
+  _hue       = n_elements(hue) eq 0L       ? 1.0           : hue
 
   fract = findgen(_ncolors) / (_ncolors - 1.0)
   angle = 2.0 * !dpi * (_start / 3.0 + 1.0 + _rotations * fract)
