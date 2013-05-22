@@ -96,6 +96,7 @@ end
 
 mg_cubehelix
 device, decomposed=0
-tv, bindgen(256) # (bytarr(10) + 1B)
+height = 40L
+tv, bindgen(256) # (bytarr(height) + 1B)
 
 end
