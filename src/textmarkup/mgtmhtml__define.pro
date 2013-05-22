@@ -28,7 +28,9 @@ function mgtmhtml::markup_listing, lines
                          strmid(lines[l], pos[0] + len[0]), $
                          format='(%"%s%s%s")')
     endif else begin
-      _lines[l] = string('<span class="code-output">', lines[l], '</span>', $
+      _lines[l] = string('<span class="code-output">', $
+                         lines[l], $
+                         '</span>', $
                          format='(%"%s%s%s")')
     endelse
   endfor
