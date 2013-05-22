@@ -12,6 +12,10 @@
 ; diagonal vary quadratically, increasing from zero at black, to a maximum,
 ; then decreasing to zero at white, all the time rotating in colour."
 ;
+; With the defaults, the cube helix color table looks like:
+;
+; .. image:: cubehelix.png
+;
 ; :Keywords:
 ;   start : in, optional, type=float, default=0.5
 ;     color (1=red, 2=green, 3=blue), e.g.  0.5=purple
@@ -85,7 +89,7 @@ pro mg_cubehelix, start=start, rotations=rotations, hue=hue, gamma=gamma, $
 
   ; output the color vectors if requested
   if (arg_present(rgb_table)) then begin
-    rgb_table = byte([[r], [g], [b]])
+    rgb_table = byte(254.0 * [[r], [g], [b]])
   endif else begin
     tvlct, byte(r * 254.0), byte(g * 254.0), byte(b * 254.0)
   endelse
