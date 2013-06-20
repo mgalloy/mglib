@@ -259,28 +259,21 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
   _im = n_elements(stretch) eq 0L ? im : hist_equal(im, percent=stretch)
 
   if (~keyword_set(noData)) then begin
+    ; use NO_SCALE value if explicitly set by caller, otherwise guess by data
+    ; type (scale if not byte data)
+    scale = n_elements(noScale) gt 0L $
+              ? (1B - keyword_set(noScale)) $
+              : (size(im, /type) ne 1L)
     if (!d.name eq 'PS') then begin
-      if (keyword_set(noScale)) then begin
-        mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
-                     xsize=!x.window[1] - !x.window[0], $
-                     ysize=!y.window[1] - !y.window[0], $
-                     true=_true, n_channels=nchannels
-      endif else begin
-        mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
-                     xsize=!x.window[1] - !x.window[0], $
-                     ysize=!y.window[1] - !y.window[0], $
-                     true=_true, /scale, n_channels=nchannels
-      endelse
+      mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
+                   xsize=!x.window[1] - !x.window[0], $
+                   ysize=!y.window[1] - !y.window[0], $
+                   true=_true, scale=scale, n_channels=nchannels
     endif else begin
       displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
                                    true=_true, _extra=e)
-      if (keyword_set(noScale)) then begin
-        mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                      true=_true, n_channels=nchannels
-      endif else begin
-        mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                      true=_true, /scale, n_channels=nchannels
-      endelse
+      mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
+                    true=_true, scale=scale, n_channels=nchannels
     endelse
   endif
 
