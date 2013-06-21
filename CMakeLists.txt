@@ -73,7 +73,11 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${MGLIB_PACKAGE_VERSION}-${MG
 include(CPack)
 
 
-install(FILES COPYING.rst INSTALL.rst README.rst DESTINATION .)
+install(FILES
+          COPYING.rst
+          INSTALL.rst
+          README.rst
+        DESTINATION .)
 install(
   FILES
     mg_doc_library.pro
