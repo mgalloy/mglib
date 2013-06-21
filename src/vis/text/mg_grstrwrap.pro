@@ -4,12 +4,12 @@
 ; Wrap a string to a given width.
 ;
 ; :Examples:
-;    To run a simple example::
+;   To run a simple example::
 ;
-;       IDL> .run mg_grstrwrap
+;     IDL> .run mg_grstrwrap
 ;
 ; :Returns:
-;    string array
+;   string array
 ;
 ; :Params:
 ;    text : in, required, type=string
@@ -18,12 +18,12 @@
 ;       width in pixels of the text area
 ;
 ; :Keywords:
-;    charsize : in, optional, type=float
-;       CHARSIZE keyword to XYOUTS
-;    charthick : in, optional, type=float
-;       CHARTHICK keyword to XYOUTS
-;    font : in, optional, type=integer
-;       FONT keyword to XYOUTS
+;   charsize : in, optional, type=float
+;     `CHARSIZE` keyword to `XYOUTS`
+;   charthick : in, optional, type=float
+;     `CHARTHICK` keyword to `XYOUTS`
+;   font : in, optional, type=integer
+;     `FONT` keyword to `XYOUTS`
 ;-
 function mg_grstrwrap, text, width, $
                        charsize=charsize, charthick=charthick, font=font
