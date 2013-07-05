@@ -59,7 +59,7 @@ function mg_readconfig, filename, defaults=defaults, error=error
     is_comment = stregex(line, '^[[:space:]]*[;#]', /boolean)
     is_section = stregex(line, '^\[', /boolean)
     is_blank = stregex(line, '^[[:space:]]*$', /boolean)
-    is_variable = stregex(line, '^[[:alnum:]]+[=:]', /boolean)
+    is_variable = stregex(line, '^[[:alnum:]]+[[:space:]]*[=:]', /boolean)
     is_continuation = stregex(line, '^[[:space:]]+', /boolean)
 
     case 1 of
