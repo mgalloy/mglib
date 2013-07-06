@@ -51,7 +51,7 @@ add_custom_target(dcdoc
 )
 
 add_custom_target(unit
-  COMMAND ${Idl_EXECUTABLE} -quiet -IDL_QUIET 1 -e mg_run_unittests 2> /dev/null
+  COMMAND ${Idl_EXECUTABLE} -quiet -e mg_run_unittests
 )
 
 set_directory_properties(PROPERTIES
