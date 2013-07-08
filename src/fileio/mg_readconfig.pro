@@ -103,7 +103,7 @@ function mg_readconfig, filename, defaults=defaults, error=error
 
   ; substitution
   foreach value, h, key do begin
-    if (stregex(value, '%\([[:alnum:]]+\)', /boolean)) then begin
+    if (stregex(value, '%\([[:alnum:]_$]+\)', /boolean)) then begin
       h[key] = mg_subs(value, h)
     endif
   endforeach
