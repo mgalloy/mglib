@@ -87,7 +87,7 @@
 ;     set to a named variable to retrieve the error status; 0 for success, other
 ;     values indicate errors
 ;-
-pro mg_statusline, str, col, length=length, clear=clear, $
+pro mg_statusline, str, column, length=length, clear=clear, $
                    left=left, right=right, quiet=quiet, close=close, $
                    enable=enable, disable=disable, nocr=nocr, error=error
   compile_opt strictarr
@@ -98,7 +98,7 @@ pro mg_statusline, str, col, length=length, clear=clear, $
   _length = n_elements(length) eq 0L $
               ? (n_elements(str) eq 0L ? 80L : strlen(str)) $
               : length
-  _col = n_elements(col) eq 0L ? 0L : (col > 0L)
+  _column = n_elements(column) eq 0L ? 0L : (column > 0L)
 
   termtype = getenv('TERM')
   switch 1 of
@@ -193,7 +193,7 @@ pro mg_statusline, str, col, length=length, clear=clear, $
   endelse
 
   outstring = ''
-  if (_col gt 0) then outstring += esc + '[' + strtrim(_col, 2) + 'C'
+  if (_column gt 0) then outstring += esc + '[' + strtrim(_column, 2) + 'C'
   outstring += _str 
   if (~keyword_set(nocr)) then outstring += cr
 
