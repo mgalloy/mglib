@@ -1,9 +1,22 @@
 ; docformat = 'rst'
 
-pro mg_run_unittests, filename
+;+
+; Run the unit tests.
+;
+; :Params:
+;   filename : in, optional, type=string
+;     if present, output is sent to `filename`, otherwise sent to `stdout`
+;
+; :Keywords:
+;   test : in, optional, type=string/strarr, default='mglib_uts'
+;     tests to run, defaults to all of them
+;-
+pro mg_run_unittests, filename, test=test
   compile_opt strictarr
 
-  mgunit, 'mglib_uts', filename=filename, html=n_elements(filename) gt 0L, $
+  _test = n_elements(test) gt 0L ? test : 'mglib_uts'
+
+  mgunit, _test, filename=filename, html=n_elements(filename) gt 0L, $
           ntest=ntest, npass=npass, nfail=nfail, nskip=nskip
   if (n_elements(filename) gt 0L) then begin
     print, ntest, npass, nfail, nskip, $
