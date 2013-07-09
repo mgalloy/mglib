@@ -8,15 +8,15 @@
 ;     if present, output is sent to `filename`, otherwise sent to `stdout`
 ;
 ; :Keywords:
-;   test : in, optional, type=string/strarr, default='mglib_uts'
+;   tests : in, optional, type=string/strarr, default='mglib_uts'
 ;     tests to run, defaults to all of them
 ;-
-pro mg_run_unittests, filename, test=test
+pro mg_run_unittests, filename, tests=tests
   compile_opt strictarr
 
-  _test = n_elements(test) gt 0L ? test : 'mglib_uts'
+  _tests = n_elements(tests) gt 0L ? test : 'mglib_uts'
 
-  mgunit, _test, filename=filename, html=n_elements(filename) gt 0L, $
+  mgunit, _tests, filename=filename, html=n_elements(filename) gt 0L, $
           ntest=ntest, npass=npass, nfail=nfail, nskip=nskip
   if (n_elements(filename) gt 0L) then begin
     print, ntest, npass, nfail, nskip, $
