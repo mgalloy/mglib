@@ -14,7 +14,20 @@
 
 ;= overload methods
 
-function mg_configs::_overloadBracketsRightSide, isRange, ss1, ss2
+
+;+
+; :Examples:
+;   For example::
+;
+;     IDL> config = mgffoptions()
+;     IDL> config->put, 'City', 'Boulder', section='Mike'
+;     IDL> config->put, 'State', 'Colorado', section='Mike'
+;     IDL> config->put, 'City', 'Madison', section='Mark'
+;     IDL> config->put, 'State', 'Wisconsin', section='Mark'
+;     IDL> print, config['Mike', 'City']
+;     Boulder
+;-
+function mgffoptions::_overloadBracketsRightSide, isRange, ss1, ss2
   compile_opt strictarr
 
   case n_params() of
@@ -32,7 +45,7 @@ function mg_configs::_overloadBracketsRightSide, isRange, ss1, ss2
 end
 
 
-pro mg_configs::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
+pro mgffoptions::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
   compile_opt strictarr
 
   case n_params() of
@@ -50,7 +63,7 @@ pro mg_configs::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
 end
 
 
-function mg_configs::_overloadForeach, value, key
+function mgffoptions::_overloadForeach, value, key
   compile_opt strictarr
 
   if (self.sections->isEmpty()) then return, 0L
@@ -83,7 +96,7 @@ end
 ;= get, set, and query
 
 
-pro mg_configs::put, option, value, section=section
+pro mgffoptions::put, option, value, section=section
   compile_opt strictarr
 
   _section = n_elements(section) gt 0L ? section : ''
@@ -104,7 +117,7 @@ pro mg_configs::put, option, value, section=section
 end
 
 
-function mg_configs::has_option, option, section=section
+function mgffoptions::has_option, option, section=section
   compile_opt strictarr
 
   _section = n_elements(section) gt 0L ? section : ''
@@ -116,7 +129,7 @@ function mg_configs::has_option, option, section=section
 end
 
 
-function mg_configs::get, option, section=section, found=found, raw=raw
+function mgffoptions::get, option, section=section, found=found, raw=raw
   compile_opt strictarr
   on_error, 2
 
@@ -144,9 +157,9 @@ end
 
 
 ;+
-; Free resources of `mg_configs` object.
+; Free resources of `mgffoptions` object.
 ;-
-pro mg_configs::cleanup
+pro mgffoptions::cleanup
   compile_opt strictarr
 
   foreach s, self.sections do obj_destroy, s
@@ -155,12 +168,12 @@ end
 
 
 ;+
-; Initialize `mg_configs` object.
+; Initialize `mgffoptions` object.
 ;
 ; :Returns:
 ;   1 for success, 0 for failure
 ;-
-function mg_configs::init, fold_case=fold_case
+function mgffoptions::init, fold_case=fold_case
   compile_opt strictarr
 
   self.fold_case = keyword_set(fold_case)
@@ -177,10 +190,10 @@ end
 ;   sections
 ;     hash of hashes
 ;-
-pro mg_configs__define
+pro mgffoptions__define
   compile_opt strictarr
   
-  dummy = { mg_configs, inherits IDL_Object, $
+  dummy = { MGffOptions, inherits IDL_Object, $
             fold_case: 0B, $
             sections: obj_new() $
           }
@@ -190,7 +203,7 @@ end
 ; main-level example
 
 ; example of putting all options in the default section
-simple_config = mg_configs(/fold_case)
+simple_config = mgffoptions(/fold_case)
 simple_config->put, 'Name', 'Mike'
 simple_config->put, 'City', 'Boulder'
 simple_config->put, 'State', 'Colorado'
@@ -202,12 +215,12 @@ print, simple_config->get('name'), $
 print
 
 ; example of using sections
-simple_config = mg_configs()
-simple_config->put, 'City', 'Boulder', section='Mike'
-simple_config->put, 'State', 'Colorado', section='Mike'
-simple_config->put, 'City', 'Madison', section='Mark'
-simple_config->put, 'State', 'Wisconsin', section='Mark'
-foreach section, simple_config, section_name do begin
+config = mgffoptions()
+config->put, 'City', 'Boulder', section='Mike'
+config->put, 'State', 'Colorado', section='Mike'
+config->put, 'City', 'Madison', section='Mark'
+config->put, 'State', 'Wisconsin', section='Mark'
+foreach section, config, section_name do begin
   print, section_name, section['City'], section['State'], $
          format='(%"%s lives in %s, %s.")'
 endforeach

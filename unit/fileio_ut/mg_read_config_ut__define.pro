@@ -72,7 +72,7 @@ function mg_read_config_ut::test_defaults
   config_filename = filepath('simple_config.ini', root=mg_src_root())
   assert, file_test(config_filename), 'test configuration file not found', /skip
 
-  defaults = mg_configs()
+  defaults = mgffoptions()
   defaults->put, 'default1', 'default value 1'
   defaults->put, 'dir', 'not frob'
 

@@ -1,24 +1,35 @@
 ; docformat = 'rst'
 
 ;+
-; Reads a configuration file and returns an `mg_configs` object with the
+; Reads a configuration file and returns an `mgffoptions` object with the
 ; results.
 ;
 ; See `Python configparser <http://docs.python.org/2/library/configparser.html>`
 ; for more details.
 ;
 ; :Returns:
-;   `mg_configs` object
+;   `mgffoptions` object
 ;
 ; :Examples:
 ;
-;   For example, the following configuration file::
+;   For example, suppose the following configuration file is in `config.ini`::
 ;
 ;     [My Section]
 ;     foodir: %(dir)s/whatever
 ;     dir=frob
 ;     long: this value continues
 ;        in the next line
+;
+;   It can be read into an `mgffoptions` object with::
+;
+;     IDL> config = mg_read_config('config.ini')
+;
+;   The result can be queried for values::
+;
+;     IDL> print, config->has_option('foodir', section='My Section')
+;        1
+;     IDL> print, config->get('foodir', section='My Section')
+;     frob/whatever
 ;
 ; :Params:
 ;   filename : in, required, type=string
@@ -52,9 +63,9 @@ function mg_read_config, filename, $
   endif
 
   ; start with copy of the defaults hash, if present, otherwise an empty hash
-  h = mg_configs(fold_case=fold_case)
+  h = mgffoptions(fold_case=fold_case)
   case 1 of
-    isa(defaults, 'mg_configs'): begin
+    isa(defaults, 'mgffoptions'): begin
         foreach section, defaults, section_name do begin
           foreach value, section, option_name do begin
             h->put, option_name, value, section=section_name
