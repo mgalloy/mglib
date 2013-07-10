@@ -104,7 +104,7 @@ function mg_configs::has_option, option, section=section
 end
 
 
-function mg_configs::get, option, section=section, found=found
+function mg_configs::get, option, section=section, found=found, raw=raw
   compile_opt strictarr
   on_error, 2
 
@@ -122,7 +122,9 @@ function mg_configs::get, option, section=section, found=found
   if (~self.sections[_section]->hasKey(_option)) then return, !null
 
   found = 1B
-  return, (self.sections[_section])[_option]
+  return, keyword_set(raw) $
+            ? (self.sections[_section])[_option] $
+            : mg_subs((self.sections[_section])[_option], self.sections[_section])
 end
 
 
