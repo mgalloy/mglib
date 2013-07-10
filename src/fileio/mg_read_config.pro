@@ -1,12 +1,14 @@
 ; docformat = 'rst'
 
-
 ;+
+; Reads a configuration file and returns an `mg_configs` object with the
+; results.
+;
 ; See `Python configparser <http://docs.python.org/2/library/configparser.html>`
 ; for more details.
 ;
 ; :Returns:
-;   hash
+;   `mg_configs` object
 ;
 ; :Examples:
 ;
@@ -30,8 +32,14 @@
 ;     set to a named variable to retrieve any error code from attempting to read
 ;     the configuration file; 0 for OK, -1 for file not found, -2 for invalid
 ;     syntax in configuration file
+;   fold_case : in, optional, type=boolean
+;     set for case-insensitive results (for section and option names, but not
+;     for values)
 ;-
-function mg_read_config, filename, defaults=defaults, error=error, fold_case=foldcase
+function mg_read_config, filename, $
+                         defaults=defaults, $
+                         error=error, $
+                         fold_case=foldcase
   compile_opt strictarr
   on_error, 2
 
@@ -126,29 +134,5 @@ function mg_read_config, filename, defaults=defaults, error=error, fold_case=fol
 
   if (continuing) then h->put, name, value, section=section_name
 
-  ; substitution
-  ; foreach value, h, key do begin
-  ;   if (stregex(value, '%\([[:alnum:]_$]+\)', /boolean)) then begin
-  ;     h[key] = mg_subs(value, h)
-  ;   endif
-  ; endforeach
-
   return, h
-end
-
-
-; main-level example
-
-; example of putting all options in the default section
-simple_config = mg_configs(/fold_case)
-simple_config->add, 'Person', 'Mike'
-simple_config->add, 'City', 'Boulder'
-simple_config->add, 'State', 'Colorado'
-print, simple_config->get('person'), $
-       simple_config->get('city'), $
-       simple_config->get('state'), $
-       format='(%"%s lives in %s, %s.")'
-
-; example of using sections
-
 end

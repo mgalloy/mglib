@@ -1,5 +1,17 @@
 ; docformat = 'rst'
 
+;+
+; This is the internal storage for configuration file options and their values.
+; It is returned by `MG_READ_CONFIG` and can also be used through the `DEFAULTS`
+; keyword of `MG_READ_CONFIG` to set defaults before reading a configuration
+; file.
+;
+; :Properties:
+;   fold_case
+;     set for case-insensitive matching for section and option names.
+;-
+
+
 ;= overload methods
 
 function mg_configs::_overloadBracketsRightSide, isRange, ss1, ss2
@@ -131,6 +143,9 @@ end
 ;= lifecycle
 
 
+;+
+; Free resources of `mg_configs` object.
+;-
 pro mg_configs::cleanup
   compile_opt strictarr
 
@@ -139,6 +154,12 @@ pro mg_configs::cleanup
 end
 
 
+;+
+; Initialize `mg_configs` object.
+;
+; :Returns:
+;   1 for success, 0 for failure
+;-
 function mg_configs::init, fold_case=fold_case
   compile_opt strictarr
 
@@ -149,6 +170,13 @@ function mg_configs::init, fold_case=fold_case
 end
 
 
+;+
+; :Fields:
+;   fold_case
+;     set to 1 for case-insensitive, 0 for case-sensitive
+;   sections
+;     hash of hashes
+;-
 pro mg_configs__define
   compile_opt strictarr
   
@@ -156,4 +184,32 @@ pro mg_configs__define
             fold_case: 0B, $
             sections: obj_new() $
           }
+end
+
+
+; main-level example
+
+; example of putting all options in the default section
+simple_config = mg_configs(/fold_case)
+simple_config->put, 'Name', 'Mike'
+simple_config->put, 'City', 'Boulder'
+simple_config->put, 'State', 'Colorado'
+print, simple_config->get('name'), $
+       simple_config->get('city'), $
+       simple_config->get('state'), $
+       format='(%"%s lives in %s, %s.")'
+
+print
+
+; example of using sections
+simple_config = mg_configs()
+simple_config->put, 'City', 'Boulder', section='Mike'
+simple_config->put, 'State', 'Colorado', section='Mike'
+simple_config->put, 'City', 'Madison', section='Mark'
+simple_config->put, 'State', 'Wisconsin', section='Mark'
+foreach section, simple_config, section_name do begin
+  print, section_name, section['City'], section['State'], $
+         format='(%"%s lives in %s, %s.")'
+endforeach
+
 end
