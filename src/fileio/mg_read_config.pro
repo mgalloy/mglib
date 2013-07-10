@@ -1,131 +1,5 @@
 ; docformat = 'rst'
 
-;= overload methods
-
-function mg_configs::_overloadBracketsRightSide, isRange, ss1, ss2
-  compile_opt strictarr
-
-  case n_params() of
-    2: begin
-        _section = ''
-        _option = ss1
-      end
-    3: begin
-        _section = ss1
-        _option = ss2
-      end
-  endcase
-
-  return, self->get(_option, section=_section)
-end
-
-
-pro mg_configs::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
-  compile_opt strictarr
-
-  case n_params() of
-    4: begin
-        _section = ''
-        _option = ss1
-      end
-    5: begin
-        _section = ss1
-        _option = ss2
-      end
-  endcase
-
-  self->put, _option, value, section=_section
-end
-
-
-;= get, set, and query
-
-
-pro mg_configs::put, option, value, section=section
-  compile_opt strictarr
-
-  _section = n_elements(section) gt 0L ? section : ''
-
-  case n_params() of
-    0: message, 'option and value specified'
-    1: message, 'option or value not specified'
-    2: _option = option
-  endcase
-
-  if (self.fold_case) then begin
-    _section = strlowcase(_section)
-    _option = strlowcase(_option)
-  endif
-
-  if (~self.sections->hasKey(_section)) then self.sections[_section] = hash()
-  (self.sections[_section])[_option] = value
-end
-
-
-function mg_configs::has_option, option, section=section
-  compile_opt strictarr
-
-  _section = n_elements(section) gt 0L ? section : ''
-
-  if (~self.sections->hasKey(_section)) then return, 0B
-  if (~self.sections[_section]->hasKey(option)) then return, 0B
-
-  return, 1B
-end
-
-
-function mg_configs::get, option, section=section, found=found
-  compile_opt strictarr
-  on_error, 2
-
-  if (n_params() lt 1L) then message, 'option not specified'
-  _option = option
-  _section = n_elements(section) gt 0L ? section : ''
-
-  if (self.fold_case) then begin
-    _section = strlowcase(_section)
-    _option = strlowcase(_option)
-  endif
-
-  found = 0B
-  if (~self.sections->hasKey(_section)) then return, !null
-  if (~self.sections[_section]->hasKey(_option)) then return, !null
-
-  found = 1B
-  return, (self.sections[_section])[_option]
-end
-
-
-;= lifecycle
-
-
-pro mg_configs::cleanup
-  compile_opt strictarr
-
-  foreach s, self.sections do obj_destroy, s
-  obj_destroy, self.sections
-end
-
-
-function mg_configs::init, fold_case=fold_case
-  compile_opt strictarr
-
-  self.fold_case = keyword_set(fold_case)
-  self.sections = hash()
-
-  return, 1
-end
-
-
-pro mg_configs__define
-  compile_opt strictarr
-  
-  dummy = { mg_configs, inherits IDL_Object, $
-            fold_case: 0B, $
-            sections: obj_new() $
-          }
-end
-
 
 ;+
 ; See `Python configparser <http://docs.python.org/2/library/configparser.html>`
@@ -170,8 +44,20 @@ function mg_read_config, filename, defaults=defaults, error=error, fold_case=fol
   endif
 
   ; start with copy of the defaults hash, if present, otherwise an empty hash
-  ;h = isa(defaults, 'hash') ? defaults[*] : hash()
   h = mg_configs(fold_case=fold_case)
+  case 1 of
+    isa(defaults, 'mg_configs'): begin
+        foreach section, defaults, section_name do begin
+          foreach value, section, option_name do begin
+            h->put, option_name, value, section=section_name
+          endforeach
+        endforeach
+      end
+    isa(defaults, 'hash'): begin
+        foreach value, defaults, key do h->put, key, value
+      end
+    else:
+  endcase
 
   ; read file
   nlines = file_lines(filename)

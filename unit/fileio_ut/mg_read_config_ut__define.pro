@@ -32,13 +32,14 @@ function mg_read_config_ut::test_basic_sections
   config = mg_read_config(config_filename, error=err)
   assert, err eq 0L, 'error reading configuration file: %d', err
 
-  assert, config.has_option('dir', section='My section'), 'dir value not present'
-  assert, config->get('dir', section='My section') eq 'frob', $
-          'invalid value for dir: %s', config->get('dir', section='My section')
+  section_name = 'My Section'
+  assert, config.has_option('dir', section=section_name), 'dir value not present'
+  assert, config->get('dir', section=section_name) eq 'frob', $
+          'invalid value for dir: %s', config->get('dir', section=section_name)
 
-  assert, config.has_option('long'), 'long value not present'
-  assert, config->get('long', section='My section') eq 'this value continues in the next line', $
-          'invalid value for long: %s', config->get('long', section='My section')
+  assert, config.has_option('long', section=section_name), 'long value not present'
+  assert, config->get('long', section=section_name) eq 'this value continues in the next line', $
+          'invalid value for long: %s', config->get('long', section=section_name)
 
   obj_destroy, config
 
@@ -49,7 +50,7 @@ end
 function mg_read_config_ut::test_substitution
   compile_opt strictarr
 
-  config_filename = filepath('config.ini', root=mg_src_root())
+  config_filename = filepath('simple_config.ini', root=mg_src_root())
   assert, file_test(config_filename), 'test configuration file not found', /skip
 
   config = mg_read_config(config_filename, error=err)
@@ -68,10 +69,12 @@ end
 function mg_read_config_ut::test_defaults
   compile_opt strictarr
 
-  config_filename = filepath('config.ini', root=mg_src_root())
+  config_filename = filepath('simple_config.ini', root=mg_src_root())
   assert, file_test(config_filename), 'test configuration file not found', /skip
 
-  defaults = hash('default1', 'default value 1', 'dir', 'not frob')
+  defaults = mg_configs()
+  defaults->put, 'default1', 'default value 1'
+  defaults->put, 'dir', 'not frob'
 
   config = mg_read_config(config_filename, error=err, defaults=defaults)
   assert, err eq 0L, 'error reading configuration file: %d', err
