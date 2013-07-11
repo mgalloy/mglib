@@ -2,8 +2,19 @@
 
 ;+
 ; Routine for writing netCDF files.
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename of file to write to; this file does not need to exist beforehand
+;   variable : in, required, type=string
+;     name of variable to write
+;   data : in, required, type=any
+;     data to write
+;
+; :Keywords:
+;   error : out, optional, type=long
+;     error code, 0 for no errors
 ;-
-
 pro mg_nc_putdata, filename, variable, data, error=error
   compile_opt strictarr
 
@@ -59,10 +70,13 @@ end
 ; main-level example program
 
 filename = 'test.nc'
+
 mg_nc_putdata, filename, 'x', findgen(10, 20), error=error
 mg_nc_putdata, filename, 'y', dindgen(10), error=error
 mg_nc_putdata, filename, 'z', lindgen(10), error=error
+
 help, error
+
 mg_nc_dump, filename
 
 end
