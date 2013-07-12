@@ -94,11 +94,17 @@ end
 ;    hash : in, required, type=hash/structure
 ;       hash table or structure with key-value pairs to subsitute into the
 ;       template
+;
+; :Keywords:
+;   unresolved_keys : out, optional, type=long
+;     set to a named variable to retrieve the number of keys that were not
+;     found in the hash; if passed, no error message is output
 ;-
-function mg_subs, template, hash
+function mg_subs, template, hash, unresolved_keys=unresolved_keys
   compile_opt strictarr
   on_error, 2
 
+  unresolved_keys = 0L
   result = ''
   re = '%\(([[:alnum:]_]+)\)([[:digit:].]*[[:alpha:]])'
 
@@ -119,13 +125,17 @@ function mg_subs, template, hash
       name = strmid(template, pos[1], len[1])
       value = mg_subs_getvalue(hash, name, found=found)
       if (~found) then begin
-        message, string(name, $
-                        format='(%"format key error: key \"%s\" not found")')
-      endif
-
-      format = string('%' + strmid(template, pos[2], len[2]), $
-                      format='(%"(\%\"%s\")")')
-      result += string(value, format=format)
+        if (arg_present(unresolved_keys)) then begin
+          unresolved_keys++
+        endif else begin
+          message, string(name, $
+                          format='(%"format key error: key \"%s\" not found")')
+        endelse
+      endif else begin
+        format = string('%' + strmid(template, pos[2], len[2]), $
+                        format='(%"(\%\"%s\")")')
+        result += string(value, format=format)
+      endelse
     endif
 
     cur = pos[0] + len[0]
