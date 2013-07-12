@@ -41,11 +41,10 @@ pro mg_nc_putdata, filename, variable, data, error=error
 
   if (variable_id eq -1L) then begin
     ndims = size(data, /n_dimensions)
-    dims = size(data, /dimensions)
     dim_ids = lonarr(ndims)
     dim_names = variable + '_x' + strtrim(sindgen(ndims), 2)
     for d = 0L, ndims - 1L do begin
-      dim_ids[d] = ncdf_dimdef(file_id, dim_names[d], /unlimited);dims[d])
+      dim_ids[d] = ncdf_dimdef(file_id, dim_names[d], /unlimited)
     endfor
     type = size(data, /type)
     variable_id = ncdf_vardef(file_id, $
