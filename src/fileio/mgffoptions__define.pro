@@ -145,7 +145,9 @@ pro mgffoptions::put, option, value, section=section
   endif
 
   if (~self.sections->hasKey(_section)) then self.sections[_section] = hash()
-  (self.sections[_section])[_option] = value
+  (self.sections[_section])[_option] = size(value, /n_dimensions) eq 0L $
+                                         ? value $
+                                         : ('[ ' + strjoin(value, ', ') + ' ]')
 end
 
 
@@ -161,9 +163,16 @@ function mgffoptions::has_option, option, section=section
 end
 
 
-function mgffoptions::get, option, section=section, found=found, raw=raw
+function mgffoptions::get, option, $
+                           section=section, $
+                           found=found, $
+                           raw=raw, $
+                           extract=extract, $
+                           count=count
   compile_opt strictarr
   on_error, 2
+
+  count = 0L
 
   if (n_params() lt 1L) then message, 'option not specified'
   _option = option
@@ -177,10 +186,11 @@ function mgffoptions::get, option, section=section, found=found, raw=raw
   found = 0B
   if (~self.sections->hasKey(_section)) then return, !null
   if (~self.sections[_section]->hasKey(_option)) then return, !null
+  count = 1L
 
   found = 1B
   if (keyword_set(raw)) then begin
-    return, (self.sections[_section])[_option]
+    value = (self.sections[_section])[_option]
   endif else begin
     value = mg_subs((self.sections[_section])[_option], $
                     self.sections[_section], $
@@ -188,8 +198,20 @@ function mgffoptions::get, option, section=section, found=found, raw=raw
     if (_section ne '' && self.sections->hasKey('')) then begin
       value = mg_subs(value, self.sections[''], unresolved_keys=unresolved_keys)
     endif
-    return, value
   endelse
+
+  if (keyword_set(extract)) then begin
+    vars_re = '\[[[:space:]]*([[:alnum:]_$]+[[:space:]]*,[[:space:]]*)*[[:alnum:]_$]+[[:space:]]*\]'
+    has_vars = stregex(value, vars_re, /boolean)
+    if (has_vars) then begin
+      vars_string = strmid(value, 1, strlen(value) - 2)
+      value = strtrim(strsplit(vars_string, ',', /extract, count=count), 2)
+    endif else begin
+      value = [value]
+    endelse
+  endif
+
+  return, value
 end
 
 

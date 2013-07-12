@@ -1,14 +1,46 @@
 ; docformat = 'rst'
 
 ;+
-; Reads a configuration file and returns an `mgffoptions` object with the
+; Reads a configuration file and returns an `MGffOptions` object with the
 ; results.
 ;
-; See `Python configparser <http://docs.python.org/2/library/configparser.html>`
-; for more details.
+; Options and their values are listed one option per line, though the value can
+; extend over multiple lines by indenting at least one space on the continued
+; lined. There must be either a ":" or an "=" after the option name. Leading
+; space before the first character in the value is ignored. For example::
+;
+;   option1: value1
+;   option2 =    value2
+;   option3 : a very long
+;     value3
+;
+; The values of options 1, 2, and 3 are "value1", "value2", and
+; "a very long value3", respectively.
+;
+; Comments have "#" or ";" as the first character on a line and are ignored.
+;
+; Sections break a configuration file into namespaces. They are specified by
+; placing a name in square brackets, such as::
+;
+;   [ section_name ]
+;
+; Options after this declaration and before the next such section declaration
+; are in the "section_name" section. Options before the first section
+; declaration are in the default section (the entire configuration file can be
+; in the default section).
+;
+; Interpolation can be used to substitute values from one option into another.
+; Only options from the default section or the current section can be used.
+; Interpolation uses `MG_SUBS` and hence its syntax, in this case::
+;
+;   %(option_name)s
+;
+; where the "s" stands for string (`MG_SUBS` can substitute numeric quantities
+; and uses the C format codes, but options are always strings so "s" is always
+; used in this case).
 ;
 ; :Returns:
-;   `mgffoptions` object
+;   `MGffOptions` object
 ;
 ; :Examples:
 ;
@@ -121,12 +153,12 @@ function mg_read_config, filename, $
 
           tokens = stregex(line, '^([[:alnum:]_$]+)[=:](.*)', /extract, /subexpr)
           name = tokens[1]
-          value = strtrim(tokens[2], 1)
+          value = strtrim(tokens[2], 2)
           continuing = 1B
         end
       is_continuation: begin
           if (continuing) then begin
-            value += ' ' + strtrim(line, 1)
+            value += ' ' + strtrim(line, 2)
           endif else begin
             error = -2L
             message, string(l, line, format='(%"invalid line %d: ''%s''")'), $

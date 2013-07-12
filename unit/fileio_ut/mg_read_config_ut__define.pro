@@ -23,7 +23,7 @@ function mg_read_config_ut::test_basic
 end
 
 
-function mg_read_config_ut::test_basic_sections
+function mg_read_config_ut::test_sections_basic
   compile_opt strictarr
 
   config_filename = filepath('config.ini', root=mg_src_root())
@@ -66,7 +66,7 @@ function mg_read_config_ut::test_substitution
 end
 
 
-function mg_read_config_ut::test_defaults
+function mg_read_config_ut::test_defaults_options
   compile_opt strictarr
 
   config_filename = filepath('simple_config.ini', root=mg_src_root())
@@ -121,6 +121,48 @@ function mg_read_config_ut::test_defaults_hash
           'invalid value for long: %s', config['long']
 
   obj_destroy, [defaults, config]
+
+  return, 1
+end
+
+
+function mg_read_config_ut::test_sections_advanced
+  compile_opt strictarr
+
+  config_filename = filepath('sections.ini', root=mg_src_root())
+  assert, file_test(config_filename), 'test configuration file not found', /skip
+
+  config = mg_read_config(config_filename, error=err, defaults=defaults)
+
+  terra_data = config->get('data', section='Terra')
+  assert, terra_data eq '~/data/MODIS/Terra/C5', $
+          'incorrect value for Terra data: %s', terra_data
+
+  obj_destroy, config
+
+  return, 1
+end
+
+
+function mg_read_config_ut::test_extract
+  compile_opt strictarr
+
+  config_filename = filepath('sections.ini', root=mg_src_root())
+  assert, file_test(config_filename), 'test configuration file not found', /skip
+
+  config = mg_read_config(config_filename, error=err, defaults=defaults)
+
+  terra_variables = config->get('variables', section='Terra', /extract, count=count)
+  terra_standard = ['Longitude', 'Latitude', 'Optical_Depth_Land_And_Ocean']
+  assert, count eq 3L, 'incorrect count for Aqua variables: %d', count
+  assert, array_equal(terra_standard, terra_variables), 'incorrect Terra variables'
+
+  aqua_variables = config->get('variables', section='Aqua', /extract, count=count)
+  aqua_standard = [ 'Longitude', 'Latitude', 'Deep_Blue_Angstrom_Exponent_Land' ]
+  assert, count eq 3L, 'incorrect count for Aqua variables: %d', count
+  assert, array_equal(aqua_standard, aqua_variables), 'incorrect Aqua variables'
+
+  obj_destroy, config
 
   return, 1
 end
