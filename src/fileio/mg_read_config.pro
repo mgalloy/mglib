@@ -111,7 +111,7 @@ function mg_read_config, filename, $
 
           section_tokens = stregex(line, '^\[[[:space:]]*([[:alnum:]_$ ]+)', $
                                    /extract, /subexpr)
-          section_name = section_tokens[1]
+          section_name = strtrim(section_tokens[1], 2)
         end
       is_variable: begin
           if (continuing) then begin

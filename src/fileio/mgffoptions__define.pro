@@ -93,6 +93,26 @@ function mgffoptions::_overloadForeach, value, key
 end
 
 
+function mgffoptions::_overloadPrint
+  compile_opt strictarr
+
+  first_line = 1B
+  output_list = list()
+  foreach sec, self.sections, s do begin
+    if (~first_line) then output_list->add, '' else first_line = 0B
+
+    output_list->add, string(s, format='(%"[ %s ]")')
+    foreach option, sec, o do begin
+      output_list->add, string(o, option, format='(%"  %s: %s")')
+    endforeach
+  endforeach
+
+  output = transpose(output_list->toArray())
+  obj_destroy, output_list
+  return, output
+end
+
+
 ;= get, set, and query
 
 
@@ -147,9 +167,17 @@ function mgffoptions::get, option, section=section, found=found, raw=raw
   if (~self.sections[_section]->hasKey(_option)) then return, !null
 
   found = 1B
-  return, keyword_set(raw) $
-            ? (self.sections[_section])[_option] $
-            : mg_subs((self.sections[_section])[_option], self.sections[_section])
+  if (keyword_set(raw)) then begin
+    return, (self.sections[_section])[_option]
+  endif else begin
+    value = mg_subs((self.sections[_section])[_option], $
+                    self.sections[_section], $
+                    unresolved_keys=unresolved_keys)
+    if (_section ne '' && self.sections->hasKey('')) then begin
+      value = mg_subs(value, self.sections[''], unresolved_keys=unresolved_keys)
+    endif
+    return, value
+  endelse
 end
 
 
