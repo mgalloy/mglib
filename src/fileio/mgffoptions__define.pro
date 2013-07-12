@@ -93,6 +93,18 @@ function mgffoptions::_overloadForeach, value, key
 end
 
 
+function mgffoptions::_overloadHelp, varname
+  compile_opt strictarr
+
+  nsections = n_elements(self.sections)
+  noptions = 0L
+  foreach sec, self.sections do noptions += n_elements(sec)
+
+  return, string(varname, obj_class(self), nsections, noptions, $
+                 format='(%"%-15s %s  <NSECTIONS=%d  NOPTIONS=%d>")')
+end
+
+
 function mgffoptions::_overloadPrint
   compile_opt strictarr
 
