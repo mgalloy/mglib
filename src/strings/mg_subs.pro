@@ -124,9 +124,11 @@ function mg_subs, template, hash, unresolved_keys=unresolved_keys
     if (pos[0] lt strlen(template)) then begin
       name = strmid(template, pos[1], len[1])
       value = mg_subs_getvalue(hash, name, found=found)
+
       if (~found) then begin
         if (arg_present(unresolved_keys)) then begin
           unresolved_keys++
+          result += strmid(template, pos[0], len[0])
         endif else begin
           message, string(name, $
                           format='(%"format key error: key \"%s\" not found")')
