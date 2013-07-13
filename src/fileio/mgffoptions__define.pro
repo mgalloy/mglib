@@ -110,12 +110,31 @@ function mgffoptions::_overloadPrint
 
   first_line = 1B
   output_list = list()
+
+  max_width = 0L
+  foreach sec, self.sections do begin
+    foreach option, sec, o do begin
+      max_width >= strlen(o)
+    endforeach
+  endforeach
+
+  format = string(max_width + 2L, format='(%"(\%\"\%-%ds \%s\"\)")')
+
+  if (self.sections->hasKey('')) then begin
+    default_sec = self.sections['']
+    foreach option, default_sec, o do begin
+      first_line = 0B
+      output_list->add, string(o + ':', option, format=format)
+    endforeach
+  endif
+
   foreach sec, self.sections, s do begin
+    if (s eq '') then continue
     if (~first_line) then output_list->add, '' else first_line = 0B
 
     output_list->add, string(s, format='(%"[ %s ]")')
     foreach option, sec, o do begin
-      output_list->add, string(o, option, format='(%"  %s: %s")')
+      output_list->add, string(o + ':', option, format=format)
     endforeach
   endforeach
 
