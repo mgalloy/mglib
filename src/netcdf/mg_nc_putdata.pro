@@ -12,10 +12,12 @@
 ;     data to write
 ;
 ; :Keywords:
+;   dim_names : in, optional, type=strarr
+;     string array of dimension names
 ;   error : out, optional, type=long
 ;     error code, 0 for no errors
 ;-
-pro mg_nc_putdata, filename, variable, data, error=error
+pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
   compile_opt strictarr
 
   error = 0L
@@ -42,9 +44,11 @@ pro mg_nc_putdata, filename, variable, data, error=error
   if (variable_id eq -1L) then begin
     ndims = size(data, /n_dimensions)
     dim_ids = lonarr(ndims)
-    dim_names = variable + '_x' + strtrim(sindgen(ndims), 2)
+    _dim_names = n_elements(dim_names) eq 0L $
+                   ? (variable + '_' + strtrim(sindgen(ndims), 2)) $
+                   : dim_names
     for d = 0L, ndims - 1L do begin
-      dim_ids[d] = ncdf_dimdef(file_id, dim_names[d], /unlimited)
+      dim_ids[d] = ncdf_dimdef(file_id, _dim_names[d], /unlimited)
     endfor
     type = size(data, /type)
     variable_id = ncdf_vardef(file_id, $
