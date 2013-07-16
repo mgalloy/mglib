@@ -7,7 +7,7 @@ add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 if (APPLE)
   set_target_properties("${DLM_NAME}"
     PROPERTIES
-      SUFFIX ".${Idl_PLATFORM_EXT}.so"
+      SUFFIX ".${IDL_PLATFORM_EXT}.so"
   )
 endif ()
 
@@ -17,7 +17,7 @@ set_target_properties("${DLM_NAME}"
 )
 
 
-target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY})
+target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY})
 
 install(TARGETS ${DLM_NAME}
   RUNTIME DESTINATION lib/${DIRNAME}

@@ -7,11 +7,11 @@ set(DLM_NAME mg_${DIRNAME})
 #   set_target_properties("${DLM_NAME}"
 #     PROPERTIES
 #       PREFIX ""
-#       SUFFIX ".${Idl_PLATFORM_EXT}.so"
+#       SUFFIX ".${IDL_PLATFORM_EXT}.so"
 #   )
 # endif ()
 #
-# target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY})
+# target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY})
 
 file(GLOB PRO_FILES "*.pro")
 install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})

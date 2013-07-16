@@ -27,7 +27,7 @@ endif ()
 find_package(IDL REQUIRED)
 
 # always need IDL's include files
-include_directories(${Idl_INCLUDE_DIR})
+include_directories(${IDL_INCLUDE_DIR})
 
 add_subdirectory(src)
 
@@ -39,19 +39,19 @@ file(GLOB_RECURSE IDLDOC_FILES "src/*.idldoc")
 
 
 add_custom_target(doc
-  COMMAND ${Idl_EXECUTABLE} -e mg_doc_library
+  COMMAND ${IDL_EXECUTABLE} -e mg_doc_library
 )
 
 add_custom_target(userdoc
-  COMMAND ${Idl_EXECUTABLE} -e mg_userdoc_library
+  COMMAND ${IDL_EXECUTABLE} -e mg_userdoc_library
 )
 
 add_custom_target(dcdoc
-  COMMAND ${Idl_EXECUTABLE} -e mg_dcdoc_library
+  COMMAND ${IDL_EXECUTABLE} -e mg_dcdoc_library
 )
 
 add_custom_target(unit
-  COMMAND ${Idl_EXECUTABLE} -quiet -e mg_run_unittests
+  COMMAND ${IDL_EXECUTABLE} -quiet -e mg_run_unittests
 )
 
 set_directory_properties(PROPERTIES
