@@ -17,7 +17,7 @@ function mg_check_path_ut::test_unknown_file
   root = mg_src_root()
 
   unknown_file = filepath('unknown.dat', root=root)
-  unknown_file_status = mg_check_path(unknown_file, partial_path=unknown_file_ppath)
+  unknown_file_status = mg_check_path(unknown_file, error_path=unknown_file_ppath)
   assert, ~unknown_file_status, 'unknown file found'
   assert, unknown_file_ppath eq unknown_file, $
           'unknown file partial path not correct: %s', $
@@ -33,7 +33,7 @@ function mg_check_path_ut::test_unknown_path
   root = mg_src_root()
 
   unknown_path = filepath('unknown.dat', subdir=['unknown1', 'unknown2'], root=root)
-  unknown_path_status = mg_check_path(unknown_path, partial_path=unknown_path_ppath)
+  unknown_path_status = mg_check_path(unknown_path, error_path=unknown_path_ppath)
   assert, ~unknown_path_status, 'unknown path found'
   assert, unknown_path_ppath eq filepath('unknown1', root=root), $
           'unknown path partial path not correct: %s', $
