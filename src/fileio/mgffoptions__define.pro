@@ -187,11 +187,13 @@ function mgffoptions::get, option, $
                            found=found, $
                            raw=raw, $
                            extract=extract, $
-                           count=count
+                           count=count, $
+                           default=default
   compile_opt strictarr
   on_error, 2
 
   count = 0L
+  _default = n_elements(default) eq 0L ? !null : default
 
   if (n_params() lt 1L) then message, 'option not specified'
   _option = option
@@ -203,8 +205,8 @@ function mgffoptions::get, option, $
   endif
 
   found = 0B
-  if (~self.sections->hasKey(_section)) then return, !null
-  if (~self.sections[_section]->hasKey(_option)) then return, !null
+  if (~self.sections->hasKey(_section)) then return, _default
+  if (~self.sections[_section]->hasKey(_option)) then return, _default
   count = 1L
 
   found = 1B
