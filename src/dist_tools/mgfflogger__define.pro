@@ -25,7 +25,7 @@
 ;         '%(time)s %(levelname)s: %(routine)s: %(message)s'
 ;
 ;       where the possible names to include are: "time", "levelname",
-;       "routine", "stacktrace", "name", and "message".
+;       "levelshortname", "routine", "stacktrace", "name", and "message".
 ;
 ;       Note that the time argument will first be formatted using the
 ;       `TIME_FORMAT` specification
@@ -263,6 +263,7 @@ pro mgfflogger::print, msg, level=level, back_levels=back_levels
     stack = scope_traceback(/structure, /system)
     vars = { time: string(systime(/julian), format='(' + self.time_format + ')'), $
              levelname: strupcase(self.levelNames[level - 1L]), $
+             levelshortname: strupcase(self.levelShortNames[level - 1L]), $
              routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
              stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, '->'), $
              name: self.name, $
@@ -308,6 +309,7 @@ function mgfflogger::init, parent=parent, name=name, _extra=e
 
   self.level = 0L
   self.levelNames = ['Critical', 'Error', 'Warning',  'Informational', 'Debug']
+  self.levelShortNames = ['Crit', 'Err', 'Warn',  'Info', 'Debug']
 
   self->setProperty, _extra=e
 
@@ -331,6 +333,8 @@ end
 ;       to this this value will be logged
 ;    levelNames
 ;       names for the different levels
+;    levelShortNames
+;       shorter names for the different levels
 ;    filename
 ;       filename to send output to
 ;    time_format
@@ -347,6 +351,7 @@ pro mgfflogger__define
              children: obj_new(), $
              level: 0L, $
              levelNames: strarr(5), $
+             levelShortNames: strarr(5), $
              filename: '', $
              time_format: '', $
              format: '' $
