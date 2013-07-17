@@ -24,7 +24,8 @@
 ;   1 if filepath exists, 0 if not
 ;
 ; :Params:
-;   string filepath
+;   path : in, required, type=string
+;     filepath to check
 ;
 ; :Keywords:
 ;   error_path : out, optional, type=string
