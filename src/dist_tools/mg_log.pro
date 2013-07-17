@@ -73,6 +73,12 @@
 ;       optional argument to be substituted into `msg` format string
 ;    arg3 : in, optional, type=string
 ;       optional argument to be substituted into `msg` format string
+;    arg4 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg5 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg6 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
 ;
 ; :Keywords:
 ;    name : in, optional, type=string
@@ -98,7 +104,7 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to `MGffLogger::setProperty` to configure the logger
 ;-
-pro mg_log, msg, arg1, arg2, arg3, name=name, $
+pro mg_log, msg, arg1, arg2, arg3, arg4, arg5, arg6, name=name, $
             debug=debug, informational=informational, $
             warning=warning, error=error, critical=critical, $
             last_error=lastError, $
@@ -113,6 +119,9 @@ pro mg_log, msg, arg1, arg2, arg3, name=name, $
     2: _msg = string(arg1, format='(%"' + msg + '")')
     3: _msg = string(arg1, arg2, format='(%"' + msg + '")')
     4: _msg = string(arg1, arg2, arg3, format='(%"' + msg + '")')
+    5: _msg = string(arg1, arg2, arg3, arg4, format='(%"' + msg + '")')
+    6: _msg = string(arg1, arg2, arg3, arg4, arg5, format='(%"' + msg + '")')
+    7: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, format='(%"' + msg + '")')
   endcase
 
   ; create the top-level logger if it doesn't already exist in the
