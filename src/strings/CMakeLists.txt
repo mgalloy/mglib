@@ -9,7 +9,7 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   if (APPLE)
     set_target_properties("${DLM_NAME}"
       PROPERTIES
-        SUFFIX ".${Idl_PLATFORM_EXT}.so"
+        SUFFIX ".${IDL_PLATFORM_EXT}.so"
     )
   endif ()
 
@@ -18,7 +18,7 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
       PREFIX ""
   )
 
-  target_link_libraries("${DLM_NAME}" ${Idl_LIBRARY} ${TRE_LIBRARY})
+  target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY} ${TRE_LIBRARY})
 
   install(TARGETS ${DLM_NAME}
     RUNTIME DESTINATION lib/${DIRNAME}
