@@ -144,6 +144,19 @@ function mgffoptions::_overloadPrint
 end
 
 
+; property access
+
+pro mgffoptions::getProperty, sections=sections
+  compile_opt strictarr
+
+  if (arg_present(sections)) then begin
+    _sections = self.sections->keys()
+    sections = sections->toArray()
+    obj_destroy, _sections
+  endif
+end
+
+
 ;= get, set, and query
 
 
