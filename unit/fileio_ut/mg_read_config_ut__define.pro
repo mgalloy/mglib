@@ -70,6 +70,29 @@ function mg_read_config_ut::test_substitution
 end
 
 
+function mg_read_config_ut::test_substitution_multiple
+  compile_opt strictarr
+
+  config_filename = filepath('simple_config.ini', root=mg_src_root())
+  assert, file_test(config_filename), 'test configuration file not found', /skip
+
+  config = mg_read_config(config_filename, error=err)
+  assert, err eq 0L, 'error reading configuration file: %d', err
+
+  assert, config->has_option('derived'), 'derived value not present'
+  assert, config['derived'] eq 'frob/whatever/extra', $
+          'invalid value for derived: %s', config['derived']
+
+  assert, config->has_option('derived2'), 'derived2 value not present'
+  assert, config['derived2'] eq 'frob/whatever/extra/more', $
+          'invalid value for derived2: %s', config['derived2']
+
+  obj_destroy, config
+
+  return, 1
+end
+
+
 function mg_read_config_ut::test_defaults_options
   compile_opt strictarr
 

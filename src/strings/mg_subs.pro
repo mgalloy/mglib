@@ -136,7 +136,9 @@ function mg_subs, template, hash, unresolved_keys=unresolved_keys
       endif else begin
         format = string('%' + strmid(template, pos[2], len[2]), $
                         format='(%"(\%\"%s\")")')
-        result += string(value, format=format)
+        result += mg_subs(string(value, format=format), hash, $
+                          unresolved_keys=sub_unresolved_keys)
+        unresolved_keys += sub_unresolved_keys
       endelse
     endif
 
