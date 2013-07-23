@@ -151,7 +151,7 @@ pro mgffoptions::getProperty, sections=sections
 
   if (arg_present(sections)) then begin
     _sections = self.sections->keys()
-    sections = sections->toArray()
+    sections = _sections->toArray()
     obj_destroy, _sections
   endif
 end
