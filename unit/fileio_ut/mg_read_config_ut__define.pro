@@ -37,6 +37,10 @@ function mg_read_config_ut::test_sections_basic
   assert, config->get('dir', section=section_name) eq 'frob', $
           'invalid value for dir: %s', config->get('dir', section=section_name)
 
+  assert, config->has_option('other', section=section_name), 'other value not present'
+  assert, config->get('other', section=section_name) eq 'value', $
+          'invalid value for other: %s', config->get('other', section=section_name)
+
   assert, config->has_option('long', section=section_name), 'long value not present'
   assert, config->get('long', section=section_name) eq 'this value continues in the next line', $
           'invalid value for long: %s', config->get('long', section=section_name)

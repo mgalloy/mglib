@@ -151,9 +151,10 @@ function mg_read_config, filename, $
             h->put, name, value, section=section_name
           endif
 
-          tokens = stregex(line, '^([[:alnum:]_$]+)[=:](.*)', /extract, /subexpr)
+          tokens = stregex(line, '^([[:alnum:]_$]+)[[:space:]]*[=:](.*)', /extract, /subexpr)
           name = tokens[1]
           value = strtrim(tokens[2], 2)
+
           continuing = 1B
         end
       is_continuation: begin
