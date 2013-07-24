@@ -85,6 +85,8 @@ end
 ; String substitution routine which substitutes values into a given string
 ; using the correspondences found in the provided hash or structure.
 ;
+; :Private:
+;
 ; :Returns:
 ;    string
 ;
@@ -100,7 +102,7 @@ end
 ;     set to a named variable to retrieve the number of keys that were not
 ;     found in the hash; if passed, no error message is output
 ;-
-function mg_subs, template, hash, unresolved_keys=unresolved_keys
+function mg_subs_iter, template, hash, unresolved_keys=unresolved_keys
   compile_opt strictarr
   on_error, 2
 
@@ -136,14 +138,48 @@ function mg_subs, template, hash, unresolved_keys=unresolved_keys
       endif else begin
         format = string('%' + strmid(template, pos[2], len[2]), $
                         format='(%"(\%\"%s\")")')
-        result += mg_subs(string(value, format=format), hash, $
-                          unresolved_keys=sub_unresolved_keys)
-        unresolved_keys += sub_unresolved_keys
+        result += string(value, format=format)
       endelse
     endif
 
     cur = pos[0] + len[0]
   endwhile
+
+  return, result
+end
+
+
+;+
+; String substitution routine which substitutes values into a given string
+; using the correspondences found in the provided hash or structure.
+;
+; :Returns:
+;    string
+;
+; :Params:
+;    template : in, optional, type=string
+;       string to substitute into
+;    hash : in, required, type=hash/structure
+;       hash table or structure with key-value pairs to subsitute into the
+;       template
+;
+; :Keywords:
+;   unresolved_keys : out, optional, type=long
+;     set to a named variable to retrieve the number of keys that were not
+;     found in the hash; if passed, no error message is output
+;-
+function mg_subs, template, hash, unresolved_keys=unresolved_keys
+  compile_opt strictarr
+  on_error, 2
+
+  result = template
+  new_result = mg_subs_iter(result, hash, unresolved_keys=unresolved_keys)
+
+  repeat begin
+    tmp = new_result
+    new_result = mg_subs_iter(new_result, hash, unresolved_keys=unresolved_keys)
+    result = tmp
+  endrep until (result eq new_result)
 
   return, result
 end

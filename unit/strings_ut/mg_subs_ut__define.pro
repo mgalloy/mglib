@@ -59,6 +59,20 @@ function mg_subs_ut::test_derived_perverse
 end
 
 
+function mg_subs_ut::test_not_found
+  compile_opt strictarr
+
+  h = hash(['location'], ['Boulder'])
+
+  value = mg_subs('%(name)s lives in %(location)s', h)
+  assert, value eq '%(name)s lives in Boulder', 'incorrect value: %s', value
+
+  obj_destroy, h
+
+  return, 1
+end
+
+
 pro mg_subs_ut__define
   compile_opt strictarr
 
