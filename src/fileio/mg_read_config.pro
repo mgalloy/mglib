@@ -82,7 +82,7 @@
 function mg_read_config, filename, $
                          defaults=defaults, $
                          error=error, $
-                         fold_case=foldcase
+                         fold_case=fold_case
   compile_opt strictarr
   on_error, 2
 

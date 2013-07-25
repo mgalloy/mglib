@@ -195,6 +195,26 @@ function mg_read_config_ut::test_extract
 end
 
 
+function mg_read_config_ut::test_case
+  compile_opt strictarr
+
+  config_filename = filepath('sections.ini', root=mg_src_root())
+  assert, file_test(config_filename), 'test configuration file not found', /skip
+
+  config = mg_read_config(config_filename, error=err, defaults=defaults, /fold_case)
+
+  assert, config->has_option('grid', section='aqua'), $
+          'grid option in aqua section not found'
+  value = config->get('grid', section='aqua')
+  assert, value eq '~/data/MODIS/Aqua/C5/grids/MERRA-125x1.25.nc', $
+          'incorrect value for grid option in aqua section: %s', value
+
+  obj_destroy, config
+
+  return, 1
+end
+
+
 ;+
 ; Test `MG_READ_CONFIG`.
 ;-

@@ -157,7 +157,7 @@ pro mgffoptions::getProperty, sections=sections
 end
 
 
-;= get, set, and query
+;= get, put, and query
 
 
 pro mgffoptions::put, option, value, section=section
@@ -166,7 +166,7 @@ pro mgffoptions::put, option, value, section=section
   _section = n_elements(section) gt 0L ? section : ''
 
   case n_params() of
-    0: message, 'option and value specified'
+    0: message, 'option and value not specified'
     1: message, 'option or value not specified'
     2: _option = option
   endcase
@@ -187,11 +187,15 @@ function mgffoptions::has_option, option, section=section
   compile_opt strictarr
 
   _section = n_elements(section) gt 0L ? section : ''
+  _option = option
 
-  if (~self.sections->hasKey(_section)) then return, 0B
-  if (~self.sections[_section]->hasKey(option)) then return, 0B
+  if (self.fold_case) then begin
+    _section = strlowcase(_section)
+    _option = strlowcase(_option)
+  endif
 
-  return, 1B
+  return, self.sections->hasKey(_section) && self.sections[_section]->hasKey(_option)
+
 end
 
 
@@ -271,6 +275,7 @@ end
 ;-
 function mgffoptions::init, fold_case=fold_case
   compile_opt strictarr
+
 
   self.fold_case = keyword_set(fold_case)
   self.sections = hash()
