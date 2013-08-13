@@ -268,12 +268,12 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
       mg_image_tv, _im, !x.window[0], !y.window[0], /normal, $
                    xsize=!x.window[1] - !x.window[0], $
                    ysize=!y.window[1] - !y.window[0], $
-                   true=_true, scale=scale, n_channels=nchannels
+                   true=_true, scale=scale, n_channels=nchannels, _extra=e
     endif else begin
       displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
                                    true=_true, _extra=e)
       mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                    true=_true, scale=scale, n_channels=nchannels
+                    true=_true, scale=scale, n_channels=nchannels, _extra=e
     endelse
   endif
 
