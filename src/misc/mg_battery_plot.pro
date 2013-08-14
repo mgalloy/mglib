@@ -36,5 +36,10 @@ pro mg_battery_plot
   endfor
   free_lun, lun
 
+  cycles = uniq(cycle_count)
+
   plot, times, float(current_capacity) / float(max_capacity)
+  for c = 0L, n_elements(cycles) - 1L do begin
+    plots, fltarr(2) + times[cycles[c]], !y.crange
+  endfor
 end
