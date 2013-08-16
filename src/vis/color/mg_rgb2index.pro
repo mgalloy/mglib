@@ -46,7 +46,11 @@ function mg_rgb2index, rgb
 
   case ndims of
     1: return, rgb[0] + rgb[1] * 2L^8 + rgb[2] * 2L^16
-    2: return, rgb[*, 0] + rgb[*, 1] * 2L^8 + rgb[*, 2] * 2L^16
+    2: begin
+        result = rgb[*, 0] + rgb[*, 1] * 2L^8 + rgb[*, 2] * 2L^16
+        if (n_elements(result) eq 1L) then result = result[0]
+        return, result
+      end
     else: message, 'invalid number of dimensions for RGB array'
   endcase
 end
