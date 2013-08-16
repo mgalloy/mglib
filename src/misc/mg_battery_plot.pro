@@ -38,8 +38,20 @@ pro mg_battery_plot
 
   cycles = uniq(cycle_count)
 
-  plot, times, float(current_capacity) / float(max_capacity)
-  for c = 0L, n_elements(cycles) - 1L do begin
-    plots, fltarr(2) + times[cycles[c]], !y.crange
+  mg_psbegin, /image, filename='battery.ps', xsize=6, ysize=4, /inches
+  mg_decomposed, 1, old_decomposed=odec
+
+  plot, times, float(current_capacity) / float(max_capacity), $
+        xstyle=9, ystyle=9, yrange=[0., 1.], $
+        psym=mg_usersym(/circle), symsize=0.15
+
+  for c = 0L, n_elements(cycles) - 2L do begin
+    plots, fltarr(2) + times[cycles[c]], !y.crange, color='0000ff'x, thick=4
   endfor
+
+  mg_decomposed, odec
+  mg_psend
+  mg_convert, 'battery', max_dimensions=[700, 700], output=im
+
+  mg_image, im, /new_window
 end
