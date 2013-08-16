@@ -38,29 +38,34 @@ pro mg_battery_plot
 
   cycles = uniq(cycle_count)
 
+  ygap = 100
+  dummy = label_date(date_format='%D %M %Z')
+
   mg_loadct, 27, /brewer, rgb_table=rgb
 
   mg_psbegin, /image, filename='battery.ps', xsize=6, ysize=4, /inches
   mg_decomposed, 1, old_decomposed=odec
 
-  plot, times, current_capacity, /nodata, $
-        xstyle=9, ystyle=8, $
+  plot, mg_epoch2julian(times), current_capacity, /nodata, $
+        xstyle=9, ystyle=8, xtickformat='LABEL_DATE', $
         ytitle='battery capacity (mAh)', $
         charsize=0.75
-  oplot, times, design_capacity, $
+  oplot, mg_epoch2julian(times), design_capacity, $
          thick=4, color=mg_rgb2index(rgb[8, *])
-  oplot, times, current_capacity, $
+  oplot, mg_epoch2julian(times), current_capacity, $
          psym=mg_usersym(/circle), symsize=0.15
-  oplot, times, max_capacity, $
+  oplot, mg_epoch2julian(times), max_capacity, $
          psym=mg_usersym(/horizontal_line), symsize=0.15, $
          color=mg_rgb2index(rgb[6, *])
 
   for c = 0L, n_elements(cycles) - 2L do begin
-    plots, fltarr(2) + times[cycles[c]], !y.crange, $
+    plots, fltarr(2) + mg_epoch2julian(times[cycles[c]]), !y.crange, $
            color=mg_rgb2index(rgb[3, *]), thick=4
+    xyouts, mg_epoch2julian(times[cycles[c]]), !y.crange[1] + ygap, strtrim(cycle_count[c], 2), $
+            alignment=0.5, color=mg_rgb2index(rgb[3, *]), charsize=0.5
   endfor
 
-  xyouts, times[-1], design_capacity[-1] + 100, 'design capacity', /data, $
+  xyouts, mg_epoch2julian(times[-1]), design_capacity[-1] + ygap, 'design capacity', /data, $
           alignment=1.0, charsize=0.75, color=mg_rgb2index(rgb[8, *])
 
   mg_decomposed, odec
