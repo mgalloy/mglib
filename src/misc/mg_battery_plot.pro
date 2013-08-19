@@ -52,20 +52,23 @@ pro mg_battery_plot
         charsize=0.75
   oplot, mg_epoch2julian(times), current_capacity, $
          psym=mg_usersym(/circle), symsize=0.15
-  oplot, mg_epoch2julian(times), max_capacity, $
-         psym=mg_usersym(/horizontal_line), symsize=0.15, $
-         color=mg_rgb2index(rgb[6, *])
 
   for c = 0L, n_elements(cycles) - 2L do begin
     plots, fltarr(2) + mg_epoch2julian(times[cycles[c]]), !y.crange, $
            color=mg_rgb2index(rgb[3, *]), thick=4
     xyouts, mg_epoch2julian(times[cycles[c]]), !y.crange[1] + ygap, $
-            strtrim(cycle_count[cycles[c]], 2) + '   ' + strtrim(cycle_count[cycles[c + 1L]], 2), $
+            string(cycle_count[cycles[c]], cycle_count[cycles[c + 1L]], $
+                   format='(%"%d   %d")'), $
             alignment=0.5, color=mg_rgb2index(rgb[3, *]), charsize=0.5
   endfor
 
+  oplot, mg_epoch2julian(times), max_capacity, $
+         color=mg_rgb2index(rgb[6, *]), thick=4, linestyle=0
+  xyouts, mg_epoch2julian(times[-1]), max_capacity[-1] + ygap, 'max capacity', /data, $
+          alignment=1.0, charsize=0.6, color=mg_rgb2index(rgb[6, *])
+
   oplot, mg_epoch2julian(times), design_capacity, $
-         thick=1, color=mg_rgb2index(rgb[8, *])
+         thick=4, color=mg_rgb2index(rgb[8, *])
   xyouts, mg_epoch2julian(times[-1]), design_capacity[-1] + ygap, 'design capacity', /data, $
           alignment=1.0, charsize=0.6, color=mg_rgb2index(rgb[8, *])
 
