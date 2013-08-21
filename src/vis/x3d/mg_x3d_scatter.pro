@@ -5,7 +5,7 @@ pro mg_x3d_scatter, x, y, z, filename=filename
 
   _filename = n_elements(filename) eq 0L ? 'x3d_scatter.html' : filename
 
-  v = obj_new('IDLgrView')
+  v = obj_new('IDLgrView', color=[200, 200, 255])
 
   m = obj_new('IDLgrModel')
   v->add, m
