@@ -122,6 +122,7 @@ pro mggrx3d::_traverse, tree, indent=indent
     obj_isa(tree, 'IDLgrView'): self->_writeView, tree, indent=_indent
     obj_isa(tree, 'IDLgrModel'): self->_writeModel, tree, indent=_indent
     obj_isa(tree, 'IDLgrPolygon'): self->_writePolygon, tree, indent=_indent
+    obj_isa(tree, 'IDLgrPolyline'): self->_writePolyline, tree, indent=_indent
     obj_isa(tree, 'IDLgrLight'):
     else: message, string(obj_class(tree), format=format)
   endcase
