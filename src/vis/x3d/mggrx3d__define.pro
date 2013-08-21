@@ -119,10 +119,10 @@ pro mggrx3d::_traverse, tree, indent=indent
   format = '(%"unsupported class in graphics tree: %s")'
 
   case 1 of
-    obj_isa(tree, 'IDLgrView'): self->_writeView, tree, indent=_indent
-    obj_isa(tree, 'IDLgrModel'): self->_writeModel, tree, indent=_indent
-    obj_isa(tree, 'IDLgrPolygon'): self->_writePolygon, tree, indent=_indent
-    obj_isa(tree, 'IDLgrPolyline'): self->_writePolyline, tree, indent=_indent
+    obj_isa(tree, 'IDLgrView'): self->_writeIDLgrView, tree, indent=_indent
+    obj_isa(tree, 'IDLgrModel'): self->_writeIDLgrModel, tree, indent=_indent
+    obj_isa(tree, 'IDLgrPolygon'): self->_writeIDLgrPolygon, tree, indent=_indent
+    obj_isa(tree, 'IDLgrPolyline'): self->_writeIDLgrPolyline, tree, indent=_indent
     obj_isa(tree, 'IDLgrLight'):
     else: message, string(obj_class(tree), format=format)
   endcase
@@ -143,7 +143,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3d::_writeView, tree, indent=indent
+pro mggrx3d::_writeIDLgrView, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, color=color, viewplane_rect=vpr, eye=eye
@@ -179,7 +179,7 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3d::_writeModel, tree, indent=indent
+pro mggrx3d::_writeIDLgrModel, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, transform=transform
@@ -209,10 +209,16 @@ end
 ;    indent : in, required, type=string
 ;       indent string
 ;-
-pro mggrx3d::_writePolygon, tree, indent=indent
+pro mggrx3d::_writeIDLgrPolygon, tree, indent=indent
   compile_opt strictarr
 
   tree->getProperty, data=pts, polygons=polygons, color=color
+  self->_writePolygon, pts, polygons, color, indent=indent
+end
+
+
+pro mggrx3d::_writePolygon, pts, polygons, color, indent=indent
+  compile_opt strictarr
   ;normals = compute_mesh_normals(vertices, polygons)
 
   coord_pts = strjoin(strtrim(reform(pts, n_elements(pts)), 2), ' ')
@@ -246,7 +252,41 @@ pro mggrx3d::_writePolygon, tree, indent=indent
   printf, self.lun, indent, self.indent, format='(%"%s%s</indexedfaceset>")'
 
   printf, self.lun, indent, format='(%"%s</shape>")'
+end
 
+
+;+
+; Write output for a `IDLgrPolyline` object.
+;
+; :Private:
+;
+; :Params:
+;    tree : in, required, type=objref
+;       object graphics hierarchy to draw
+;
+; :Keywords:
+;    indent : in, required, type=string
+;       indent string
+;-
+pro mggrx3d::_writeIDLgrPolyline, tree, indent=indent
+  compile_opt strictarr
+
+  ; pts = fltarr(3, n)
+  ; colors = bytarr(3, n)
+  tree->getProperty, data=pts, vert_colors=colors
+  dims = size(pts, /dimensions)
+
+  for p = 0L, dims[1] - 1L do begin
+    printf, self.lun, indent, pts[0, p], pts[1, p], pts[2, p], $
+            format='(%"%s<transform translation=''%f %f %f''>")'
+    printf, self.lun, indent, format='(%"%s  <shape>")'
+    printf, self.lun, indent, format='(%"%s    <sphere radius=''0.02''/>")'
+    printf, self.lun, indent, format='(%"%s    <appearance>")'
+    printf, self.lun, indent, format='(%"%s      <material diffuseColor=''0 1 1''/>")'
+    printf, self.lun, indent, format='(%"%s    </appearance>")'
+    printf, self.lun, indent, format='(%"%s  </shape>")'
+    printf, self.lun, indent, format='(%"%s</transform>")'
+  endfor
 end
 
 
