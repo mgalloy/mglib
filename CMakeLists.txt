@@ -59,7 +59,7 @@ if (IDLdoc_FOUND)
   )
 
   add_custom_target(dcdoc
-    COMMAND ${IDL_EXECUTABLE} -e mg_dcdoc_library
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_dcdoc_library
   )
 endif ()
 
@@ -87,19 +87,21 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${MGLIB_PACKAGE_VERSION}-${MG
 
 include(CPack)
 
-
 install(FILES
           COPYING.rst
           INSTALL.rst
           README.rst
         DESTINATION .)
+install(DIRECTORY
+          examples
+        DESTINATION examples)
 
 if (IDLdoc_FOUND)
-  install(DIRECTORY api-docs DESTINATION .)
-  install(DIRECTORY api-userdocs DESTINATION .)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-docs DESTINATION .)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-userdocs DESTINATION .)
 endif ()
 
-add_custom_target(dist
-  COMMAND ${CMAKE_MAKE_PROGRAM} package
-  COMMENT "custom target to create distribution")
-#add_dependencies(dist doc userdoc)
+# add_custom_target(dist
+#   COMMAND ${CMAKE_MAKE_PROGRAM} package
+#   COMMENT "custom target to create distribution")
+# add_dependencies(dist doc userdoc)
