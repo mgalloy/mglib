@@ -319,6 +319,7 @@ IDL_VPTR IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
     default:
       IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "unknown type");
   }
+  return(IDL_GettmpLong(0));  // needed to not get a compiler warning
 }
 
 
