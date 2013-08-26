@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm -rf build
+
 rm -rf _CPack_Packages
 rm -f  CPackConfig.cmake
 rm -f  CPackSourceConfig.cmake
