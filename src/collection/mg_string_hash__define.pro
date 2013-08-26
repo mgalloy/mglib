@@ -145,7 +145,7 @@ function mg_string_hash::hasKeys, keys
           if (nkeys eq 0L) then _keys = keys else begin
             _keys = keys->toArray(type=7)
             if (self.fold_case) then _keys = strlowcase(_keys)
-          endif
+          endelse
         endif else message, 'invalid key type'
       end
     size(keys, /type) eq 7: _keys = self.fold_case ? strlowcase(keys) : keys
