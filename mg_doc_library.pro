@@ -6,10 +6,12 @@
 pro mg_doc_library
   compile_opt strictarr
   
-  root = mg_src_root()   ; location of this file
+  args = command_line_args(count=nargs)
+
+  root = nargs gt 1L ? args[0] : mg_src_root()   ; location of this file
 
   idldoc, root=filepath('src', root=root), $
-          output=filepath('api-docs', root=root), $
+          output=filepath('api-docs', root='.'), $
           overview=filepath('overview.txt', root=root), $
           footer=filepath('footer.html', root=root), $
           title='mglib', $
