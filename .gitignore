@@ -13,3 +13,4 @@ _CPack_Packages/
 install_manifest.txt
 mglib-*.tar.gz
 TestIDLVersion.c
+build
