@@ -4,7 +4,7 @@ set(DLM_NAME mg_${DIRNAME})
 if (GSL_INCLUDE_DIR AND GSL_LIBRARY_DIR)
   add_custom_command(
     OUTPUT mg_gsl.${IDL_PLATFORM_EXT}.${IDL_DLL_EXT}
-    COMMAND ${IDL_EXECUTABLE} -quiet -IDL_QUIET 1 -e \"mg_make_gsl_bindings, header_directory='${GSL_INCLUDE_DIR}', lib_directory='${GSL_LIBRARY_DIR}'\"
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -quiet -IDL_QUIET 1 -e \"mg_make_gsl_bindings, header_directory='${GSL_INCLUDE_DIR}', lib_directory='${GSL_LIBRARY_DIR}'\"
     DEPENDS
       mg_gsl_sf_ellint_bindings.h
       mg_gsl_sf_zeta_bindings.h

@@ -25,6 +25,9 @@ else ()
 endif ()
 
 find_package(IDL REQUIRED)
+find_package(IDLdoc)
+find_package(mgunit)
+
 
 # always need IDL's include files
 include_directories(${IDL_INCLUDE_DIR})
@@ -38,21 +41,33 @@ file(GLOB_RECURSE SAV_FILES "src/*.sav")
 file(GLOB_RECURSE IDLDOC_FILES "src/*.idldoc")
 
 
-add_custom_target(doc
-  COMMAND ${IDL_EXECUTABLE} -e mg_doc_library
-)
+if (WIN32 OR CYGWIN)
+  set(SEP_CHAR ";")
+else ()
+  set(SEP_CHAR ":")
+endif ()
 
-add_custom_target(userdoc
-  COMMAND ${IDL_EXECUTABLE} -e mg_userdoc_library
-)
+if (IDLdoc_FOUND)
+  add_custom_target(doc
+    ALL
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_doc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 
-add_custom_target(dcdoc
-  COMMAND ${IDL_EXECUTABLE} -e mg_dcdoc_library
-)
+  add_custom_target(userdoc
+    ALL
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_userdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 
-add_custom_target(unit
-  COMMAND ${IDL_EXECUTABLE} -quiet -e mg_run_unittests
-)
+  add_custom_target(dcdoc
+    COMMAND ${IDL_EXECUTABLE} -e mg_dcdoc_library
+  )
+endif ()
+
+if (mgunit_FOUND)
+  add_custom_target(unit
+    COMMAND ${IDL_EXECUTABLE} -quiet -e mg_run_unittests
+  )
+endif ()
 
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
@@ -78,17 +93,13 @@ install(FILES
           INSTALL.rst
           README.rst
         DESTINATION .)
-install(
-  FILES
-    mg_doc_library.pro
-    mg_userdoc_library.pro
-  DESTINATION .
-)
-#install(DIRECTORY api-docs DESTINATION .)
-#install(DIRECTORY api-userdocs DESTINATION .)
 
+if (IDLdoc_FOUND)
+  install(DIRECTORY api-docs DESTINATION .)
+  install(DIRECTORY api-userdocs DESTINATION .)
+endif ()
 
 add_custom_target(dist
   COMMAND ${CMAKE_MAKE_PROGRAM} package
   COMMENT "custom target to create distribution")
-add_dependencies(dist doc userdoc)
+#add_dependencies(dist doc userdoc)
