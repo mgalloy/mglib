@@ -19,8 +19,10 @@ if (GSL_INCLUDE_DIR AND GSL_LIBRARY_DIR)
       "mg_gsl.c;mg_gsl.dlm;mg_gsl.${IDL_PLATFORM_EXT}.${IDL_DLL_EXT}"
   )
 
-  install(FILES ${DLM_NAME}.${IDL_PLATFORM_EXT}.${IDL_DLL_EXT}
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.${IDL_PLATFORM_EXT}.${IDL_DLL_EXT}
     DESTINATION lib/${DIRNAME}
   )
-  install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm
+    DESTINATION lib/${DIRNAME}
+  )
 endif ()
