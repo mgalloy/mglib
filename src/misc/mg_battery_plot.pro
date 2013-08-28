@@ -54,6 +54,9 @@ pro mg_battery_plot
 
   xyouts, 0.5, 0.95, 'feynman battery life', alignment=0.5, /normal, charsize=0.8
 
+  oplot, mg_epoch2julian(times), current_capacity, $
+         psym=mg_usersym(/circle), symsize=0.15, color=mg_rgb2index(rgb[8, *])
+
   for c = 0L, n_elements(cycles) - 2L do begin
     plots, fltarr(2) + mg_epoch2julian(times[cycles[c]]), !y.crange, $
            color=mg_rgb2index(rgb[3, *]), thick=4
@@ -72,9 +75,6 @@ pro mg_battery_plot
          thick=4, color=mg_rgb2index(rgb[8, *])
   xyouts, mg_epoch2julian(times[-1]), design_capacity[-1] + ygap, 'design capacity', /data, $
           alignment=1.0, charsize=0.6, color=mg_rgb2index(rgb[8, *])
-
-  oplot, mg_epoch2julian(times), current_capacity, $
-         psym=mg_usersym(/circle), symsize=0.15
 
   mg_decomposed, odec
   mg_psend
