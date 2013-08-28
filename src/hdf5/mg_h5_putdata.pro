@@ -227,7 +227,7 @@ pro mg_h5_putdata_putattributedata, id, attname, attvalue, $
   endelse
 
   ; scalars and arrays are created differently
-  if (size(data, /n_dimensions) eq 0L) then begin
+  if (size(attvalue, /n_dimensions) eq 0L) then begin
     dataspaceId = h5s_create_scalar()
   endif else begin
     dataspaceId = h5s_create_simple(size(attvalue, /dimensions))
