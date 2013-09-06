@@ -66,8 +66,13 @@ end
 ;
 ; :Returns:
 ;    string
+;
+; :Keywords:
+;    preamble
+;      string/string array of code to be inserted after declarations, but before
+;      argument checking
 ;-
-function mg_routinebinding::output
+function mg_routinebinding::output, preamble=preamble
   compile_opt strictarr
 
   output = ''
@@ -89,6 +94,14 @@ function mg_routinebinding::output
     output += string(mg_newline(), $
                      mg_idltype(*self.returnType, /declaration), $
                      format='(%"%s  %s result;")')
+  endif
+
+  if (n_elements(preamble) gt 0L) then begin
+    foreach p, preamble do begin
+      output += string(mg_newline(), $
+                       p, $
+                       format='(%"%s  %s")')
+    endforeach
   endif
 
   if (n_elements(self.parameters) gt 0L) then begin
@@ -160,8 +173,8 @@ function mg_routinebinding::output
 
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
-                     mg_idltype(*self.returnType, /declaration), $
-                     format='(%"%s  return MG_get_%s(result);")')
+                     mg_idltype(*self.returnType, /tmp_routine), $
+                     format='(%"%s  return %s(result);")')
   endif
 
   output += string(mg_newline(), format='(%"%s}")')

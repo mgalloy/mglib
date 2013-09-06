@@ -87,9 +87,9 @@ function mg_routinePoundDefineAccessor::output
 
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
-                     mg_idltype(*self.returnType, /declaration), $
+                     mg_idltype(*self.returnType, /tmp_routine), $
                      self.name, $
-                     format='(%"%s  return MG_get_%s(%s);")')
+                     format='(%"%s  return %s(%s);")')
   endif
 
   output += string(mg_newline(), format='(%"%s}")')
