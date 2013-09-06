@@ -43,7 +43,6 @@
 ;   `MGffOptions` object
 ;
 ; :Examples:
-;
 ;   For example, suppose the following configuration file is in `config.ini`::
 ;
 ;     [My Section]
@@ -52,7 +51,7 @@
 ;     long: this value continues
 ;        in the next line
 ;
-;   It can be read into an `mgffoptions` object with::
+;   It can be read into an `MGffOptions` object with::
 ;
 ;     IDL> config = mg_read_config('config.ini')
 ;
@@ -62,6 +61,11 @@
 ;        1
 ;     IDL> print, config->get('foodir', section='My Section')
 ;     frob/whatever
+;
+;   This example is found as a main-level program at the end of this file. Run
+;   it with::
+;
+;     IDL> .run mg_read_config
 ;
 ; :Params:
 ;   filename : in, required, type=string
@@ -151,7 +155,8 @@ function mg_read_config, filename, $
             h->put, name, value, section=section_name
           endif
 
-          tokens = stregex(line, '^([[:alnum:]_$]+)[[:space:]]*[=:](.*)', /extract, /subexpr)
+          tokens = stregex(line, '^([[:alnum:]_$]+)[[:space:]]*[=:](.*)', $
+                           /extract, /subexpr)
           name = tokens[1]
           value = strtrim(tokens[2], 2)
 
@@ -179,4 +184,13 @@ function mg_read_config, filename, $
   if (continuing) then h->put, name, value, section=section_name
 
   return, h
+end
+
+
+; main-level example program
+
+config = mg_read_config(filepath('config.ini', root=mg_src_root()))
+print, config->has_option('foodir', section='My Section')
+print, config->get('foodir', section='My Section')
+
 end

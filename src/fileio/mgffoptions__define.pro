@@ -9,6 +9,8 @@
 ; :Properties:
 ;   fold_case
 ;     set for case-insensitive matching for section and option names.
+;   sections
+;     array of section names
 ;-
 
 
@@ -16,6 +18,8 @@
 
 
 ;+
+; Overload method to handle accessing options via array indexing notation.
+;
 ; :Examples:
 ;   For example::
 ;
@@ -26,6 +30,17 @@
 ;     IDL> config->put, 'State', 'Wisconsin', section='Mark'
 ;     IDL> print, config['Mike', 'City']
 ;     Boulder
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   isRange : in, required, type=bytarr
+;     unused
+;   ss1 : in, required, type=string
+;     option name if `ss2` not given, section name if `ss2` given
+;   ss2 : in, optional, type=string, default=''
+;     option name if present
 ;-
 function mgffoptions::_overloadBracketsRightSide, isRange, ss1, ss2
   compile_opt strictarr
@@ -45,6 +60,38 @@ function mgffoptions::_overloadBracketsRightSide, isRange, ss1, ss2
 end
 
 
+;+
+; Overload method to handle setting option values using array notation.
+;
+; :Examples:
+;   For example::
+;
+;     IDL> config = mgffoptions()
+;     IDL> config['Mike', 'City'] = 'Boulder'
+;     IDL> config['Mike', 'State'] = 'Colorado'
+;     IDL> config['Mark', 'City'] = 'Madison'
+;     IDL> config['Mark', 'State'] = 'Wisconsin'
+;     IDL> print, config
+;     [ Mark ]
+;     City:   Madison
+;     State:  Wisconsin
+;
+;     [ Mike ]
+;     City:   Boulder
+;     State:  Colorado
+;
+; :Params:
+;   obj : in, required, type=MGffOptions object
+;     `MGffOptions` object, should be `self`
+;   value : in, required, type=string
+;     value from the right-hand side of the expression
+;   isRange : in, required, type=bytarr
+;     unused
+;   ss1 : in, required, type=string
+;     option name if `ss2` not given, section name if `ss2` given
+;   ss2 : in, optional, type=string, default=''
+;     option name if present
+;-
 pro mgffoptions::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
   compile_opt strictarr
 
@@ -64,6 +111,8 @@ end
 
 
 ;+
+; Loop through sections of a `MGffOptions` object.
+;
 ; :Examples:
 ;   Try::
 ;
@@ -77,6 +126,16 @@ end
 ;     IDL>          format='(%"%s lives in %s, %s.")'
 ;     Mark lives in Madison, Wisconsin.
 ;     Mike lives in Boulder, Colorado.
+;
+;
+; :Returns:
+;   1 if there is an element to return, 0 if there are no elements to retrieve
+;
+; :Params:
+;   value : in, required, type=string
+;     sections hash
+;   key : in, required, type=string
+;     section name
 ;-
 function mgffoptions::_overloadForeach, value, key
   compile_opt strictarr
@@ -109,11 +168,17 @@ end
 
 
 ;+
+; Print help message about an `MGffOptions` object.
+;
 ; :Examples:
 ;   For example::
 ;
 ;     IDL> help, config
 ;     CONFIG          MGFFOPTIONS  <NSECTIONS=2  NOPTIONS=4>
+;
+; :Params:
+;   varname : in, required, type=string
+;     `MGffOptions` object variable name
 ;-
 function mgffoptions::_overloadHelp, varname
   compile_opt strictarr
@@ -128,6 +193,9 @@ end
 
 
 ;+
+; Print `MGffOptions` object content in an INI format that can be read by
+; `MG_READ_CONFIG`.
+;
 ; :Examples:
 ;   For example::
 ;
@@ -179,7 +247,7 @@ function mgffoptions::_overloadPrint
 end
 
 
-; property access
+;= property access
 
 ;+
 ; Retrieve properties of the options object.
@@ -198,6 +266,19 @@ end
 ;= get, put, and query
 
 
+;+
+; Put a new option into the `MGffOptions` object.
+;
+; :Params:
+;   option : in, required, type=string
+;     option name
+;   value : in, required, type=string
+;     option value
+;
+; :Keywords:
+;   section : in, optional, type=string, default=''
+;     section name to place option in
+;-
 pro mgffoptions::put, option, value, section=section
   compile_opt strictarr
 
@@ -414,6 +495,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Fields:
 ;   fold_case
 ;     set to 1 for case-insensitive, 0 for case-sensitive
