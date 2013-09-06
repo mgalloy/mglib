@@ -276,10 +276,13 @@ end
 ; :Keywords:
 ;   section : in, required, type=string
 ;     section to list options for
+;   count : out, optional, type=long
+;     set to a named variable to retrieve the number of options returned
 ;-
-function mgffoptions::options, section=section
+function mgffoptions::options, section=section, count=count
   compile_opt strictarr
 
+  count = 0L
   _section = n_elements(section) eq 0L ? '' : section
 
   if (self.fold_case) then begin
@@ -289,6 +292,7 @@ function mgffoptions::options, section=section
   if (~self->has_section(_section)) then return, []
 
   option_list = self.sections[_section]->keys()
+  count = option_list->count()
   options = option_list->toArray()
   obj_destroy, option_list
 
