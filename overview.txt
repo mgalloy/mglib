@@ -13,6 +13,8 @@ IDL library of Michael Galloy.
     various algorithms (sorting, sampling, etc.) and math helper routines
   animation/
     classes to produce animations using object graphics
+  calendar/
+    routines to deal with dates/times
   cmdline_tools/
     routines useful at the IDL command line
   collection/

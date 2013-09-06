@@ -12,8 +12,11 @@
 pro mg_write_config, filename, config
   compile_opt strictarr
 
-  output = config->_overloadPrint()
   openw, lun, filename, /get_lun
+
+  ; could do "printf, lun, config", but that wouldn't work pre-IDL 8.0
+  output = config->_overloadPrint()
   printf, lun, output
+
   free_lun, lun
 end

@@ -4,6 +4,26 @@
 ; `MG_XML_BROWSER` is a widget program to browse the contents of an XML file
 ; (either a local file or an URL).
 ;
+; :Examples:
+;   Both local files and URLs can be accessed. For example, to load an example
+;   XML file that comes with IDL, do::
+;
+;     planets = filepath('planets.xml', subdir=['examples', 'data'])
+;     mg_xml_browser, planets
+;
+;   This should result in something like:
+;
+;   .. image:: xml_browser.png
+;
+;   To browse an XML file from the Internet, try::
+;
+;     url = 'http://michaelgalloy.com/feed'
+;     mg_xml_browser, url, /url
+;
+;   This should result in something like:
+;
+;   .. image:: xml_browser_url.png
+;
 ; :Categories:
 ;    xml, fileio
 ;
@@ -11,6 +31,9 @@
 ;    Michael Galloy
 ;-
 
+;+
+; :Private:
+;-
 pro mg_xml_browser_parser::startElement, uri, local, name, attName, attValue
   compile_opt strictarr
 
@@ -23,6 +46,9 @@ pro mg_xml_browser_parser::startElement, uri, local, name, attName, attValue
 end
 
 
+;+
+; :Private:
+;-
 pro mg_xml_browser_parser::endElement, uri, local, name
   compile_opt strictarr
 
@@ -30,6 +56,9 @@ pro mg_xml_browser_parser::endElement, uri, local, name
 end
 
 
+;+
+; :Private:
+;-
 pro mg_xml_browser_parser::characters, chars
   compile_opt strictarr
 
@@ -39,6 +68,9 @@ pro mg_xml_browser_parser::characters, chars
 end
 
 
+;+
+; :Private:
+;-
 function mg_xml_browser_parser::init, root=root
   compile_opt strictarr
 
@@ -49,6 +81,9 @@ function mg_xml_browser_parser::init, root=root
 end
 
 
+;+
+; :Private:
+;-
 pro mg_xml_browser_parser__define
   compile_opt strictarr
 
@@ -61,6 +96,8 @@ end
 
 ;+
 ; Resize the browser to the given size.
+;
+; :Private:
 ;
 ; :Params:
 ;    tlb : in, required, type=long
@@ -91,6 +128,8 @@ end
 ;+
 ; Expand or contract the widget tree.
 ;
+; :Private:
+;
 ; :Params:
 ;    tlb : in, required, type=long
 ;       widget identifier of top-level base
@@ -109,6 +148,8 @@ end
 
 ;+
 ; Handle all events.
+;
+; :Private:
 ;
 ; :Params:
 ;    event : in, required, type=structure
@@ -135,6 +176,8 @@ end
 ;+
 ; Cleanup resources claimed by the widget program.
 ;
+; :Private:
+;
 ; :Params:
 ;    tlb : in, required, type=long
 ;       top-level base widget identifier
@@ -149,13 +192,13 @@ end
 ; Start a widget program to browse an XML file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename or URL to browse
+;   filename : in, required, type=string
+;     filename or URL to browse
 ;
 ; :Keywords:
-;    url : in, optional, type=boolean
-;       set to specify an URL instead of a local filename for the filename
-;       positional parameter
+;   url : in, optional, type=boolean
+;     set to specify an URL instead of a local filename for the filename
+;     positional parameter
 ;-
 pro mg_xml_browser, filename, url=url
   compile_opt strictarr
@@ -201,12 +244,13 @@ pro mg_xml_browser, filename, url=url
             cleanup='mg_xml_browser_cleanup'
 end
 
+
 ; main-level program as an example of using MG_XML_BROWSER
 
 planets = filepath('planets.xml', subdir=['examples', 'data'])
 mg_xml_browser, planets
 
-url = 'http://opendap.gsfc.nasa.gov:9090/dods/catalog.xml'
+url = 'http://michaelgalloy.com/feed'
 mg_xml_browser, url, /url
 
 end
