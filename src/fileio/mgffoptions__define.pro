@@ -63,6 +63,21 @@ pro mgffoptions::_overloadBracketsLeftSide, obj, value, isRange, ss1, ss2
 end
 
 
+;+
+; :Examples:
+;   Try::
+;
+;     IDL> config = mgffoptions()
+;     IDL> config->put, 'City', 'Boulder', section='Mike'
+;     IDL> config->put, 'State', 'Colorado', section='Mike'
+;     IDL> config->put, 'City', 'Madison', section='Mark'
+;     IDL> config->put, 'State', 'Wisconsin', section='Mark'
+;     IDL> foreach section, config, section_name do $
+;     IDL>   print, section_name, section['City'], section['State'], $
+;     IDL>          format='(%"%s lives in %s, %s.")'
+;     Mark lives in Madison, Wisconsin.
+;     Mike lives in Boulder, Colorado.
+;-
 function mgffoptions::_overloadForeach, value, key
   compile_opt strictarr
 
@@ -93,6 +108,13 @@ function mgffoptions::_overloadForeach, value, key
 end
 
 
+;+
+; :Examples:
+;   For example::
+;
+;     IDL> help, config
+;     CONFIG          MGFFOPTIONS  <NSECTIONS=2  NOPTIONS=4>
+;-
 function mgffoptions::_overloadHelp, varname
   compile_opt strictarr
 
@@ -105,6 +127,19 @@ function mgffoptions::_overloadHelp, varname
 end
 
 
+;+
+; :Examples:
+;   For example::
+;
+;     IDL> print, config
+;     [ Mark ]
+;     City:   Madison
+;     State:  Wisconsin
+;
+;     [ Mike ]
+;     City:   Boulder
+;     State:  Colorado
+;-
 function mgffoptions::_overloadPrint
   compile_opt strictarr
 
@@ -146,6 +181,9 @@ end
 
 ; property access
 
+;+
+; Retrieve properties of the options object.
+;-
 pro mgffoptions::getProperty, sections=sections
   compile_opt strictarr
 
@@ -183,6 +221,37 @@ pro mgffoptions::put, option, value, section=section
 end
 
 
+;+
+; Determine if an options object has a given section.
+;
+; :Returns:
+;   1B if section present, 0B if not
+;
+; :Params:
+;   section : in, required, type=string
+;     section to check
+;-
+function mgffoptions::has_section, section
+  compile_opt strictarr
+
+  return, self.sections->hasKey(self.fold_case ? strlowcase(section) : section)
+end
+
+
+;+
+; Determine if a particular section has a given option.
+;
+; :Returns:
+;   1B if option present, 0B if not
+;
+; :Params:
+;   option : in, required, type=string
+;     option to check
+;
+; :Keywords:
+;   section : in, required, type=string
+;     section to check
+;-
 function mgffoptions::has_option, option, section=section
   compile_opt strictarr
 
@@ -195,10 +264,66 @@ function mgffoptions::has_option, option, section=section
   endif
 
   return, self.sections->hasKey(_section) && self.sections[_section]->hasKey(_option)
-
 end
 
 
+;+
+; Return an array of the option names for a given section.
+;
+; :Returns:
+;   `strarr`, or `!null` if no options present
+;
+; :Keywords:
+;   section : in, required, type=string
+;     section to list options for
+;-
+function mgffoptions::options, section=section
+  compile_opt strictarr
+
+  _section = n_elements(section) eq 0L ? '' : section
+
+  if (self.fold_case) then begin
+    _section = strlowcase(_section)
+  endif
+
+  if (~self->has_section(_section)) then return, []
+
+  option_list = self.sections[_section]->keys()
+  options = option_list->toArray()
+  obj_destroy, option_list
+
+  return, options
+end
+
+
+;+
+; Return value for a given option.
+;
+; :Returns:
+;   string or string array
+;
+; :Params:
+;   option : in, required, type=string
+;     option name to retrieve value for
+;
+; :Keywords:
+;   section : in, optional, type=string, default=''
+;     section to search for option in
+;   found : out, optional, type=boolean
+;     set to a named variable to determine if the option is found
+;   raw : in, optional, type=boolean
+;     set to retrieve value with no processing
+;   extract : in, optional, type=boolean
+;     set to return an array of the elements in a value that is formatted like::
+;
+;       [0, 1, 2]
+;
+;   count : out, optional, type=long
+;     set to a named variable to determine the number of elements returned (most
+;     useful when using `EXTRACT`)
+;   default : in, optional, type=string
+;     default value to return if option is not found
+;-
 function mgffoptions::get, option, $
                            section=section, $
                            found=found, $
@@ -321,9 +446,8 @@ config->put, 'City', 'Boulder', section='Mike'
 config->put, 'State', 'Colorado', section='Mike'
 config->put, 'City', 'Madison', section='Mark'
 config->put, 'State', 'Wisconsin', section='Mark'
-foreach section, config, section_name do begin
+foreach section, config, section_name do $
   print, section_name, section['City'], section['State'], $
          format='(%"%s lives in %s, %s.")'
-endforeach
 
 end
