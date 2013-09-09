@@ -1,4 +1,4 @@
 #!/bin/sh
 
-git submodule foreach --recursive git pull
+git submodule foreach --recursive git pull origin master
 git pull
