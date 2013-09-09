@@ -5,7 +5,7 @@ include_directories(".")
 
 add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 
-if (APPLE)
+if (UNIX)
   set_target_properties("${DLM_NAME}"
     PROPERTIES
       SUFFIX ".${IDL_PLATFORM_EXT}.so"
