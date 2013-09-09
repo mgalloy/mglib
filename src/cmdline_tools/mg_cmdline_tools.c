@@ -3,6 +3,8 @@
 
 #include "idl_export.h"
 
+static FILE *outf_fp;
+static int diverting = 0;
 
 static IDL_MSG_DEF msg_arr[] = {
 #define M_MG_WRONG_TYPE       0
@@ -90,6 +92,38 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
+void mg_tout_outf(int flags, char *buf, int n) {
+  char *output = (char *) malloc(strlen(buf) + 1);
+
+  strncpy(output, buf, n);
+  output[n] = '\0';
+  
+  printf("%s", output);
+  if (flags & IDL_TOUT_F_NLPOST) printf("\n");
+  fprintf(outf_fp, "%s", output);
+  if (flags & IDL_TOUT_F_NLPOST) fprintf(outf_fp, "\n");
+
+  free(output);
+}
+
+
+static void IDL_CDECL IDL_mg_tout_push(int argc, IDL_VPTR *argv) {
+  if (diverting) {
+    IDL_ToutPop();
+  } else diverting = 1;
+
+  IDL_ENSURE_STRING(argv[0]);
+  outf_fp = fopen(IDL_VarGetString(argv[0]), "w");
+
+  IDL_ToutPush(mg_tout_outf);
+}
+
+
+static void IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
+  IDL_ToutPop();
+}
+
+
 int IDL_Load(void) {
   /*
      These tables contain information on the functions and procedures
@@ -104,7 +138,9 @@ int IDL_Load(void) {
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
-    { (IDL_SYSRTN_GENERIC) IDL_mg_print,    "MG_PRINT",    0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_print,     "MG_PRINT",     0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_tout_push, "MG_TOUT_PUSH", 1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_tout_pop,  "MG_TOUT_POP",  0, 0, 0, 0 },
   };
 
   if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM",
