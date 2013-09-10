@@ -66,8 +66,13 @@ end
 ;
 ; :Returns:
 ;    string
+;
+; :Keywords:
+;    preamble
+;      string/string array of code to be inserted after declarations, but before
+;      argument checking
 ;-
-function mg_routinePoundDefineAccessor::output
+function mg_routinePoundDefineAccessor::output, preamble=preamble
   compile_opt strictarr
 
   output = ''
@@ -84,7 +89,13 @@ function mg_routinePoundDefineAccessor::output
                    self.cprefix, $
                    self.name, $
                    format='(%"static %s %s_%s(int argc, IDL_VPTR *argv, char *argk) {")')
-
+  if (n_elements(preamble) gt 0L) then begin
+    foreach p, preamble do begin
+      output += string(mg_newline(), $
+                       p, $
+                       format='(%"%s  %s")')
+    endforeach
+  endif
   if (returnTypeStr ne 'void') then begin
     output += string(mg_newline(), $
                      mg_idltype(*self.returnType, /tmp_routine), $
