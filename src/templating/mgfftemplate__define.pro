@@ -600,9 +600,11 @@ pro mgfftemplate::_process_insert, output_lun, spaces=spaces
 
   openr, insertLun, filename, /get_lun
   line = ''
+  i = 0L
   while (~eof(insertLun)) do begin
     readf, insertLun, line
-    self->_printf, output_lun, spaces + line
+    self->_printf, output_lun, (i eq 0L ? '' : spaces) + line
+    i++
   endwhile
   free_lun, insertLun
 end
