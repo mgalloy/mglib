@@ -3,8 +3,13 @@
 
 #include "idl_export.h"
 
-static FILE *outf_fp;
+#define OUTF_BUFFER_BLOCKSIZE 1024
+
 static int diverting = 0;
+static FILE *outf_fp = 0;
+static char *outf_buffer = 0;
+static int outf_buffer_loc = 0;
+static int outf_buffer_size = 0;
 
 static IDL_MSG_DEF msg_arr[] = {
 #define M_MG_WRONG_TYPE       0
@@ -92,18 +97,42 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
-void mg_tout_outf(int flags, char *buf, int n) {
+void mg_tout_outf_file(int flags, char *buf, int n) {
   char *output = (char *) malloc(strlen(buf) + 1);
 
   strncpy(output, buf, n);
   output[n] = '\0';
   
-  printf("%s", output);
-  if (flags & IDL_TOUT_F_NLPOST) printf("\n");
+//  printf("%s", output);
+//  if (flags & IDL_TOUT_F_NLPOST) printf("\n");
   fprintf(outf_fp, "%s", output);
   if (flags & IDL_TOUT_F_NLPOST) fprintf(outf_fp, "\n");
 
   free(output);
+}
+
+
+void mg_tout_outf_buffer(int flags, char *buf, int n) {
+  int n_extra_chars = flags & IDL_TOUT_F_NLPOST;
+  int new_size = 2 * outf_buffer_size;
+  char *tmp_buffer;
+
+  // make a new buffer if the old one is too small
+  if (outf_buffer_loc + n + n_extra_chars > outf_buffer_size) {
+    // find the required size
+    while(outf_buffer_loc + n + n_extra_chars < new_size) new_size *= 2;
+
+    tmp_buffer = (char *) malloc(new_size);
+    strncpy(tmp_buffer, outf_buffer, outf_buffer_loc);
+
+    free(outf_buffer);
+    outf_buffer = tmp_buffer;
+    tmp_buffer = 0;
+  }
+
+  strncpy(outf_buffer + outf_buffer_loc, buf, n);
+  if (flags & IDL_TOUT_F_NLPOST) sprintf(outf_buffer + outf_buffer_loc + n, "\n");
+  outf_buffer_loc += n + n_extra_chars;
 }
 
 
@@ -112,15 +141,44 @@ static void IDL_CDECL IDL_mg_tout_push(int argc, IDL_VPTR *argv) {
     IDL_ToutPop();
   } else diverting = 1;
 
-  IDL_ENSURE_STRING(argv[0]);
-  outf_fp = fopen(IDL_VarGetString(argv[0]), "w");
+  if (argc > 0) {
+    IDL_ENSURE_STRING(argv[0]);
+    outf_fp = fopen(IDL_VarGetString(argv[0]), "w");
+    IDL_ToutPush(mg_tout_outf_file);
+  } else {
+    outf_buffer_loc = 0;
+    outf_buffer_size = OUTF_BUFFER_BLOCKSIZE;
+    outf_buffer = (char *) malloc(OUTF_BUFFER_BLOCKSIZE);
+    IDL_ToutPush(mg_tout_outf_buffer);
+  }
 
-  IDL_ToutPush(mg_tout_outf);
 }
 
 
-static void IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
+  char *output;
+  IDL_VPTR result;
+
   IDL_ToutPop();
+
+  if (outf_buffer_size == 0) {
+    fclose(outf_fp);
+    return IDL_GettmpLong(-1);
+  } else {
+    output = (char *) malloc(outf_buffer_loc + 1);
+    strncpy(output, outf_buffer, outf_buffer_loc);
+    output[outf_buffer_loc] = '\0';
+
+    free(outf_buffer);
+    outf_buffer_loc = 0;
+    outf_buffer_size = 0;
+
+    result = IDL_StrToSTRING(output);
+
+    free(output);
+
+    return(result);
+  }
 }
 
 
@@ -135,12 +193,12 @@ int IDL_Load(void) {
     { IDL_mg_termcolumns,   "MG_TERMCOLUMNS",   0, 0, 0, 0 },
     { IDL_mg_termistty,     "MG_TERMISTTY",     0, 0, 0, 0 },
     { IDL_mg_heapid,        "MG_HEAPID",        1, 1, 0, 0 },
+    { IDL_mg_tout_pop,      "MG_TOUT_POP",      0, 0, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC) IDL_mg_print,     "MG_PRINT",     0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { (IDL_SYSRTN_GENERIC) IDL_mg_tout_push, "MG_TOUT_PUSH", 1, 1, 0, 0 },
-    { (IDL_SYSRTN_GENERIC) IDL_mg_tout_pop,  "MG_TOUT_POP",  0, 0, 0, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_tout_push, "MG_TOUT_PUSH", 0, 1, 0, 0 },
   };
 
   if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM",
