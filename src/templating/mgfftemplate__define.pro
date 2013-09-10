@@ -282,6 +282,30 @@ end
 
 
 ;+
+; Make a string array which has an empty first element and all the rest are
+; given by `spaces`.
+;
+; :Private:
+;
+; :Returns:
+;   `strarr`
+;
+; :Params:
+;   spaces : in, required, type=string
+;     string to prefix all elements of the returned array by (except first)
+;   n : in, required, type=integer
+;     number of elements in returned array
+;-
+function mgfftemplate_makespace, spaces, n
+  compile_opt strictarr
+
+  result = strarr(n)
+  if (n gt 1L) then result[1:*] = spaces
+  return, result
+end
+
+
+;+
 ; Wrapper for PRINTF that recognizes LUN=-3 as /dev/null.
 ;
 ; :Private:
@@ -726,13 +750,16 @@ end
 ;       value of the expression evaluated
 ;    found : out, optional, type=boolean
 ;       true if the expression was evaluated without error
+;    spaces : in, optional, type=integer, default=0
+;       number of spaces to indent the include
 ;-
 pro mgfftemplate::_process_variable, mgfftemplate$expression, $
                                      mgfftemplate$variables, $
                                      mgfftemplate$output_lun, $
                                      post_delim=mgfftemplate$post_delim, $
                                      value=mgfftemplate$value, $
-                                     found=mgfftemplate$result
+                                     found=mgfftemplate$result, $
+                                     spaces=mgfftemplate$spaces
   compile_opt strictarr, logical_predicate
   on_error, 2
 
@@ -762,7 +789,11 @@ pro mgfftemplate::_process_variable, mgfftemplate$expression, $
   mgfftemplate$result = execute('mgfftemplate$value = ' + mgfftemplate$expression, 1, 1)
   if (mgfftemplate$result) then begin
     if (~arg_present(mgfftemplate$value)) then begin
-      self->_printf, mgfftemplate$output_lun, mgfftemplate$value, format='(A, $)'
+      self->_printf, mgfftemplate$output_lun, $
+                     mgfftemplate_makespace(mgfftemplate$spaces, $
+                                            n_elements(mgfftemplate$value)) $
+                       + mgfftemplate$value, $
+                     format='(A, $)'
     endif
   endif else begin
     mgfftemplate$line = self.tokenizer->getCurrentLine(number=mgfftemplate$lineNumber)
@@ -820,7 +851,7 @@ pro mgfftemplate::_process_tokens, variables, output_lun, $
         end
         else : begin
           self->_process_variable, command, variables, output_lun, $
-                                   post_delim=post_delim
+                                   post_delim=post_delim, spaces=spaces
         end
       endcase
     endif else if (strtrim(pre_delim, 2) eq '%]') then begin
