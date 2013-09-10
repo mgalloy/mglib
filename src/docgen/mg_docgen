@@ -1,0 +1,3 @@
+#!/bin/sh
+
+idl -quiet -e "mg_docgen, '$0'"
