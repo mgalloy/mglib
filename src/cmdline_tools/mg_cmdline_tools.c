@@ -113,16 +113,16 @@ void mg_tout_outf_file(int flags, char *buf, int n) {
 
 
 void mg_tout_outf_buffer(int flags, char *buf, int n) {
-  int n_extra_chars = flags & IDL_TOUT_F_NLPOST;
+  int n_extra_chars = flags & IDL_TOUT_F_NLPOST ? 1 : 0;
   int new_size = 2 * outf_buffer_size;
   char *tmp_buffer;
 
   // make a new buffer if the old one is too small
   if (outf_buffer_loc + n + n_extra_chars > outf_buffer_size) {
     // find the required size
-    while(outf_buffer_loc + n + n_extra_chars < new_size) new_size *= 2;
-
-    tmp_buffer = (char *) malloc(new_size);
+    while(outf_buffer_loc + n + n_extra_chars > new_size) new_size *= 2;
+    outf_buffer_size = new_size;
+    tmp_buffer = (char *) malloc(outf_buffer_size);
     strncpy(tmp_buffer, outf_buffer, outf_buffer_loc);
 
     free(outf_buffer);
@@ -131,7 +131,9 @@ void mg_tout_outf_buffer(int flags, char *buf, int n) {
   }
 
   strncpy(outf_buffer + outf_buffer_loc, buf, n);
-  if (flags & IDL_TOUT_F_NLPOST) sprintf(outf_buffer + outf_buffer_loc + n, "\n");
+  if (flags & IDL_TOUT_F_NLPOST) {
+    sprintf(outf_buffer + outf_buffer_loc + n, "\n");
+  }
   outf_buffer_loc += n + n_extra_chars;
 }
 
@@ -165,9 +167,9 @@ static IDL_VPTR IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
     fclose(outf_fp);
     return IDL_GettmpLong(-1);
   } else {
-    output = (char *) malloc(outf_buffer_loc + 1);
+    output = (char *) malloc(outf_buffer_loc);
     strncpy(output, outf_buffer, outf_buffer_loc);
-    output[outf_buffer_loc] = '\0';
+    output[outf_buffer_loc - 1] = '\0';
 
     free(outf_buffer);
     outf_buffer_loc = 0;
