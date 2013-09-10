@@ -742,11 +742,11 @@ obj_destroy, f
 ; normally, the routines in just compiled DLM can't be called until IDL returns
 ; to the command line, but EXECUTE, CALL_PROCEDURE, and CALL_FUNCTION can be
 ; used to get around this
-print, 'Calling a routine from the created DLM...'
-print, call_function('IDL_OutputFormatFunc', 5L), $
-       format='(%"Default double format: %s")'
-
-print, 'Accessing a #define from idl_export.h...'
-print, call_function('idl_typ_undef'), format='(%"#define IDL_TYP_UNDEF %d")'
+; print, 'Calling a routine from the created DLM...'
+; print, call_function('IDL_OutputFormatFunc', 5L), $
+;        format='(%"Default double format: %s")'
+;
+; print, 'Accessing a #define from idl_export.h...'
+; print, call_function('idl_typ_undef'), format='(%"#define IDL_TYP_UNDEF %d")'
 
 end
