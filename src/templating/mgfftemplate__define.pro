@@ -598,12 +598,15 @@ pro mgfftemplate::_process_insert, output_lun, spaces=spaces
     message, 'filename ' + filename + ' not found', /noname
   endif
 
+  nlines = file_lines(filename)
   openr, insertLun, filename, /get_lun
   line = ''
   i = 0L
   while (~eof(insertLun)) do begin
     readf, insertLun, line
-    self->_printf, output_lun, (i eq 0L ? '' : spaces) + line
+    self->_printf, output_lun, $
+                   (i eq 0L ? '' : spaces) + line, $
+                   format=(i eq nlines - 1L) ? '(A, $)' : '(A)'
     i++
   endwhile
   free_lun, insertLun
@@ -817,7 +820,7 @@ pro mgfftemplate::_process_tokens, variables, output_lun, $
         end
         else : begin
           self->_process_variable, command, variables, output_lun, $
-            post_delim=post_delim
+                                   post_delim=post_delim
         end
       endcase
     endif else if (strtrim(pre_delim, 2) eq '%]') then begin
