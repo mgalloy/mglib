@@ -155,7 +155,7 @@ function mg_idltype_tmp_routine, type_code
      4: return, 'IDL_GettmpFloat'
      5: return, 'IDL_GettmpDouble'
      6: return, 'MG_GettmpComplex'
-     7: return, 'IDL_TYP_STRING'
+     7: return, 'IDL_StrToSTRING'
      8: return, 'IDL_TYP_STRUCT'
      9: return, 'MG_GettmpDComplex'
     10: return, 'IDL_GettmpPtr'
