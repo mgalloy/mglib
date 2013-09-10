@@ -7,3 +7,8 @@ indicating the files that `mg_docgen` should process. For example, this tutorial
 is produced with the following `docgen.ini` file:
 
     [% INSERT docgen.ini %]
+
+This contains an `IDL` section, which specifies the template input files (and
+the output filename) that should be run through IDL. Other sections can be
+present and accessed in the templates.
+  
