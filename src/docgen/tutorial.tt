@@ -1,0 +1,9 @@
+`mg_docgen` is a utility to produce text output that combines static written
+text and the output from IDL. This is perfect for writing tutorials on how to
+use an IDL routine, documenting your scientific process, etc.
+
+Using `mg_docgen` is easy. You will need to create a `docgen.ini` in a directory
+indicating the files that `mg_docgen` should process. For example, this tutorial
+is produced with the following `docgen.ini` file:
+
+    [% INSERT docgen.ini %]

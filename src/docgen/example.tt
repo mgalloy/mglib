@@ -1,0 +1,8 @@
+This is an example template.
+
+This is an example of running some simple code: 1 + 1 = [% strtrim(1 + 1, 2) %].
+
+You can also put things in the `docgen.ini` file and retrieve them in your
+template. For example, the answer to life, the universe, and everything is
+[% config->get('answer', section='My section') %].
+
