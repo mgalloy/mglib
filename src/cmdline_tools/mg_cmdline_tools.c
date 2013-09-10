@@ -189,7 +189,7 @@ static IDL_VPTR IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
 
 
 // char *IDL_OutputFormatFunc(int type)
-static IDL_VPTR IDL_IDL_OutputFormatFunc(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_IDL_OutputFormatFunc(int argc, IDL_VPTR *argv, char *argk) {
   char *result;
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0])
@@ -199,7 +199,7 @@ static IDL_VPTR IDL_IDL_OutputFormatFunc(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 // int IDL_OutputFormatLenFunc(int type)
-static IDL_VPTR IDL_IDL_OutputFormatLenFunc(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_IDL_OutputFormatLenFunc(int argc, IDL_VPTR *argv, char *argk) {
   IDL_LONG result;
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0])
@@ -209,7 +209,7 @@ static IDL_VPTR IDL_IDL_OutputFormatLenFunc(int argc, IDL_VPTR *argv, char *argk
 }
 
 // int IDL_TypeSizeFunc(int type)
-static IDL_VPTR IDL_IDL_TypeSizeFunc(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_IDL_TypeSizeFunc(int argc, IDL_VPTR *argv, char *argk) {
   IDL_LONG result;
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0])
@@ -219,7 +219,7 @@ static IDL_VPTR IDL_IDL_TypeSizeFunc(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 // char *IDL_TypeNameFunc(int type)
-static IDL_VPTR IDL_IDL_TypeNameFunc(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_IDL_TypeNameFunc(int argc, IDL_VPTR *argv, char *argk) {
   char *result;
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0])
@@ -229,12 +229,12 @@ static IDL_VPTR IDL_IDL_TypeNameFunc(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 // void IDL_TTYReset()
-static void IDL_IDL_TTYReset(int argc, IDL_VPTR *argv, char *argk) {
+static void IDL_CDECL IDL_IDL_TTYReset(int argc, IDL_VPTR *argv, char *argk) {
   IDL_TTYReset();
 }
 
 // IDL_LONG64 IDL_SysRtnNumEnabled(int is_function, int enabled)
-static IDL_VPTR IDL_IDL_SysRtnNumEnabled(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_IDL_SysRtnNumEnabled(int argc, IDL_VPTR *argv, char *argk) {
   IDL_LONG64 result;
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0])
