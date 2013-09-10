@@ -129,7 +129,7 @@ function mg_read_config, filename, $
     is_comment = stregex(line, '^[[:space:]]*[;#]', /boolean)
     is_section = stregex(line, '^\[', /boolean)
     is_blank = stregex(line, '^[[:space:]]*$', /boolean)
-    is_variable = stregex(line, '^[[:alnum:]_$]+[[:space:]]*[=:]', /boolean)
+    is_variable = stregex(line, '^[-.[:alnum:]_$]+[[:space:]]*[=:]', /boolean)
     is_continuation = stregex(line, '^[[:space:]]+', /boolean)
 
     case 1 of
@@ -155,7 +155,7 @@ function mg_read_config, filename, $
             h->put, name, value, section=section_name
           endif
 
-          tokens = stregex(line, '^([[:alnum:]_$]+)[[:space:]]*[=:](.*)', $
+          tokens = stregex(line, '^([-.[:alnum:]_$]+)[[:space:]]*[=:](.*)', $
                            /extract, /subexpr)
           name = tokens[1]
           value = strtrim(tokens[2], 2)
