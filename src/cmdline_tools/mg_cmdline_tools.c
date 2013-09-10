@@ -14,8 +14,12 @@ static int outf_buffer_size = 0;
 static IDL_MSG_DEF msg_arr[] = {
 #define M_MG_WRONG_TYPE       0
   {  "M_MG_WRONG_TYPE",   "%NInput must be of type pointer or object." },
+#define MG_INCORRECT_TYPE_ERROR -1
+  { "MG_INCORRECT_TYPE_ERROR", "%Nincorrect type for parameter '%s'" },
   };
 static IDL_MSG_BLOCK msg_block;
+
+#define MG_ENSURE_TYPE(v,t,var) { if ((v)->type != t) IDL_MessageFromBlock(msg_block, MG_INCORRECT_TYPE_ERROR, IDL_MSG_RET, var); }
 
 
 #ifdef WIN32
@@ -184,6 +188,66 @@ static IDL_VPTR IDL_CDECL IDL_mg_tout_pop(int argc, IDL_VPTR *argv) {
 }
 
 
+// char *IDL_OutputFormatFunc(int type)
+static IDL_VPTR IDL_IDL_OutputFormatFunc(int argc, IDL_VPTR *argv, char *argk) {
+  char *result;
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0])
+  MG_ENSURE_TYPE(argv[0], IDL_TYP_LONG, "int type")
+  result = (char *) IDL_OutputFormatFunc(argv[0]->value.l);   // int type
+  return IDL_StrToSTRING(result);
+}
+
+// int IDL_OutputFormatLenFunc(int type)
+static IDL_VPTR IDL_IDL_OutputFormatLenFunc(int argc, IDL_VPTR *argv, char *argk) {
+  IDL_LONG result;
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0])
+  MG_ENSURE_TYPE(argv[0], IDL_TYP_LONG, "int type")
+  result = (IDL_LONG) IDL_OutputFormatLenFunc(argv[0]->value.l);   // int type
+  return IDL_GettmpLong(result);
+}
+
+// int IDL_TypeSizeFunc(int type)
+static IDL_VPTR IDL_IDL_TypeSizeFunc(int argc, IDL_VPTR *argv, char *argk) {
+  IDL_LONG result;
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0])
+  MG_ENSURE_TYPE(argv[0], IDL_TYP_LONG, "int type")
+  result = (IDL_LONG) IDL_TypeSizeFunc(argv[0]->value.l);   // int type
+  return IDL_GettmpLong(result);
+}
+
+// char *IDL_TypeNameFunc(int type)
+static IDL_VPTR IDL_IDL_TypeNameFunc(int argc, IDL_VPTR *argv, char *argk) {
+  char *result;
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0])
+  MG_ENSURE_TYPE(argv[0], IDL_TYP_LONG, "int type")
+  result = (char *) IDL_TypeNameFunc(argv[0]->value.l);   // int type
+  return IDL_StrToSTRING(result);
+}
+
+// void IDL_TTYReset()
+static void IDL_IDL_TTYReset(int argc, IDL_VPTR *argv, char *argk) {
+  IDL_TTYReset();
+}
+
+// IDL_LONG64 IDL_SysRtnNumEnabled(int is_function, int enabled)
+static IDL_VPTR IDL_IDL_SysRtnNumEnabled(int argc, IDL_VPTR *argv, char *argk) {
+  IDL_LONG64 result;
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0])
+  MG_ENSURE_TYPE(argv[0], IDL_TYP_LONG, "int is_function")
+  IDL_ENSURE_SIMPLE(argv[1]);
+  IDL_ENSURE_SCALAR(argv[1])
+  MG_ENSURE_TYPE(argv[1], IDL_TYP_LONG, "int enabled")
+  result = (IDL_LONG64) IDL_SysRtnNumEnabled(argv[0]->value.l,   // int is_function
+                                             argv[1]->value.l);   // int enabled
+  return IDL_GettmpLong64(result);
+}
+
+
 int IDL_Load(void) {
   /*
      These tables contain information on the functions and procedures
@@ -191,16 +255,22 @@ int IDL_Load(void) {
      tables must be identical to that contained in cmdline_tools.dlm.
   */
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { IDL_mg_termlines,     "MG_TERMLINES",     0, 0, 0, 0 },
-    { IDL_mg_termcolumns,   "MG_TERMCOLUMNS",   0, 0, 0, 0 },
-    { IDL_mg_termistty,     "MG_TERMISTTY",     0, 0, 0, 0 },
-    { IDL_mg_heapid,        "MG_HEAPID",        1, 1, 0, 0 },
-    { IDL_mg_tout_pop,      "MG_TOUT_POP",      0, 0, 0, 0 },
+    { IDL_mg_termlines,            "MG_TERMLINES",            0, 0, 0, 0 },
+    { IDL_mg_termcolumns,          "MG_TERMCOLUMNS",          0, 0, 0, 0 },
+    { IDL_mg_termistty,            "MG_TERMISTTY",            0, 0, 0, 0 },
+    { IDL_mg_heapid,               "MG_HEAPID",               1, 1, 0, 0 },
+    { IDL_mg_tout_pop,             "MG_TOUT_POP",             0, 0, 0, 0 },
+    { IDL_IDL_OutputFormatFunc,    "MG_OUTPUTFORMATFUNC",     1, 1, 0, 0 },
+    { IDL_IDL_OutputFormatLenFunc, "MG_OUTPUTFORMATLENFUNC",  1, 1, 0, 0 },
+    { IDL_IDL_TypeSizeFunc,        "MG_TYPESIZEFUNC",         1, 1, 0, 0 },
+    { IDL_IDL_TypeNameFunc,        "MG_TYPENAMEFUNC",         1, 1, 0, 0 },
+    { IDL_IDL_SysRtnNumEnabled,    "MG_SYSRTNNUMENABLED",     2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC) IDL_mg_print,     "MG_PRINT",     0, IDL_MAXPARAMS, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { (IDL_SYSRTN_GENERIC) IDL_mg_tout_push, "MG_TOUT_PUSH", 0, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_IDL_TTYReset, "MG_TTYRESET",  0, 0, 0, 0 },
   };
 
   if (!(msg_block = IDL_MessageDefineBlock("MG_Cmdline_tools_DLM",
