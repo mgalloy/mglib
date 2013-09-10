@@ -11,4 +11,9 @@ is produced with the following `docgen.ini` file:
 This contains an `IDL` section, which specifies the template input files (and
 the output filename) that should be run through IDL. Other sections can be
 present and accessed in the templates.
-  
+
+    [% INSERT example.tt %]
+
+This should produce:
+
+    [% INSERT example.rst %]
