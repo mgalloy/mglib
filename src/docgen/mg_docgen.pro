@@ -16,9 +16,9 @@ pro mg_docgen, root
   configuration_filename = filepath('docgen.ini', root=_root)
   config = mg_read_config(configuration_filename)
 
-  files = config->options(section='IDL')
+  files = config->options(section='Templates')
   foreach f, files do begin
-    output_filename = config->get(f, section='IDL')
+    output_filename = config->get(f, section='Templates')
     print, f, output_filename, format='(%"Processing %s (%s)...")'
     t = obj_new('MGffTemplate', f)
     t->process, { config: config }, output_filename

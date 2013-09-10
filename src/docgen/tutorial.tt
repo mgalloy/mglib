@@ -17,3 +17,12 @@ present and accessed in the templates.
 This should produce:
 
     [% INSERT example.rst %]
+
+You can capture the output from running code with the `CAPTURE` template
+directive. For example, do:
+
+    mg_capture('print, findgen(10)')
+
+This yields:
+
+[% mg_capture('print, findgen(10)') %]
