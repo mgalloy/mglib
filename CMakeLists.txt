@@ -65,7 +65,7 @@ endif ()
 
 if (mgunit_FOUND)
   add_custom_target(unit
-    COMMAND ${IDL_EXECUTABLE} -quiet -e mg_run_unittests
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${mgunit_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -quiet -e mg_run_unittests
   )
 endif ()
 
