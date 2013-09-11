@@ -85,7 +85,7 @@
 //}
 
 
-static IDL_VPTR IDL_mg_rasterpolyline(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_rasterpolyline(int argc, IDL_VPTR *argv) {
   IDL_VPTR x, y, polylines, dims, xrange, yrange, result;
   int *result_data;
 

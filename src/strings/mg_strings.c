@@ -22,16 +22,16 @@ struct mg_regmatch {
 typedef struct mg_regmatch mg_regmatch_t;
 
 
-static IDL_VPTR IDL_mg_strsplit(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_strsplit(int argc, IDL_VPTR *argv) {
   return IDL_GettmpLong(5);
 }
 
-mg_regmatch_t *mg_getamatches(regex_t *preg,
-                              char *input, int offset, int input_length,
-                              int cost_ins, int cost_del, int cost_subst,
-                              int max_cost, int max_del, int max_err,
-                              int max_ins, int max_subst,
-                              int find_all) {
+static mg_regmatch_t *mg_getamatches(regex_t *preg,
+				     char *input, int offset, int input_length,
+				     int cost_ins, int cost_del, int cost_subst,
+				     int max_cost, int max_del, int max_err,
+				     int max_ins, int max_subst,
+				     int find_all) {
 
   regamatch_t amatch;
   regaparams_t match_params;
@@ -114,7 +114,7 @@ mg_regmatch_t *mg_getamatches(regex_t *preg,
 
 
 
-static IDL_VPTR IDL_mg_stregex(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_mg_stregex(int argc, IDL_VPTR *argv, char *argk) {
   typedef struct {
     IDL_KW_RESULT_FIRST_FIELD;
     IDL_LONG all;
@@ -217,34 +217,34 @@ static IDL_VPTR IDL_mg_stregex(int argc, IDL_VPTR *argv, char *argk) {
                     "invalid collating element referenced in regex");
       case REG_ECTYPE:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "unknown character class name in regex");
+			  "unknown character class name in regex");
       case REG_EESCAPE:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "last character of regex was a backslash");
+			  "last character of regex was a backslash");
       case REG_ESUBREG:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "invalid back reference in regex");
+			  "invalid back reference in regex");
       case REG_EBRACK:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "unbalanced [] in regex");
+			  "unbalanced [] in regex");
       case REG_EPAREN:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "unbalanced parentheses in regex");
+			  "unbalanced parentheses in regex");
       case REG_EBRACE:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "unbalanced braces in regex");
+			  "unbalanced braces in regex");
       case REG_BADBR:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "content invalid in regex");
+			  "content invalid in regex");
       case REG_ERANGE:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "invalid character range in regex");
+			  "invalid character range in regex");
       case REG_ESPACE:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "out of memory in regex");
+			  "out of memory in regex");
       case REG_BADRPT:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-		                "invalid use of repetition operators in regex");
+			  "invalid use of repetition operators in regex");
       default:
 	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "invalid regex");
     }
@@ -397,7 +397,7 @@ static IDL_VPTR IDL_mg_stregex(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
-static IDL_VPTR IDL_mg_tre_config(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_mg_tre_config(int argc, IDL_VPTR *argv, char *argk) {
   typedef struct {
     IDL_KW_RESULT_FIRST_FIELD;
     IDL_LONG approximate;
@@ -461,7 +461,7 @@ static IDL_VPTR IDL_mg_tre_config(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
-static IDL_VPTR IDL_mg_tre_version(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_tre_version(int argc, IDL_VPTR *argv) {
   return IDL_StrToSTRING(tre_version());
 }
 
@@ -469,9 +469,9 @@ static IDL_VPTR IDL_mg_tre_version(int argc, IDL_VPTR *argv) {
 int IDL_Load(void) {
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_mg_tre_version, "MG_TRE_VERSION", 0, 0, 0, 0 },
-    { IDL_mg_tre_config, "MG_TRE_CONFIG", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_mg_stregex, "MG_STREGEX", 2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_mg_strsplit, "MG_STRSPLIT", 2, 2, 0, 0 },
+    { IDL_mg_tre_config,  "MG_TRE_CONFIG",  0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_mg_stregex,     "MG_STREGEX",     2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_mg_strsplit,    "MG_STRSPLIT",    2, 2, 0, 0 },
   };
 
   return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));

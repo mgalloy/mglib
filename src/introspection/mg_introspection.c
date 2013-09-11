@@ -2,21 +2,7 @@
 #include "idl_export.h"
 
 
-static IDL_VPTR get_IDL_long(int l) {
-  IDL_VPTR idl_l;
-  if ((idl_l = IDL_Gettmp()) == (IDL_VPTR) NULL) {
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-                "Could not create temporary variable");
-  }
-
-  idl_l->type = IDL_TYP_LONG;
-  idl_l->value.l = (IDL_LONG) l;
-
-  return idl_l;
-}
-
-
-IDL_VPTR IDL_mg_sizeof(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_sizeof(int argc, IDL_VPTR *argv) {
   IDL_ARRAY arr;
   int s;
   IDL_VPTR v = argv[0];
@@ -32,11 +18,8 @@ IDL_VPTR IDL_mg_sizeof(int argc, IDL_VPTR *argv) {
     s += sizeof((*v).value.s);
   }
 
-  return get_IDL_long(s);
+  return IDL_GettmpLong(s);
 }
-
-
-
 
 
 int IDL_Load(void) {

@@ -5,22 +5,22 @@
 
 static IDL_USER_INFO user_info;
 
-IDL_VPTR IDL_mg_loginname(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_loginname(int argc, IDL_VPTR *argv) {
   return IDL_StrToSTRING(user_info.logname);
 }
 
 
-IDL_VPTR IDL_mg_homedir(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_homedir(int argc, IDL_VPTR *argv) {
   return IDL_StrToSTRING(user_info.homedir);
 }
 
 
-IDL_VPTR IDL_mg_pid(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_pid(int argc, IDL_VPTR *argv) {
   return IDL_StrToSTRING(user_info.pid);
 }
 
 
-IDL_VPTR IDL_mg_hostname(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_hostname(int argc, IDL_VPTR *argv) {
   return IDL_StrToSTRING(user_info.host);
 }
 

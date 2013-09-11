@@ -33,16 +33,16 @@ static IDL_MSG_DEF msg_arr[] = {
 static IDL_MSG_BLOCK msg_block;
 
 
-static IDL_VPTR IDL_mg_zlib_version(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_CDECL IDL_mg_zlib_version(int argc, IDL_VPTR *argv) {
   return(IDL_StrToSTRING(zlibVersion()));
 }
 
 
-static void IDL_mg_compress(int argc, IDL_VPTR *argv) {
+static void IDL_CDECL IDL_mg_compress(int argc, IDL_VPTR *argv) {
 }
 
 
-static void IDL_mg_decompress(int argc, IDL_VPTR *argv) {
+static void IDL_CDECL IDL_mg_decompress(int argc, IDL_VPTR *argv) {
 }
 
 

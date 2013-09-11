@@ -23,11 +23,11 @@ static IDL_MSG_BLOCK msg_block;
 
 
 #ifdef WIN32
-int MG_FileTermIsTty(void) {
+static int MG_FileTermIsTty(void) {
   return 0;
 }
 #else
-int MG_FileTermIsTty(void) {
+static int MG_FileTermIsTty(void) {
   return IDL_FileTermIsTty();
 }
 #endif
@@ -101,7 +101,7 @@ static void IDL_CDECL IDL_mg_print(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
-void mg_tout_outf_file(int flags, char *buf, int n) {
+static void mg_tout_outf_file(int flags, char *buf, int n) {
   char *output = (char *) malloc(strlen(buf) + 1);
 
   strncpy(output, buf, n);
@@ -116,7 +116,7 @@ void mg_tout_outf_file(int flags, char *buf, int n) {
 }
 
 
-void mg_tout_outf_buffer(int flags, char *buf, int n) {
+static void mg_tout_outf_buffer(int flags, char *buf, int n) {
   int n_extra_chars = flags & IDL_TOUT_F_NLPOST ? 1 : 0;
   int new_size = 2 * outf_buffer_size;
   char *tmp_buffer;

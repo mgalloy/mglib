@@ -10,7 +10,7 @@
 #define MG_C_ABS(z) sqrt(z.r*z.r + z.i*z.i)
 
 #define MG_ARRAY_EQUAL_ARR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS)  \
-int mg_array_equal_ ## TYPE ## _arr2arr(int n,                              \
+static int mg_array_equal_ ## TYPE ## _arr2arr(int n,                       \
                                         TYPE *arr1, TYPE *arr2,             \
                                         TOLERANCE_TYPE tolerance) {         \
   int i;                                                                    \
@@ -35,7 +35,7 @@ MG_ARRAY_EQUAL_ARR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs)
 MG_ARRAY_EQUAL_ARR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, labs)
 
 #define MG_ARRAY_EQUAL_SCALAR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS) \
-int mg_array_equal_ ## TYPE ## _scalar2arr(int n,                             \
+static int mg_array_equal_ ## TYPE ## _scalar2arr(int n,                      \
                                            TYPE scalar, TYPE *arr,            \
                                            TOLERANCE_TYPE tolerance) {        \
   int i;                                                                      \
@@ -60,7 +60,7 @@ MG_ARRAY_EQUAL_SCALAR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs)
 MG_ARRAY_EQUAL_SCALAR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, labs)
 
 #define MG_ARRAY_EQUAL_SCALAR2SCALAR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS) \
-int mg_array_equal_ ## TYPE ## _scalar2scalar(TYPE scalar1, TYPE scalar2,        \
+static int mg_array_equal_ ## TYPE ## _scalar2scalar(TYPE scalar1, TYPE scalar2, \
                                               TOLERANCE_TYPE tolerance) {        \
   int i;                                                                         \
   TYPE d, a1 = scalar1, a2 = scalar2;                                            \
@@ -106,7 +106,7 @@ MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, labs)
       break;
 
 
-IDL_VPTR IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
   int is_equal, nargs;
 
   typedef struct {
@@ -227,7 +227,7 @@ IDL_VPTR IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *argk) {
 //
 //    http://en.wikipedia.org/wiki/Kahan_summation_algorithm
 #define IDL_MG_TOTAL_TYPE(TYPE, IDL_TYPE, INIT)                              \
-IDL_VPTR IDL_mg_total_ ## IDL_TYPE (IDL_VPTR arg) {                          \
+static IDL_VPTR IDL_CDECL IDL_mg_total_ ## IDL_TYPE (IDL_VPTR arg) {         \
   TYPE sum = INIT, c = INIT, y = INIT, t = INIT;                             \
   int i;                                                                     \
                                                                              \
@@ -243,7 +243,7 @@ IDL_VPTR IDL_mg_total_ ## IDL_TYPE (IDL_VPTR arg) {                          \
 }
 
 #define IDL_MG_TOTAL_CTYPE(TYPE, IDL_TYPE, INIT, FIELD, TYPE_CODE)           \
-IDL_VPTR IDL_mg_total_ ## IDL_TYPE (IDL_VPTR arg) {                          \
+static IDL_VPTR IDL_CDECL IDL_mg_total_ ## IDL_TYPE (IDL_VPTR arg) {         \
   IDL_VPTR result;                                                           \
   TYPE sum, c, y, t;                                                         \
                                                                              \
@@ -291,7 +291,7 @@ IDL_MG_TOTAL_TYPE(IDL_ULONG, ULong, 0)
 IDL_MG_TOTAL_TYPE(IDL_LONG64, Long64, 0)
 IDL_MG_TOTAL_TYPE(IDL_ULONG64, ULong64, 0)
 
-IDL_VPTR IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
+static IDL_VPTR IDL_CDECL IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
   IDL_ENSURE_ARRAY(argv[0]);
   switch (argv[0]->type) {
     case IDL_TYP_BYTE:
