@@ -49,12 +49,10 @@ endif ()
 
 if (IDLdoc_FOUND)
   add_custom_target(doc
-    ALL
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_doc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
   add_custom_target(userdoc
-    ALL
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_userdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
@@ -101,7 +99,10 @@ if (IDLdoc_FOUND)
   install(DIRECTORY ${CMAKE_BINARY_DIR}/api-userdocs DESTINATION .)
 endif ()
 
-# add_custom_target(dist
-#   COMMAND ${CMAKE_MAKE_PROGRAM} package
-#   COMMENT "custom target to create distribution")
-# add_dependencies(dist doc userdoc)
+add_custom_target(dist
+  COMMAND ${CMAKE_MAKE_PROGRAM} package
+  COMMENT "custom target to create distribution")
+
+if (IDLdoc_FOUND)
+  add_dependencies(dist doc userdoc)
+endif ()
