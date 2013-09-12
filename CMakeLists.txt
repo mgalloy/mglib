@@ -95,8 +95,12 @@ install(DIRECTORY
         DESTINATION examples)
 
 if (IDLdoc_FOUND)
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-docs DESTINATION .)
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-userdocs DESTINATION .)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-docs DESTINATION . OPTIONAL)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/api-userdocs DESTINATION . OPTIONAL)
+endif ()
+
+if (mgunit_FOUND)
+  install(DIRECTORY unit DESTINATION .)
 endif ()
 
 add_custom_target(dist
