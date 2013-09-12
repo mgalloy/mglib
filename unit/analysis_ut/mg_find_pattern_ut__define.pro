@@ -1,4 +1,4 @@
-function mg_find_pattern_ut::test1
+function mg_find_pattern_ut::test_basic
   compile_opt strictarr
 
   n = 1000L
