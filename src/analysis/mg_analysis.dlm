@@ -29,7 +29,7 @@ FUNCTION MG_ARRAY_EQUAL      2 2 KEYWORDS
 #+
 # Uses the Kahan summation algorithm::
 #
-#   http://en.wikipedia.org/wiki/Kahan_summation_algorithm>
+#   http://en.wikipedia.org/wiki/Kahan_summation_algorithm
 #
 # :Returns:
 #   total of elements of array
