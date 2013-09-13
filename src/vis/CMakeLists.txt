@@ -2,6 +2,7 @@ get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 add_subdirectory(animation)
 add_subdirectory(color)
+add_subdirectory(directgraphics)
 add_subdirectory(flow)
 add_subdirectory(geometry)
 add_subdirectory(googlechart)
