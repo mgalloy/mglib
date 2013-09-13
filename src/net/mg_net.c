@@ -93,8 +93,8 @@ static IDL_SYSFUN_DEF2 net_functions[] = {
   one. Codes must be monotonic and contiguous.
  */
 static IDL_MSG_DEF msg_arr[] = {
-  { "MG_NET_ERROR",	  "%NError: %s." },
-  { "MG_NET_BADTYPE",	"%NUnsupproted data type: %s." },
+  { "MG_NET_ERROR", "%NError: %s." },
+  { "MG_NET_BADTYPE", "%NUnsupproted data type: %s." },
 };
 
 

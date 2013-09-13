@@ -1,0 +1,9 @@
+MODULE        mg_introspection
+DESCRIPTION   Tools for introspection
+VERSION       ${VERSION}
+SOURCE        mgalloy
+BUILD_DATE    ${mglib_BUILD_DATE}
+
+
+FUNCTION  MG_SIZEOF  1 1
+

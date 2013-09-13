@@ -1,8 +1,8 @@
-MODULE mg_cmdline_tools
-DESCRIPTION Tools for the command line
-VERSION 1.2
-SOURCE mgalloy
-BUILD_DATE March 6, 2009
+MODULE        mg_cmdline_tools
+DESCRIPTION   Tools for the command line
+VERSION       ${VERSION}
+SOURCE        mgalloy
+BUILD_DATE    ${mglib_BUILD_DATE}
 
 FUNCTION   MG_TERMLINES                     0    0
 FUNCTION   MG_TERMCOLUMNS                   0    0

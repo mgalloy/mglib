@@ -1,0 +1,7 @@
+MODULE        mg_markdown
+DESCRIPTION   IDL bindings for markdown
+VERSION       ${VERSION}
+SOURCE        mgalloy
+BUILD_DATE    ${mglib_BUILD_DATE}
+
+FUNCTION  MG_MARKDOWN   1 1

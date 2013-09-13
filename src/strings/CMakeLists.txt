@@ -4,6 +4,7 @@ set(DLM_NAME mg_${DIRNAME})
 if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   include_directories(${TRE_INCLUDE_DIR})
 
+  configure_file("${DLM_NAME}.dlm.in" "${DLM_NAME}.dlm")
   add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
 
   if (APPLE)
@@ -24,7 +25,7 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
     RUNTIME DESTINATION lib/${DIRNAME}
     LIBRARY DESTINATION lib/${DIRNAME}
   )
-  install(FILES "${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
 
 file(GLOB PRO_FILES "*.pro")

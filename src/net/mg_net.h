@@ -15,8 +15,8 @@
 #define MG_NET_H
 
 /* message numbers */
-#define MG_NET_ERROR	0
-#define MG_NET_BADTYPE	-1
+#define MG_NET_ERROR     0
+#define MG_NET_BADTYPE  -1
 
 /* Handy macro */
 #define ARRLEN(arr) (sizeof(arr) / sizeof(arr[0]))
@@ -29,21 +29,21 @@ extern IDL_MSG_BLOCK msg_block;
  * on a read determines if byteswapping is necessary on the
  * read data.  ('IDLV')
  */
-#define	TOKEN	0x49444C56
-#define SWAPTOKEN	0x564C4449
+#define TOKEN       0x49444C56
+#define SWAPTOKEN   0x564C4449
 
 /* IDL variable packet header */
 typedef struct {
-	IDL_LONG token;
-	IDL_LONG type;
-	IDL_LONG ndims;
-	IDL_LONG len;
-	IDL_LONG nelts;
-	IDL_LONG dims[IDL_MAX_ARRAY_DIM];
+  IDL_LONG token;
+  IDL_LONG type;
+  IDL_LONG ndims;
+  IDL_LONG len;
+  IDL_LONG nelts;
+  IDL_LONG dims[IDL_MAX_ARRAY_DIM];
 } i_var;
 
-extern void byteswap(void *buffer, int len, int swapsize);
-extern void mg_net_exit_handler(void);
+static void byteswap(void *buffer, int len, int swapsize);
+static void mg_net_exit_handler(void);
 
 #endif
 

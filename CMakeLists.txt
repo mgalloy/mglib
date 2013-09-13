@@ -24,6 +24,9 @@ else ()
   set(REVISION "")
 endif ()
 
+include(${CMAKE_SOURCE_DIR}/mgcmake/GetDate.cmake)
+TODAY(mglib_BUILD_DATE)
+
 find_package(IDL REQUIRED)
 find_package(IDLdoc)
 find_package(mgunit)
