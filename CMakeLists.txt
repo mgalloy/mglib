@@ -25,7 +25,8 @@ else ()
 endif ()
 
 include(${CMAKE_SOURCE_DIR}/mgcmake/GetDate.cmake)
-TODAY(mglib_BUILD_DATE)
+LONG_TODAY(mglib_BUILD_DATE)
+message(STATUS "Build date = ${mglib_BUILD_DATE}")
 
 find_package(IDL REQUIRED)
 find_package(IDLdoc)
