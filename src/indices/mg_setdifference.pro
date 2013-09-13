@@ -6,24 +6,24 @@
 ; indicates the empty set.
 ;
 ; :Examples:
-;    For example, try::
+;   For example, try::
 ;
-;       IDL> print, mg_setdifference([0, 3, 5, 6, 9], [3, 5])
-;                  0           6           9
+;     IDL> print, mg_setdifference([0, 3, 5, 6, 9], [3, 5])
+;                0           6           9
 ;
 ; :Returns:
-;    `lonarr` or `-1L`
+;   `lonarr` or `-1L`
 ;
 ; :Params:
-;    ind1 : in, required, type=lonarr or -1L
-;       array of indices where `-1L` indicates an empty set of indices
-;    ind2 : in, required, type=lonarr or -1L
-;       array of indices where `-1L` indicates an empty set of indices
+;   ind1 : in, required, type=lonarr or -1L
+;     array of indices where `-1L` indicates an empty set of indices
+;   ind2 : in, required, type=lonarr or -1L
+;     array of indices where `-1L` indicates an empty set of indices
 ;
 ; :Keywords:
-;    count : out, optional, type=long
-;       set to a named variable to return the number of elements in the
-;       difference
+;   count : out, optional, type=long
+;     set to a named variable to return the number of elements in the
+;     difference
 ;-
 function mg_setdifference, ind1, ind2, count=count
   compile_opt strictarr
