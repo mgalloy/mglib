@@ -17,5 +17,6 @@ pro mg_userdoc_library
           footer=filepath('footer.html', root=root), $
           title='mglib', $
           subtitle='Personal IDL library for M. Galloy', $
-          /embed, index_level=1, format_style='rst', /use_latex
+          /embed, index_level=1, format_style='rst', /use_latex, $
+          /nosource
 end
