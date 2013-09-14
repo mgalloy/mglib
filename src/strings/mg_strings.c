@@ -27,11 +27,11 @@ static IDL_VPTR IDL_CDECL IDL_mg_strsplit(int argc, IDL_VPTR *argv) {
 }
 
 static mg_regmatch_t *mg_getamatches(regex_t *preg,
-				     char *input, int offset, int input_length,
-				     int cost_ins, int cost_del, int cost_subst,
-				     int max_cost, int max_del, int max_err,
-				     int max_ins, int max_subst,
-				     int find_all) {
+                                     char *input, int offset, int input_length,
+                                     int cost_ins, int cost_del, int cost_subst,
+                                     int max_cost, int max_del, int max_err,
+                                     int max_ins, int max_subst,
+                                     int find_all) {
 
   regamatch_t amatch;
   regaparams_t match_params;
@@ -216,37 +216,37 @@ static IDL_VPTR IDL_CDECL IDL_mg_stregex(int argc, IDL_VPTR *argv, char *argk) {
         IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
                     "invalid collating element referenced in regex");
       case REG_ECTYPE:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "unknown character class name in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "unknown character class name in regex");
       case REG_EESCAPE:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "last character of regex was a backslash");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "last character of regex was a backslash");
       case REG_ESUBREG:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "invalid back reference in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "invalid back reference in regex");
       case REG_EBRACK:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "unbalanced [] in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "unbalanced [] in regex");
       case REG_EPAREN:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "unbalanced parentheses in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "unbalanced parentheses in regex");
       case REG_EBRACE:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "unbalanced braces in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "unbalanced braces in regex");
       case REG_BADBR:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "content invalid in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "content invalid in regex");
       case REG_ERANGE:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "invalid character range in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "invalid character range in regex");
       case REG_ESPACE:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "out of memory in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "out of memory in regex");
       case REG_BADRPT:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
-			  "invalid use of repetition operators in regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+                    "invalid use of repetition operators in regex");
       default:
-	      IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "invalid regex");
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "invalid regex");
     }
   }
 
