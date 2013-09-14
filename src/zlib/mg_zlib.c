@@ -34,7 +34,7 @@ static IDL_MSG_BLOCK msg_block;
 
 
 static IDL_VPTR IDL_CDECL IDL_mg_zlib_version(int argc, IDL_VPTR *argv) {
-  return(IDL_StrToSTRING(zlibVersion()));
+  return(IDL_StrToSTRING(ZLIB_VERSION));
 }
 
 
