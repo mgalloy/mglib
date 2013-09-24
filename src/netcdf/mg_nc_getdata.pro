@@ -31,7 +31,7 @@
 ;   And then display::
 ;
 ;     IDL> dims = size(im, /dimensions)
-;     IDL window, /free, title=title, xsize=dims[0], ysize=dims[1]
+;     IDL> window, /free, title=title, xsize=dims[0], ysize=dims[1]
 ;     IDL> tvscl, im
 ;
 ;     IDL> window, /free, title='Profile at row = 256', xsize=600, ysize=200
