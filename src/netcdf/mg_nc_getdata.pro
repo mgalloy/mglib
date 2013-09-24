@@ -5,52 +5,37 @@
 ; an netCDF file with simple notation.
 ;
 ; :Todo:
-;    better error messages when items not found
-;    access for global attributes
+;   better error messages when items not found
+;   access for global attributes
 ;
 ; :Categories:
 ;    file i/o, netcdf, sdf
 ;
 ; :Examples:
-;    An example file is provided with the IDL distribution::
+;   An example file is provided with the IDL distribution::
 ;
-;       IDL> f = filepath('hdf5_test.h5', subdir=['examples', 'data'])
+;     IDL> sample_filename = file_which('sample.nc')
 ;
-;    A full dataset can be easily extracted::
+;   A full variable can be pulled out of the file easily::
 ;
-;       IDL> fullResult = mg_h5_getdata(f, '/arrays/3D int array')
+;     IDL> im = mg_nc_getdata(sample_filename, '/image')
 ;
-;    Slices can also be pulled out::
+;   Or an attribute::
 ;
-;       IDL> bounds = [[3, 3, 1], [5, 49, 2], [0, 49, 3]]
-;       IDL> res1 = mg_h5_getdata(f, '/arrays/3D int array', bounds=bounds)
-;       IDL> help, res1
-;       RESULT1         LONG      = Array[1, 23, 17]
+;     IDL> title = mg_nc_getdata(sample_filename, '/image.TITLE')
 ;
-;    Verify that the slice is the same as the slice pulled out of the
-;    fullResult::
+;   You can use basic IDL array notations to retrieve a portion of an array::
 ;
-;       IDL> same = array_equal(fullResult[3, 5:*:2, 0:49:3], res1)
-;       IDL> print, same ? 'equal' : 'error'
-;       equal
+;     IDL> line = mg_nc_getdata(sample_filename, '/image[*, 256]')
 ;
-;    Normal IDL array indexing notation can be used as well::
+;   And then display::
 ;
-;       IDL> bounds = '3, 5:*:2, 0:49:3'
-;       IDL> res2 = mg_h5_getdata(f, '/arrays/3D int array', bounds=bounds)
-;       IDL> print, array_equal(res1, res2) ? 'equal' : 'error'
-;       equal
+;     IDL> dims = size(im, /dimensions)
+;     IDL window, /free, title=title, xsize=dims[0], ysize=dims[1]
+;     IDL> tvscl, im
 ;
-;    The variable location and bounds can be combined to slice a variable::
-;
-;       IDL> res3 = mg_h5_getdata(f, '/arrays/3D int array[3, 5:*:2, 0:49:3]')
-;       IDL> print, array_equal(res1, res3) ? 'equal' : 'error'
-;       equal
-;
-;    Attributes can be accessed as well::
-;
-;       IDL> print, mg_h5_getdata(f, '/images/Eskimo.CLASS')
-;       IMAGE
+;     IDL> window, /free, title='Profile at row = 256', xsize=600, ysize=200
+;     IDL> plot, line, yrange=[0, 255], xstyle=9, ystyle=9
 ;
 ;    This example is available as a main-level program included in this file::
 ;
@@ -326,7 +311,6 @@ function mg_nc_getdata_getattribute, fileId, variable, error=error
 
   tokens = strsplit(variable, '.', escape='\', count=ndots)
   dotpos = tokens[ndots - 1L] - 1L
-
   loc = strmid(variable, 0, dotpos)
   attname = strmid(variable, dotpos + 1L)
 
@@ -365,11 +349,10 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
   on_error, 2
 
   fileId = ncdf_open(filename, /nowrite)
-
   tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
   ndots = ntokens - 1L
 
-  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens[0], '.')
+  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens, '.')
   _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
 
   if (ndots eq 0L) then begin
@@ -404,14 +387,15 @@ sample_filename = file_which('sample.nc')
 im = mg_nc_getdata(sample_filename, '/image')
 title = mg_nc_getdata(sample_filename, '/image.TITLE')
 
+line = mg_nc_getdata(sample_filename, '/image[*, 256]')
+
 dims = size(im, /dimensions)
 window, /free, title=title, xsize=dims[0], ysize=dims[1]
 tvscl, im
 
 window, /free, title='Profile at row = 256', xsize=600, ysize=200
-plot, mg_nc_getdata(sample_filename, '/image[*, 256]'), $
-      yrange=[0, 255], xstyle=9, ystyle=9
+plot, line, yrange=[0, 255], xstyle=9, ystyle=9
 
-ncgroup_filename = file_which('ncgroup.nc')
+;ncgroup_filename = file_which('ncgroup.nc')
 
 end
