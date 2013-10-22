@@ -18,7 +18,7 @@ function mg_repmat, arr, ncolumns, nrows
   compile_opt strictarr
   on_error, 2
 
-  if (n_params()  lt 3L) then message, 'incorrect number of arguments'
+  if (n_params() lt 3L) then message, 'incorrect number of arguments'
 
   ndims = size(arr, /n_dimensions)
   if (ndims gt 2L) then message, 'input array must be at most 2-dimensional'
