@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "idl_export.h"
+
+#include "mg_idl_export.h"
 
 
 static IDL_VPTR IDL_CDECL IDL_mg_sizeof(int argc, IDL_VPTR *argv) {

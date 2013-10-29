@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "idl_export.h"
+#include "mg_idl_export.h"
 #include "mkdio.h"
 
 /*

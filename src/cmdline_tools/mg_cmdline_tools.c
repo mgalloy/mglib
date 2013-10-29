@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "idl_export.h"
+#include "mg_idl_export.h"
 
 #define OUTF_BUFFER_BLOCKSIZE 1024
 

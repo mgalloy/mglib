@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "idl_export.h"
+
+#include "mg_idl_export.h"
 
 #define N_SEGMENTS 20
 #define STEP_SIZE 0.5

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "idl_export.h"
+
+#include "mg_idl_export.h"
 
 /**************************************************************************
   Helper routines

@@ -35,6 +35,7 @@ find_package(mgunit)
 
 # always need IDL's include files
 include_directories(${IDL_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/dist_tools)
 
 add_subdirectory(src)
 

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-#include "idl_export.h"
+#include "mg_idl_export.h"
 #include "tre/tre.h"
 
 
