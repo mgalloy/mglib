@@ -25,6 +25,7 @@ pro mg_battery_plot
   current_capacity = lonarr(nreadings)
   design_capacity = lonarr(nreadings)
 
+  on_ioerror, ioerror
   openr, lun, filename, /get_lun
   for i = 0L, nreadings - 1L do begin
     readf, lun, reading
@@ -81,4 +82,8 @@ pro mg_battery_plot
   mg_convert, 'battery', max_dimensions=[700, 700], output=im
 
   mg_image, im, /new_window
+  return
+
+  ioerror:
+  print, i * nLinesPerReading + 1, format='(%"error parsing line %d")'
 end
