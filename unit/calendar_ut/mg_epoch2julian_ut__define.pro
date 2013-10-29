@@ -5,7 +5,7 @@ function mg_epoch2julian_ut::test_basic
   julian_t = systime(/julian, /utc)
 
   error = abs(julian_t - mg_epoch2julian(epoch_t))
-  assert, error lt 1.e-5, $
+  assert, error lt 2.e-5, $
          'invalid Julian day conversion, error = %f', error
 
   return, 1
