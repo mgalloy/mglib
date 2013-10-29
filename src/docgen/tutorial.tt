@@ -10,7 +10,7 @@ is produced with the following `docgen.ini` file:
 
 This contains an `IDL` section, which specifies the template input files (and
 the output filename) that should be run through IDL. Other sections can be
-present and accessed in the templates.
+present and accessed in the templates via the `MGffOptions` object `config`:
 
     [% INSERT example.tt %]
 
@@ -21,8 +21,9 @@ This should produce:
 You can capture the output from running code with the `CAPTURE` template
 directive. For example, do:
 
-    mg_capture('print, findgen(10)')
+    IDL> result = mg_capture('print, findgen(10)')
+    IDL> print, result
 
 This yields:
 
-[% mg_capture('print, findgen(10)') %]
+    [% mg_capture('print, findgen(10)') %]
