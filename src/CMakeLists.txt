@@ -29,3 +29,6 @@ add_subdirectory(updater)
 add_subdirectory(vis)
 add_subdirectory(widgets)
 add_subdirectory(zlib)
+
+file(GLOB PRO_FILES "*.pro")
+install(FILES ${PRO_FILES} DESTINATION lib)
