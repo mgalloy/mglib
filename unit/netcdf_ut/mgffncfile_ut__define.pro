@@ -3,6 +3,9 @@
 function mgffncfile_ut::test_sample
   compile_opt strictarr
 
+  assert, mg_idlversion(require='8.0'), /skip, $
+          'test requires IDL 8.0, %s present', !version.release
+
   f = obj_new('MGffNCFile', filename=file_which('sample.nc'))
 
   assert, array_equal(f.attributes, ['TITLE', 'GALAXY', 'PLANET']), $
@@ -18,6 +21,9 @@ end
 
 function mgffncfile_ut::test_group
   compile_opt strictarr
+
+  assert, mg_idlversion(require='8.0'), /skip, $
+          'test requires IDL 8.0, %s present', !version.release
 
   f = obj_new('MGffNCFile', filename=file_which('ncgroup.nc'))
 

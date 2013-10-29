@@ -17,6 +17,9 @@
 ;       name of the group
 ;    fullname
 ;       full path to object inside the netCDF hierarchy
+;
+; :Requires:
+;   IDL 8.0
 ;-
 
 

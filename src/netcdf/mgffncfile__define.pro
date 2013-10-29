@@ -15,6 +15,9 @@
 ;       names of child groups
 ;    filename
 ;       filename of netCDF file
+;
+; :Requires:
+;   IDL 8.0
 ;-
 
 

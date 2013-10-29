@@ -11,6 +11,9 @@
 ;     set for case-insensitive matching for section and option names.
 ;   sections
 ;     array of section names
+;
+; :Requires:
+;   IDL 8.0
 ;-
 
 
@@ -140,7 +143,7 @@ end
 function mgffoptions::_overloadForeach, value, key
   compile_opt strictarr
 
-  if (self.sections->isEmpty()) then return, 0L
+  if (n_elements(self.sections) eq 0L) then return, 0L
 
   keys = self.sections->keys()
   section_names = keys->toArray()
