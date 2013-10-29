@@ -35,6 +35,9 @@
 ;
 ; :History:
 ;   Developed from code posted by JD Smith to the IDL newsgroup 8/16/2011
+;
+; :Requires:
+;   IDL 8.0
 ;-
 function mg_find_pattern, data, pattern
   compile_opt strictarr

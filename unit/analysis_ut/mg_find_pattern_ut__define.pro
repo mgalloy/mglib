@@ -1,6 +1,9 @@
 function mg_find_pattern_ut::test_basic
   compile_opt strictarr
 
+  assert, mg_idlversion(require='8.0'), /skip, $
+          'test requires IDL 8.0, %s present', !version.release
+
   ; IDL random numbers changed in IDL 8.2.2
   if (mg_idlversion(require='8.2.2')) then begin
     pattern = [55, 2, 16, 82, 36]

@@ -26,6 +26,9 @@
 ;
 ; :Author:
 ;    Michael D. Galloy, 2012
+;
+; :Requires:
+;   IDL 8.0
 ;-
 
 
