@@ -5,7 +5,7 @@ device, retain=2
 
 appdir = app_user_dir('mgalloy', 'mgalloy', 'mglib', 'mglib', 'mglib', 1)
 last_modified = 0LL
-last_modified_filename = filepath('last_modified_paths', root=appdir)
+last_modified_filename = filepath('modpaths-', root=appdir) + !version.release
 if (file_test(last_modified_filename)) then begin & openr, lun, last_modified_filename, /get_lun & readf, lun, last_modified & free_lun, lun & endif
 
 changed_paths = 0B
