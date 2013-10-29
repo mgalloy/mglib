@@ -8,7 +8,7 @@
 ; `SORT` function.
 ;
 ; :History:
-; 	Derived from code by Atle Borsholm, VIS, 2012
+;   Derived from code by Atle Borsholm, VIS, 2012
 ;-
 
 
