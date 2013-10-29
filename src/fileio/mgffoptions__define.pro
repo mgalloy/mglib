@@ -148,7 +148,7 @@ function mgffoptions::_overloadForeach, value, key
 
   if (n_elements(key) eq 0L) then begin
     key = section_names[0]
-    value = self.sections[key]
+    value = (self.sections)[key]
     return, 1L
   endif
 
@@ -160,7 +160,7 @@ function mgffoptions::_overloadForeach, value, key
       return, 0L
     endif else begin
       key = section_names[ind[0] + 1L]
-      value = self.sections[key]
+      value = (self.sections)[key]
       return, 1L
     endelse
   endelse
@@ -224,7 +224,7 @@ function mgffoptions::_overloadPrint
   format = string(max_width + 2L, format='(%"(\%\"\%-%ds \%s\"\)")')
 
   if (self.sections->hasKey('')) then begin
-    default_sec = self.sections['']
+    default_sec = (self.sections)['']
     foreach option, default_sec, o do begin
       first_line = 0B
       output_list->add, string(o + ':', option, format=format)
@@ -295,8 +295,8 @@ pro mgffoptions::put, option, value, section=section
     _option = strlowcase(_option)
   endif
 
-  if (~self.sections->hasKey(_section)) then self.sections[_section] = hash()
-  (self.sections[_section])[_option] = size(value, /n_dimensions) eq 0L $
+  if (~self.sections->hasKey(_section)) then (self.sections)[_section] = hash()
+  ((self.sections)[_section])[_option] = size(value, /n_dimensions) eq 0L $
                                          ? value $
                                          : ('[ ' + strjoin(value, ', ') + ' ]')
 end
@@ -344,7 +344,7 @@ function mgffoptions::has_option, option, section=section
     _option = strlowcase(_option)
   endif
 
-  return, self.sections->hasKey(_section) && self.sections[_section]->hasKey(_option)
+  return, self.sections->hasKey(_section) && (self.sections)[_section]->hasKey(_option)
 end
 
 
@@ -372,7 +372,7 @@ function mgffoptions::options, section=section, count=count
 
   if (~self->has_section(_section)) then return, []
 
-  option_list = self.sections[_section]->keys()
+  option_list = (self.sections)[_section]->keys()
   count = option_list->count()
   options = option_list->toArray()
   obj_destroy, option_list
@@ -433,18 +433,18 @@ function mgffoptions::get, option, $
 
   found = 0B
   if (~self.sections->hasKey(_section)) then return, _default
-  if (~self.sections[_section]->hasKey(_option)) then return, _default
+  if (~(self.sections)[_section]->hasKey(_option)) then return, _default
   count = 1L
 
   found = 1B
   if (keyword_set(raw)) then begin
-    value = (self.sections[_section])[_option]
+    value = ((self.sections)[_section])[_option]
   endif else begin
-    value = mg_subs((self.sections[_section])[_option], $
-                    self.sections[_section], $
+    value = mg_subs(((self.sections)[_section])[_option], $
+                    (self.sections)[_section], $
                     unresolved_keys=unresolved_keys)
     if (_section ne '' && self.sections->hasKey('')) then begin
-      value = mg_subs(value, self.sections[''], unresolved_keys=unresolved_keys)
+      value = mg_subs(value, (self.sections)[''], unresolved_keys=unresolved_keys)
     endif
   endelse
 
