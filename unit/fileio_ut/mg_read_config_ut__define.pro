@@ -96,6 +96,9 @@ end
 function mg_read_config_ut::test_defaults_options
   compile_opt strictarr
 
+  assert, mg_idlversion(require='8.1'), /skip, $
+          'test requires IDL 8.1, %s present', !version.release
+
   config_filename = filepath('simple_config.ini', root=mg_src_root())
   assert, file_test(config_filename), 'test configuration file not found', /skip
 
