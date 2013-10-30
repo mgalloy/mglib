@@ -10,8 +10,8 @@
 ; memento was produced.
 ;
 ; :Params:
-;    memento : in, required, type=structure
-;       memento produced by save_pos method
+;   memento : in, required, type=structure
+;     memento produced by save_pos method
 ;-
 pro mgfftokenizer::restorePos, memento
   compile_opt strictarr
@@ -28,7 +28,7 @@ end
 ; Saves the current state/location of the tokenizer in a memento structure.
 ;
 ; :Returns:
-;    structure
+;   structure
 ;-
 function mgfftokenizer::savePos
   compile_opt strictarr
@@ -48,11 +48,11 @@ end
 ; Returns the current line of the tokenized file.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Keywords:
-;    number : out, optional, type=long
-;       line number of returned line
+;   number : out, optional, type=long
+;     line number of returned line
 ;-
 function mgfftokenizer::getCurrentLine, number=number
   compile_opt strictarr
@@ -67,15 +67,15 @@ end
 ; Returns the next token of the file.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Keywords:
-;    pre_delim : out, optional, type=string
-;       delimiter before the returned token
-;    post_delim : out, optional, type=string
-;       delimiter after the returned token
-;    newline : out, optional, type=boolean
-;       true if token is first on a new line
+;   pre_delim : out, optional, type=string
+;     delimiter before the returned token
+;   post_delim : out, optional, type=string
+;     delimiter after the returned token
+;   newline : out, optional, type=boolean
+;     true if token is first on a new line
 ;-
 function mgfftokenizer::next, pre_delim=pre_delim, post_delim=post_delim, $
                               newline=newline
@@ -137,7 +137,7 @@ end
 ; the file if necessary.
 ;
 ; :Returns:
-;    1B if no more tokens or 0B otherwise
+;   1B if no more tokens or 0B otherwise
 ;-
 function mgfftokenizer::done
   compile_opt strictarr
@@ -148,7 +148,6 @@ function mgfftokenizer::done
   ; handle: EOF, no tokens
   if (self.lineNumber ge self.nlines - 1L) then return, 1B
 
-  ; skip blank lines
   self.line = (*self.data)[++self.lineNumber]
 
   ; new tokens
@@ -193,20 +192,20 @@ end
 ; tokenizer opens the file.
 ;
 ; :Returns:
-;    1 if successful, 0 otherwise
+;   1 if successful, 0 otherwise
 ;
 ; :Params:
-;    filename : in, required, type=string/strarr
-;       filename of the file to be tokenized or (if /STRING_ARRAY) string
-;       array of text to be tokenized
+;   filename : in, required, type=string/strarr
+;     filename of the file to be tokenized or (if /STRING_ARRAY) string array
+;     of text to be tokenized
 ;
 ; :Keywords:
-;    pattern : in, optional, type=string, default=space
-;       regular expression (as in STRPSLIT) to split the text of the file into
-;       tokens
-;    string_array : in, optional, type=boolean
-;       set to indicate that filename argument is a string array to be
-;       tokenized instead of a filename
+;   pattern : in, optional, type=string, default=space
+;     regular expression (as in STRPSLIT) to split the text of the file into
+;     tokens
+;   string_array : in, optional, type=boolean
+;     set to indicate that filename argument is a string array to be
+;     tokenized instead of a filename
 ;-
 function mgfftokenizer::init, filename, pattern=pattern, $
                               string_array=stringArray
@@ -250,32 +249,31 @@ end
 ; Define instance variables.
 ;
 ; :Requires:
-;    IDL 6.0
+;   IDL 6.0
 ;
 ; :Categories:
-;    input/output
+;   input/output
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;
 ; :Fields:
-;    data
-;       contents of file to be tokenized
-;    pattern
-;       regular expression to split lines on
-;    lineNumber
-;       indicates the line number in the file of line (starts at 0)
-;    nlines
-;       number of lines in file to be tokenized
-;    line
-;       current line read by tokenizer
-;    tokens
-;       pointer to long array which indicates the beginnings of thectokens in
-;       line
-;    tokenLength
-;       pointer to long array which indicates the length of the tokens in line
-;    tokenCounter
-;       next token in tokens and token_length
+;   data
+;     contents of file to be tokenized
+;   pattern
+;     regular expression to split lines on
+;   lineNumber
+;     indicates the line number in the file of line (starts at 0)
+;   nlines
+;     number of lines in file to be tokenized
+;   line
+;     current line read by tokenizer
+;   tokens
+;     pointer to long array which indicates the beginnings of thectokens in line
+;   tokenLength
+;     pointer to long array which indicates the length of the tokens in line
+;   tokenCounter
+;     next token in tokens and token_length
 ;-
 pro mgfftokenizer__define
   compile_opt strictarr
