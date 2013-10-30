@@ -9,11 +9,17 @@
 ;-
 pro mg_docgen, root
   compile_opt strictarr
+  on_error, 2
 
   t0 = systime(/seconds)
 
-  _root = file_expand_path(file_dirname(root))
+  _root = file_expand_path(root)
   configuration_filename = filepath('docgen.ini', root=_root)
+  if (~file_test(configuration_filename)) then begin
+    message, string(configuration_filename, $
+                    format='(%"configuration file %s not found")')
+  endif
+
   config = mg_read_config(configuration_filename)
 
   files = config->options(section='Templates')
