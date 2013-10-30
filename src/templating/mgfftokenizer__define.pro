@@ -269,7 +269,8 @@ end
 ;   line
 ;     current line read by tokenizer
 ;   tokens
-;     pointer to long array which indicates the beginnings of thectokens in line
+;     pointer to long array which indicates the beginnings of the tokens in
+;     `line`
 ;   tokenLength
 ;     pointer to long array which indicates the length of the tokens in line
 ;   tokenCounter
