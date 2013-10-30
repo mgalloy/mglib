@@ -788,6 +788,9 @@ pro mgfftemplate::_process_variable, mgfftemplate$expression, $
   ; evaluate expression
   mgfftemplate$result = execute('mgfftemplate$value = ' + mgfftemplate$expression, 1, 1)
   if (mgfftemplate$result) then begin
+    if (size(mgfftemplate$value, /type) ne 7) then begin
+      mgfftemplate$value = strtrim(mgfftemplate$value, 2)
+    endif
     if (~arg_present(mgfftemplate$value)) then begin
       self->_printf, mgfftemplate$output_lun, $
                      mgfftemplate_makespace(mgfftemplate$spaces, $
