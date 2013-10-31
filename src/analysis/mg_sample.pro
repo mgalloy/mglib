@@ -19,21 +19,26 @@
 ;            0.250856     0.135338    0.0753110
 ;
 ; :Returns:
-;    lonarr(`nIndices`)
+;   lonarr(`nIndices`)
 ;
 ; :Params:
-;    nValues : in, required, type=long
-;       size of array to choose indices from
-;    nIndices : in, required, type=long
-;       number of indices needed
+;   nValues : in, required, type=long
+;     size of array to choose indices from
+;   nIndices : in, required, type=long
+;     number of indices needed
 ;
 ; :Keywords:
-;    seed : in, out, optional, type=integer or lonarr(36)
-;       seed to use for random number generation, leave undefined to use a
-;       seed generated from the system clock; new seed will be output
+;   seed : in, out, optional, type=integer or lonarr(36)
+;     seed to use for random number generation, leave undefined to use a
+;     seed generated from the system clock; new seed will be output
+;
+; :Requires:
+;   IDL 8.0
 ;-
 function mg_sample, nValues, nIndices, seed=seed
   compile_opt strictarr
+
+  if (nIndices le 0L || nIndices gt nValues) then return, !null
 
   ; get random nIndices by finding the indices of the smallest nIndices in a
   ; array of random values
