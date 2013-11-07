@@ -179,7 +179,8 @@ function mg_hist_nd, array, $
 
   ; handle weights, if present
   if (n_elements(weights) gt 0L) then begin
-    weighted = replicate(weights[0], size(unweighted, /dimensions))
+    weighted = make_array(dimension=size(unweighted, /dimensions), $
+                          type=size(weights, /type))
 
     for i = 0L, n_elements(unweighted) - 1L do begin
       if (unweighted[i] gt 0) then begin

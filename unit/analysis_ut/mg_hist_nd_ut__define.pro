@@ -21,7 +21,7 @@ function mg_hist_nd_ut::test_2d_weights
 
   result = mg_hist_nd(q, bin_size=1., weights=weights, unweighted=unweighted)
 
-  standard = long(identity(4))
+  standard = identity(4)
   unweighted_standard = 10L * long(identity(4))
 
   assert, size(unweighted, /n_dimensions) eq 2, $
@@ -33,7 +33,7 @@ function mg_hist_nd_ut::test_2d_weights
 
   assert, size(result, /n_dimensions) eq 2, 'incorrect number of dimensions'
   assert, array_equal(size(result, /dimensions), [4, 4]), 'incorrect dimensions'
-  assert, array_equal(result, standard), 'incorrect result'
+  assert, total(abs(result - standard)) lt 1e-6, 'incorrect result'
 
   return, 1
 end
