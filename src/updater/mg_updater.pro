@@ -86,10 +86,12 @@ function mg_updater, url, $
                      name=name, $
                      development_builds=development_builds, $
                      releases=releases, $
-                     error=error
+                     error=error, $
+                     response_code=response_code
   compile_opt strictarr
 
   _current_version = n_elements(current_version) eq 0L ? '0.0' : current_version
+  error = 0L
 
   response_code = 408L
   while (response_code eq 408L) do begin
