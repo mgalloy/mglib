@@ -89,6 +89,9 @@ function mg_updater, url, $
                      error=error, $
                      response_code=response_code
   compile_opt strictarr
+  on_error, 2
+
+  if (n_elements(url) eq 0L) then message, 'URL parameter required'
 
   _current_version = n_elements(current_version) eq 0L ? '0.0' : current_version
   error = 0L
