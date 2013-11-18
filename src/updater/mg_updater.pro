@@ -80,6 +80,10 @@ end
 ;
 ;   error : out, optional, type=long
 ;     set to a named variable to retrieve error status: 0 if OK, 1 if not
+;   response_code : out, optional, type=long
+;     set to a named variable to retrieve the response code
+;   _extra : in, optional, type=keywords
+;     keywords to `MG_GET_URL_CONTENT`
 ;-
 function mg_updater, url, $
                      current_version=current_version, $
@@ -87,7 +91,8 @@ function mg_updater, url, $
                      development_builds=development_builds, $
                      releases=releases, $
                      error=error, $
-                     response_code=response_code
+                     response_code=response_code, $
+                     _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -100,7 +105,8 @@ function mg_updater, url, $
   while (response_code eq 408L) do begin
     content = mg_get_url_content(url, $
                                  response_code=response_code, $
-                                 connect_timeout=5.0)
+                                 connect_timeout=5.0, $
+                                 _extra=e)
     case response_code of
       200L:
       408L:
