@@ -1,6 +1,9 @@
 function mganrandom_ut::test_integers
   compile_opt strictarr
 
+  assert, mg_idlversion(require='6.4'), /skip, $
+          'test requires IDL 6.4, %s present', !version.release
+
   assert, mg_connected(), /skip, $
           'must be connected to the Internet to use MGanRandom class'
 
@@ -25,6 +28,9 @@ end
 
 function mganrandom_ut::test_gaussians
   compile_opt strictarr
+
+  assert, mg_idlversion(require='6.4'), /skip, $
+          'test requires IDL 6.4, %s present', !version.release
 
   assert, mg_connected(), /skip, $
           'must be connected to the Internet to use MGanRandom class'
