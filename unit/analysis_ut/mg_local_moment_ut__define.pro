@@ -1,6 +1,9 @@
 function mg_local_moment_ut::test1
   compile_opt strictarr
 
+  assert, mg_idlversion(require='8.1'), /skip, $
+          'test requires IDL 8.1, %s present', !version.release
+
   x = findgen(10)
 
   result = mg_local_moment(x, 3)

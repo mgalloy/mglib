@@ -19,7 +19,7 @@ function mg_connected
     return, 0B
   endif
 
-  url = IDLnetURL(url_hostname='www.google.com')
+  url = obj_new('IDLnetURL', url_hostname='www.google.com')
   result = url->get(/string_array)
   url->getProperty, response_code=response_code
   obj_destroy, url

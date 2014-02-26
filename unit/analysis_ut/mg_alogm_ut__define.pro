@@ -22,7 +22,7 @@ function mg_alogm_ut::test2
 
   result = mg_expm(mg_alogm(x))
   error = total(abs(result - x))
-  assert, error lt 0.0001, 'incorrect result, error = %f', error
+  assert, error lt 0.0002, 'incorrect result, error = %f', error
 
   return, 1
 end
