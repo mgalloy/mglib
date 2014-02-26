@@ -273,7 +273,7 @@ pro mg_image, im, x, y, $
   ; cut down to min/max range
   _min_value = n_elements(min_value) eq 0L ? min(im) : min_value
   _max_value = n_elements(max_value) eq 0L ? max(im) : max_value
-  help, _min_value, _max_value
+
   _im = (im < _max_value) > _min_value
 
   ; stretch if requested
