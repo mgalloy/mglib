@@ -129,6 +129,12 @@ end
 ;       dimensions will be searched for a size 3 dimension.
 ;    stretch : in, optional, type=float
 ;       set to a value between `0.` and `100.` to stretch the histogram
+;    min_value : in, optional, type="same as data"
+;       miniumum value to display in the image, smaller values will be truncated
+;       to the `MIN` value
+;    max_value : in, optional, type="same as data"
+;       maximum value to display in the image, larger values will be truncated
+;       to the `MAX` value
 ;    axes : in, optional, type=boolean
 ;       set to display axes around the image
 ;    scale : in, optional, type=float, default=1.0
@@ -153,9 +159,18 @@ end
 ;    _extra : in, optional, type=keywords
 ;       keywords to PLOT, CONGRID, or WINDOW routines
 ;-
-pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
-              new_window=newWindow, no_scale=noScale, no_data=noData, $
-              position=position, xmargin=xmargin, ymargin=ymargin, $
+pro mg_image, im, x, y, $
+              true=true, $
+              stretch=stretch, $
+              min_value=min_value, $
+              max_value=max_value, $
+              axes=axes, $
+              scale=scale, $
+              new_window=newWindow, $
+              no_scale=noScale, $
+              no_data=noData, $
+              position=position, $
+              xmargin=xmargin, ymargin=ymargin, $
               charsize=charsize, $
               ticklen=ticklen, $
               _extra=e
@@ -255,8 +270,14 @@ pro mg_image, im, x, y, true=true, stretch=stretch, axes=axes, scale=scale, $
   upper = round(convert_coord(!x.window[1], !y.window[1], /normal, /to_device))
   displaySize = (upper - lower - lineThick) > 1
 
+  ; cut down to min/max range
+  _min_value = n_elements(min_value) eq 0L ? min(im) : min_value
+  _max_value = n_elements(max_value) eq 0L ? max(im) : max_value
+  help, _min_value, _max_value
+  _im = (im < _max_value) > _min_value
+
   ; stretch if requested
-  _im = n_elements(stretch) eq 0L ? im : hist_equal(im, percent=stretch)
+  _im = n_elements(stretch) eq 0L ? _im : hist_equal(_im, percent=stretch)
 
   if (~keyword_set(noData)) then begin
     ; use NO_SCALE value if explicitly set by caller, otherwise guess by data
