@@ -8,7 +8,11 @@
 ;
 ;       IDL> .run mg_histplot
 ;
-;    This should result in::
+;    This should result in:
+;
+;    .. image:: histplot-example.png
+;
+; Another histogram plot example:
 ;
 ;    .. image:: histogram.png
 ;
@@ -54,31 +58,40 @@ end
 marsFilename = file_which('marsglobe.jpg')
 mars = read_image(marsFilename)
 
+mg_psbegin, filename='histplot.ps', xsize=6, ysize=3, /inches, /image
+
 binsize = 2
-mg_decomposed, 0, old_decomposed=odec
+mg_decomposed, 1, old_decomposed=dec
 
 mg_loadct, 39
 
 pattern = mg_checkerboard(block_size=2, colors=[0, 150])
 
-redH = histogram(mars[0, *, *], binsize=binsize, min=0, max=255)
+redH = histogram(mars[0, *, *], binsize=binsize, min=0, max=255, locations=bins)
 greenH = histogram(mars[1, *, *], binsize=binsize, min=0, max=255)
 blueH = histogram(mars[2, *, *], binsize=binsize, min=0, max=255)
 
+; set first bin to 0, otherwise it would overwhelm the plot
 redH[0] = 0
 greenH[0] = 0
 blueH[0] = 0
 
-mg_histplot, findgen(256 / binsize) * binsize, redH, $
-             xstyle=9, ystyle=9, yrange=[0, 10000], $
-             /fill, color=250, axis_color=255
-mg_histplot, findgen(256 / binsize) * binsize, greenH, $
+spacing = 0.1
+mg_histplot, bins, redH, $
+             xstyle=9, ystyle=9, yrange=[0, 10000], ticklen=-0.01, $
+             /fill, color='ff0000'x, /line_fill, orientation=0, spacing=spacing, $
+             axis_color='000000'x, charsize=1.0
+mg_histplot, bins, greenH, $
              /fill, /overplot, $
-             color=150, pattern=pattern
-mg_histplot, findgen(256 / binsize) * binsize, blueH, $
+             color='00ff00'x, /line_fill, orientation=-60, spacing=spacing;pattern=pattern
+mg_histplot, bins, blueH, $
              /fill, /overplot, $
-             color=75, /line_fill, orientation=45, spacing=0.1
+             color='0000ff'x, /line_fill, orientation=60, spacing=spacing
 
-mg_decomposed, odec
+mg_decomposed, dec
+mg_psend
+
+mg_convert, 'histplot', max_dimensions=[350, 350], output=im
+mg_image, im, /new_window
 
 end
