@@ -43,19 +43,14 @@ pro mg_call_lapack_example
 
   info = 0L
   tau = fltarr(m < n)
-  lwork = -1L
-  work = fltarr(1)
-  status = call_external(lapack, routine_name, $
-                         m, n, x, m, tau, work, lwork, info, $
-                         value=[0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L], $
-                         /auto_glue)
-  lwork = long(work[0])
-  work2 = fltarr(lwork)
+  nb = 32L
+  lwork = nb * n
+  work = fltarr(lwork)
 
   print, lwork, format='(%"Determined workspace required: %d bytes")'
 
   status = call_external(lapack, routine_name, $
-                         m, n, x, m, tau, work2, lwork, info, $
+                         m, n, x, m, tau, work, lwork, info, $
                          value=[0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L], $
                          /auto_glue)
 
