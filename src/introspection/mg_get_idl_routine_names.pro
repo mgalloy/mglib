@@ -1,6 +1,16 @@
 ; docformat = 'rst'
 
-function mg_get_idl_routine_names, root, functions=functions, procedures=procedures, classes=classes
+;+
+; Determine the names of the IDL library routines.
+;
+; :Returns:
+;   `strarr`
+;
+; :Params:
+;   root : in, optional, type=string
+;     location of IDL distribution to find online help
+;-
+function mg_get_idl_routine_names, root
   compile_opt strictarr
 
   dir = filepath('', $
