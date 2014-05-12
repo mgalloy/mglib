@@ -1,15 +1,15 @@
 ; docformat = 'rst'
 
-function mg_get_idl_routine_names, root
+function mg_get_idl_routine_names, root, functions=functions, procedures=procedures, classes=classes
   compile_opt strictarr
 
   dir = filepath('', $
                  subdir=['help', 'online_help', 'IDL', 'Content', $
                          'Reference Material'], $
                  root=n_elements(root) eq 0L ? filepath('') : root)
-  files = file_search(dir, '*.html', /quote)
+  files = file_search(dir, '*.htm', /quote)
 
-  basenames = file_basename(files, '.html')
+  basenames = file_basename(files, '.htm')
 
   ; add routines that are bundled with other routines' help
   not_included = ['OPENR', 'OPENU', 'OPENW', 'PRINTF', 'READF']
