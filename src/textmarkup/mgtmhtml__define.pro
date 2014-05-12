@@ -78,6 +78,7 @@ function mgtmhtml::_preTag, type, newline=newline, tag=tag
     'heading4': return, '<h4>'
     'heading5': return, '<h5>'
     'heading6': return, '<h6>'
+    'html' : RETURN, tag->getAttribute('html')      
     'image': begin
         src = tag->getAttribute('source')
         loc = tag->getAttribute('html_location')
