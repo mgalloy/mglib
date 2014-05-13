@@ -24,7 +24,7 @@ end
 ; and return the URL to the online help if it does.
 ;
 ; :Returns:
-;   string URL or -1L if symbol not found
+;   string URL or '' if symbol not found
 ;
 ; :Params:
 ;   name : in, required, type=string
@@ -66,7 +66,7 @@ function mg_onlinehelp_lookup, name, found=found, type=type, root_url=root_url
 
   ; create URL to documentation link
   case type of
-    -1: return, -1L
+    -1: return, ''
     1: begin
          found = 1B
          url = string(_root, strupcase(_name), format='(%"%s/%s.html")')
