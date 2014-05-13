@@ -5,15 +5,23 @@
 ;-
 function mg_onlinehelp_lookup_routines
   compile_opt strictarr
+  common mg_onlinehelp, basenames
   on_error, 2
 
-  dir = filepath('', $
-                 subdir=['help', 'online_help', 'IDL', 'Content', $
-                         'Reference Material'], $
-                 root=n_elements(root) eq 0L ? filepath('') : root)
-  files = file_search(dir, '*.htm', /quote)
+  if (n_elements(basenames) eq 0L) then begin
+    dir = filepath('', $
+                   subdir=['help', 'online_help', 'IDL', 'Content', $
+                           'Reference Material'], $
+                   root=n_elements(root) eq 0L ? filepath('') : root)
 
-  basenames = file_basename(files, '.htm')
+    files = file_search(dir, '*.htm', /quote, count=nfiles)
+    if (nfiles gt 0L) then begin
+      basenames = file_basename(files, '.htm')
+    endif else begin
+      files = file_search(dir, '*.html', /quote, count=nfiles)
+      basenames = file_basename(files, '.html')
+    endelse
+  endif
 
   return, basenames
 end
