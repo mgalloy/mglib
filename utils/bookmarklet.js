@@ -1,0 +1,1 @@
+javascript:(function(){name=location.href.substring(location.href.lastIndexOf('/')+1);name=name.substring(0,name.indexOf('.'));location.href='http://exelisvis.com/docs/'+name+'.html';})();
