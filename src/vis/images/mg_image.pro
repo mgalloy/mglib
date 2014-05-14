@@ -258,6 +258,7 @@ pro mg_image, im, x, y, $
           /nodata, $
           xstyle=1, ystyle=1, $
           position=_position, xmargin=xmargin, ymargin=ymargin, $
+          xrange=mg_range(_x), yrange=mg_range(_y), $
           charsize=charsize, $
           ticklen=_ticklen, $
           _extra=e
@@ -307,6 +308,7 @@ pro mg_image, im, x, y, $
           /nodata, /noerase, $
           xstyle=1, ystyle=1, $
           position=_position, xmargin=xmargin, ymargin=ymargin, $
+          xrange=mg_range(_x), yrange=mg_range(_y), $
           charsize=charsize, $
           ticklen=_ticklen, $
           _extra=e
