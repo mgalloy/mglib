@@ -66,6 +66,10 @@
 ;       length of tick marks for vertical colorbars
 ;    ticklen : in, optional, type=float
 ;       length of tick marks on colorbar
+;    xtitle : in, optional, type=string
+;       string for xtitle
+;    ytitle : in, optional, type=string
+;       string for ytitle
 ;    _extra : in, optional, type=keywords
 ;       keywords to `MG_IMAGE`
 ;-
@@ -78,11 +82,12 @@ pro mg_colorbar, range=range, $
                  red=red, green=green, blue=blue, $
                  divisions=divisions, $
                  xticklen=xticklen, yticklen=yticklen, ticklen=ticklen, $
+                 xtitle=xtitle, ytitle=ytitle, $
                  _extra=e
   compile_opt strictarr
   on_error, 2
 
-  _divisions = n_elements(dimgions) eq 0L ? 6L : dimgions
+  _divisions = n_elements(divisions) eq 0L ? 6L : divisions
   _range = n_elements(range) eq 0L ? [0, 255] : range
 
   if (n_elements(colors) gt 0L) then begin
@@ -136,7 +141,7 @@ pro mg_colorbar, range=range, $
         axis, yaxis=keyword_set(labelsOnRight), $
               yticks=_divisions, yrange=_range, ystyle=1, $
               yticklen=yticklen, ticklen=ticklen, $
-              color=axisColor, _extra=e
+              color=axisColor, xtitle=xtitle, ytitle=ytitle, _extra=e
       end
     keyword_set(horizontal): begin
         _im = _colors # (bytarr(2) + 1B)
@@ -180,7 +185,7 @@ pro mg_colorbar, range=range, $
         axis, xaxis=keyword_set(labelsOnTop), $
               xticks=_divisions, xrange=_range, xstyle=1, $
               xticklen=xticklen, ticklen=ticklen, $
-              color=axisColor, _extra=e
+              color=axisColor, xtitle=xtitle, ytitle=ytitle, _extra=e
       end
     else: message, 'either VERTICAL or HORIZONTAL must be set'
   endcase
