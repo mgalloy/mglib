@@ -53,11 +53,17 @@
 ;       number of channels present in the image
 ;    true : in, required, type=int
 ;       TRUE value for the image
+;    min_value : in, optional, type="same as data"
+;       miniumum value to display in the image, smaller values will be truncated
+;       to the `MIN` value
+;    max_value : in, optional, type="same as data"
+;       maximum value to display in the image, larger values will be truncated
+;       to the `MAX` value
 ;    _extra : in, optional, type=keywords
 ;       keywords to TV or TVSCL
 ;-
 pro mg_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
-                 _extra=e
+                 min_value=min_value, max_value=max_value, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -82,7 +88,7 @@ pro mg_image_tv, im, x, y, scale=scale, n_channels=nchannels, true=true, $
   endcase
 
   if (keyword_set(scale)) then begin
-    tvscl, _im, x, y, true=_true, _extra=e
+    tv, bytscl(_im, min=min_value, max=max_value), x, y, true=_true, _extra=e
   endif else begin
     tv, _im, x, y, true=_true, _extra=e
   endelse
@@ -293,9 +299,10 @@ pro mg_image, im, x, y, $
                    true=_true, scale=scale, n_channels=nchannels, _extra=e
     endif else begin
       displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
-                                   true=_true, _extra=e)
+                                  true=_true, _extra=e)
       mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
-                    true=_true, scale=scale, n_channels=nchannels, _extra=e
+                   true=_true, scale=scale, n_channels=nchannels, $
+                   min_value=_min_value, max_value=_max_value, _extra=e
     endelse
   endif
 
