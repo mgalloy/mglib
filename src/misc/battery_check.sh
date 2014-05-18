@@ -1,8 +1,9 @@
 #!/bin/sh
 
-# add this as a cron job to be run regularly
+DATA_DIR=$HOME/data
+BATTERY_LOG=$DATA_DIR/battery.log
 
-BATTERY_LOG=/Users/mgalloy/data/battery.log
-date +%s >> $BATTERY_LOG
-/usr/sbin/ioreg -l | grep \"CycleCount\" | sed -e 's/^[ |]*//' -e 's/\"//g' >> $BATTERY_LOG
-/usr/sbin/ioreg -l | egrep "(Max|Current|Design)Capacity" | sed -e 's/^[ |]*//' -e 's/\"//g' >> $BATTERY_LOG
+DATE=`date +%s`
+CYCLE_COUNT=`/usr/sbin/ioreg -l | grep \"CycleCount\" | sed -e 's/^[ |]*//' -e 's/\"//g'`
+CAPACITY=`/usr/sbin/ioreg -l | egrep "(Max|Current|Design)Capacity" | sed -e 's/^[ |]*//' -e 's/\"//g' | tr '\n' ','`
+echo "$DATE,$CAPACITY$CYCLE_COUNT" >> $BATTERY_LOG

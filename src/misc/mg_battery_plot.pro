@@ -1,11 +1,29 @@
 ; docformat = 'rst'
 
 
+; 1400386980,MaxCapacity = 9016,CurrentCapacity = 4773,DesignCapacity = 8440,CycleCount = 5
+
+function mg_battery_plot_extract_number, s
+  compile_opt strictarr
+  
+  tokens = stregex(s, '.* = ([[:digit:]]+)', /extract, /subexpr)
+  return, tokens[1] eq '' ? -1L : long(tokens[1])
+end
+
+
 function mg_battery_plot_extract, line
   compile_opt strictarr
 
-  tokens = stregex(line, '.* = ([[:digit:]]+)', /extract, /subexpr)
-  return, tokens[1] eq '' ? -1L : long(tokens[1])
+  tokens = strsplit(line, ',', /extract)
+
+  readings = lonarr(5)
+  readings[0] = long(tokens[0])
+  readings[1] = mg_battery_plot_extract_number(tokens[1])
+  readings[2] = mg_battery_plot_extract_number(tokens[2])
+  readings[3] = mg_battery_plot_extract_number(tokens[3])
+  readings[4] = mg_battery_plot_extract_number(tokens[4])
+
+  return, readings
 end
 
 
@@ -13,27 +31,28 @@ pro mg_battery_plot
   compile_opt strictarr
 
   filename = '~/data/battery.log'
-  nlinesPerReading = 5L
 
   nlines = file_lines(filename)
-  nreadings = nlines / nlinesPerReading
 
-  reading = strarr(nlinesPerReading)
-  times = lonarr(nreadings)
-  cycle_count = lonarr(nreadings)
-  max_capacity = lonarr(nreadings)
-  current_capacity = lonarr(nreadings)
-  design_capacity = lonarr(nreadings)
+  times            = lonarr(nlines)
+  cycle_count      = lonarr(nlines)
+  max_capacity     = lonarr(nlines)
+  current_capacity = lonarr(nlines)
+  design_capacity  = lonarr(nlines)
 
   on_ioerror, ioerror
   openr, lun, filename, /get_lun
-  for i = 0L, nreadings - 1L do begin
-    readf, lun, reading
-    times[i] = long(reading[0])
-    cycle_count[i] = mg_battery_plot_extract(reading[1])
-    max_capacity[i] = mg_battery_plot_extract(reading[2])
-    current_capacity[i] = mg_battery_plot_extract(reading[3])
-    design_capacity[i] = mg_battery_plot_extract(reading[4])
+  line = ''
+
+  for i = 0L, nlines - 1L do begin
+    readf, lun, line
+    reading = mg_battery_plot_extract(line)
+
+    times[i]            = reading[0]
+    max_capacity[i]     = reading[1]
+    current_capacity[i] = reading[2]
+    design_capacity[i]  = reading[3]
+    cycle_count[i]      = reading[4]
   endfor
   free_lun, lun
 
@@ -53,7 +72,9 @@ pro mg_battery_plot
         charsize=0.65, $
         position=[0.1, .1, 0.97, 0.9]
 
-  xyouts, 0.5, 0.95, 'feynman battery life', alignment=0.5, /normal, charsize=0.8
+  xyouts, 0.5, 0.95, /normal, $
+          'feynman battery life', $
+          alignment=0.5, charsize=0.8
 
   oplot, mg_epoch2julian(times), current_capacity, $
          psym=mg_usersym(/circle), symsize=0.15, color=mg_rgb2index(rgb[8, *])
@@ -69,12 +90,14 @@ pro mg_battery_plot
 
   oplot, mg_epoch2julian(times), max_capacity, $
          color=mg_rgb2index(rgb[6, *]), thick=4, linestyle=0
-  xyouts, mg_epoch2julian(times[-1]), max_capacity[-1] + ygap, 'max capacity', /data, $
+  xyouts, mg_epoch2julian(times[-1]), max_capacity[-1] + ygap, /data, $
+          'max capacity', $
           alignment=1.0, charsize=0.6, color=mg_rgb2index(rgb[6, *])
 
   oplot, mg_epoch2julian(times), design_capacity, $
          thick=4, color=mg_rgb2index(rgb[8, *])
-  xyouts, mg_epoch2julian(times[-1]), design_capacity[-1] + ygap, 'design capacity', /data, $
+  xyouts, mg_epoch2julian(times[-1]), design_capacity[-1] + ygap, /data, $
+          'design capacity', $
           alignment=1.0, charsize=0.6, color=mg_rgb2index(rgb[8, *])
 
   mg_decomposed, odec
@@ -85,5 +108,5 @@ pro mg_battery_plot
   return
 
   ioerror:
-  print, i * nLinesPerReading + 1, format='(%"error parsing line %d")'
+  print, i + 1, format='(%"error parsing line %d")'
 end
