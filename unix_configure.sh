@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# using static libtre.a requires adding an --enable-static flag to the tre
-# formula in /usr/local/Library/Formula/tre.rb
-
 rm -rf build
 mkdir build
 cd build

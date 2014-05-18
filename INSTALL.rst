@@ -2,16 +2,20 @@ Building
 --------
 
 Use `CMake <http://www.cmake.org>`_ to configure mglib before building. For
-example, for a basic install, you would do the following from the root
+example, for a basic install, you could do the following from the root
 directory of mglib::
 
   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install .
 
-There is a more complete example configuration (using builds in */usr/local*)
-command in *example_configure.sh* which specifies some optional libraries that
-cause DLMs that depend on them to be built.
+There are more complete example configuration commands in
+*homebrew_configure.sh* (for OS X builds using homebrew to get dependencies),
+*unix_configure.sh* (for basic unix configuration), and *simmple_configure.sh*
+(which doesn't build any DLMs with dependencies) which specifies some optional
+libraries that cause DLMs that depend on them to be built. These example configuration scripts build out-of-source, so change to the *build* directory before building::
 
-After configuration, build mglib with::
+  cd build
+
+Then build mglib with::
 
   make
 
