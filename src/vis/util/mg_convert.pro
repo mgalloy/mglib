@@ -83,6 +83,9 @@ end
 ;     density of output image in dots per inch
 ;   scale : in, optional, type=long, default=100
 ;     scale percentage to use
+;   retina : in, optional, type=boolean
+;     set to double default density to 600 dpi and double `MAX_DIMENSIONS`
+;     value
 ;   from_extension : in, optional, type=string
 ;     extension to use for input file
 ;   from_eps : in, optional, type=boolean
@@ -117,6 +120,7 @@ pro mg_convert, basename, $
                 density=density, $
                 max_dimensions=maxDimensions, $
                 scale=scale, $
+                retina=retina, $
                 from_extension=fromExtension, $
                 from_eps=fromEps, $
                 from_png=fromPng, $
@@ -149,12 +153,16 @@ pro mg_convert, basename, $
     else: outputExtension = 'png'
   endcase
 
-  _density = n_elements(density) eq 0L ? 300L : density
+  _density = n_elements(density) eq 0L ? (keyword_set(retina) ? 600L : 300L) : density
+  if (n_elements(maxDimensions) gt 0L) then begin
+    _maxDimensions = 2L * maxDimensions
+  endif
+
   _resize = n_elements(maxDimensions) eq 0L $
               ? (n_elements(scale) eq 0 $
                    ? '' $
                    : ' -resize ' + strtrim(scale, 2) + '%') $
-              : ' -resize ' + strjoin(strtrim(maxDimensions, 2), 'x')
+              : ' -resize ' + strjoin(strtrim(_maxDimensions, 2), 'x')
 
   defsysv, '!convert_location', exists=locationExists
   if (n_elements(convertLocation) gt 0L) then begin
@@ -169,11 +177,17 @@ pro mg_convert, basename, $
   ; create ImageMagick command:
   ;    -alpha is needed to produce a normal background for a PNG file that IDL
   ;           can read
-  cmdFormat = '\"%s\" -alpha off -density %d %s.%s%s -quality 100 %s%s.%s'
+  retina_spec = keyword_set(retina) && keyword_set(toPng) ? '@2x' : ''
+  cmdFormat = '\"%s\" -alpha off -density %d %s.%s%s -quality 100 %s%s%s.%s'
   cmd = string(format='(%"' + cmdFormat + '")', $
-               _convertLocation, _density, basename, inputExtension, $
+               _convertLocation, $
+               _density, $
+               basename, $
+               inputExtension, $
                _resize, $
-               (outputExtension eq 'png' ? 'PNG24:' : ''), basename, $
+               (outputExtension eq 'png' ? 'PNG24:' : ''), $
+               basename, $
+               retina_spec, $
                outputExtension)
 
   ; run ImageMagick and check for an error
@@ -182,9 +196,9 @@ pro mg_convert, basename, $
 
   ; send output back if requested
   if (arg_present(output)) then begin
-    output = mg_convert_read_image(basename + '.' + outputExtension)
+    output = mg_convert_read_image(basename + retina_spec + '.' + outputExtension)
     if (~keyword_set(keep_output)) then begin
-      file_delete, basename + '.' + outputExtension
+      file_delete, basename + retina_spec + '.' + outputExtension
     endif
   endif
 
