@@ -224,8 +224,6 @@ function mg_hdf_getdata_getattribute, sd_id, variable, error=error
   att_index = hdf_sd_attrfind(sds_id, attr_name)
   hdf_sd_attrinfo, sds_id, att_index, data=attribute_data
 
-  help, attribute_data
-
   hdf_sd_endaccess, sds_id
 
   return, attribute_data
