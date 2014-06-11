@@ -188,6 +188,51 @@ end
 
 
 ;+
+; Helper routine to get attribute data.
+;
+; :Private:
+;
+; :Returns:
+;   attribute value or `!null` if an error
+;
+; :Params:
+;   sds_id : in, required, type=long
+;     netCDF file/dataset identifier
+;   variable : in, required, type=string
+;     variable name and attribute name string, i.e., "var1.attribute_name"
+;
+; :Keywords:
+;   error : out, optional, type=long
+;     set to a named variable to return the error value; 0 indicates no error
+;-
+function mg_hdf_getdata_getattribute, sd_id, variable, error=error
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, !null
+  endif
+
+  tokens = strsplit(variable, '.', /extract)
+  var_name = tokens[0]
+  attr_name = tokens[1]
+
+  var_index = hdf_sd_nametoindex(sd_id, var_name)
+  sds_id = hdf_sd_select(sd_id, var_index)
+
+  att_index = hdf_sd_attrfind(sds_id, attr_name)
+  hdf_sd_attrinfo, sds_id, att_index, data=attribute_data
+
+  help, attribute_data
+
+  hdf_sd_endaccess, sds_id
+
+  return, attribute_data
+end
+
+
+;+
 ; Pulls out a section of a HDF variable.
 ;
 ; :Returns:
@@ -232,9 +277,8 @@ function mg_hdf_getdata, filename, variable, bounds=bounds, error=error
     if (error) then message, 'variable not found', /informational
   endif else begin
     ; attribute
-    ; TODO: implement
-    ;result = mg_hdf_getdata_getattribute(fileId, variable, error=error)
-    ;if (error) then message, 'attribute not found', /informational
+    result = mg_hdf_getdata_getattribute(file_id, variable, error=error)
+    if (error) then message, 'attribute not found', /informational
   endelse
 
   hdf_sd_end, file_id
