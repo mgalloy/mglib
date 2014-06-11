@@ -309,7 +309,7 @@ function mgfflogger::init, parent=parent, name=name, _extra=e
 
   self.level = 0L
   self.levelNames = ['Critical', 'Error', 'Warning',  'Informational', 'Debug']
-  self.levelShortNames = ['Crit', 'Err', 'Warn',  'Info', 'Debug']
+  self.levelShortNames = ['Critical', 'Error', 'Warn',  'Info', 'Debug']
 
   self->setProperty, _extra=e
 
