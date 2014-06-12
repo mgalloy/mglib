@@ -28,6 +28,7 @@ add_subdirectory(textmarkup)
 add_subdirectory(updater)
 add_subdirectory(vis)
 add_subdirectory(widgets)
+add_subdirectory(zeromq)
 add_subdirectory(zlib)
 
 file(GLOB PRO_FILES "*.pro")

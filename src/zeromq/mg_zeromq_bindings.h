@@ -1,0 +1,1 @@
+int zmq_errno();
