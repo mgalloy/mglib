@@ -29,7 +29,8 @@ function mg_nc_typedecl, dataType
   case strlowcase(dataType) of
     'unknown': return, '<undefined>'
     'byte': return, 'bytarr'
-    'char': return, 'string'
+    'char': return, 'strarr'
+    'string': return, 'strarr'
     'int': return, 'intarr'
     'long': return, 'lonarr'
     'float': return, 'fltarr'

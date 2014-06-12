@@ -375,7 +375,7 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
     if (error) then message, 'attribute not found', /informational
   endelse
 
-  ncdf_close, fileId
+  ncdf_close, file_id
 
   return, result
 end

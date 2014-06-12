@@ -1,33 +1,14 @@
 ; docformat = 'rst'
 
-;+
-; Routine for writing netCDF files.
-;
-; :Params:
-;   filename : in, required, type=string
-;     filename of file to write to; this file does not need to exist beforehand
-;   variable : in, required, type=string
-;     name of variable to write
-;   data : in, required, type=any
-;     data to write
-;
-; :Keywords:
-;   dim_names : in, optional, type=strarr
-;     string array of dimension names
-;   error : out, optional, type=long
-;     error code, 0 for no errors
-;-
-pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
+pro mg_nc_putdata_putvariable, file_id, variable, data, error=error
   compile_opt strictarr
 
-  error = 0L
-
-  ; create an new netCDF file if it doesn't already exist
-  if (file_test(filename)) then begin
-    file_id = ncdf_open(filename, /write)
-  endif else begin
-    file_id = ncdf_create(filename, /netcdf4_format)
-  endelse
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    error = 1L
+    return
+  endif
 
   var_ids = ncdf_varidsinq(file_id)
   variable_id = -1L
@@ -65,6 +46,75 @@ pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
   endif
 
   ncdf_varput, file_id, variable_id, data
+end
+
+
+pro mg_nc_putdata_putattribute, file_id, variable, data, error=error
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    error = 1L
+    return
+  endif
+
+  tokens = strsplit(variable, '.', escape='\', count=ndots)
+  dotpos = tokens[ndots - 1L] - 1L
+  loc = strmid(variable, 0, dotpos)
+  attname = strmid(variable, dotpos + 1L)
+
+  if (loc eq '') then begin
+    ncdf_attput, file_id, attname, data, /global
+  endif else begin
+    var_id = ncdf_varid(file_id, loc)
+    ncdf_attput, file_id, var_id, attname, data
+  endelse
+end
+
+
+;+
+; Routine for writing netCDF files.
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename of file to write to; this file does not need to exist beforehand
+;   variable : in, required, type=string
+;     name of variable to write
+;   data : in, required, type=any
+;     data to write
+;
+; :Keywords:
+;   dim_names : in, optional, type=strarr
+;     string array of dimension names
+;   error : out, optional, type=long
+;     error code, 0 for no errors
+;-
+pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
+  compile_opt strictarr
+
+  error = 0L
+
+  ; create an new netCDF file if it doesn't already exist
+  if (file_test(filename)) then begin
+    file_id = ncdf_open(filename, /write)
+  endif else begin
+    file_id = ncdf_create(filename, /netcdf4_format)
+  endelse
+
+  tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
+  ndots = ntokens - 1L
+
+  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens, '.')
+  _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
+
+  if (ndots eq 0L) then begin
+    mg_nc_putdata_putvariable, file_id, _variable, data, error=error
+    if (error) then message, 'error writing variable', /informational
+  endif else begin
+    mg_nc_putdata_putattribute, file_id, _variable, data, error=error
+    if (error) then message, 'error writing attribute', /informational
+  endelse
 
   ncdf_close, file_id
 end
