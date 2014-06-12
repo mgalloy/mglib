@@ -28,6 +28,7 @@ pro mg_routinebinding::setProperty, name=name, $
                                     prefix=prefix, $
                                     cprefix=cprefix, $
                                     return_type=returnType, $
+                                    return_pointer=returnPointer, $
                                     prototype=prototype
   compile_opt strictarr
 
@@ -35,6 +36,7 @@ pro mg_routinebinding::setProperty, name=name, $
   if (n_elements(prefix) gt 0L) then self.prefix = prefix
   if (n_elements(cprefix) gt 0L) then self.cprefix = cprefix
   if (n_elements(returnType) gt 0L) then *self.returnType = returnType
+  if (n_elements(returnPointer) gt 0L) then self.returnPointer = returnPointer
   if (n_elements(prototype) gt 0L) then self.prototype = prototype
 end
 
@@ -46,6 +48,7 @@ pro mg_routinebinding::getProperty, name=name, $
                                     prefix=prefix, $
                                     cprefix=cprefix, $
                                     return_type=returnType, $
+                                    return_pointer=returnPointer, $
                                     n_min_parameters=nMinParameters, $
                                     n_max_parameters=nMaxParameters, $
                                     prototype=prototype
@@ -55,6 +58,7 @@ pro mg_routinebinding::getProperty, name=name, $
   if (arg_present(prefix)) then prefix = self.prefix
   if (arg_present(cprefix)) then cprefix = self.cprefix
   if (arg_present(returnType)) then returnType = *self.returnType
+  if (arg_present(returnPointer)) then returnPointer = self.returnPointer
   if (arg_present(nMinParameters)) then nMinParameters = n_elements(self.parameters)
   if (arg_present(nMaxParameters)) then nMaxParameters = n_elements(self.parameters)
   if (arg_present(prototype)) then prototype = self.prototype
@@ -113,7 +117,7 @@ function mg_routinebinding::output, preamble=preamble
                        (p.array && ~p.device) ? 'ARRAY' : 'SCALAR', $
                        i, $
                        format='(%"%s  IDL_ENSURE_%s(argv[%d])")')
-      if (p.device) then begin
+      if (p.device || p.pointer) then begin
         output += string(mg_newline(), $
                          i, $
                          'IDL_TYP_PTRINT', $
@@ -159,7 +163,9 @@ function mg_routinebinding::output, preamble=preamble
           param = string(i, mg_idltype(p.type), $
                          format='(%"IDL_STRING_STR(&argv[%d]->value.%s)")')
         endif else begin
-          param = string(p.pointer ? '&' : '', i, mg_idltype(p.type), $
+          param = string((p.pointer && p.type ne 0L) ? '&' : '', $
+                         i, $
+                         mg_idltype(p.type, pointer=p.pointer && p.type eq 0L), $
                          format='(%"%sargv[%d]->value.%s")')
         endelse
       endelse
@@ -268,6 +274,7 @@ pro mg_routinebinding__define
              prefix: '', $
              cprefix: '', $
              returnType: ptr_new(), $
+             returnPointer: 0B, $
              parameters: obj_new(), $
              parameter_prototypes: obj_new() $
            }

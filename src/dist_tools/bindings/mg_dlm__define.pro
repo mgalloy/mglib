@@ -532,11 +532,15 @@ end
 pro mg_dlm::addRoutineFromPrototype, proto
   compile_opt strictarr
 
-  name = mg_parse_cprototype(proto, params=params, return_type=return_type)
-
+  name = mg_parse_cprototype(proto, $
+                             params=params, $
+                             return_type=return_type, $
+                             return_pointer=return_pointer)
+  if (return_pointer) then return_type = 14L
   r = mg_routinebinding(name=name, $
                         prefix=self.prefix, $
                         return_type=return_type, $
+                        return_pointer=return_pointer, $
                         prototype=proto)
 
   if (params[0] ne '') then begin
@@ -544,12 +548,11 @@ pro mg_dlm::addRoutineFromPrototype, proto
       param_type = mg_parse_cdeclaration(params[i], $
                                          pointer=pointer, array=array, $
                                          device=device)
-
       if (size(param_type, /type) eq 7) then begin
         message, string(param_type, format='(%"unrecognized type: %s")'), /informational
       endif
 
-      if (size(param_type, /type) eq 7 || param_type ne 0) then begin
+      if (size(param_type, /type) eq 7 || param_type ne 0 || (param_type eq 0 && keyword_set(pointer))) then begin
         r->addParameter, type=param_type, $
                          pointer=pointer, array=array, device=device, $
                          prototype=params[i]

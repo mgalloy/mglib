@@ -19,10 +19,10 @@
 ;   type_code : in, required, type=long
 ;     `SIZE` type code
 ;-
-function mg_idltype_tmp_fieldname, type_code
+function mg_idltype_tmp_fieldname, type_code, pointer=pointer
   compile_opt strictarr
 
-  if (size(type_code, /type) eq 7) then begin
+  if (size(type_code, /type) eq 7 || keyword_set(pointer)) then begin
     return, 'ptrint'
   endif
 
@@ -191,6 +191,7 @@ end
 function mg_idltype, type_code, $
                      declaration=declaration, $
                      type=type, $
+                     pointer=pointer, $
                      tmp_routine=tmp_routine
   compile_opt strictarr
 
@@ -198,6 +199,6 @@ function mg_idltype, type_code, $
     keyword_set(type):        return, mg_idltype_type(type_code)
     keyword_set(declaration): return, mg_idltype_declaration(type_code)
     keyword_set(tmp_routine): return, mg_idltype_tmp_routine(type_code)
-    else:                     return, mg_idltype_tmp_fieldname(type_code)
+    else:                     return, mg_idltype_tmp_fieldname(type_code, pointer=pointer)
   endcase
 end
