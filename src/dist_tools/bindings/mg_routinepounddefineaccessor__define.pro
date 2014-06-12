@@ -34,7 +34,11 @@ pro mg_routinePoundDefineAccessor::setProperty, name=name, $
   if (n_elements(name) gt 0L) then self.name = name
   if (n_elements(prefix) gt 0L) then self.prefix = prefix
   if (n_elements(cprefix) gt 0L) then self.cprefix = cprefix
-  if (n_elements(returnType) gt 0L) then *self.returnType = returnType
+  if (n_elements(returnType) gt 0L) then begin
+    *self.returnType = size(returnType, /type) eq 7L $
+                         ? returnType $
+                         : long(returnType)
+  endif
   if (n_elements(prototype) gt 0L) then self.prototype = prototype
 end
 
