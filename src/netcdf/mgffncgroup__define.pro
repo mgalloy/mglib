@@ -4,19 +4,19 @@
 ; Class representing a netCDF group.
 ;
 ; :Categories:
-;    file i/o, netcdf, sdf
+;   file i/o, netcdf, sdf
 ;
 ; :Properties:
-;    attributes
-;       names of attributes of object
-;    variables
-;       names of child variables
-;    groups
-;       names of child groups
-;    name
-;       name of the group
-;    fullname
-;       full path to object inside the netCDF hierarchy
+;   attributes
+;     names of attributes of object
+;   variables
+;     names of child variables
+;   groups
+;     names of child groups
+;   name
+;     name of the group
+;   fullname
+;     full path to object inside the netCDF hierarchy
 ;
 ; :Requires:
 ;   IDL 8.0
@@ -29,15 +29,15 @@
 ; :Private:
 ;
 ; :Returns:
-;    attribute value or `!null` if not found
+;   attribute value or `!null` if not found
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of the attribute to retrieve
+;   name : in, required, type=string
+;     name of the attribute to retrieve
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       set to a named variable to get whether the attribute was found
+;   found : out, optional, type=boolean
+;     set to a named variable to get whether the attribute was found
 ;-
 function mgffncvariable::_getAttribute, name, found=found
   compile_opt strictarr
@@ -99,12 +99,12 @@ end
 ; Returns the output display by HELP on an object of the class.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of the variable to get help about, passed in to display in HELP
-;       output
+;   varname : in, required, type=string
+;     name of the variable to get help about, passed in to display in HELP
+;     output
 ;-
 function mgffncgroup::_overloadHelp, varname
   compile_opt strictarr
@@ -116,14 +116,14 @@ end
 
 
 ;+
-; Get output for use with PRINT
+; Get output for use with `PRINT`.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Keywords:
-;    indent : in, optional, type=string
-;       indent to use when printing message
+;   indent : in, optional, type=string
+;     indent to use when printing message
 ;-
 function mgffncgroup::dump, indent=indent
   compile_opt strictarr
@@ -155,10 +155,10 @@ end
 
 
 ;+
-; Get output for use with PRINT
+; Get output for use with `PRINT`.
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mgffncgroup::_overloadPrint
   compile_opt strictarr
@@ -171,28 +171,28 @@ end
 ; Get attributes, groups, or variables from a file.
 ;
 ; :Returns:
-;    attribute value, group object, or variable object
+;   attribute value, group object, or variable object
 ;
 ; :Params:
-;    isRange : in, required, type=lonarr(ndims)
-;       array indicating whether each dimensions present is a range or a list
-;       of indices
-;    ss1 : in, required, type=string
-;       name of subgroup or variable
-;    ss2 : in, optional, type=any
-;       unused
-;    ss3 : in, optional, type=any
-;       unused
-;    ss4 : in, optional, type=any
-;       unused
-;    ss5 : in, optional, type=any
-;       unused
-;    ss6 : in, optional, type=any
-;       unused
-;    ss7 : in, optional, type=any
-;       unused
-;    ss8 : in, optional, type=any
-;       unused
+;   isRange : in, required, type=lonarr(ndims)
+;     array indicating whether each dimensions present is a range or a list
+;     of indices
+;   ss1 : in, required, type=string
+;     name of subgroup or variable
+;   ss2 : in, optional, type=any
+;     unused
+;   ss3 : in, optional, type=any
+;     unused
+;   ss4 : in, optional, type=any
+;     unused
+;   ss5 : in, optional, type=any
+;     unused
+;   ss6 : in, optional, type=any
+;     unused
+;   ss7 : in, optional, type=any
+;     unused
+;   ss8 : in, optional, type=any
+;     unused
 ;-
 function mgffncgroup::_overloadBracketsRightSide, isRange, $
                                                   ss1, ss2, ss3, ss4, $
@@ -242,7 +242,7 @@ end
 ; Create a netCDF group object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;-
 function mgffncgroup::init, _extra=e
   compile_opt strictarr
@@ -259,8 +259,8 @@ end
 ; Define instance variables and class inheritance.
 ;
 ; :Fields:
-;    children
-;       `IDL_Container` containing child groups/variables
+;   children
+;     `IDL_Container` containing child groups/variables
 ;-
 pro mgffncgroup__define
   compile_opt strictarr

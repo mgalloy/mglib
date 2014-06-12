@@ -4,13 +4,13 @@
 ; Class of functionality common to files, groups, and variables.
 ;
 ; :Categories:
-;    file i/o, netcdf, sdf
+;   file i/o, netcdf, sdf
 ;
 ; :Properties:
-;    identifier
-;       netCDF object identifier
-;    parent
-;       parent object in netCDF hierarchy
+;   identifier
+;     netCDF object identifier
+;   parent
+;     parent object in netCDF hierarchy
 ;-
 
 
@@ -20,15 +20,15 @@
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    parent_id : in, required, type=long
-;       identifier of the file, not used if `GLOBAL` is set
-;    id : in, required, type=long
-;       attribute identifier, set to file identifier if `GLOBAL` is set
-;    attnum : in, required, type=long
-;       attribute index
+;   parent_id : in, required, type=long
+;     identifier of the file, not used if `GLOBAL` is set
+;   id : in, required, type=long
+;     attribute identifier, set to file identifier if `GLOBAL` is set
+;   attnum : in, required, type=long
+;     attribute index
 ;-
 function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
                                       indent=indent
@@ -111,17 +111,17 @@ end
 
 
 ;+
-; HELP overload common routine.
+; `HELP` overload common routine.
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of variable to provide HELP for
+;   varname : in, required, type=string
+;      name of variable to provide HELP for
 ;
 ; :Keywords:
-;    type : in, optional, type=string, default='NC_BASE'
-;       type for object
-;    specs : in, optional, type=string, default='<undefined>'
-;       specs for object, depending on object type
+;   type : in, optional, type=string, default='NC_BASE'
+;     type for object
+;   specs : in, optional, type=string, default='<undefined>'
+;     specs for object, depending on object type
 ;-
 function mgffncbase::_overloadHelp, varname, type=type, specs=specs
   compile_opt strictarr
@@ -146,7 +146,7 @@ end
 ; Do base instantiation.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;-
 function mgffncbase::init, identifier=identifier, parent=parent
   compile_opt strictarr
@@ -162,8 +162,8 @@ end
 ; Define instance variables and class inheritance.
 ;
 ; :Fields:
-;    id
-;       netCDF identifier for object
+;   id
+;     netCDF identifier for object
 ;-
 pro mgffncbase__define
   compile_opt strictarr

@@ -4,15 +4,15 @@
 ; Class representing netCDF variable.
 ;
 ; :Categories:
-;    file i/o, netcdf, sdf
+;   file i/o, netcdf, sdf
 ;
 ; :Properties:
-;    attributes
-;       names of attributes of object
-;    variables
-;       names of child variables
-;    groups
-;       names of child groups
+;   attributes
+;     names of attributes of object
+;   variables
+;     names of child variables
+;   groups
+;     names of child groups
 ;-
 
 ;+
@@ -21,16 +21,16 @@
 ; :Private:
 ;
 ; :Params:
-;    bounds : in, required, type="lonarr(ndims, 3)"
-;       bounds
+;   bounds : in, required, type="lonarr(ndims, 3)"
+;     bounds
 ;
 ; :Keywords:
-;    offset : out, optional, type=lonarr(ndims)
-;       input for offset argument to NCDF_VARGET
-;    count : out, optional, type=lonarr(ndims)
-;       input for count argument to NCDF_VARGET
-;    stride : out, optional, type=lonarr(ndims)
-;       input for stride keyword to NCDF_VARGET
+;   offset : out, optional, type=lonarr(ndims)
+;     input for offset argument to NCDF_VARGET
+;   count : out, optional, type=lonarr(ndims)
+;     input for count argument to NCDF_VARGET
+;   stride : out, optional, type=lonarr(ndims)
+;     input for stride keyword to NCDF_VARGET
 ;-
 pro mgffncvariable::_computeslab, bounds, $
                                   offset=offset, $
@@ -56,12 +56,12 @@ end
 ;    attribute value or `!null` if not found
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of the attribute to retrieve
+;   name : in, required, type=string
+;     name of the attribute to retrieve
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       set to a named variable to get whether the attribute was found
+;   found : out, optional, type=boolean
+;     set to a named variable to get whether the attribute was found
 ;-
 function mgffncvariable::_getAttribute, name, found=found
   compile_opt strictarr
@@ -141,12 +141,12 @@ end
 ; Returns the output display by HELP on an object of the class.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of the variable to get help about, passed in to display in HELP
-;       output
+;   varname : in, required, type=string
+;     name of the variable to get help about, passed in to display in HELP
+;     output
 ;-
 function mgffncvariable::_overloadHelp, varname
   compile_opt strictarr
@@ -160,14 +160,14 @@ end
 
 
 ;+
-; Get output for use with PRINT
+; Get output for use with `PRINT`.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Keywords:
-;    indent : in, optional, type=string
-;       indent to use when printing message
+;   indent : in, optional, type=string
+;     indent to use when printing message
 ;-
 function mgffncvariable::dump, indent=indent
   compile_opt strictarr
@@ -205,7 +205,7 @@ end
 ; Get output for use with PRINT
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mgffncvariable::_overloadPrint
   compile_opt strictarr
@@ -224,41 +224,41 @@ end
 ;    attribute value, group object, or variable object
 ;
 ; :Params:
-;    isRange : in, required, type=lonarr(ndims)
-;       array indicating whether each dimensions present is a range or a list
-;       of indices
-;    ss1 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss1` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss2 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss2` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss3 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss3` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss4 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss4` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss5 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss5` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss6 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss6` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss7 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss7` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
-;    ss8 : in, required, type=lonarr
-;       if corresponding element of `isRange` is 1B, then `ss8` is a
-;       3-element array specifying start index, end index, and stride,
-;       otherwise an `n` element list of indices
+;   isRange : in, required, type=lonarr(ndims)
+;     array indicating whether each dimensions present is a range or a list
+;     of indices
+;   ss1 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss1` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss2 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss2` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss3 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss3` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss4 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss4` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss5 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss5` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss6 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss6` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss7 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss7` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
+;   ss8 : in, required, type=lonarr
+;     if corresponding element of `isRange` is 1B, then `ss8` is a
+;     3-element array specifying start index, end index, and stride,
+;     otherwise an `n` element list of indices
 ;-
 function mgffncvariable::_overloadBracketsRightSide, isRange, $
                                                      ss1, ss2, ss3, ss4, $

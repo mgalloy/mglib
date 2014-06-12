@@ -212,7 +212,7 @@ function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
   if (error ne 0L) then begin
     catch, /cancel
     error = 1L
-    return, -1L
+    return, !null
   endif
 
   ; get full dimensions of variable
@@ -255,23 +255,23 @@ end
 ;    attribute data
 ;
 ; :Params:
-;    fileId : in, required, type=long
+;    file_id : in, required, type=long
 ;       identifier of netCDF file
-;    varId : in, required, type=long
+;    var_id : in, required, type=long
 ;       identifier of variable
 ;    attname : in, required, type=string
 ;       attribute name
 ;-
-function mg_h5_getdata_getattributedata, fileId, varId, attname, global=global
+function mg_nc_getdata_getattributedata, file_id, var_id, attname, global=global
   compile_opt strictarr
   on_error, 2
 
   if (keyword_set(global)) then begin
-    ncdf_attget, fileId, attname, attvalue, /global
-    attInfo = ncdf_attinq(fileId, attname, /global)
+    ncdf_attget, file_id, attname, attvalue, /global
+    attInfo = ncdf_attinq(file_id, attname, /global)
   endif else begin
-    ncdf_attget, fileId, varId, attname, attvalue
-    attInfo = ncdf_attinq(fileId, varId, attname)
+    ncdf_attget, file_id, var_id, attname, attvalue
+    attInfo = ncdf_attinq(file_id, var_id, attname)
   endelse
 
   if (attInfo.dataType eq 'CHAR') then attvalue = string(attvalue)
@@ -289,7 +289,7 @@ end
 ;    attribute value
 ;
 ; :Params:
-;    fileId : in, required, type=long
+;    file_id : in, required, type=long
 ;       netCDF file identifier of the file to read
 ;    variable : in, required, type=string
 ;       path to attribute using "/" to navigate groups/datasets and "." to
@@ -299,14 +299,14 @@ end
 ;    error : out, optional, type=long
 ;       error value
 ;-
-function mg_nc_getdata_getattribute, fileId, variable, error=error
+function mg_nc_getdata_getattribute, file_id, variable, error=error
   compile_opt strictarr
 
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
     error = 1L
-    return, -1L
+    return, !null
   endif
 
   tokens = strsplit(variable, '.', escape='\', count=ndots)
@@ -315,10 +315,10 @@ function mg_nc_getdata_getattribute, fileId, variable, error=error
   attname = strmid(variable, dotpos + 1L)
 
   if (loc eq '') then begin
-    data = mg_h5_getdata_getattributedata(fileId, -1L, attname, /global)
+    data = mg_nc_getdata_getattributedata(file_id, -1L, attname, /global)
   endif else begin
-    varId = ncdf_varid(fileId, loc)
-    data = mg_h5_getdata_getattributedata(fileId, varId, attname)
+    var_id = ncdf_varid(file_id, loc)
+    data = mg_nc_getdata_getattributedata(file_id, var_id, attname)
   endelse
 
   return, data
@@ -348,7 +348,7 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
   compile_opt strictarr
   on_error, 2
 
-  fileId = ncdf_open(filename, /nowrite)
+  file_id = ncdf_open(filename, /nowrite)
   tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
   ndots = ntokens - 1L
 
@@ -366,12 +366,12 @@ function mg_nc_getdata, filename, variable, bounds=bounds, error=error
       _variable = strmid(_variable, 0L, bracketPos)
     endelse
 
-    result = mg_nc_getdata_getvariable(fileId, _variable, bounds=_bounds, $
+    result = mg_nc_getdata_getvariable(file_id, _variable, bounds=_bounds, $
                                        error=error)
     if (error) then message, 'variable not found', /informational
   endif else begin
     ; attribute
-    result = mg_nc_getdata_getattribute(fileId, _variable, error=error)
+    result = mg_nc_getdata_getattribute(file_id, _variable, error=error)
     if (error) then message, 'attribute not found', /informational
   endelse
 
