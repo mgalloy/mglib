@@ -1,12 +1,29 @@
 ; docformat = 'rst'
 
-pro mg_nc_putdata_putvariable, file_id, variable, data, error=error
+function mg_nc_putdata_checkdimname, file_id, dim_name, found=found
+  compile_opt strictarr
+
+  found = 0B
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, -1
+  endif
+
+  id = ncdf_dimid(file_id, dim_names[i])
+  found = 1L
+
+  return, id
+end
+
+
+pro mg_nc_putdata_putvariable, file_id, variable, data, $
+                               dim_names=dim_names, error=error
   compile_opt strictarr
 
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
-    error = 1L
     return
   endif
 
@@ -23,14 +40,24 @@ pro mg_nc_putdata_putvariable, file_id, variable, data, error=error
   endif
 
   if (variable_id eq -1L) then begin
-    ndims = size(data, /n_dimensions)
-    dim_ids = lonarr(ndims)
-    _dim_names = n_elements(dim_names) eq 0L $
-                   ? (variable + '_' + strtrim(sindgen(ndims), 2)) $
-                   : dim_names
-    for d = 0L, ndims - 1L do begin
-      dim_ids[d] = ncdf_dimdef(file_id, _dim_names[d], /unlimited)
+    ; create dimensions as needed
+    dims = size(data, /dimensions)
+    n_dims = size(data, /n_dimensions)
+    dim_ids = lonarr(n_dims)
+
+    for i = 0L, n_dims - 1L do begin
+      if (i ge n_elements(dim_names)) then begin
+        dim_ids[i] = ncdf_dimdef(file_id, $
+                                 variable + '_' + strtrim(i, 2), $
+                                 dims[i])
+      endif else begin
+        dim_ids[i] = mg_nc_putdata_checkdimname(file_id, dim_names[i], found=found)
+        if (~found) then begin
+          dim_ids[i] = ncdf_dimdef(file_id, dim_names[i], dims[i])
+        endif
+      endelse
     endfor
+  
     type = size(data, /type)
     variable_id = ncdf_vardef(file_id, $
                               variable, $
@@ -109,7 +136,8 @@ pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
   _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
 
   if (ndots eq 0L) then begin
-    mg_nc_putdata_putvariable, file_id, _variable, data, error=error
+    mg_nc_putdata_putvariable, file_id, _variable, data, $
+                               dim_names=dim_names, error=error
     if (error) then message, 'error writing variable', /informational
   endif else begin
     mg_nc_putdata_putattribute, file_id, _variable, data, error=error
