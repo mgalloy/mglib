@@ -21,15 +21,22 @@
 function mg_nc_putdata_checkdimname, file_id, dim_name, found=found
   compile_opt strictarr
 
+  ; annoying to have to do all this, but NCDF_DIMID will print an error message
+  ; when dim_name is not found otherwise
+
   found = 0B
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
+    !quiet = old_quiet
     return, -1
   endif
 
-  id = ncdf_dimid(file_id, dim_names[i])
-  found = 1L
+  old_quiet = !quiet
+  !quiet = 1
+  id = ncdf_dimid(file_id, dim_name)
+  !quiet = old_quiet
+  found = id lt 0L ? 0B : 1B
 
   return, id
 end
