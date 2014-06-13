@@ -1,5 +1,23 @@
 ; docformat = 'rst'
 
+;+
+; Determine if a dimension name is in use and what its identifier is.
+;
+; :Private:
+;
+; :Returns:
+;   dimension identifier if dimension name found, -1 otherwise
+;
+; :Params:
+;   file_id : in, required, type=long
+;     identifier for netCDF file open for writing
+;
+; :Keywords:
+;   dim_name : in, required, type=string
+;     potential dimension name
+;   found : out, optional, type=boolean
+;     set to a named variable to return whether the dimension name was found
+;-
 function mg_nc_putdata_checkdimname, file_id, dim_name, found=found
   compile_opt strictarr
 
@@ -17,6 +35,25 @@ function mg_nc_putdata_checkdimname, file_id, dim_name, found=found
 end
 
 
+;+
+; Put a variable into an open netCDF file with a given name.
+;
+; :Private:
+;
+; :Params:
+;   file_id : in, required, type=long
+;     identifier for netCDF file open for writing
+;   variable : in, required, type=string
+;     name of variable
+;   data : in, required, type=numeric
+;     data to store in variable
+;
+; :Keywords:
+;   dim_names : in, optional, type=strarr
+;     string array of dimension names
+;   error : out, optional, type=long
+;     set to a named variable to return error status
+;-
 pro mg_nc_putdata_putvariable, file_id, variable, data, $
                                dim_names=dim_names, error=error
   compile_opt strictarr
@@ -76,6 +113,23 @@ pro mg_nc_putdata_putvariable, file_id, variable, data, $
 end
 
 
+;+
+; Put an attribute into an open netCDF file with a given name.
+;
+; :Private:
+;
+; :Params:
+;   file_id : in, required, type=long
+;     identifier for netCDF file open for writing
+;   variable : in, required, type=string
+;     name of variable/attribute
+;   data : in, required, type=numeric
+;     data to store in variable
+;
+; :Keywords:
+;   error : out, optional, type=long
+;     set to a named variable to return error status
+;-
 pro mg_nc_putdata_putattribute, file_id, variable, data, error=error
   compile_opt strictarr
 
