@@ -11,32 +11,34 @@
 ; Parses a variable or routine declaration into a name and type declaration.
 ; For example, it splits the following::
 ;
-;    char *IDL_OutputFormatFunc
+;   char *IDL_OutputFormatFunc
 ;
 ; into the type "char *" and `NAME` "IDL_OutputFormatFunc".
 ;
 ; :Returns:
-;    SIZE type code or C string declaration
+;   `SIZE` type code or C string declaration
 ;
 ; :Params:
-;    decl : in, required, type=string
-;       C declaration
+;   decl : in, required, type=string
+;     C declaration
 ;
 ; :Keywords:
-;    name : out, optional, type=string
-;       routine/parameter name
-;    pointer : out, optional, type=boolean
-;       pass a named variable to get whether the declaration is a pointer (but
-;       not an array)
-;    array : out, optional, type=boolean
-;       pass a named variable to get whether the declaration is an array (but
-;       not a pointer)
-;    device : out, optional, type=boolean
-;       pass a named variable to get whether the declaration is a device
-;       pointer/array
+;   name : out, optional, type=string
+;     routine/parameter name
+;   pointer : out, optional, type=boolean
+;     pass a named variable to get whether the declaration is a pointer (but
+;     not an array)
+;   array : out, optional, type=boolean
+;     pass a named variable to get whether the declaration is an array (but
+;     not a pointer)
+;   device : out, optional, type=boolean
+;     pass a named variable to get whether the declaration is a device
+;     pointer/array
 ;-
 function mg_parse_cdeclaration, decl, name=name, $
-                                pointer=pointer, array=array, device=device
+                                pointer=pointer, $
+                                array=array, $
+                                device=device
   compile_opt strictarr
 
   _decl = strtrim(decl, 2)
@@ -147,6 +149,13 @@ function mg_parse_cdeclaration, decl, name=name, $
       pointer = 1B
       return, 15L
     end
-    else: return, type
+    else: begin
+        if (strmid(type, 0, 1, /reverse_offset) eq '*') then begin
+          pointer = 1B
+          return, 0L
+        endif else begin
+          return, type
+        endelse
+      end
   endcase
 end
