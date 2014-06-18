@@ -34,27 +34,27 @@
 ;    direct graphics
 ;
 ; :Copyright:
-;    Color tables accessed with `MG_LOADCT` and `MG_XLOADCT` are provided
-;    courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org,
-;    accessed 20 October 2007.
+;   Color tables accessed with `MG_LOADCT` and `MG_XLOADCT` are provided
+;   courtesy of Brewer, Cynthia A., 2007. http://www.ColorBrewer.org,
+;   accessed 20 October 2007.
 ;
-;    Apache-Style Software License for ColorBrewer software and ColorBrewer
-;    Color Schemes
+;   Apache-Style Software License for ColorBrewer software and ColorBrewer
+;   Color Schemes
 ;
-;    Copyright (c) 2002 Cynthia Brewer, Mark Harrower, and The Pennsylvania
-;    State University.
+;   Copyright (c) 2002 Cynthia Brewer, Mark Harrower, and The Pennsylvania
+;   State University.
 ;
-;    Licensed under the Apache License, Version 2.0 (the "License"); you may
-;    not use this file except in compliance with the License. You may obtain
-;    a copy of the License at::
+;   Licensed under the Apache License, Version 2.0 (the "License"); you may
+;   not use this file except in compliance with the License. You may obtain
+;   a copy of the License at::
 ;
-;       http://www.apache.org/licenses/LICENSE-2.0
+;     http://www.apache.org/licenses/LICENSE-2.0
 ;
-;    Unless required by applicable law or agreed to in writing, software
-;    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-;    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-;    License for the specific language governing permissions and limitations
-;    under the License.
+;   Unless required by applicable law or agreed to in writing, software
+;   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+;   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+;   License for the specific language governing permissions and limitations
+;   under the License.
 ;-
 
 ;+
@@ -64,7 +64,7 @@
 ; :Private:
 ;
 ; :Returns:
-;    long
+;   long
 ;-
 function mg_loadct_termcolumns
   compile_opt strictarr
@@ -85,8 +85,8 @@ end
 ; :Private:
 ;
 ; :Params:
-;    ctnames : in, required, type=strarr
-;       names of the color tables
+;   ctnames : in, required, type=strarr
+;     names of the color tables
 ;-
 pro mg_loadct_showtables, ctnames
   compile_opt strictarr
@@ -114,45 +114,46 @@ end
 
 
 ;+
+; Load a pre-defined color table.
+;
 ; :Params:
-;    table : in, optional, type=long
-;       table number, 0-40 if using default color table file, 0-34 for Brewer
-;       color tables, 0-6 for the Yorick/Gist color tables, or 0-15 for the
-;       matplotlib color tables
-
+;   table : in, optional, type=long
+;     table number, 0-40 if using default color table file, 0-34 for Brewer
+;     color tables, 0-6 for the Yorick/Gist color tables, or 0-15 for the
+;     matplotlib color tables
 ;
 ; :Keywords:
-;    file : in, optional, type=string, default=colors.tbl
-;       filename of color table file; this is present to make `MG_LOADCT`
-;       completely implement `LOADCT`'s interface, it would normally not be used
-;    brewer : in, optional, type=boolean
-;       set to use the Brewer color tables
-;    gmt : in, optional, type=boolean
-;       set to use the GMT color tables
-;    mpl : in, optional, type=boolean
-;       set to use the matplotlib color tables
-;    gist : in, optional, type=boolean
-;       set to use the Gist/Yorick color tables
-;    chaco : in, optional, type=boolean
-;       set to use the Chaco color tables
-;    mg : in, optional, type=boolean
-;       set to use the MG library color tables
-;    rgb_table : out, optional, type="lonarr(ncolors, 2)"
-;       set to a named variable to retrieve the color table
-;    reverse : in, optional, type=boolean
-;       set to reverse color table
-;    get_names : out, optional, type=strarr
-;       set to a named variables to return the name of the color tables
-;    show_tables : in, optional, type=boolean
-;       set to print a listing of the available color tables
-;    cpt_filename : in, optional, type=string
-;       filename of `.cpt` file to load a color table from; the `.cpt`
-;       filename extension is optional; the filename given can be absolute,
-;       relative from the current working directory, or relative from the
-;       `cpt-city` directory in the mglib library; see `cptcity_catalog.idldoc`
-;       for a listing of the `.cpt` files provided with the mglib library
-;    _ref_extra : in, out, optional, type=keyword
-;       keywords to `LOADCT`
+;   file : in, optional, type=string, default=colors.tbl
+;     filename of color table file; this is present to make `MG_LOADCT`
+;     completely implement `LOADCT`'s interface, it would normally not be used
+;   brewer : in, optional, type=boolean
+;     set to use the Brewer color tables
+;   gmt : in, optional, type=boolean
+;     set to use the GMT color tables
+;   mpl : in, optional, type=boolean
+;     set to use the matplotlib color tables
+;   gist : in, optional, type=boolean
+;     set to use the Gist/Yorick color tables
+;   chaco : in, optional, type=boolean
+;     set to use the Chaco color tables
+;   mg : in, optional, type=boolean
+;     set to use the MG library color tables
+;   rgb_table : out, optional, type="lonarr(ncolors, 2)"
+;     set to a named variable to retrieve the color table
+;   reverse : in, optional, type=boolean
+;     set to reverse color table
+;   get_names : out, optional, type=strarr
+;     set to a named variables to return the name of the color tables
+;   show_tables : in, optional, type=boolean
+;     set to print a listing of the available color tables
+;   cpt_filename : in, optional, type=string
+;     filename of `.cpt` file to load a color table from; the `.cpt`
+;     filename extension is optional; the filename given can be absolute,
+;     relative from the current working directory, or relative from the
+;     `cpt-city` directory in the mglib library; see `cptcity_catalog.idldoc`
+;     for a listing of the `.cpt` files provided with the mglib library
+;   _ref_extra : in, out, optional, type=keyword
+;     keywords to `LOADCT`
 ;-
 pro mg_loadct, table, file=file, $
                brewer=brewer, gmt=gmt, mpl=mpl, gist=gist, chaco=chaco, mg=mg, $

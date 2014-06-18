@@ -4,7 +4,7 @@
 ;+
 ; Convert string bounds like `0:*` to a 3-element bounds specification::
 ;
-;    [start_index, stop_index, string]
+;   [start_index, stop_index, string]
 ;
 ; :Private:
 ;
@@ -13,9 +13,9 @@
 ;
 ; :Params:
 ;   sbounds : in, required, type=string
-;      notation for 1 dimension, e.g., '0', '3:9', '3:*:2'
+;     notation for 1 dimension, e.g., `0`, `3:9`, `3:*:2`
 ;   dim_size : in, required, type=lonarr
-;      size of the dimension being converted
+;     size of the dimension being converted
 ;-
 function mg_hdf_getdata_convertbounds_1d, sbounds, dim_size
   compile_opt strictarr
@@ -67,18 +67,18 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    lonarr(ndims, 3)
+;   `lonarr(ndims, 3)`
 ;
 ; :Params:
-;    sbounds : in, required, type=string
-;       bounds specified as a string using IDL's normal indexing notation
+;   sbounds : in, required, type=string
+;     bounds specified as a string using IDL's normal indexing notation
 ;
 ; :Keywords:
-;    dimensions : in, optional, type=lonarr(ndims)
-;       dimensions of the full array; required if a '*' is used in sbounds
-;    single : out, optional, type=boolean
-;       set to a named variable to determine if the bounds expression was
-;       specified in single-index dimensioning
+;   dimensions : in, optional, type=lonarr(ndims)
+;     dimensions of the full array; required if a '*' is used in sbounds
+;   single : out, optional, type=boolean
+;     set to a named variable to determine if the bounds expression was
+;     specified in single-index dimensioning
 ;-
 function mg_hdf_getdata_convertbounds, sbounds, dimensions=dimensions, $
                                        single=single
@@ -114,16 +114,16 @@ end
 ; :Private:
 ;
 ; :Params:
-;    bounds : in, required, type="lonarr(ndims, 3)"
-;       bounds
+;   bounds : in, required, type="lonarr(ndims, 3)"
+;     bounds
 ;
 ; :Keywords:
-;    start : out, optional, type=lonarr(ndims)
-;       input for start argument to H5S_SELECT_HYPERSLAB
-;    count : out, optional, type=lonarr(ndims)
-;       input for count argument to H5S_SELECT_HYPERSLAB
-;    stride : out, optional, type=lonarr(ndims)
-;       input for stride keyword to H5S_SELECT_HYPERSLAB
+;   start : out, optional, type=lonarr(ndims)
+;     input for start argument to H5S_SELECT_HYPERSLAB
+;   count : out, optional, type=lonarr(ndims)
+;     input for count argument to H5S_SELECT_HYPERSLAB
+;   stride : out, optional, type=lonarr(ndims)
+;     input for stride keyword to H5S_SELECT_HYPERSLAB
 ;-
 pro mg_hdf_getdata_computeslab, bounds, $
                                 start=start, count=count, stride=stride
@@ -144,15 +144,23 @@ end
 ; :Private:
 ;
 ; :Requires:
-;    IDL 8.0
+;   IDL 8.0
 ;
 ; :Returns:
+;   any
 ;
 ; :Params:
-;    sd_id : in, required, type=long
-;       HDF file identifier
-;    varname : in, required, type=string
-;       name of variable to retreive from file
+;   sd_id : in, required, type=long
+;     HDF file identifier
+;   varname : in, required, type=string
+;     name of variable to retreive from file
+;
+; :Keywords:
+;   bounds : in, optional, type="lonarr(3, ndims) or string"
+;     gives start value, end value, and stride for each dimension of the
+;     variable
+;   error : out, optional, type=long
+;     set to a named variable to return the error value; 0 indicates no error
 ;-
 function mg_hdf_getdata_getsdvariable, sd_id, varname, $
                                        bounds=bounds, $
@@ -234,20 +242,20 @@ end
 ; Pulls out a section of a HDF variable.
 ;
 ; :Returns:
-;    data array
+;   data array
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of the HDF file
-;    variable : in, required, type=string
-;       variable name (with path if inside a group)
+;   filename : in, required, type=string
+;     filename of the HDF file
+;   variable : in, required, type=string
+;     variable name (with path if inside a group)
 ;
 ; :Keywords:
-;    bounds : in, optional, type="lonarr(3, ndims) or string"
-;       gives start value, end value, and stride for each dimension of the
-;       variable
-;    error : out, optional, type=long
-;       error value
+;   bounds : in, optional, type="lonarr(3, ndims) or string"
+;     gives start value, end value, and stride for each dimension of the
+;     variable
+;   error : out, optional, type=long
+;     error value
 ;-
 function mg_hdf_getdata, filename, variable, bounds=bounds, error=error
   compile_opt strictarr
