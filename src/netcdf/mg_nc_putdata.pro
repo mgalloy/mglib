@@ -11,10 +11,10 @@
 ; :Params:
 ;   file_id : in, required, type=long
 ;     identifier for netCDF file open for writing
-;
-; :Keywords:
 ;   dim_name : in, required, type=string
 ;     potential dimension name
+;
+; :Keywords:
 ;   found : out, optional, type=boolean
 ;     set to a named variable to return whether the dimension name was found
 ;-

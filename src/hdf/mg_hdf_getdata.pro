@@ -196,7 +196,7 @@ end
 ;   attribute value or `!null` if an error
 ;
 ; :Params:
-;   sds_id : in, required, type=long
+;   sd_id : in, required, type=long
 ;     netCDF file/dataset identifier
 ;   variable : in, required, type=string
 ;     variable name and attribute name string, i.e., "var1.attribute_name"
