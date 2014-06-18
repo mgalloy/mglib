@@ -27,8 +27,12 @@ IDL library of Michael Galloy.
   dist_tools/bindings/
     routines for wrapping C routines with a DLM in a quick and nearly an
     automatic manner using the `MG_DLM` class
-  dist_tools/cidl
+  dist_tools/cidl/
     routines for creating hybrid C/IDL routines
+  docgen/
+    `mg_docgen` is a utility to produce text output that combines static
+    written text and the output from IDL. This is perfect for writing tutorials
+    on how to use an IDL routine, documenting your scientific process, etc.
   envi/
     ENVI user routines
   fileio/
@@ -36,7 +40,7 @@ IDL library of Michael Galloy.
   googlevoice/
     class for connecting to Google Voice
   gsl/
-    wrappers for GNU Scientific Library (GSL) routines
+    generated wrappers for GNU Scientific Library (GSL) routines
   hdf/
     routines for reading/writing/querying HDF files
   hdf5/
@@ -50,7 +54,7 @@ IDL library of Michael Galloy.
   itools/
     iTools related helpers and components
   markdown/
-    wrapper for a C implementation of John Gruber's markdown
+    DLM wrapper for a C implementation of John Gruber's markdown
   misc/
     miscellaneous routines
   net/
@@ -120,3 +124,7 @@ IDL library of Michael Galloy.
     x3dom output from IDL object graphics
   widgets/
     routines and objects for doing widget programming
+  zeromq/
+    generated bindings for 0MQ library
+  zlib/
+    zlib compression DLM
