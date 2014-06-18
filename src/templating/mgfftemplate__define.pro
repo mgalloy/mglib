@@ -449,12 +449,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename to include
+;   filename : in, required, type=string
+;     filename to include
+;   output_lun : in, required, type=long
+;     LUN to output contents of file to
 ;
 ; :Keywords:
-;    spaces : in, required, type=string
-;       indentation of output
+;   spaces : in, required, type=string
+;     indentation of output
 ;-
 pro mgfftemplate::_copyFile, filename, output_lun, spaces=spaces
   compile_opt strictarr
