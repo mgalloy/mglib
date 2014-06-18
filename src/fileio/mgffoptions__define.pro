@@ -179,6 +179,9 @@ end
 ;     IDL> help, config
 ;     CONFIG          MGFFOPTIONS  <NSECTIONS=2  NOPTIONS=4>
 ;
+; :Returns:
+;   string
+;
 ; :Params:
 ;   varname : in, required, type=string
 ;     `MGffOptions` object variable name
@@ -210,6 +213,9 @@ end
 ;     [ Mike ]
 ;     City:   Boulder
 ;     State:  Colorado
+;
+; :Returns:
+;   string
 ;-
 function mgffoptions::_overloadPrint
   compile_opt strictarr
