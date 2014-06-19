@@ -192,7 +192,7 @@ end
 ;   value of data read from dataset
 ;
 ; :Params:
-;   fileId : in, required, type=long
+;   file_id : in, required, type=long
 ;     netCDF indentifier of the file
 ;   variable : in, required, type=string
 ;     string navigating the path to the dataset
@@ -204,7 +204,7 @@ end
 ;   error : out, optional, type=long
 ;     error value
 ;-
-function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
+function mg_nc_getdata_getvariable, file_id, variable, bounds=bounds, $
                                     error=error
   compile_opt strictarr
 
@@ -214,12 +214,21 @@ function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
     return, !null
   endif
 
+  ; get variable ID
+  tokens = strsplit(variable, '/', /extract, count=n_tokens)
+  group_id = file_id
+  for i = 0L, n_tokens - 2L do begin
+    group_id = ncdf_ncidinq(group_id, tokens[i])
+  endfor
+  varname = tokens[-1]
+
+  var_id = ncdf_varid(group_id, varname)
+
   ; get full dimensions of variable
-  varId = ncdf_varid(fileId, variable)
-  varInfo = ncdf_varinq(fileId, varId)
+  varInfo = ncdf_varinq(group_id, var_id)
   dimensions = lonarr(varInfo.ndims)
   for d = 0L, varInfo.ndims - 1L do begin
-    ncdf_diminq, fileId, varInfo.dim[d], dimName, dimSize
+    ncdf_diminq, group_id, varInfo.dim[d], dimName, dimSize
     dimensions[d] = dimSize
   endfor
 
@@ -239,7 +248,7 @@ function mg_nc_getdata_getvariable, fileId, variable, bounds=bounds, $
                              count=count, $
                              stride=stride
 
-  ncdf_varget, fileId, varId, value, count=count, offset=offset, stride=stride
+  ncdf_varget, group_id, var_id, value, count=count, offset=offset, stride=stride
 
   return, value
 end

@@ -44,29 +44,37 @@ function mg_nc_getdata_ut::test_group
 
   filename = file_which('ncgroup.nc')
 
-  diesel = mg_nc_getdata(filename, 'Submarine/Diesel_Electric/Sub Depth', error=err)
-  assert, err eq 0, 'MG_NC_GETDATA error = %d', err
+  varname = '/Submarine/Diesel_Electric/Sub Depth'
+  diesel = mg_nc_getdata(filename, varname, error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
   result_type = size(diesel, /type)
   result_dims = size(diesel, /dimensions)
   assert, result_type eq 2L, 'incorrect diesel type: %d', result_type
   assert, array_equal(result_dims, [2]), $
-          'incorrect dimensions: [%s]', strjoin(strtrim(result_dims, 2), ', ')
+          'incorrect dimensions for %s: [%s]', $
+          varname, strjoin(strtrim(result_dims, 2), ', ')
 
-  attack = mg_nc_getdata(filename, 'Submarine/Nuclear/Attack/Sub Depth', error=err)
-  assert, err eq 0, 'MG_NC_GETDATA error = %d', err
+  varname = '/Submarine/Nuclear/Attack/Sub Depth'
+  attack = mg_nc_getdata(filename, varname, error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
   result_type = size(attack, /type)
   result_dims = size(attack, /dimensions)
   assert, result_type eq 2L, 'incorrect diesel type: %d', result_type
-  assert, array_equal(result_dims, [2]), $
-          'incorrect dimensions: [%s]', strjoin(strtrim(result_dims, 2), ', ')
+  assert, array_equal(result_dims, [4]), $
+          'incorrect dimensions for %s: [%s]', $
+          varname, $
+          strjoin(strtrim(result_dims, 2), ', ')
 
-  missile = mg_nc_getdata(filename, 'Submarine/Nuclear/Missile/Sub Depth', error=err)
-  assert, err eq 0, 'MG_NC_GETDATA error = %d', err
+  varname = '/Submarine/Nuclear/Missile/Sub Depth'
+  missile = mg_nc_getdata(filename, varname, error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
   result_type = size(missile, /type)
   result_dims = size(missile, /dimensions)
   assert, result_type eq 2L, 'incorrect diesel type: %d', result_type
-  assert, array_equal(result_dims, [2]), $
-          'incorrect dimensions: [%s]', strjoin(strtrim(result_dims, 2), ', ')
+  assert, array_equal(result_dims, [3]), $
+          'incorrect dimensions for %s: [%s]', $
+          varname, $
+          strjoin(strtrim(result_dims, 2), ', ')
 
   return, 1
 end
