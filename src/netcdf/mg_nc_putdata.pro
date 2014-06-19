@@ -48,9 +48,9 @@ end
 ; :Private:
 ;
 ; :Params:
-;   file_id : in, required, type=long
-;     identifier for netCDF file open for writing
-;   variable : in, required, type=string
+;   parent_id : in, required, type=long
+;     parent/group identifier
+;   varname : in, required, type=string
 ;     name of variable
 ;   data : in, required, type=numeric
 ;     data to store in variable
@@ -61,7 +61,7 @@ end
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
-pro mg_nc_putdata_putvariable, file_id, variable, data, $
+pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                                dim_names=dim_names, error=error
   compile_opt strictarr
 
@@ -71,12 +71,12 @@ pro mg_nc_putdata_putvariable, file_id, variable, data, $
     return
   endif
 
-  var_ids = ncdf_varidsinq(file_id)
+  var_ids = ncdf_varidsinq(parent_id)
   variable_id = -1L
   if (var_ids[0] ne -1L) then begin
     for v = 0L, n_elements(var_ids) - 1L do begin
-      var_info = ncdf_varinq(file_id, var_ids[v])
-      if (var_info.name eq variable) then begin
+      var_info = ncdf_varinq(parent_id, var_ids[v])
+      if (var_info.name eq varname) then begin
         variable_id = var_ids[v]
         break
       endif
@@ -91,20 +91,20 @@ pro mg_nc_putdata_putvariable, file_id, variable, data, $
 
     for i = 0L, n_dims - 1L do begin
       if (i ge n_elements(dim_names)) then begin
-        dim_ids[i] = ncdf_dimdef(file_id, $
-                                 variable + '_' + strtrim(i, 2), $
+        dim_ids[i] = ncdf_dimdef(parent_id, $
+                                 varname + '_' + strtrim(i, 2), $
                                  dims[i])
       endif else begin
-        dim_ids[i] = mg_nc_putdata_checkdimname(file_id, dim_names[i], found=found)
+        dim_ids[i] = mg_nc_putdata_checkdimname(parent_id, dim_names[i], found=found)
         if (~found) then begin
-          dim_ids[i] = ncdf_dimdef(file_id, dim_names[i], dims[i])
+          dim_ids[i] = ncdf_dimdef(parent_id, dim_names[i], dims[i])
         endif
       endelse
     endfor
   
     type = size(data, /type)
-    variable_id = ncdf_vardef(file_id, $
-                              variable, $
+    variable_id = ncdf_vardef(parent_id, $
+                              varname, $
                               dim_ids, $
                               ubyte=type eq 1, $
                               short=type eq 2, $
@@ -116,7 +116,7 @@ pro mg_nc_putdata_putvariable, file_id, variable, data, $
                               ulong=type eq 13)
   endif
 
-  ncdf_varput, file_id, variable_id, data
+  ncdf_varput, parent_id, variable_id, data
 end
 
 
@@ -128,16 +128,18 @@ end
 ; :Params:
 ;   file_id : in, required, type=long
 ;     identifier for netCDF file open for writing
-;   variable : in, required, type=string
-;     name of variable/attribute
+;   parent_id : in, required, type=long
+;     identifier for parent group/variable
+;   attname : in, required, type=string
+;     name of attribute
 ;   data : in, required, type=numeric
-;     data to store in variable
+;     data to store in attribute
 ;
 ; :Keywords:
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
-pro mg_nc_putdata_putattribute, file_id, variable, data, error=error
+pro mg_nc_putdata_putattribute, file_id, parent_id, attname, data, error=error
   compile_opt strictarr
 
   catch, error
@@ -147,16 +149,10 @@ pro mg_nc_putdata_putattribute, file_id, variable, data, error=error
     return
   endif
 
-  tokens = strsplit(variable, '.', escape='\', count=ndots)
-  dotpos = tokens[ndots - 1L] - 1L
-  loc = strmid(variable, 0, dotpos)
-  attname = strmid(variable, dotpos + 1L)
-
-  if (loc eq '') then begin
+  if (file_id eq parent_id) then begin
     ncdf_attput, file_id, attname, data, /global
   endif else begin
-    var_id = ncdf_varid(file_id, loc)
-    ncdf_attput, file_id, var_id, attname, data
+    ncdf_attput, file_id, parent_id, attname, data
   endelse
 end
 
@@ -167,8 +163,8 @@ end
 ; :Params:
 ;   filename : in, required, type=string
 ;     filename of file to write to; this file does not need to exist beforehand
-;   variable : in, required, type=string
-;     name of variable to write
+;   descriptor : in, required, type=string
+;     name of variable/attribute to write
 ;   data : in, required, type=any
 ;     data to write
 ;
@@ -178,8 +174,9 @@ end
 ;   error : out, optional, type=long
 ;     error code, 0 for no errors
 ;-
-pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
+pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
   compile_opt strictarr
+  on_error, 2
 
   error = 0L
 
@@ -190,20 +187,35 @@ pro mg_nc_putdata, filename, variable, data, dim_names=dim_names, error=error
     file_id = ncdf_create(filename, /netcdf4_format)
   endelse
 
-  tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
-  ndots = ntokens - 1L
-
-  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens, '.')
-  _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
-
-  if (ndots eq 0L) then begin
-    mg_nc_putdata_putvariable, file_id, _variable, data, $
-                               dim_names=dim_names, error=error
-    if (error) then message, 'error writing variable', /informational
-  endif else begin
-    mg_nc_putdata_putattribute, file_id, _variable, data, error=error
-    if (error) then message, 'error writing attribute', /informational
-  endelse
+  type = mg_nc_decompose(file_id, descriptor, $
+                         parent_type=parent_type, $
+                         parent_id=parent_id, $
+                         element_name=element_name, $
+                         /write, error=error)
+  if (error ne 0L) then return
+  case type of
+    0: begin
+        error = -1L
+        message, 'unknown descriptor type', /informational
+      end
+    1: begin
+         mg_nc_putdata_putattribute, file_id, parent_id, element_name, data, $
+                                     error=error
+         if (error) then message, 'error writing attribute', /informational
+      end
+    2: begin
+         mg_nc_putdata_putvariable, parent_id, element_name, data, $
+                                    dim_names=dim_names, error=error
+         if (error) then message, 'error writing variable', /informational
+      end
+    3: begin
+        message, 'unable to create group from descriptor', /informational
+      end
+    else: begin
+        error = -1L
+        message, 'unknown descriptor type', /informational
+      end
+  endcase
 
   ncdf_close, file_id
 end

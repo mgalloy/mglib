@@ -66,7 +66,7 @@ function mg_nc_putdata_ut::test_groupvar
   mg_nc_putdata, self.test_filename, 'group/example_var', standard, error=err
   assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
 
-  result = mg_nc_getdata(self.test_filename, 'group.example_attribute', $
+  result = mg_nc_getdata(self.test_filename, 'group/example_var', $
                          error=err)
   assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
 
@@ -108,6 +108,25 @@ function mg_nc_putdata_ut::test_rootattr
   assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
 
   result = mg_nc_getdata(self.test_filename, '.example_attribute', error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
+
+  result_type = size(result, /type)
+  assert, result_type eq 7L, 'incorrect type: %d', result_type
+
+  assert, result eq standard, 'incorrect value: %s', result
+
+  return, 1
+end
+
+
+function mg_nc_putdata_ut::test_rootattr_withslash
+  compile_opt strictarr
+
+  standard = 'Example string attribute'
+  mg_nc_putdata, self.test_filename, '/.example_attribute', standard, error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  result = mg_nc_getdata(self.test_filename, '/.example_attribute', error=err)
   assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
 
   result_type = size(result, /type)

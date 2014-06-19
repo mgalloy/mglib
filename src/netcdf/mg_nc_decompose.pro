@@ -42,36 +42,43 @@ function mg_nc_decompose, file_id, descriptor, $
     return, 0L
   endif
 
-  has_atrribute = 0B
+  has_attribute = 0B
 
   ; use STRSPLIT instead of STRPOS to handle escapes
   dotpos = strsplit(descriptor, '.', escape='\', count=n_dots, /preserve_null)
   n_dots--
-  dotpos = n_dots gt 0L ? dotpos[-1] : -1L
+  dotpos = n_dots gt 0L ? (dotpos[-1] - 1L) : -1L
 
   if (dotpos ne -1L) then begin
     has_attribute = 1B
-    group_descriptor = strmid(descriptor, 0, dotpos)
+    group_descriptor = dotpos eq 0L ? '/' : strmid(descriptor, 0, dotpos)
   endif else begin
     group_descriptor = descriptor
   endelse
 
-  groups = strsplit(group_descriptor, '/', /extract, count=n_groups)
-  group_id = file_id
-  for i = 0L, n_groups - 2L do begin
-    new_group_id = ncdf_ncidinq(group_id, groups[i])
+  if (group_descriptor eq '/') then begin
+    parent_type = 3L
+    parent_id = file_id
+    element_name = strmid(descriptor, dotpos + 1)
+    return, 1L
+  endif else begin
+    groups = strsplit(group_descriptor, '/', /extract, count=n_groups)
+    group_id = file_id
+    for i = 0L, n_groups - 2L do begin
+      new_group_id = ncdf_ncidinq(group_id, groups[i])
 
-    ; create group if it doesn't already exist (and WRITE is set)
-    if (group_id eq -1L) then begin
-      if (keyword_set(write)) then begin
-        group_id = ncdf_groupdef(group_id, groups[i])
+      ; create group if it doesn't already exist (and WRITE is set)
+      if (new_group_id eq -1L) then begin
+        if (keyword_set(write)) then begin
+          group_id = ncdf_groupdef(group_id, groups[i])
+        endif else begin
+          return, 0L
+        endelse
       endif else begin
-        return, 0L
+        group_id = new_group_id
       endelse
-    endif else begin
-      group_id = new_group_id
-    endelse
-  endfor
+    endfor
+  endelse
 
   ; last "group" could be a group or variable
 

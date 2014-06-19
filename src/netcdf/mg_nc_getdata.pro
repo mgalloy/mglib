@@ -265,12 +265,19 @@ end
 ; :Params:
 ;   file_id : in, required, type=long
 ;     identifier of netCDF file
-;   var_id : in, required, type=long
-;     identifier of variable
+;   parent_id : in, required, type=long
+;     identifier of parent variable/group
 ;   attname : in, required, type=string
 ;     attribute name
+;
+; :Keywords:
+;   global : in, optional, type=boolean
+;     set to indicate that the attribute is a global attribute
+;   error : out, optional, type=long
+;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattributedata, file_id, var_id, attname, global=global, error=error
+function mg_nc_getdata_getattributedata, file_id, parent_id, attname, $
+                                         global=global, error=error
   compile_opt strictarr
   on_error, 2
 
@@ -281,16 +288,16 @@ function mg_nc_getdata_getattributedata, file_id, var_id, attname, global=global
   endif
 
   if (keyword_set(global)) then begin
-    ncdf_attget, file_id, attname, attvalue, /global
-    attInfo = ncdf_attinq(file_id, attname, /global)
+    ncdf_attget, file_id, attname, attr_value, /global
+    attr_info = ncdf_attinq(file_id, attname, /global)
   endif else begin
-    ncdf_attget, file_id, var_id, attname, attvalue
-    attInfo = ncdf_attinq(file_id, var_id, attname)
+    ncdf_attget, file_id, parent_id, attname, attr_value
+    attr_info = ncdf_attinq(file_id, parent_id, attname)
   endelse
 
-  if (attInfo.dataType eq 'CHAR') then attvalue = string(attvalue)
+  if (attr_info.dataType eq 'CHAR') then attr_value = string(attr_value)
 
-  return, attvalue
+  return, attr_value
 end
 
 
@@ -305,15 +312,16 @@ end
 ; :Params:
 ;   file_id : in, required, type=long
 ;     netCDF file identifier of the file to read
-;   variable : in, required, type=string
-;     path to attribute using "/" to navigate groups/datasets and "." to
-;     indicate the attribute name
+;   parent_id : in, required, type=long
+;     parent group/variable identifier
+;   attname : in, required, type=string
+;     name of attribute
 ;
 ; :Keywords:
 ;   error : out, optional, type=long
-;     error value
+;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattribute, file_id, variable, error=error
+function mg_nc_getdata_getattribute, file_id, parent_id, attname, error=error
   compile_opt strictarr
 
   catch, error
@@ -322,17 +330,9 @@ function mg_nc_getdata_getattribute, file_id, variable, error=error
     return, !null
   endif
 
-  tokens = strsplit(variable, '.', escape='\', count=ndots)
-  dotpos = tokens[ndots - 1L] - 1L
-  loc = strmid(variable, 0, dotpos)
-  attname = strmid(variable, dotpos + 1L)
-
-  if (loc eq '') then begin
-    data = mg_nc_getdata_getattributedata(file_id, -1L, attname, /global, error=error)
-  endif else begin
-    var_id = ncdf_varid(file_id, loc)
-    data = mg_nc_getdata_getattributedata(file_id, var_id, attname, error=error)
-  endelse
+  data = mg_nc_getdata_getattributedata(file_id, parent_id, attname, $
+                                        global=file_id eq parent_id, $
+                                        error=error)
 
   return, data
 end
@@ -347,47 +347,66 @@ end
 ; :Params:
 ;   filename : in, required, type=string
 ;     filename of the netCDF file
-;   variable : in, required, type=string
-;     variable name (with path if inside a group)
+;   descriptor : in, required, type=string
+;     descriptor for variable/attribute name (with path if inside a group)
 ;
 ; :Keywords:
 ;   bounds : in, optional, type="lonarr(3, ndims) or string"
 ;     gives start value, end value, and stride for each dimension of the
 ;     variable
 ;   error : out, optional, type=long
-;     error value
+;     error value, 0 indicates success
 ;-
-function mg_nc_getdata, filename, variable, bounds=bounds, error=error
+function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
   compile_opt strictarr
   on_error, 2
 
   error = 0L
   file_id = ncdf_open(filename, /nowrite)
-  tokens = strsplit(variable, '.', escape='\', count=ntokens, /preserve_null, /extract)
-  ndots = ntokens - 1L
 
-  _variable = ndots eq 0L ? tokens[0] : strjoin(tokens, '.')
-  _variable = strpos(_variable, '/') eq 0L ? strmid(_variable, 1) : _variable
+  type = mg_nc_decompose(file_id, descriptor, $
+                         parent_type=parent_type, $
+                         parent_id=parent_id, $
+                         element_name=element_name, $
+                         /write, error=error)
+  if (error ne 0L) then return, !null
+  case type of
+    0: begin
+        error = -1L
+        message, 'unknown descriptor type', /informational
+      end
+    1: begin
+         ; attribute
+         result = mg_nc_getdata_getattribute(file_id, parent_id, element_name, $
+                                             error=error)
+         if (error) then message, 'attribute not found', /informational
+      end
+    2: begin
+         ; variable
+         _variable = element_name
 
-  if (ndots eq 0L) then begin
-    ; variable
-    bracketPos = strpos(_variable, '[')
-    if (bracketPos eq -1L) then begin
-      if (n_elements(bounds) gt 0L) then _bounds = bounds
-    endif else begin
-      closeBracketPos = strpos(_variable, ']', /reverse_search)
-      _bounds = strmid(_variable, bracketPos + 1L, closeBracketPos - bracketPos - 1L)
-      _variable = strmid(_variable, 0L, bracketPos)
-    endelse
+         bracketPos = strpos(element_name, '[')
+         if (bracketPos eq -1L) then begin
+           if (n_elements(bounds) gt 0L) then _bounds = bounds
+         endif else begin
+           closeBracketPos = strpos(element_name, ']', /reverse_search)
+           _bounds = strmid(element_name, bracketPos + 1L, closeBracketPos - bracketPos - 1L)
+           _variable = strmid(element_name, 0L, bracketPos)
+         endelse
 
-    result = mg_nc_getdata_getvariable(file_id, _variable, bounds=_bounds, $
-                                       error=error)
-    if (error) then message, 'variable not found', /informational
-  endif else begin
-    ; attribute
-    result = mg_nc_getdata_getattribute(file_id, _variable, error=error)
-    if (error) then message, 'attribute not found', /informational
-  endelse
+         result = mg_nc_getdata_getvariable(parent_id, _variable, $
+                                            bounds=_bounds, $
+                                            error=error)
+         if (error) then message, 'variable not found', /informational
+      end
+    3: begin
+        message, 'unable to return group', /informational
+      end
+    else: begin
+        error = -1L
+        message, 'unknown descriptor type', /informational
+      end
+  endcase
 
   ncdf_close, file_id
 
