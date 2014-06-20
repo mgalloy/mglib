@@ -1,6 +1,29 @@
 ; docformat = 'rst'
 
 ;+
+; Wrapper for `NCDF_VARID` so that messages are not displayed.
+;
+; :Private:
+;
+; :Params:
+;   parent_id : in, required, type=long
+;     identifier for parent group
+;   varname : in, required, type=string
+;     variable name
+;-
+function mg_nc_varid, parent_id, varname
+  compile_opt strictarr
+
+  old_quiet = !quiet
+  !quiet = 1
+  var_id = ncdf_varid(parent_id, varname)
+  !quiet = old_quiet
+
+  return, var_id
+end
+
+
+;+
 ; Determines the type of element described by `descriptor`, i.e., invalid (0),
 ; attribute (1), variable (2), or group (3).
 ;
@@ -31,6 +54,7 @@
 function mg_nc_decompose, file_id, descriptor, $
                           parent_type=parent_type, $
                           parent_id=parent_id, $
+                          group_id=group_id, $
                           element_name=element_name, $
                           write=write, $
                           error=error
@@ -56,6 +80,8 @@ function mg_nc_decompose, file_id, descriptor, $
     group_descriptor = descriptor
   endelse
 
+  group_id = file_id
+
   if (group_descriptor eq '/') then begin
     parent_type = 3L
     parent_id = file_id
@@ -63,7 +89,7 @@ function mg_nc_decompose, file_id, descriptor, $
     return, 1L
   endif else begin
     groups = strsplit(group_descriptor, '/', /extract, count=n_groups)
-    group_id = file_id
+
     for i = 0L, n_groups - 2L do begin
       new_group_id = ncdf_ncidinq(group_id, groups[i])
 
@@ -83,7 +109,7 @@ function mg_nc_decompose, file_id, descriptor, $
   ; last "group" could be a group or variable
 
   ; check to see if last "group" is a variable
-  var_id = ncdf_varid(group_id, groups[-1])
+  var_id = mg_nc_varid(group_id, groups[-1])
   if (var_id ne -1L) then begin
     if (has_attribute) then begin
       parent_type = 2L

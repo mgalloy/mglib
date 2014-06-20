@@ -145,14 +145,34 @@ pro mg_nc_putdata_putattribute, file_id, parent_id, attname, data, error=error
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
-    error = 1L
     return
   endif
 
+  type = size(data, /type)
+
   if (file_id eq parent_id) then begin
-    ncdf_attput, file_id, attname, data, /global
+    ncdf_attput, file_id, attname, data, /global, $
+                 ubyte=type eq 1, $
+                 short=type eq 2, $
+                 long=type eq 3, $
+                 float=type eq 4, $
+                 double=type eq 5, $
+                 string=type eq 7, $
+                 ushort=type eq 12, $
+                 ulong=type eq 13, $
+                 uint64=type eq 15
+    
   endif else begin
-    ncdf_attput, file_id, parent_id, attname, data
+    ncdf_attput, file_id, parent_id, attname, data, $
+                 ubyte=type eq 1, $
+                 short=type eq 2, $
+                 long=type eq 3, $
+                 float=type eq 4, $
+                 double=type eq 5, $
+                 string=type eq 7, $
+                 ushort=type eq 12, $
+                 ulong=type eq 13, $
+                 uint64=type eq 15
   endelse
 end
 
@@ -190,17 +210,39 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
   type = mg_nc_decompose(file_id, descriptor, $
                          parent_type=parent_type, $
                          parent_id=parent_id, $
+                         group_id=group_id, $
                          element_name=element_name, $
                          /write, error=error)
   if (error ne 0L) then return
+
   case type of
     0: begin
         error = -1L
         message, 'unknown descriptor type', /informational
       end
     1: begin
-         mg_nc_putdata_putattribute, file_id, parent_id, element_name, data, $
-                                     error=error
+         case parent_type of
+           2: mg_nc_putdata_putattribute, group_id, parent_id, $
+                                          element_name, data, $
+                                          error=error
+           3: begin
+               if (parent_id eq file_id) then begin
+                 mg_nc_putdata_putattribute, file_id, parent_id, $
+                                             element_name, data, $
+                                             error=error
+               endif else begin
+                 mg_nc_putdata_putattribute, parent_id, parent_id, $
+                                             element_name, data, $
+                                             error=error
+                 ;error = -1L
+                 ;message, 'attributes on groups not allowed', /informational
+               endelse
+             end
+           else: begin
+               error = -1L
+               message, 'invalid parent type', /informational
+             end
+         endcase
          if (error) then message, 'error writing attribute', /informational
       end
     2: begin

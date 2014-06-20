@@ -43,6 +43,18 @@ function mgffncvariable::_getAttribute, name, found=found
   compile_opt strictarr
 
   found = 0B
+
+  fileinfo = ncdf_inquire(self.id)
+  for a = 0L, fileinfo.ngAtts - 1L do begin
+    attname = ncdf_attname(self.id, a, /global)
+    if (name eq attname) then begin
+      ncdf_attget, self.id, name, attvalue, /global
+      attinfo = ncdf_attinq(self.id, name, /global)
+      found = 1B
+      return, attinfo.dataType eq 'CHAR' ? string(attvalue) : attvalue
+    endif
+  endfor
+
   return, !null
 end
 
@@ -58,7 +70,18 @@ pro mgffncgroup::getProperty, attributes=attributes, $
                               _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(attributes)) then attributes = !null
+  if (arg_present(attributes)) then begin
+    info = ncdf_inquire(self.id)
+
+    if (info.ngatts eq 0L) then begin
+      attributes = !null
+    endif else begin
+      attributes = strarr(info.ngatts)
+      for a = 0L, info.ngatts - 1L do begin
+        attributes[a] = ncdf_attname(self.id, a, /global)
+      endfor
+    endelse
+  endif
 
   if (arg_present(groups)) then begin
     group_ids = ncdf_groupsinq(self.id)
@@ -136,9 +159,9 @@ function mgffncgroup::dump, indent=indent
                    format='(%"%s%s+ GROUP %s")')
 
   self->getProperty, attributes=attributes
-  foreach att_name, attributes do begin
-    result += string(mg_newline(), _indent, att_name, format='(%"%s%s  = ATTRIBUTE %s")')
-  endforeach
+  for a = 0L, n_elements(attributes) - 1L do begin
+    result += self->_printAttribute(self.id, self.id, a, indent=indent, /global)
+  endfor
 
   self->getProperty, groups=groups
   foreach group_name, groups do begin

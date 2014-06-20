@@ -39,7 +39,7 @@ function mg_nc_putdata_ut::test_attribute
   compile_opt strictarr
 
   var = indgen(10)
-  standard = 'Example string attribute'
+  standard = 0.0D
   mg_nc_putdata, self.test_filename, 'test', var, error=err
   assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
   mg_nc_putdata, self.test_filename, 'test.example_attribute', standard, $
@@ -51,7 +51,7 @@ function mg_nc_putdata_ut::test_attribute
   assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
 
   result_type = size(result, /type)
-  assert, result_type eq 7L, 'incorrect type: %d', result_type
+  assert, result_type eq 5L, 'incorrect type: %d', result_type
 
   assert, result eq standard, 'incorrect value: %s', result
 
@@ -82,7 +82,7 @@ end
 function mg_nc_putdata_ut::test_groupattr
   compile_opt strictarr
 
-  standard = 'Example string attribute'
+  standard = 0.0
   mg_nc_putdata, self.test_filename, 'group.example_attribute', standard, $
                  error=err
   assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
@@ -92,7 +92,7 @@ function mg_nc_putdata_ut::test_groupattr
   assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
 
   result_type = size(result, /type)
-  assert, result_type eq 7L, 'incorrect type: %d', result_type
+  assert, result_type eq 4L, 'incorrect type: %d', result_type
 
   assert, result eq standard, 'incorrect value: %s', result
 
