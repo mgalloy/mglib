@@ -226,18 +226,10 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
                                           element_name, data, $
                                           error=error
            3: begin
-               if (parent_id eq file_id) then begin
-                 mg_nc_putdata_putattribute, file_id, parent_id, $
-                                             element_name, data, $
-                                             error=error
-               endif else begin
                  mg_nc_putdata_putattribute, parent_id, parent_id, $
                                              element_name, data, $
                                              error=error
-                 ;error = -1L
-                 ;message, 'attributes on groups not allowed', /informational
-               endelse
-             end
+               end
            else: begin
                error = -1L
                message, 'invalid parent type', /informational

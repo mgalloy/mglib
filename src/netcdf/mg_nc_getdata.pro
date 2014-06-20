@@ -367,6 +367,7 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
   type = mg_nc_decompose(file_id, descriptor, $
                          parent_type=parent_type, $
                          parent_id=parent_id, $
+                         group_id=group_id, $
                          element_name=element_name, $
                          /write, error=error)
   if (error ne 0L) then return, !null
@@ -377,8 +378,19 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
       end
     1: begin
          ; attribute
-         result = mg_nc_getdata_getattribute(file_id, parent_id, element_name, $
-                                             error=error)
+         case parent_type of
+           2: begin
+               result = mg_nc_getdata_getattribute(file_id, parent_id, $
+                                                   element_name, $
+                                                   error=error)
+             end
+           3: begin
+               result = mg_nc_getdata_getattribute(parent_id, parent_id, $
+                                                   element_name, $
+                                                   error=error)
+             end
+           else:
+         endcase
          if (error) then message, 'attribute not found', /informational
       end
     2: begin
