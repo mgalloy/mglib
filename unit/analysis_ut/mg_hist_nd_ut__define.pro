@@ -39,6 +39,30 @@ function mg_hist_nd_ut::test_2d_weights
 end
 
 
+function mg_hist_nd_ut::test_geo
+  compile_opt strictarr
+
+  lons  = [100.0, 105.0, 107.0, 110.0, 111.0, 112.0]
+  lats  = [-85.0, -84.0, -83.0, -85.0, -84.0, -83.0]
+  times = [  0.0,   2.0,   3.0,   6.0,   7.0,   8.0]
+  pts = transpose([[lons], [lats], [times]])
+  h = mg_hist_nd(pts, $
+                 bin_size=[10.0, 10.0, 5.0], $
+                 min=[0.0, -90.0, 0.0], $
+                 max=[360.0, 90.0, 10.0], $
+                 reverse_indices=ri)
+
+  npts = total(h, /preserve_type)
+
+  assert, npts eq n_elements(lons), $
+          'incorrect number of points in histogram: %d', npts
+  assert, h[10, 0, 0] eq 3L, 'invalid value for h[10, 0, 0]'
+  assert, h[11, 0, 1] eq 3L, 'invalid value for h[11, 0, 1]'
+
+  return, 1
+end
+
+
 pro mg_hist_nd_ut__define
   compile_opt strictarr
 
