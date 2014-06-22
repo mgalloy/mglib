@@ -25,7 +25,8 @@
 ;         '%(time)s %(levelname)s: %(routine)s: %(message)s'
 ;
 ;       where the possible names to include are: "time", "levelname",
-;       "levelshortname", "routine", "stacktrace", "name", and "message".
+;       "levelshortname", "routine", "stacktrace", "name", "fullname" and
+;       "message".
 ;
 ;       Note that the time argument will first be formatted using the
 ;       `TIME_FORMAT` specification
@@ -147,6 +148,7 @@ end
 pro mgfflogger::getProperty, level=level, $
                              format=format, time_format=time_format, $
                              name=name, $
+                             fullname=fullname, $
                              filename=filename, $
                              output=output
   compile_opt strictarr
@@ -155,6 +157,13 @@ pro mgfflogger::getProperty, level=level, $
   if (arg_present(format)) then format = self.format
   if (arg_present(time_format)) then time_format = self.time_format
   if (arg_present(name)) then name = self.name
+  if (arg_present(fullname)) then begin
+    if (obj_valid(self.parent)) then begin
+      self.parent->getProperty, fullname=parent_fullname
+      parent_fullname += '/'
+    endif else parent_fullname = ''
+    fullname = parent_fullname + self.name
+  endif
   if (arg_present(filename)) then filename = self.filename
   if (arg_present(output)) then begin
     if (self.filename ne '') then begin
@@ -261,12 +270,14 @@ pro mgfflogger::print, msg, level=level, back_levels=back_levels
 
   if (level le self->_getLevel()) then begin
     stack = scope_traceback(/structure, /system)
+    self->getProperty, fullname=fullname
     vars = { time: string(systime(/julian), format='(' + self.time_format + ')'), $
              levelname: strupcase(self.levelNames[level - 1L]), $
              levelshortname: strupcase(self.levelShortNames[level - 1L]), $
              routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
              stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, '->'), $
              name: self.name, $
+             fullname: fullname, $
              message: msg $
            }
     s = mg_subs(self.format, vars)
@@ -324,7 +335,7 @@ end
 ;    parent
 ;       parent `MGffLoffer` object
 ;    name
-;       name of the loffer
+;       name of the logger
 ;    children
 ;       `IDL_Container` of children loggers
 ;    level
