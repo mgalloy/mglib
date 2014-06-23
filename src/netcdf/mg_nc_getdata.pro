@@ -369,11 +369,13 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
                          parent_id=parent_id, $
                          group_id=group_id, $
                          element_name=element_name, $
-                         /write, error=error)
+                         error=error)
   if (error ne 0L) then return, !null
+
   case type of
     0: begin
         error = -1L
+        result = !null
         message, 'unknown descriptor type', /informational
       end
     1: begin
@@ -412,10 +414,13 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
          if (error) then message, 'variable not found', /informational
       end
     3: begin
+        error = -1L
+        result = !null
         message, 'unable to return group', /informational
       end
     else: begin
         error = -1L
+        result = !null
         message, 'unknown descriptor type', /informational
       end
   endcase

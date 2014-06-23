@@ -83,10 +83,17 @@ function mg_nc_decompose, file_id, descriptor, $
   group_id = file_id
 
   if (group_descriptor eq '/') then begin
-    parent_type = 3L
-    parent_id = file_id
-    element_name = strmid(descriptor, dotpos + 1)
-    return, 1L
+    if (has_attribute) then begin
+      parent_type = 3L
+      parent_id = file_id
+      element_name = strmid(descriptor, dotpos + 1)
+      return, 1L
+    endif else begin
+      parent_type = 3L
+      parent_id = file_id
+      element_name = ''
+      return, 3L
+    endelse
   endif else begin
     groups = strsplit(group_descriptor, '/', /extract, count=n_groups)
 
