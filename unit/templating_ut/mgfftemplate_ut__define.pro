@@ -62,7 +62,7 @@ function mgfftemplate_ut::test_include_template_object
   self.a = 5S
   result = self->_runTest('include_template', $
                           self, $
-                          '      15')
+                          '15')
   assert, result, 'incorrect result'
 
   return, 1
@@ -112,7 +112,7 @@ function mgfftemplate_ut::test_scope
     self.objects[i] = o
   endfor
 
-  answer = '       0       1       2       3       4       5       6       7       8       9'
+  answer = '0123456789'
   result = self->_runTest('scope', $
                           self, $
                           answer, $
@@ -137,8 +137,7 @@ function mgfftemplate_ut::test_double_scope
     self.objects[i] = o
   endfor
 
-  answer = '       0       1       2       3       4       5       6       7       8       9'
-  answer = answer + answer
+  answer = '01234567890123456789'
   result = self->_runTest('double-scope', $
                           self, $
                           answer, $
@@ -160,7 +159,7 @@ function mgfftemplate_ut::test_for_object
   self.arr = bindgen(10)
   result = self->_runTest('for', $
                           self, $
-                          '   0   1   2   3   4   5   6   7   8   9')
+                          '0123456789')
   assert, result, 'incorrect result'
 
   return, 1
@@ -176,7 +175,7 @@ function mgfftemplate_ut::test_double_for_object
   self.arr = bindgen(10)
   result = self->_runTest('double-for', $
                           self, $
-                          '   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9', line=line)
+                          '01234567890123456789', line=line)
   assert, result, 'incorrect result'
 
   return, 1
@@ -209,7 +208,7 @@ function mgfftemplate_ut::test_simple_object
 
 
   self.a = 5S
-  result = self->_runTest('simple', self, '      15')
+  result = self->_runTest('simple', self, '15')
   assert, result, 'incorrect result'
 
   return, 1
@@ -225,7 +224,7 @@ function mgfftemplate_ut::test_include_template
   simpleFilename = filepath('simple.tt', root=mg_src_root())
   result = self->_runTest('include_template', $
                           { filename: simpleFilename, a: 5 }, $
-                          '      15')
+                          '15')
   assert, result, 'incorrect result'
 
   return, 1
@@ -271,7 +270,7 @@ function mgfftemplate_ut::test_for
 
   result = self->_runTest('for', $
                           { arr:bindgen(10) }, $
-                          '   0   1   2   3   4   5   6   7   8   9')
+                          '0123456789')
   assert, result, 'incorrect result'
 
   return, 1
@@ -306,7 +305,7 @@ function mgfftemplate_ut::test_simple
 
   result = self->_runTest('simple', $
                           { a: 5 }, $
-                          '      15')
+                          '15')
   assert, result, 'incorrect result'
 
   return, 1
@@ -317,12 +316,12 @@ end
 ; Unit tests fo MGffTemplate.
 ;-
 pro mgfftemplate_ut__define
-	compile_opt strictarr
+  compile_opt strictarr
 
-	define = { mgfftemplate_ut, inherits MGutLibTestCase, $
-	           a: 0S, $
-	           arr: bytarr(10), $
-	           objects: objarr(10), $
-	           filename: '' $
-	         }
+  define = { mgfftemplate_ut, inherits MGutLibTestCase, $
+             a: 0S, $
+             arr: bytarr(10), $
+             objects: objarr(10), $
+             filename: '' $
+           }
 end
