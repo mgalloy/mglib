@@ -7,7 +7,7 @@ function mganrandom_ut::test_integers
   assert, mg_connected(), /skip, $
           'must be connected to the Internet to use MGanRandom class'
 
-  n = 10L
+  n = 20L
   minimum = 0L
   maximum = 1000L
 
@@ -17,10 +17,14 @@ function mganrandom_ut::test_integers
 
   assert, error eq 0L, 'error %d retrieving data', error
 
-  assert, size(result, /type) eq 3, 'incorrect type'
-  assert, n_elements(result) eq n, 'incorrect number of values'
-  assert, min(result) ge minimum, 'returned too small values'
-  assert, max(result) le maximum, 'returned too large values'
+  assert, size(result, /type) eq 3, $
+          'incorrect type: %d', size(result, /type)
+  assert, n_elements(result) eq n, $
+          'incorrect number of values: %d', n_elements(result)
+  assert, min(result) ge minimum, $
+          'returned too small values: min = %f', min(result)
+  assert, max(result) le maximum, $
+          'returned too large values: max = %f', max(result)
 
   return, 1
 end
@@ -45,10 +49,14 @@ function mganrandom_ut::test_gaussians
 
   assert, error eq 0L, 'error %d retrieving data', error
 
-  assert, size(result, /type) eq 4, 'incorrect type'
-  assert, n_elements(result) eq n, 'incorrect number of values'
-  assert, abs(mean(result) - mean) lt 0.3, 'incorrect mean'
-  assert, abs(stddev(result) - stddev) lt 0.5, 'incorrect stddev'
+  assert, size(result, /type) eq 4, $
+          'incorrect type: %d', size(result, /type)
+  assert, n_elements(result) eq n, $
+          'incorrect number of values: %d', n_elements(result)
+  assert, abs(mean(result) - mean) lt 0.3, $
+          'incorrect mean: %f', mean(result)
+  assert, abs(stddev(result) - stddev) lt 0.5, $
+          'incorrect stddev: %f', stddev(result)
 
   return, 1
 end
