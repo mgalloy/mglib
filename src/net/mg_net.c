@@ -523,7 +523,7 @@ static IDL_VPTR IDL_CDECL mg_net_recv(int argc, IDL_VPTR argv[], char *argk) {
 
   iRet = recv(net_list[i].socket, pbuffer, len, 0);
 
- err:
+  err:
   IDL_KWCleanup(IDL_KW_CLEAN);
 
   return(IDL_GettmpLong(iRet));
@@ -627,8 +627,8 @@ static IDL_VPTR IDL_CDECL mg_net_query(int argc, IDL_VPTR argv[], char *argk) {
   Internal function to read a (potentially fragmented) block from a socket.
 */
 static int mg_recv_packet(SOCKET s, void *buffer, int len) {
-  int	n;
-  int	num = 0;
+  int n;
+  int num = 0;
   char *pbuf = (char *) buffer;
 
   while(num < len) {
@@ -636,8 +636,8 @@ static int mg_recv_packet(SOCKET s, void *buffer, int len) {
     if (n == -1) return(n);
     pbuf += n;
     num += n;
-#ifdef	INTERRUPTABLE_READ
-    if (IDL_BailOut(IDL_FALSE)) return (-1);
+#ifdef INTERRUPTABLE_READ
+    if (IDL_BailOut(IDL_FALSE)) return(-1);
 #endif
   }
 
@@ -664,9 +664,9 @@ static int mg_recv_packet(SOCKET s, void *buffer, int len) {
 */
 static IDL_VPTR IDL_CDECL mg_net_sendvar(int argc, IDL_VPTR argv[], char *argk) {
   IDL_LONG i;
-  i_var	var;
+  i_var var;
   int host, addr_len;
-  short	port;
+  short port;
   IDL_LONG iRet;
   IDL_VPTR vpTmp;
   char *pbuffer;
@@ -798,7 +798,7 @@ static IDL_VPTR IDL_CDECL mg_net_recvvar(int argc, IDL_VPTR argv[], char *argk) 
   if (swab) {
     int	swapsize = var.len / var.nelts;
     if ((var.type == IDL_TYP_COMPLEX)
-	|| (var.type == IDL_TYP_DCOMPLEX)) {
+          || (var.type == IDL_TYP_DCOMPLEX)) {
       swapsize /= 2;
     }
     mg_byteswap(pbuffer, var.len, swapsize);
