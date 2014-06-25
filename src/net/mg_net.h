@@ -42,7 +42,7 @@ typedef struct {
   IDL_LONG dims[IDL_MAX_ARRAY_DIM];
 } i_var;
 
-static void byteswap(void *buffer, int len, int swapsize);
+static void mg_byteswap(void *buffer, int len, int swapsize);
 static void mg_net_exit_handler(void);
 
 #endif

@@ -12,7 +12,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "idl_export.h"
+
+#include "mg_idl_export.h"
 #include "mg_net.h"
 
 #define MAX_SOCKETS 256
@@ -363,15 +364,15 @@ static IDL_VPTR IDL_CDECL mg_net_connect(int argc, IDL_VPTR inargv[], char *argk
 static IDL_VPTR IDL_CDECL mg_net_accept(int argc, IDL_VPTR inargv[], char *argk) {
   IDL_LONG i, j;
   struct sockaddr_in peer_addr;
-  int	addr_len;
+  unsigned int addr_len;
   SOCKET s;
   IDL_VPTR argv[1];
 
   static IDL_LONG	iBuffer, iNoDelay;
   static IDL_KW_PAR kw_pars[] = { IDL_KW_FAST_SCAN,
-				  { "BUFFER", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iBuffer) },
-				  { "NODELAY", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iNoDelay) },
-				  { NULL }
+    { "BUFFER", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iBuffer) },
+    { "NODELAY", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iNoDelay) },
+    { NULL }
   };
 
   IDL_KWCleanup(IDL_KW_MARK);
@@ -411,9 +412,10 @@ static IDL_VPTR IDL_CDECL mg_net_accept(int argc, IDL_VPTR inargv[], char *argk)
 	function.
 */
 static IDL_VPTR IDL_CDECL mg_net_send(int argc, IDL_VPTR argv[], char *argk) {
-  IDL_LONG i, iNum, iRet;
+  IDL_LONG i, iRet;
   IDL_VPTR vpTmp;
   char *pbuffer;
+  IDL_MEMINT iNum;
 
   i = IDL_LongScalar(argv[0]);
   if ((i < 0) || (i >= MAX_SOCKETS)) return(IDL_GettmpLong(-1));
@@ -444,7 +446,8 @@ static IDL_VPTR IDL_CDECL mg_net_send(int argc, IDL_VPTR argv[], char *argk) {
   number of bytes sent or -1 for error. Note: no byteswapping is performed.
 */
 static IDL_VPTR IDL_CDECL mg_net_sendto(int argc, IDL_VPTR argv[], char *argk) {
-  IDL_LONG i, iNum, iRet;
+  IDL_LONG i, iRet;
+  IDL_MEMINT iNum;
   struct sockaddr_in sin;
   IDL_VPTR vpTmp;
   char *pbuffer;
@@ -495,8 +498,8 @@ static IDL_VPTR IDL_CDECL mg_net_recv(int argc, IDL_VPTR argv[], char *argk) {
 
   static IDL_LONG	iMax;
   static IDL_KW_PAR kw_pars[] = { IDL_KW_FAST_SCAN,
-				  { "MAXIMUM_BYTES", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iMax) },
-				  { NULL }
+    { "MAXIMUM_BYTES", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iMax) },
+    { NULL }
   };
 
   IDL_KWCleanup(IDL_KW_MARK);
@@ -541,18 +544,19 @@ static IDL_VPTR IDL_CDECL mg_net_query(int argc, IDL_VPTR argv[], char *argk) {
   IDL_LONG i;
   IDL_VPTR vpPlainArgs[1],vpTmp;
   struct sockaddr_in peer_addr;
-  int addr_len, err;
+  unsigned int addr_len;
+  int err;
   IDL_LONG iRet = 0;
 
   static IDL_VPTR	vpRHost, vpAvail, vpListen, vpLPort, vpRPort, vpLHost;
   static IDL_KW_PAR kw_pars[] = { IDL_KW_FAST_SCAN,
-				  { "AVAILABLE_BYTES", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpAvail) },
-				  { "IS_LISTENER", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpListen) },
-				  { "LOCAL_HOST", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpLHost) },
-				  { "LOCAL_PORT", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpLPort) },
-				  { "REMOTE_HOST", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpRHost) },
-				  { "REMOTE_PORT", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpRPort) },
-				  { NULL}
+    { "AVAILABLE_BYTES", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpAvail) },
+    { "IS_LISTENER", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpListen) },
+    { "LOCAL_HOST", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpLHost) },
+    { "LOCAL_PORT", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpLPort) },
+    { "REMOTE_HOST", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpRHost) },
+    { "REMOTE_PORT", IDL_TYP_UNDEF, 1, IDL_KW_OUT | IDL_KW_ZERO, 0, IDL_CHARA(vpRPort) },
+    { NULL}
   };
 
   IDL_KWCleanup(IDL_KW_MARK);
@@ -567,17 +571,17 @@ static IDL_VPTR IDL_CDECL mg_net_query(int argc, IDL_VPTR argv[], char *argk) {
   if (vpRHost || vpRPort) {
     addr_len = sizeof(struct sockaddr_in);
     err = getpeername(net_list[i].socket,
-		      (struct sockaddr *) &peer_addr, &addr_len);
+                      (struct sockaddr *) &peer_addr, &addr_len);
     if (err != 0) {
       iRet = -1;
     } else {
       if (vpRHost) {
-	vpTmp = IDL_GettmpULong(peer_addr.sin_addr.s_addr);
-	IDL_VarCopy(vpTmp, vpRHost);
+        vpTmp = IDL_GettmpULong(peer_addr.sin_addr.s_addr);
+        IDL_VarCopy(vpTmp, vpRHost);
       }
       if (vpRPort) {
-	vpTmp = IDL_GettmpLong((long) ntohs(peer_addr.sin_port));
-	IDL_VarCopy(vpTmp, vpRPort);
+        vpTmp = IDL_GettmpLong((long) ntohs(peer_addr.sin_port));
+        IDL_VarCopy(vpTmp, vpRPort);
       }
     }
   }
@@ -598,7 +602,7 @@ static IDL_VPTR IDL_CDECL mg_net_query(int argc, IDL_VPTR argv[], char *argk) {
   if (vpLPort || vpLHost) {
     addr_len = sizeof(struct  sockaddr_in);
     err = getsockname(net_list[i].socket,
-		      (struct sockaddr *) &peer_addr, &addr_len);
+                      (struct sockaddr *) &peer_addr, &addr_len);
     if (err != 0) {
       iRet = -1;
     } else {
@@ -679,9 +683,9 @@ static IDL_VPTR IDL_CDECL mg_net_sendvar(int argc, IDL_VPTR argv[], char *argk) 
       port = (short) IDL_LongScalar(argv[3]);
     } else {
       IDL_MessageFromBlock(msg_block,
-			   MG_NET_ERROR,
-			   IDL_MSG_RET,
-			   "This UDP socket requires the destination HOST and PORT arguments.");
+                           MG_NET_ERROR,
+                           IDL_MSG_RET,
+                           "This UDP socket requires the destination HOST and PORT arguments.");
     }
   }
 
@@ -692,9 +696,9 @@ static IDL_VPTR IDL_CDECL mg_net_sendvar(int argc, IDL_VPTR argv[], char *argk) 
       (var.type == IDL_TYP_OBJREF) ||
       (var.type == IDL_TYP_UNDEF)) {
     IDL_MessageFromBlock(msg_block,
-			 MG_NET_BADTYPE,
-			 IDL_MSG_LONGJMP,
-			 IDL_TypeNameFunc(var.type));
+                         MG_NET_BADTYPE,
+                         IDL_MSG_LONGJMP,
+                         IDL_TypeNameFunc(var.type));
   }
 
   if (vpTmp->type == IDL_TYP_STRING) {
@@ -704,13 +708,13 @@ static IDL_VPTR IDL_CDECL mg_net_sendvar(int argc, IDL_VPTR argv[], char *argk) 
     var.len = vpTmp->value.str.slen + 1;
     var.nelts = var.len;
   } else if (vpTmp->flags & IDL_V_ARR) {
-    pbuffer = vpTmp->value.arr->data;
+    pbuffer = (char *) vpTmp->value.arr->data;
     var.ndims = vpTmp->value.arr->n_dim;
     var.len = vpTmp->value.arr->arr_len;
     var.nelts = vpTmp->value.arr->n_elts;
     memcpy(var.dims, vpTmp->value.arr->dim, IDL_MAX_ARRAY_DIM * sizeof(IDL_LONG));
   } else {
-    pbuffer = &(vpTmp->value.c);
+    pbuffer = (char *) &(vpTmp->value.c);
     var.ndims = 0;
     var.len = IDL_TypeSizeFunc(var.type);
     var.nelts = 1;
@@ -724,11 +728,11 @@ static IDL_VPTR IDL_CDECL mg_net_sendvar(int argc, IDL_VPTR argv[], char *argk) 
     addr_len = sizeof(struct sockaddr_in);
 
     iRet = sendto(net_list[i].socket, (char *) &var, sizeof(i_var), 0,
-		  (struct sockaddr *) &sin, addr_len);
+                  (struct sockaddr *) &sin, addr_len);
     if (iRet == -1) return(IDL_GettmpLong(iRet));
 
     iRet = sendto(net_list[i].socket, pbuffer, var.len, 0,
-		  (struct sockaddr *) &sin, addr_len);
+                  (struct sockaddr *) &sin, addr_len);
   } else {
     iRet = send(net_list[i].socket,(char *) &var, sizeof(i_var), 0);
     if (iRet == -1) return (IDL_GettmpLong(iRet));
@@ -777,13 +781,14 @@ static IDL_VPTR IDL_CDECL mg_net_recvvar(int argc, IDL_VPTR argv[], char *argk) 
     pbuffer[var.len] = '\0';
     IDL_VarCopy(vpTmp, argv[1]);
   } else if (var.ndims != 0) {
-    pbuffer = IDL_MakeTempArray(var.type, var.ndims, var.dims, IDL_BARR_INI_NOP, &vpTmp);
+    pbuffer = IDL_MakeTempArray(var.type, var.ndims, (IDL_LONG64 *) var.dims,
+                                IDL_BARR_INI_NOP, &vpTmp);
     IDL_VarCopy(vpTmp, argv[1]);
   } else {
     vpTmp = IDL_GettmpLong(0);
     IDL_VarCopy(vpTmp, argv[1]);
     IDL_StoreScalarZero(argv[1], var.type);
-    pbuffer = &(argv[1]->value.c);
+    pbuffer = (char *) &(argv[1]->value.c);
   }
 
   /* read the data */
@@ -820,8 +825,9 @@ static IDL_VPTR IDL_CDECL mg_net_select(int argc, IDL_VPTR argv[], char *argk) {
   IDL_LONG n, num;
 
   float	fWait;
-  IDL_LONG *piSocks,iNum;
+  IDL_LONG *piSocks;
   IDL_VPTR vpSocks;
+  IDL_MEMINT iNum;
 
   vpSocks = IDL_CvtLng(1, &(argv[0]));
   IDL_VarGetData(vpSocks, &iNum, (char **) &piSocks, 1);
@@ -865,13 +871,13 @@ static IDL_VPTR IDL_CDECL mg_net_select(int argc, IDL_VPTR argv[], char *argk) {
     IDL_VPTR vpTmp;
 
     pOut = (IDL_LONG *) IDL_MakeTempVector(IDL_TYP_LONG,
-					   n, IDL_ARR_INI_NOP, &vpTmp);
+                                           n, IDL_ARR_INI_NOP, &vpTmp);
     for (j = 0; j < iNum; j++) {
       i = piSocks[j];
       if (net_list[i].iState != NET_UNUSED) {
-	if (FD_ISSET(net_list[i].socket, &rfds)){
-	  *pOut++ = i;
-	}
+        if (FD_ISSET(net_list[i].socket, &rfds)) {
+          *pOut++ = i;
+        }
       }
     }
     if (vpSocks != argv[0]) IDL_Deltmp(vpSocks);
