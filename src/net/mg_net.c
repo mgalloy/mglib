@@ -32,6 +32,7 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 #define SOCKET int
 #define IOCTL ioctl
 #define CLOSE close
@@ -42,9 +43,9 @@
 #endif
 
 typedef struct _sock {
-	IDL_LONG iState;
-	IDL_LONG iType;
-	SOCKET socket;
+  IDL_LONG iState;
+  IDL_LONG iType;
+  SOCKET socket;
 } sock;
 
 /* local prototypes */
@@ -185,12 +186,12 @@ static IDL_VPTR IDL_CDECL mg_net_createport(int argc, IDL_VPTR argv[], char *arg
   short	port;
   int err;
   IDL_LONG i;
-  
+
   static IDL_LONG	iUDP,iTCP;
   static IDL_KW_PAR kw_pars[] = { IDL_KW_FAST_SCAN,
-				  { "TCP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iTCP) },
-				  { "UDP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iUDP) },
-				  { NULL }
+    { "TCP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iTCP) },
+    { "UDP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iUDP) },
+    { NULL }
   };
 
   IDL_KWCleanup(IDL_KW_MARK);
@@ -290,12 +291,12 @@ static IDL_VPTR IDL_CDECL mg_net_connect(int argc, IDL_VPTR inargv[], char *argk
 
   static IDL_LONG	iBuffer,iNoDelay,iUDP,iTCP, iLocPort;
   static IDL_KW_PAR kw_pars[] = { IDL_KW_FAST_SCAN,
-				  { "BUFFER", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iBuffer) },
-				  { "LOCAL_PORT", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iLocPort) },
-				  { "NODELAY", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iNoDelay) },
-				  { "TCP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iTCP) },
-				  { "UDP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iUDP) },
-				  { NULL }
+    { "BUFFER", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iBuffer) },
+    { "LOCAL_PORT", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iLocPort) },
+    { "NODELAY", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iNoDelay) },
+    { "TCP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iTCP) },
+    { "UDP", IDL_TYP_LONG, 1, IDL_KW_ZERO, 0, IDL_CHARA(iUDP) },
+    { NULL }
   };
 
   IDL_KWCleanup(IDL_KW_MARK);
@@ -314,8 +315,8 @@ static IDL_VPTR IDL_CDECL mg_net_connect(int argc, IDL_VPTR inargv[], char *argk
     net_list[i].iType = NET_UDP_PEER;
   } else {
     s = socket(AF_INET, SOCK_STREAM, 0);
-    if (iBuffer) rebuffer_socket(s, iBuffer);
-    if (iNoDelay) nodelay_socket(s, 1);
+    if (iBuffer) mg_rebuffer_socket(s, iBuffer);
+    if (iNoDelay) mg_nodelay_socket(s, 1);
     net_list[i].iType = NET_TCP;
   }
   if (s == -1) return (IDL_GettmpLong(-2));
@@ -392,8 +393,8 @@ static IDL_VPTR IDL_CDECL mg_net_accept(int argc, IDL_VPTR inargv[], char *argk)
   s = accept(net_list[j].socket, (struct sockaddr *)&peer_addr, &addr_len);
   if (s == -1) return (IDL_GettmpLong(-1));
 
-  if (iBuffer) rebuffer_socket(s, iBuffer);
-  if (iNoDelay) nodelay_socket(s, 1);
+  if (iBuffer) mg_rebuffer_socket(s, iBuffer);
+  if (iNoDelay) mg_nodelay_socket(s, 1);
   net_list[i].iState = NET_IO;
   net_list[i].socket = s;
 
@@ -763,7 +764,7 @@ static IDL_VPTR IDL_CDECL mg_net_recvvar(int argc, IDL_VPTR argv[], char *argk) 
   IDL_EXCLUDE_EXPR(argv[1]);
 
   /* read the header */
-  iRet = recv_packet(net_list[i].socket, &var,sizeof(i_var));
+  iRet = mg_recv_packet(net_list[i].socket, &var,sizeof(i_var));
   if (iRet == -1) return (IDL_GettmpLong(-1));
   if (var.token == SWAPTOKEN) {
     mg_byteswap(&var, sizeof(i_var), sizeof(IDL_LONG));
@@ -792,7 +793,7 @@ static IDL_VPTR IDL_CDECL mg_net_recvvar(int argc, IDL_VPTR argv[], char *argk) 
   }
 
   /* read the data */
-  iRet = recv_packet(net_list[i].socket, pbuffer, var.len);
+  iRet = mg_recv_packet(net_list[i].socket, pbuffer, var.len);
   if (iRet == -1) return (IDL_GettmpLong(-1));
   if (swab) {
     int	swapsize = var.len / var.nelts;
