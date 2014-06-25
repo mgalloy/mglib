@@ -61,6 +61,10 @@ if (IDLdoc_FOUND)
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_userdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
+  add_custom_target(upload_userdoc
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/upload_userdoc.sh ${CMAKE_CURRENT_BINARY_DIR}
+  )
+
   add_custom_target(dcdoc
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${IDLdoc_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_dcdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
