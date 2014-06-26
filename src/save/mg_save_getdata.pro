@@ -8,14 +8,14 @@
 ;   is requested
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of a `.sav` file
-;    varname : in, required, type=string
-;       name of variable to retrieve from the save file
+;   filename : in, required, type=string
+;     filename of a `.sav` file
+;   varname : in, required, type=string
+;     name of variable to retrieve from the save file
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       keywords to `IDL_Savefile::restore`
+;   _extra : in, optional, type=keywords
+;     keywords to `IDL_Savefile::restore`
 ;-
 function mg_save_getdata, filename, varname, _extra=e
   compile_opt strictarr
@@ -25,8 +25,6 @@ function mg_save_getdata, filename, varname, _extra=e
   case n_elements(varname) of
     0: begin
         varnames = savefile->names(count=nvarnames)
-        help, nvarnames
-        help, varnames
         savefile->restore, varnames, _extra=e
         result = hash()
         for v = 0L, nvarnames - 1L do begin
