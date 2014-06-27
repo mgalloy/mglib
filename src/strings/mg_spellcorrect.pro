@@ -180,26 +180,33 @@ end
 ; Corrects the spelling of a word.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    word : in, required, type=string
-;       string to check spelling of
+;   word : in, required, type=string
+;     string to check spelling of
 ;
 ; :Keywords:
-;    known_words : in, out, optional, type=hash object
-;       can be passed in to avoid reading/construction the known words
-;       frequency table; will be passed out if given a named variable
-;    correct : out, optional, type=boolean
-;       set to a named variable to indicate if the word passed in was
-;       correctly spelled
+;   known_words : in, out, optional, type=hash object
+;     can be passed in to avoid reading/construction the known words
+;     frequency table; will be passed out if given a named variable
+;   correct : out, optional, type=boolean
+;     set to a named variable to indicate if the word passed in was
+;     correctly spelled
+;   found : out, optional, type=boolean
+;     set to a named variable to return whether a match was found for the
+;     incorrect word
 ;-
-function mg_spellcorrect, word, known_words=spell_hash, correct=correct
+function mg_spellcorrect, word, $
+                          known_words=spell_hash, $
+                          correct=correct, $
+                          found=found
   compile_opt strictarr
 
-  spell_hash_filename = filepath('spell_hash.sav', root=mg_src_root())
+  found = 0B
 
   if (n_elements(spell_hash) eq 0L) then begin
+    spell_hash_filename = filepath('spell_hash.sav', root=mg_src_root())
     if (file_test(spell_hash_filename)) then begin
       restore, filename=spell_hash_filename
     endif else begin
@@ -215,6 +222,7 @@ function mg_spellcorrect, word, known_words=spell_hash, correct=correct
     candidates += mg_spellcorrect_known(mg_spellcorrect_edits1(word), known_hash=spell_hash)
   endif else begin
     correct = 1B
+    found = 1B
     return, word
   endelse
 
@@ -229,6 +237,7 @@ function mg_spellcorrect, word, known_words=spell_hash, correct=correct
     if (spell_hash[c] gt highest_count) then begin
       best_candidate = c
       highest_count = spell_hash[c]
+      found = 1B
     endif
   endforeach
 
@@ -242,12 +251,35 @@ end
 words = ['corect', 'information', 'informtion', 'known']
 
 foreach w, words do begin
-  corrected = mg_spellcorrect(w, known_words=spell_hash, correct=correct)
+  corrected = mg_spellcorrect(w, correct=correct)
   if (correct) then begin
     print, w, format='(%"\"%s\" was spelled correctly")'
   endif else begin
     print, w, corrected, format='(%"\"%s\" should be spelled \"%s\"")'
   endelse
 endforeach
+
+; slightly different use case: determining which choice a user made from a list
+; of potential choices
+choices = ['time series', 'contour', 'profile', 'image', 'heatmap']
+spell_hash = hash()
+foreach c, choices do spell_hash[c] = 1L
+
+words = ['time series', 'tme series', 'contours', 'another']
+foreach w, words do begin
+  corrected = mg_spellcorrect(w, known_words=spell_hash, $
+                              correct=correct, found=found)
+  if (correct) then begin
+    print, w, format='(%"you chose ''%s''")'
+  endif else begin
+    if (found) then begin
+      print, w, corrected, format='(%"''%s'': did you mean ''%s''?")'
+    endif else begin
+      print, w, format='(%"no choice found matching ''%s''")'
+    endelse
+  endelse
+endforeach
+
+obj_destroy, spell_hash
 
 end
