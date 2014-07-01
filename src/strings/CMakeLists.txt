@@ -28,6 +28,8 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
 endif ()
 
+add_subdirectory(dictionary)
+
 file(GLOB PRO_FILES "*.pro")
 install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
 install(FILES big.txt DESTINATION lib/${DIRNAME})

@@ -29,7 +29,7 @@
 function mg_spellcorrect_generate_hash
   compile_opt strictarr, hidden
 
-  filename = filepath('big.txt', root=mg_src_root())
+  filename = filepath('big.txt', subdir='dictionary', root=mg_src_root())
   nlines = file_lines(filename)
   text = strarr(nlines)
   openr, lun, filename, /get_lun
@@ -206,7 +206,9 @@ function mg_spellcorrect, word, $
   found = 0B
 
   if (n_elements(spell_hash) eq 0L) then begin
-    spell_hash_filename = filepath('spell_hash.sav', root=mg_src_root())
+    spell_hash_filename = filepath('spell_hash.sav', $
+                                   subdir='dictionary', $
+                                   root=mg_src_root())
     if (file_test(spell_hash_filename)) then begin
       restore, filename=spell_hash_filename
     endif else begin
