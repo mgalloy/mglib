@@ -58,9 +58,9 @@ pro mg_contour, z, x, y, nlevels=nlevels, levels=levels, _extra=e
   if (n_elements(levels) eq 0) then begin
     step = (float(max(z)) - float(min(z))) / float(_nlevels)
     if (step eq 0.0) then begin
-      levels = findgen(_nlevels)
+      levels = findgen(_nlevels) + 1.0
     endif else begin
-      levels = findgen(_nlevels) * step + min(z)
+      levels = (findgen(_nlevels) + 1.0) * step + min(z)
     endelse
   endif
 
