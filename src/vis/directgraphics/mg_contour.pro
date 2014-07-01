@@ -52,12 +52,16 @@ pro mg_contour, z, x, y, nlevels=nlevels, levels=levels, _extra=e
   compile_opt strictarr
   on_error, 2
 
-  _nlevels = n_elements(nlevels) gt 0L ? nlevels : 6
+  _nlevels = n_elements(nlevels) gt 0L ? nlevels : 6L
 
   ; if LEVELS is not specified, use _nlevels to compute them
   if (n_elements(levels) eq 0) then begin
     step = (float(max(z)) - float(min(z))) / float(_nlevels)
-    levels = findgen(_nlevels) * step + min(z)
+    if (step eq 0.0) then begin
+      levels = findgen(_nlevels)
+    endif else begin
+      levels = findgen(_nlevels) * step + min(z)
+    endelse
   endif
 
   case n_params() of
