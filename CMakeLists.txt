@@ -7,6 +7,7 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 # required version of CMake
 cmake_minimum_required(VERSION 2.8.3)
 cmake_policy(SET CMP0017 NEW)
+cmake_policy(SET CMP0042 NEW)
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/mgcmake/Modules
