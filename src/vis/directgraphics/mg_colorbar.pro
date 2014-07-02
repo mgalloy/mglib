@@ -117,7 +117,7 @@ pro mg_colorbar, range=range, $
                 yticks=1, ytickname=strarr(2) + ' ', $
                 ticklen=0., xstyle=5, ystyle=5, _extra=e
           inc = (double(_range[1]) - double(_range[0])) / double(n_elements(_colors))
-          ys = inc * dindgen(n_elements(_colors)) + _range[0]
+          ys = inc * dindgen(n_elements(_colors) + 1L) + _range[0]
           for c = 0L, n_elements(_colors) - 1L do begin
             polyfill, [0.D, 1.D, 1.D, 0.D, 0.D], $
                       ys[[c, c, c + 1L, c + 1L, c]], $
