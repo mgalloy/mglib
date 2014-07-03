@@ -12,6 +12,8 @@ pro mg_ticks_tickinc, diff, potential_increments, potential_ticks, $
 
   m_ind = sort(m)
   match_ind = value_locate(m[m_ind], diff)
+  match_ind = match_ind > 0
+  match_ind = match_ind < (n_elements(m) - 1L)
   match_pos = array_indices(m, m_ind[match_ind])
 
   ticks = potential_ticks[match_pos[1]]
