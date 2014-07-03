@@ -14,17 +14,24 @@ pro mg_ticks_tickinc, diff, potential_increments, potential_ticks, $
   match_ind = value_locate(m[m_ind], diff)
   match_ind = match_ind > 0
   match_ind = match_ind < (n_elements(m) - 1L)
+
   match_pos = array_indices(m, m_ind[match_ind])
 
   ticks = potential_ticks[match_pos[1]]
   increment = potential_increments[match_pos[0]]
 
   if ((ticks + 1L) * increment lt diff) then begin
-    match_pos = array_indices(m, m_ind[match_ind + 1L])
-    ticks = potential_ticks[match_pos[1]]
-    increment = potential_increments[match_pos[0]]
+    if (match_ind lt n_elements(m) - 1L) then begin
+      match_pos = array_indices(m, m_ind[match_ind + 1L])
+      ticks = potential_ticks[match_pos[1]]
+      increment = potential_increments[match_pos[0]]
+    endif else begin
+      mg_ticks_tickinc, diff, potential_increments * 10L, potential_ticks, $
+                        ticks=ticks, increment=increment
+    endelse
   endif
 end
+
 
 ;+
 ; Calculates `[xyz]ticks`, `[xyz]range`, and `[xyz]tickv` for axis values.
@@ -42,14 +49,17 @@ end
 ;   tickv : out, optional, type=fltarr
 ;     tick values for `[xyz]tickv` keywords
 ;-
-function mg_ticks, values, range=range, tickv=tickv
+function mg_ticks, values, range=range, tickv=tickv, geographic=geographic
   compile_opt strictarr
 
   r = mg_range(values)
   diff = r[1] - r[0]
 
   ; preferred spacing between tick marks
-  potential_increments = [1, 5, 10, 25]
+  case 1 of
+    keyword_set(geographic): potential_increments = [1, 10, 45, 90]
+    else: potential_increments = [1, 5, 10, 25]
+  endcase
 
   ; ticks should be in the range of 4 to 10
   potential_ticks = lindgen(7) + 4L
