@@ -1,5 +1,8 @@
 ; docformat = 'rst'
 
+;+
+; Build CULA wrappers.
+;-
 pro mg_make_cula_bindings
   compile_opt strictarr
 

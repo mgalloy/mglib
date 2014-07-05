@@ -1,6 +1,25 @@
 ; docformat = 'rst'
 
-pro mg_ticks_tickinc, diff, potential_increments, potential_ticks, $
+;+
+; Determine ticks and increment.
+;
+; :Params:
+;   diff : in, required, type=float
+;     range difference
+;   potential_increments : in, required, type=lonarr
+;     potential increments between ticks
+;   potential_ticks : in, required, type=lonarr
+;     potential number of ticks
+;
+; :Keywords:
+;   ticks : out, optional, type=long
+;     set to a named variable to return the number of tick marks
+;   increment : out, optional, type=long
+;     set to a named variable to return the increment between tick marks
+;-
+pro mg_ticks_tickinc, diff, $
+                      potential_increments, $
+                      potential_ticks, $
                       ticks=ticks, increment=increment
   compile_opt strictarr
 

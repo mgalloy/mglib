@@ -72,17 +72,21 @@
 ;     printed.
 ;   quiet : in, optional, type=boolean
 ;     if set, then no output is made (for this call only)
-;   nocr : in, optional, type=boolean
-;     If set, no carriage return operation is performed after output. This also
-;     has the side effect that in subsequent calls, column "0" will not cause
-;     the cursor to move. The default is for the cursor to return to column 0
-;     after each output.
 ;   close : in, optional, type=boolean
 ;     If set, instruct `MG_STATUSLINE` to close the terminal device logical unit
 ;     number. Users should perform this operation when the computation has
 ;     finished so that the terminal device is not left dangling open. If, at a
 ;     later time, `MG_STATUSLINE` is called again, the terminal device will be
 ;     re-opened.
+;   enable : in, optional, type=boolean
+;     set to explicitly enable status line
+;   disable : in, optional, type=boolean
+;     set to explicitly disable status line
+;   nocr : in, optional, type=boolean
+;     If set, no carriage return operation is performed after output. This also
+;     has the side effect that in subsequent calls, column "0" will not cause
+;     the cursor to move. The default is for the cursor to return to column 0
+;     after each output.
 ;   error : out, optional, type=long
 ;     set to a named variable to retrieve the error status; 0 for success, other
 ;     values indicate errors

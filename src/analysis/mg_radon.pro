@@ -1,39 +1,44 @@
 ; docformat = 'rst'
 
 ;+
-; Pure IDL implementation of the RADON routine.
-;
-; :Todo:
-;    implement forward projection
+; Pure IDL implementation of the `RADON` routine.
 ;
 ; :Returns:
-;    fltarr
+;   `fltarr`
 ;
 ; :Params:
-;    arr : in, required, type=fltarr
-;       array to transform or backproject
+;   arr : in, required, type=fltarr
+;     array to transform or backproject
 ;
 ; :Keywords:
-;    backproject : in, optional, type=boolean
-;       set to perform backprojection instead of forward Radon transform
-;    rho : in, optional, type=fltarr
-;    theta : in, optional, type=fltarr
-;    dx : in, optional, type=float, default=1.0
-;    dy : in, optional, type=float, default=1.0
-;    nx : in, optional, type=float, default=
-;       when doing a backprojection, this specifies x-size of the output; the
-;       default is::
+;   backproject : in, optional, type=boolean
+;     set to perform backprojection instead of forward Radon transform
+;   rho : in, optional, type=fltarr
+;   nrho
+;   theta : in, optional, type=fltarr
+;   ntheta
+;   dx : in, optional, type=float, default=1.0
+;     increment in x
+;   dy : in, optional, type=float, default=1.0
+;     increment in y
+;   nx : in, optional, type=float, default=
+;     when doing a backprojection, this specifies x-size of the output; the
+;     default is::
 ;
-;          floor(2 * ((drho * nrho / 2.) / sqrt(_dx * _dx + _dy * _dy)) + 1.)
+;       floor(2 * ((drho * nrho / 2.) / sqrt(_dx * _dx + _dy * _dy)) + 1.)
 ;
-;    ny : in, optional, type=float
-;       when doing a backprojection, this specifies y-size of the output; the
-;       default is::
+;   ny : in, optional, type=float
+;     when doing a backprojection, this specifies y-size of the output; the
+;     default is::
 ;
-;          floor(2 * ((drho * nrho / 2.) / sqrt(_dx * _dx + _dy * _dy)) + 1.)
+;       floor(2 * ((drho * nrho / 2.) / sqrt(_dx * _dx + _dy * _dy)) + 1.)
 ;
-;    xmin : in, optional, type=float, default=- _dx * (_nx - 1.) / 2.
-;    ymin : in, optional, type=float, default=- _dy * (_ny - 1.) / 2.
+;   xmin : in, optional, type=float, default=- _dx * (_nx - 1.) / 2.
+;     x-coorindate of lower-left corner of input array of the input array (or
+;     result, if `BACKPROJECT` is set)
+;   ymin : in, optional, type=float, default=- _dy * (_ny - 1.) / 2.
+;     y-coorindate of lower-left corner of input array of the input array (or
+;     result, if `BACKPROJECT` is set)
 ;-
 function mg_radon, arr, backproject=backproject, $
                    nrho=nrho, ntheta=ntheta, rho=rho, theta=theta, $

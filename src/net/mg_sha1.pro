@@ -8,7 +8,17 @@
 
 
 ;+
+; First round helper routine.
+;
 ; :Private:
+;
+; :Params:
+;   x : in, required, type=unsigned long
+;     first arg
+;   y : in, required, type=unsigned long
+;     second arg
+;   z : in, required, type=unsigned long
+;     third arg
 ;-
 function mg_sha_helper1, x, y, z
   return, (x and y) or ((not x) and z)
@@ -16,7 +26,17 @@ end
 
 
 ;+
+; Second round helper routine.
+;
 ; :Private:
+;
+; :Params:
+;   x : in, required, type=unsigned long
+;     first arg
+;   y : in, required, type=unsigned long
+;     second arg
+;   z : in, required, type=unsigned long
+;     third arg
 ;-
 function mg_sha_helper2, x, y, z
   return, x xor y xor z
@@ -24,7 +44,17 @@ end
 
 
 ;+
+; Third round helper routine.
+;
 ; :Private:
+;
+; :Params:
+;   x : in, required, type=unsigned long
+;     first arg
+;   y : in, required, type=unsigned long
+;     second arg
+;   z : in, required, type=unsigned long
+;     third arg
 ;-
 function mg_sha_helper3, x, y, z
   return, (x and y) or (x and z) or (y and z)

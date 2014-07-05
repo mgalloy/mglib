@@ -9,23 +9,23 @@
 ; Machine.
 ;
 ; :Examples:
-;    For example, simple arithmetic expressions can be evaluated::
+;   For example, simple arithmetic expressions can be evaluated::
 ;
-;       IDL> print, mg_evalexpr('1 + 2 + 3', error=error), error
-;                            6       0
+;     IDL> print, mg_evalexpr('1 + 2 + 3', error=error), error
+;                          6       0
 ;
-;    Note that the `ERROR` keyword returns whether there was an error in
-;    evaluating the expression. Expressions can also take variables, if their
-;    values are provided via a structure or hash-like object::
+;   Note that the `ERROR` keyword returns whether there was an error in
+;   evaluating the expression. Expressions can also take variables, if their
+;   values are provided via a structure or hash-like object::
 ;
-;       IDL> print, mg_evalexpr('exp(i * pi)', { pi: !dpi, i: complex(0, 1) })
-;       (      -1.0000000,   1.2246468e-16)
+;     IDL> print, mg_evalexpr('exp(i * pi)', { pi: !dpi, i: complex(0, 1) })
+;     (      -1.0000000,   1.2246468e-16)
 ;
 ; :Bugs:
-;    does not support functions of multiple variables
+;   does not support functions of multiple variables
 ;
 ; :Author:
-;    Michael D. Galloy, 2012
+;   Michael D. Galloy, 2012
 ;
 ; :Requires:
 ;   IDL 8.0
@@ -37,22 +37,22 @@
 ; the next token.
 ;
 ; :Returns:
-;    string, double, long64, or `!null` if no tokens left
+;   string, double, long64, or `!null` if no tokens left
 ;
 ; :Private:
 ;
 ; :Params:
-;    expr : in, required, type=string
-;       mathematical expression to parse
-;    start_index : in, required, type=long
-;       index to start looking for the next token at
+;   expr : in, required, type=string
+;     mathematical expression to parse
+;   start_index : in, required, type=long
+;     index to start looking for the next token at
 ;
 ; :Keywords:
-;    length : out, optional, type=long
-;       set to a named variable to get the length of the returned token from
-;       `start_index`, i.e., it might include whitespace and hence by longer
-;       than the actual length of the return token; this is the value to
-;       advance the `start_index` to find the next token
+;   length : out, optional, type=long
+;     set to a named variable to get the length of the returned token from
+;     `start_index`, i.e., it might include whitespace and hence by longer
+;     than the actual length of the return token; this is the value to
+;     advance the `start_index` to find the next token
 ;-
 function mg_evalexpr_parse, expr, start_index, length=length
   compile_opt strictarr
@@ -133,15 +133,19 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    value of variable or `!null` if not found
+;   value of variable or `!null` if not found
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of variable to lookup
-;    vars : in, required, type=structure/object
-;       either a structure or a hash-like object, i.e., an object that has a
-;       `hasKey` method and implements the right-side bracket operators to
-;       retrieve a value for a given name
+;   name : in, required, type=string
+;     name of variable to lookup
+;   vars : in, required, type=structure/object
+;     either a structure or a hash-like object, i.e., an object that has a
+;     `hasKey` method and implements the right-side bracket operators to
+;     retrieve a value for a given name
+;
+; :Keywords:
+;   found : out, optional, type=boolean
+;     set to a named variable to return whether the name was found
 ;-
 function mg_evalexpr_lookup, name, vars, found=found
   compile_opt strictarr
@@ -168,16 +172,16 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    double or long64
+;   double or long64
 ;
 ; :Params:
-;    stack : in, required, type=list object
-;       current stack of parser tokens
-;    pos : in, out, required, type=long
-;       current position on the stack
-;    vars : in, required, type=structure/object
-;       structure or hash-like object which defines the values of variables
-;       in the expression
+;   stack : in, required, type=list object
+;     current stack of parser tokens
+;   pos : in, out, required, type=long
+;     current position on the stack
+;   vars : in, required, type=structure/object
+;     structure or hash-like object which defines the values of variables in
+;     the expression
 ;-
 function mg_evalexpr_expr, stack, pos, vars
   compile_opt strictarr
@@ -205,16 +209,16 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    double or long64
+;   double or long64
 ;
 ; :Params:
-;    stack : in, required, type=list object
-;       current stack of parser tokens
-;    pos : in, out, required, type=long
-;       current position on the stack
-;    vars : in, required, type=structure/object
-;       structure or hash-like object which defines the values of variables
-;       in the expression
+;   stack : in, required, type=list object
+;     current stack of parser tokens
+;   pos : in, out, required, type=long
+;     current position on the stack
+;   vars : in, required, type=structure/object
+;     structure or hash-like object which defines the values of variables in
+;     the expression
 ;-
 function mg_evalexpr_superscript, stack, pos, vars
   compile_opt strictarr
@@ -238,16 +242,16 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    double or long64
+;   double or long64
 ;
 ; :Params:
-;    stack : in, required, type=list object
-;       current stack of parser tokens
-;    pos : in, out, required, type=long
-;       current position on the stack
-;    vars : in, required, type=structure/object
-;       structure or hash-like object which defines the values of variables
-;       in the expression
+;   stack : in, required, type=list object
+;     current stack of parser tokens
+;   pos : in, out, required, type=long
+;     current position on the stack
+;   vars : in, required, type=structure/object
+;     structure or hash-like object which defines the values of variables in
+;     the expression
 ;-
 function mg_evalexpr_term, stack, pos, vars
   compile_opt strictarr
@@ -276,16 +280,16 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    double or long64
+;   double or long64
 ;
 ; :Params:
-;    stack : in, required, type=list object
-;       current stack of parser tokens
-;    pos : in, out, required, type=long
-;       current position on the stack
-;    vars : in, required, type=structure/object
-;       structure or hash-like object which defines the values of variables
-;       in the expression
+;   stack : in, required, type=list object
+;     current stack of parser tokens
+;   pos : in, out, required, type=long
+;     current position on the stack
+;   vars : in, required, type=structure/object
+;     structure or hash-like object which defines the values of variables in
+;     the expression
 ;-
 function mg_evalexpr_factor, stack, pos, vars
   compile_opt strictarr
@@ -322,20 +326,19 @@ end
 ; Evaluates a mathematical expression.
 ;
 ; :Returns:
-;    double or long64
+;   double or long64
 ;
 ; :Params:
-;    expr : in, required, type=string
-;       expression to evaluate
-;    vars : in, optional, type=structure or hash
-;       variables to substitute into expression specified as a structure or
-;       hash-like object; if a structure, the variable names are
-;       case-insensitive
+;   expr : in, required, type=string
+;     expression to evaluate
+;   vars : in, optional, type=structure or hash
+;     variables to substitute into expression specified as a structure or
+;     hash-like object; if a structure, the variable names are case-insensitive
 ;
 ; :Keywords:
-;    error : out, optional, type=boolean
-;       set to named variable to return if there was an error evaluating the
-;       expression
+;   error : out, optional, type=boolean
+;     set to named variable to return if there was an error evaluating the
+;     expression
 ;-
 function mg_evalexpr, expr, vars, error=error
   compile_opt strictarr

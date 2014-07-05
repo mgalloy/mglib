@@ -628,6 +628,13 @@ end
 
 ;+
 ; Create the DLM object.
+;
+; :Returns:
+;   1 if successfully initialized, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `MG_DLM::setProperty`
 ;-
 function mg_dlm::init, _extra=e
   compile_opt strictarr

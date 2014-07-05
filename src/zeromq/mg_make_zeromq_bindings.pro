@@ -1,5 +1,16 @@
 ; docformat = 'rst'
 
+;+
+; Make 0MQ bindings.
+;
+; :Keywords:
+;   header_directory : in, optional, type=string
+;     directory containing 0MQ include files
+;   lib_directory : in, optional, type=string
+;     directory containing 0MQ library files
+;   show_all_output : in, optional, type=boolean
+;     set to show all build output
+;-
 pro mg_make_zeromq_bindings, header_directory=header_directory, $
                              lib_directory=lib_directory, $
                              show_all_output=show_all_output

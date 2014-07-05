@@ -68,6 +68,8 @@ end
 
 
 ;+
+; Create local header.
+;
 ; :Private:
 ;
 ; :Returns:
@@ -144,6 +146,8 @@ end
 
 
 ;+
+; Create central header.
+;
 ; :Private:
 ;
 ; :Returns:

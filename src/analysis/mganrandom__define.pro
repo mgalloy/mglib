@@ -34,9 +34,28 @@ function mganrandom::_getData, urlString, error=error
 end
 
 
+;+
+; Convert data to given type.
+;
+; :Returns:
+;   array of type `TYPE`
+;
+; :Params:
+;   data : in, required, type=any
+;     data to convert
+;
+; :Keywords:
+;   type : in, required, type=long
+;     `SIZE` type code
+;   error : out, optional, type=long
+;     set to a named variable to return whether the conversion was correctly
+;     performed
+;-
 function mganrandom::_convertData, data, type=type, error=error
   compile_opt strictarr
   on_ioerror, bad_values
+
+  error = 0L
 
   result = fix(data, type=type)
   return, result
@@ -51,16 +70,16 @@ end
 ; Returns a permutation of the given range of integers.
 ;
 ; :Returns:
-;    lonarr
+;   lonarr
 ;
 ; :Keywords:
-;    minimum : in, optional, type=long, default=0
-;       minimum value of returned integers
-;    maximum : in, optional, type=long, default=100
-;       maximum value of returned integers
-;    error : out, optional, type=long
-;       pass a named variable to get the response code: 0 for success,
-;       anything else indicates a failure
+;   minimum : in, optional, type=long, default=0
+;     minimum value of returned integers
+;   maximum : in, optional, type=long, default=100
+;     maximum value of returned integers
+;   error : out, optional, type=long
+;     pass a named variable to get the response code: 0 for success,
+;     anything else indicates a failure
 ;-
 function mganrandom::getSequence, minimum=minimum, maximum=maximum, $
                                   error=error
@@ -82,20 +101,20 @@ end
 ; Return the given number of random integers (with repetition).
 ;
 ; :Returns:
-;    lonarr
+;   `lonarr`
 ;
 ; :Params:
-;    n : in, required, type=long
-;       number of random numbers to generate
+;   n : in, required, type=long
+;     number of random numbers to generate
 ;
 ; :Keywords:
-;    minimum : in, optional, type=long, default=0
-;       minimum value of returned integers
-;    maximum : in, optional, type=long, default=100
-;       maximum value of returned integers
-;    error : out, optional, type=long
-;       pass a named variable to get the response code: 0 for success,
-;       anything else indicates a failure
+;   minimum : in, optional, type=long, default=0
+;     minimum value of returned integers
+;   maximum : in, optional, type=long, default=100
+;     maximum value of returned integers
+;   error : out, optional, type=long
+;     pass a named variable to get the response code: 0 for success,
+;     anything else indicates a failure
 ;-
 function mganrandom::getIntegers, n, minimum=minimum, maximum=maximum, $
                                   error=error
@@ -119,6 +138,25 @@ function mganrandom::getIntegers, n, minimum=minimum, maximum=maximum, $
 end
 
 
+;+
+; Return the given number of random Gaussian floats.
+;
+; :Returns:
+;   `fltarr`
+;
+; :Params:
+;   n : in, required, type=long
+;     number of random numbers to generate
+;
+; :Keywords:
+;   mean : in, optional, type=float, default=0.0
+;     mean of requested floats
+;   stddev : in, optional, type=float, default=1.0
+;     standard deviation of requested floats
+;   error : out, optional, type=long
+;     pass a named variable to get the response code: 0 for success,
+;     anything else indicates a failure
+;-
 function mganrandom::getGaussians, n, mean=mean, stddev=stddev, error=error
   compile_opt strictarr
   on_error, 2
@@ -153,7 +191,7 @@ end
 ; Creates a random number generator.
 ;
 ; :Returns:
-;    1 if success, 0 if failure
+;   1 if success, 0 if failure
 ;-
 function mganrandom::init
   compile_opt strictarr
@@ -169,11 +207,10 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    url
-;       IDLnetURL object used to communicate with random.org
-;    randomURL
-;       URL of the random.org website which generates the random
-;       numbers
+;   url
+;     IDLnetURL object used to communicate with random.org
+;   randomURL
+;     URL of the random.org website which generates the random numbers
 ;-
 pro mganrandom__define
   compile_opt strictarr

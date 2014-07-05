@@ -1,5 +1,8 @@
 ; docformat = 'rst'
 
+;+
+; Example of calling CULA routines.
+;-
 pro mg_cula_demo
   compile_opt strictarr
 

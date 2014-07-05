@@ -1,7 +1,18 @@
+; docformat = 'rst'
+
+
+;+
+; For the current image in an ENVI display, export image to KML file for Google
+; Earth.
+;-
+
+
 ;+
 ; Trick to automatically add this to the ENVI menu.
 ;
-; @param button_info {out}{required}{type=structure} information about the button
+; :Params:
+;   button_info : out, required, type=structure
+;     information about the button
 ;-
 pro mg_write_kml_define_buttons, button_info
   compile_opt strictarr
@@ -16,12 +27,13 @@ pro mg_write_kml_define_buttons, button_info
                            separator=1
 end
 
+
 ;+
 ; Event handler for ENVI menu.
 ;
-; @file_comments For the current image in an ENVI display, export image to KML
-;                file for Google Earth.
-; @param event {in}{required}{type=event structure} event from ENVI
+; :Params:
+;   event : in, required, type=event structure
+;     event from ENVI
 ;-
 pro mg_write_kml, event
   compile_opt strictarr

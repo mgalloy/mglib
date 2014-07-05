@@ -1,5 +1,15 @@
 ; docformat = 'rst'
 
+
+;+
+; Login to Google Voice.
+;
+; :Params:
+;   email : in, required, type=string
+;     Google Voice email
+;   passwd : in, required, type=string
+;     Google Voice password
+;-
 pro mgnetgvoice::login, email, passwd
   compile_opt strictarr
 
@@ -29,6 +39,9 @@ print, d
 end
 
 
+;+
+; Logout of Google Voice.
+;-
 pro mgnetgvoice::logout
   compile_opt strictarr
 
@@ -40,18 +53,35 @@ pro mgnetgvoice::logout
 end
 
 
+;+
+; Send SMS.
+;
+; Note: not implemented yet.
+;
+; :Params:
+;   number : in, required, type=string
+;     number to send SMS to
+;   msg : in, required, type=string
+;     SMS message
+;-
 pro mgnetgvoice::send_sms, number, msg
   compile_opt strictarr
 
 end
 
 
+;+
+; Set properties.
+;-
 pro mgnetgvoice::setProperty
   compile_opt strictarr
 
 end
 
 
+;+
+; Cleanup resources.
+;-
 pro mgnetgvoice::cleanup
   compile_opt strictarr
 
@@ -59,6 +89,16 @@ pro mgnetgvoice::cleanup
 end
 
 
+;+
+; Initialize MGnetGVoice.
+;
+; :Returns:
+;   1 if initialize successfully, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties to `MGnetGVoice::setProperty`
+;-
 function mgnetgvoice::init, _extra=e
   compile_opt strictarr
 
@@ -71,6 +111,17 @@ function mgnetgvoice::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;
+; :Fields:
+;   url
+;     `IDLnetURL` object
+;   user_agent
+;     string presentation of user agent
+;   auth
+;     login
+;-
 pro mgnetgvoice__define
   compile_opt strictarr
 

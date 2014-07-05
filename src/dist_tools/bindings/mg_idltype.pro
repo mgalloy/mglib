@@ -18,6 +18,10 @@
 ; :Params:
 ;   type_code : in, required, type=long
 ;     `SIZE` type code
+;
+; :Keywords:
+;   pointer : in, optional, type=boolean
+;     set to indicate a pointer to the type
 ;-
 function mg_idltype_tmp_fieldname, type_code, pointer=pointer
   compile_opt strictarr
@@ -184,6 +188,8 @@ end
 ;     set to get the `IDL_ALLTYPES` field name's declaration type
 ;   type : in, optional, type=boolean
 ;     set to get the `SIZE` type code C constant name
+;   pointer : in, optional, type=boolean
+;     set to indicate a pointer to the type
 ;   tmp_routine : in, optional, type=boolean
 ;     set to return the name of the routine to get a temporary variable of that
 ;     type
