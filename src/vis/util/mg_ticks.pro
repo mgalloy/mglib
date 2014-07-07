@@ -1,7 +1,38 @@
 ; docformat = 'rst'
 
+
+;+
+; Return potential increments.
+;
+; :Private:
+;
+; :Returns:
+;   `fltarr`
+;
+; :Keywords:
+;   degrees : in, optional, type=boolean
+;     set to indicate increments should be in degrees
+;-
+function mg_ticks_increments, degrees=degrees
+  compile_opt strictarr
+
+  ; preferred spacing between tick marks
+  case 1 of
+    keyword_set(degrees): potential_increments = [1., 5., 10., 45., 90.]
+    else: potential_increments = [1., 2.5, 5.]
+  endcase
+
+  return, potential_increments
+end
+
+
 ;+
 ; Determine ticks and increment.
+;
+; :Private:
+;
+; :Returns:
+;   increment as a float
 ;
 ; :Params:
 ;   diff : in, required, type=float
@@ -14,13 +45,12 @@
 ; :Keywords:
 ;   ticks : out, optional, type=long
 ;     set to a named variable to return the number of tick marks
-;   increment : out, optional, type=long
-;     set to a named variable to return the increment between tick marks
 ;-
-pro mg_ticks_tickinc, diff, $
-                      potential_increments, $
-                      potential_ticks, $
-                      ticks=ticks, increment=increment
+function mg_ticks_tickinc, diff, $
+                           potential_increments, $
+                           potential_ticks, $
+                           ticks=ticks, $
+                           degrees=degrees
   compile_opt strictarr
 
   ; lonarr(increments, ticks)
@@ -39,16 +69,26 @@ pro mg_ticks_tickinc, diff, $
   ticks = potential_ticks[match_pos[1]]
   increment = potential_increments[match_pos[0]]
 
-  if ((ticks + 1L) * increment lt diff) then begin
+  ; if ticks/interval is not enough to cover the range
+  if (ticks * increment lt diff) then begin
     if (match_ind lt n_elements(m) - 1L) then begin
       match_pos = array_indices(m, m_ind[match_ind + 1L])
       ticks = potential_ticks[match_pos[1]]
       increment = potential_increments[match_pos[0]]
     endif else begin
-      mg_ticks_tickinc, diff, potential_increments * 10L, potential_ticks, $
-                        ticks=ticks, increment=increment
+      if (keyword_set(degrees)) then begin
+        potential_increments = mg_ticks_increments()
+      endif else begin
+        potential_increments = potential_increments * 10L
+      endelse
+      increment = mg_ticks_tickinc(diff, $
+                                   potential_increments, $
+                                   potential_ticks, $
+                                   ticks=ticks)
     endelse
   endif
+
+  return, increment
 end
 
 
@@ -67,50 +107,41 @@ end
 ;     range for `[xyz]range` keywords
 ;   tickv : out, optional, type=fltarr
 ;     tick values for `[xyz]tickv` keywords
+;   degrees : in, optional, type=boolean
+;     set to indicate values are in degrees
 ;-
-function mg_ticks, values, range=range, tickv=tickv, geographic=geographic
+function mg_ticks, values, range=range, tickv=tickv, degrees=degrees
   compile_opt strictarr
 
   r = mg_range(values)
   diff = r[1] - r[0]
 
-  ; preferred spacing between tick marks
-  case 1 of
-    keyword_set(geographic): potential_increments = [1, 10, 45, 90]
-    else: potential_increments = [1, 5, 10, 25]
-  endcase
+  potential_increments = mg_ticks_increments(degrees=degrees)
 
-  ; ticks should be in the range of 4 to 10
-  potential_ticks = lindgen(7) + 4L
+  ; ticks should be in the range of 3 to 10
+  potential_ticks = lindgen(8) + 3L
 
-  mg_ticks_tickinc, diff, potential_increments, potential_ticks, $
-                    ticks=ticks, increment=increment
+  increment = mg_ticks_tickinc(diff, $
+                               potential_increments, $
+                               potential_ticks, $
+                               ticks=ticks, degrees=degrees)
 
-  start = long(r[0] / increment) * increment
-  if (start eq r[0]) then begin
-    tickv = increment * findgen(ticks + 1L) + start
-  endif else begin
-    ticks--
-    tickv = increment * (findgen(ticks + 1L) + 1.0) + start
-  endelse
+  range = fltarr(2)
+  prange = [long(r[0] / increment), ceil(r[1] / increment)] * increment
 
-  ; expand range to include tickmarks
-  range = mg_range_union(r, mg_range(tickv))
+  if (r[0] - prange[0] gt 0.15 * increment || r[0] - prange[0] lt 0.0) then begin
+    range[0] = r[0]
+  endif else range[0] = prange[0]
+  if (prange[1] - r[1] gt 0.15 * increment || prange[1] - r[1] lt 0.0) then begin
+    range[1] = r[1]
+  endif else range[1] = prange[1]
 
-  potential_end = ceil(r[1] / increment) * increment
-  error = potential_end - range[1]
-  if (error gt 0.0 && error lt 0.1 * increment) then begin
-    ticks++
-    tickv = [tickv, tickv[-1] + increment]
-  endif
+  increment = mg_ticks_tickinc(range[1] - range[0], $
+                               potential_increments, $
+                               potential_ticks, $
+                               ticks=ticks, degrees=degrees)
 
-  ; expand range to include tickmarks
-  range = mg_range_union(r, mg_range(tickv))
-
-  if (range[0] lt tickv[0]) then begin
-    ticks++
-    tickv = [tickv[0] - increment, tickv]
-  endif
+  tickv = increment * findgen(ticks + 1L) + prange[0]
 
   return, ticks
 end
