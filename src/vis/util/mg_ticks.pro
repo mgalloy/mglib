@@ -127,7 +127,7 @@ function mg_ticks, values, range=range, tickv=tickv, degrees=degrees
                                ticks=ticks, degrees=degrees)
 
   range = fltarr(2)
-  prange = [long(r[0] / increment), ceil(r[1] / increment)] * increment
+  prange = [floor(r[0] / increment), ceil(r[1] / increment)] * increment
 
   if (r[0] - prange[0] gt 0.15 * increment || r[0] - prange[0] lt 0.0) then begin
     range[0] = r[0]
