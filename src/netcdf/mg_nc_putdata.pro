@@ -126,7 +126,7 @@ end
 ; :Private:
 ;
 ; :Params:
-;   file_id : in, required, type=long
+;   group_id : in, required, type=long
 ;     identifier for netCDF file open for writing
 ;   parent_id : in, required, type=long
 ;     identifier for parent group/variable
@@ -139,7 +139,7 @@ end
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
-pro mg_nc_putdata_putattribute, file_id, parent_id, attname, data, error=error
+pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
   compile_opt strictarr
 
   catch, error
@@ -150,26 +150,26 @@ pro mg_nc_putdata_putattribute, file_id, parent_id, attname, data, error=error
 
   type = size(data, /type)
 
-  if (file_id eq parent_id) then begin
-    ncdf_attput, file_id, attname, data, /global, $
+  if (group_id eq parent_id) then begin
+    ncdf_attput, group_id, attname, data, /global, $
                  ubyte=type eq 1, $
                  short=type eq 2, $
                  long=type eq 3, $
                  float=type eq 4, $
                  double=type eq 5, $
-                 string=type eq 7, $
+                 char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
                  uint64=type eq 15
     
   endif else begin
-    ncdf_attput, file_id, parent_id, attname, data, $
+    ncdf_attput, group_id, parent_id, attname, data, $
                  ubyte=type eq 1, $
                  short=type eq 2, $
                  long=type eq 3, $
                  float=type eq 4, $
                  double=type eq 5, $
-                 string=type eq 7, $
+                 char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
                  uint64=type eq 15
@@ -222,14 +222,16 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
       end
     1: begin
          case parent_type of
-           2: mg_nc_putdata_putattribute, group_id, parent_id, $
-                                          element_name, data, $
-                                          error=error
+           2: begin
+               mg_nc_putdata_putattribute, group_id, parent_id, $
+                                           element_name, data, $
+                                           error=error
+             end
            3: begin
-                 mg_nc_putdata_putattribute, parent_id, parent_id, $
-                                             element_name, data, $
-                                             error=error
-               end
+               mg_nc_putdata_putattribute, parent_id, parent_id, $
+                                           element_name, data, $
+                                           error=error
+             end
            else: begin
                error = -1L
                message, 'invalid parent type', /informational

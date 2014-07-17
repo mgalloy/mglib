@@ -100,6 +100,75 @@ function mg_nc_putdata_ut::test_groupattr
 end
 
 
+function mg_nc_putdata_ut::test_string_rootattr
+  compile_opt strictarr
+
+  standard = 'meters'
+  mg_nc_putdata, self.test_filename, '.example_attribute', standard, $
+                 error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  result = mg_nc_getdata(self.test_filename, '.example_attribute', $
+                         error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
+
+  result_type = size(result, /type)
+  assert, result_type eq 7L, 'incorrect root attribute type: %d', result_type
+
+  assert, result eq standard, 'incorrect root attribute value: %s', result
+
+  return, 1
+end
+
+
+function mg_nc_putdata_ut::test_string_groupattr
+  compile_opt strictarr
+
+  standard = 'meters'
+  mg_nc_putdata, self.test_filename, 'group.example_attribute', standard, $
+                 error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  result = mg_nc_getdata(self.test_filename, 'group.example_attribute', $
+                         error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
+
+  result_type = size(result, /type)
+  assert, result_type eq 7L, 'incorrect group attribute type: %d', result_type
+
+  assert, result eq standard, 'incorrect group attribute value: %s', result
+
+  return, 1
+end
+
+
+function mg_nc_putdata_ut::test_string_varattr
+  compile_opt strictarr
+
+  standard = 'meters'
+
+  mg_nc_putdata, self.test_filename, 'var', findgen(10), error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  mg_nc_putdata, self.test_filename, 'var.example_attribute', standard, $
+                 error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  result = mg_nc_getdata(self.test_filename, 'var.example_attribute', $
+                         error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
+
+  result_type = size(result, /type)
+  assert, result_type eq 7L, 'incorrect var attribute type: %d', result_type
+
+  assert, result eq standard, 'incorrect var attribute value: %s', result
+
+
+
+  return, 1
+end
+
+
 function mg_nc_putdata_ut::test_rootattr
   compile_opt strictarr
 
