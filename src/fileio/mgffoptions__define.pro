@@ -458,7 +458,8 @@ function mgffoptions::get, option, $
   endelse
 
   if (keyword_set(extract)) then begin
-    vars_re = '\[[[:space:]]*([-[:alnum:]._$]+[[:space:]]*,[[:space:]]*)*[-[:alnum:]._$]+[[:space:]]*\][[:space:]]*'
+    ;vars_re = '\[[[:space:]]*([-[:alnum:]._$]+[[:space:]]*,[[:space:]]*)*[-[:alnum:]._$]+[[:space:]]*\][[:space:]]*'
+    vars_re = '\[.*\]'
     has_vars = stregex(value, vars_re, /boolean)
     if (has_vars) then begin
       vars_string = strmid(value, 1, strlen(value) - 2)
