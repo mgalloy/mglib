@@ -234,11 +234,11 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
              end
            else: begin
                error = -1L
-               if (~arg_present(error)) thenmessage, 'invalid parent type', /informational
+               if (~arg_present(error)) then message, 'invalid parent type', /informational
              end
          endcase
          if (error) then begin
-           if (~arg_present(error)) thenmessage, 'error writing attribute', /informational
+           if (~arg_present(error)) then message, 'error writing attribute', /informational
          endif
       end
     2: begin
@@ -249,11 +249,11 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
          endif
       end
     3: begin
-        if (~arg_present(error)) thenmessage, 'unable to create group from descriptor', /informational
+        if (~arg_present(error)) then message, 'unable to create group from descriptor', /informational
       end
     else: begin
         error = -1L
-        if (~arg_present(error)) thenmessage, 'unknown descriptor type', /informational
+        if (~arg_present(error)) then message, 'unknown descriptor type', /informational
       end
   endcase
 
