@@ -88,8 +88,8 @@ function mg_nc_errormessage, code
     -126: m = 'Can''t specify both contiguous and chunking'
     -127: m = 'Bad chunksize'
     -128: m = 'Attempt to use feature that was not turned on when netCDF was built'
-    -129: m = 'Error in using diskless  access'
-    else: m = 'Uknown error code'
+    -129: m = 'Error in using diskless access'
+    else: m = 'Unknown error code'
   endcase
 
   return, m
