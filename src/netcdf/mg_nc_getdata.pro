@@ -263,7 +263,7 @@ end
 ;   attribute data
 ;
 ; :Params:
-;   file_id : in, required, type=long
+;   group_id : in, required, type=long
 ;     identifier of netCDF file
 ;   parent_id : in, required, type=long
 ;     identifier of parent variable/group
@@ -276,7 +276,7 @@ end
 ;   error : out, optional, type=long
 ;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattributedata, file_id, parent_id, attname, $
+function mg_nc_getdata_getattributedata, group_id, parent_id, attname, $
                                          global=global, error=error
   compile_opt strictarr
   on_error, 2
@@ -288,14 +288,20 @@ function mg_nc_getdata_getattributedata, file_id, parent_id, attname, $
   endif
 
   if (keyword_set(global)) then begin
-    ncdf_attget, file_id, attname, attr_value, /global
-    attr_info = ncdf_attinq(file_id, attname, /global)
+    ncdf_attget, group_id, attname, attr_value, /global
+    attr_info = ncdf_attinq(group_id, attname, /global)
   endif else begin
-    ncdf_attget, file_id, parent_id, attname, attr_value
-    attr_info = ncdf_attinq(file_id, parent_id, attname)
+    old_quiet = !quiet
+    !quiet = 1
+    ncdf_attget, group_id, parent_id, attname, attr_value
+    attr_info = ncdf_attinq(group_id, parent_id, attname)
+    !quiet = old_quiet
   endelse
 
-  if (attr_info.dataType eq 'CHAR') then attr_value = string(attr_value)
+  case attr_info.datatype of
+    'CHAR': attr_value = string(attr_value)
+    else:
+  endcase
 
   return, attr_value
 end
@@ -310,7 +316,7 @@ end
 ;   attribute value
 ;
 ; :Params:
-;   file_id : in, required, type=long
+;   group_id : in, required, type=long
 ;     netCDF file identifier of the file to read
 ;   parent_id : in, required, type=long
 ;     parent group/variable identifier
@@ -321,7 +327,7 @@ end
 ;   error : out, optional, type=long
 ;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattribute, file_id, parent_id, attname, error=error
+function mg_nc_getdata_getattribute, group_id, parent_id, attname, error=error
   compile_opt strictarr
 
   catch, error
@@ -330,8 +336,8 @@ function mg_nc_getdata_getattribute, file_id, parent_id, attname, error=error
     return, !null
   endif
 
-  data = mg_nc_getdata_getattributedata(file_id, parent_id, attname, $
-                                        global=file_id eq parent_id, $
+  data = mg_nc_getdata_getattributedata(group_id, parent_id, attname, $
+                                        global=group_id eq parent_id, $
                                         error=error)
 
   return, data
@@ -382,12 +388,12 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
          ; attribute
          case parent_type of
            2: begin
-               result = mg_nc_getdata_getattribute(file_id, parent_id, $
+               result = mg_nc_getdata_getattribute(group_id, parent_id, $
                                                    element_name, $
                                                    error=error)
              end
            3: begin
-               result = mg_nc_getdata_getattribute(parent_id, parent_id, $
+               result = mg_nc_getdata_getattribute(group_id, group_id, $
                                                    element_name, $
                                                    error=error)
              end
