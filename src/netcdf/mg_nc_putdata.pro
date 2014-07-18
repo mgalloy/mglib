@@ -218,7 +218,7 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
   case type of
     0: begin
         error = -1L
-        message, 'unknown descriptor type', /informational
+        if (~arg_present(error)) then message, 'unknown descriptor type', /informational
       end
     1: begin
          case parent_type of
@@ -234,22 +234,26 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
              end
            else: begin
                error = -1L
-               message, 'invalid parent type', /informational
+               if (~arg_present(error)) thenmessage, 'invalid parent type', /informational
              end
          endcase
-         if (error) then message, 'error writing attribute', /informational
+         if (error) then begin
+           if (~arg_present(error)) thenmessage, 'error writing attribute', /informational
+         endif
       end
     2: begin
          mg_nc_putdata_putvariable, parent_id, element_name, data, $
                                     dim_names=dim_names, error=error
-         if (error) then message, 'error writing variable', /informational
+         if (error) then begin
+           if (~arg_present(error)) then message, 'error writing variable', /informational
+         endif
       end
     3: begin
-        message, 'unable to create group from descriptor', /informational
+        if (~arg_present(error)) thenmessage, 'unable to create group from descriptor', /informational
       end
     else: begin
         error = -1L
-        message, 'unknown descriptor type', /informational
+        if (~arg_present(error)) thenmessage, 'unknown descriptor type', /informational
       end
   endcase
 

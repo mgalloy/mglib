@@ -144,7 +144,7 @@ function mg_nc_getdata_convertbounds, sbounds, dimensions=dimensions, $
           result[d, *] = mg_nc_getdata_convertbounds_1d(dimIndices[d], dimensions[d])
         endfor
       end
-    else:  message, 'invalid number of dimensions in array indexing notation'
+    else: message, 'invalid number of dimensions in array indexing notation'
   endcase
 
   return, result
@@ -222,7 +222,7 @@ function mg_nc_getdata_getvariable, file_id, variable, bounds=bounds, $
   endfor
   varname = tokens[-1]
 
-  var_id = ncdf_varid(group_id, varname)
+  var_id = mg_nc_varid(group_id, varname)
 
   ; get full dimensions of variable
   varInfo = ncdf_varinq(group_id, var_id)
@@ -376,7 +376,7 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
     0: begin
         error = -1L
         result = !null
-        message, 'unknown descriptor type', /informational
+        if (~arg_present(error)) then message, 'unknown descriptor type', /informational
       end
     1: begin
          ; attribute
@@ -393,7 +393,9 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
              end
            else:
          endcase
-         if (error) then message, 'attribute not found', /informational
+         if (error) then begin
+           if (~arg_present(error)) then message, 'attribute not found', /informational
+         endif
       end
     2: begin
          ; variable
@@ -411,17 +413,19 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
          result = mg_nc_getdata_getvariable(parent_id, _variable, $
                                             bounds=_bounds, $
                                             error=error)
-         if (error) then message, 'variable not found', /informational
+         if (error) then begin
+           if (~arg_present(error)) then message, 'variable not found', /informational
+         endif
       end
     3: begin
         error = -1L
         result = !null
-        message, 'unable to return group', /informational
+        if (~arg_present(error)) then message, 'unable to return group', /informational
       end
     else: begin
         error = -1L
         result = !null
-        message, 'unknown descriptor type', /informational
+        if (~arg_present(error)) then message, 'unknown descriptor type', /informational
       end
   endcase
 
