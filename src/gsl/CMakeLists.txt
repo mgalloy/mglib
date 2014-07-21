@@ -15,6 +15,7 @@ if (GSL_INCLUDE_DIR AND GSL_LIBRARY_DIR)
       mg_gsl_sf_ellint_bindings.h
       mg_gsl_sf_zeta_bindings.h
       mg_gsl_rng_bindings.h
+      mg_gsl_randist_bindings.h
       mg_make_gsl_bindings.pro
   )
   add_custom_target(mg_gsl

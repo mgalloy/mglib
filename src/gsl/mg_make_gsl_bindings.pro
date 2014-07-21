@@ -32,7 +32,8 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
   dlm->addInclude, ['gsl/gsl_math.h', $
                     'gsl/gsl_sf_zeta.h', $
                     'gsl/gsl_sf_ellint.h', $
-                    'gsl/gsl_rng.h'], $
+                    'gsl/gsl_rng.h', $
+                    'gsl/gsl_randist.h'], $
                    header_directory=_header_directory
   dlm->addLibrary, 'libgsl.a', $
                    lib_directory=_lib_directory, $
@@ -42,6 +43,8 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
   dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_sf_zeta_bindings.h', $
                                            root=mg_src_root())
   dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_rng_bindings.h', $
+                                           root=mg_src_root())
+  dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_randist_bindings.h', $
                                            root=mg_src_root())
 
   dlm->addPoundDefineAccessor, 'M_EULER', type=5L
