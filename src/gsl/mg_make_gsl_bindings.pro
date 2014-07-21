@@ -45,7 +45,15 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
                                            root=mg_src_root())
 
   dlm->addPoundDefineAccessor, 'M_EULER', type=5L
-  dlm->addPoundDefineAccessor, 'gsl_rng_default', type=15L
+
+  filename = filepath('gsl_rng_types.txt', root=mg_src_root())
+  rng_types = strarr(file_lines(filename))
+  openr, lun, filename, /get_lun
+  readf, lun, rng_types
+  free_lun, lun
+
+  foreach t, rng_types do dlm->addPoundDefineAccessor, t, type=15L
+
   dlm->write
   dlm->build, show_all_output=keyword_set(show_all_output)
 
