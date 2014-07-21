@@ -108,7 +108,7 @@ install(FILES
         DESTINATION .)
 install(DIRECTORY
           examples
-        DESTINATION examples)
+        DESTINATION .)
 
 if (IDLdoc_FOUND)
   install(DIRECTORY ${CMAKE_BINARY_DIR}/api-docs DESTINATION . OPTIONAL)
