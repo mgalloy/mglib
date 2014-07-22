@@ -77,6 +77,7 @@ function mg_parse_cdeclaration, decl, name=name, $
     'IDL_LONG64': return, 14L
     'unsigned long': return, 15L
     'IDL_ULONG64': return, 15L
+    'IDL_PTRINT': return, 14L
     'void *': begin
       pointer = 1B
       return, 0L
