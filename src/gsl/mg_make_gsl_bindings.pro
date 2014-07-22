@@ -55,7 +55,7 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
   readf, lun, rng_types
   free_lun, lun
 
-  foreach t, rng_types do dlm->addPoundDefineAccessor, t, type=15L
+  foreach t, rng_types do dlm->addPoundDefineAccessor, t, type=14L
 
   dlm->write
   dlm->build, show_all_output=keyword_set(show_all_output)

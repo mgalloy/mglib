@@ -4,7 +4,7 @@
 ; Example of using GSL bindings to produce random numbers.
 ;
 ; :Keywords:
-;   n : optional, type=integer, default=1000
+;   n : in, optional, type=integer, default=1000
 ;     number of random numbers to generate
 ;-
 pro mg_gsl_rng_example, n=n

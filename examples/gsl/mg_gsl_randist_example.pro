@@ -4,9 +4,9 @@
 ; Example of using GSL bindings to produce non-uniform random distributions.
 ;
 ; :Keywords:
-;   n : optional, type=integer, default=1000
+;   n : in, optional, type=integer, default=1000
 ;     number of random numbers to generate
-;   sigma : optional, type=float, default=1.0
+;   sigma : in, optional, type=float, default=1.0
 ;     standard deviation for Gaussian distribution
 ;-
 pro mg_gsl_randist_example, n=n, sigma=sigma
