@@ -49,6 +49,13 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
 
   dlm->addPoundDefineAccessor, 'M_EULER', type=5L
 
+  dlm->addRoutineFromFile, filepath('mg_gsl_randomu.c', root=mg_src_root()), $
+                           name='mg_gsl_randomu', $
+                           /is_function, $
+                           has_keywords=0B, $
+                           n_parameters=[2, 9], $
+                           cprefix='IDL'
+  
   filename = filepath('gsl_rng_types.txt', root=mg_src_root())
   rng_types = strarr(file_lines(filename))
   openr, lun, filename, /get_lun
