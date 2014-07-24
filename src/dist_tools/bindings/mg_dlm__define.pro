@@ -218,17 +218,19 @@ function mg_dlm::output_c, separate=separate
       r->getProperty, name=name, $
                       prefix=prefix, $
                       cprefix=cprefix, $
-                      return_type=returnType, $
+                      is_function=is_function, $
+                      has_keywords=has_keywords, $
                       n_min_parameters=nMinParameters, $
                       n_max_parameters=nMaxParameters
-      if (returnType eq 0L) then continue
+      if (~is_function) then continue
       func_output += string(cprefix, $
                        name, $
                        strupcase(prefix + name), $
                        nMinParameters, $
                        nMaxParameters, $
+                       keyword_set(has_keywords) ? 'IDL_SYSFUN_DEF_F_KEYWORDS' : '0', $
                        mg_newline(), $
-                       format='(%"    { %s_%s, \"%s\", %d, %d, 0, 0 },%s")')
+                       format='(%"    { %s_%s, \"%s\", %d, %d, %s, 0 },%s")')
     endforeach
 
     if (~keyword_set(separate)) then begin
@@ -249,17 +251,19 @@ function mg_dlm::output_c, separate=separate
       r->getProperty, name=name, $
                       prefix=prefix, $
                       cprefix=cprefix, $
-                      return_type=returnType, $
+                      is_function=is_function, $
+                      has_keyword=has_keywords, $
                       n_min_parameters=nMinParameters, $
                       n_max_parameters=nMaxParameters
-      if (returnType ne 0L) then continue
+      if (is_function) then continue
       proc_output += string(cprefix, $
                        name, $
                        strupcase(prefix + name), $
                        nMinParameters, $
                        nMaxParameters, $
+                       keyword_set(has_keywords) ? 'IDL_SYSFUN_DEF_F_KEYWORDS' : '0', $
                        mg_newline(), $
-                       format='(%"    { (IDL_SYSRTN_GENERIC) %s_%s, \"%s\", %d, %d, 0, 0 },%s")')
+                       format='(%"    { (IDL_SYSRTN_GENERIC) %s_%s, \"%s\", %d, %d, %s, 0 },%s")')
     endforeach
 
     if (~keyword_set(separate)) then begin
@@ -304,23 +308,23 @@ function mg_dlm::output_dlm, no_header=no_header
 
   ; header
   if (~keyword_set(no_header)) then begin
-    output += string(self.name, mg_newline(), format='(%"MODULE %s%s")')
+    output += string(self.name, mg_newline(), format='(%"module %s%s")')
 
     if (self.description ne '') then begin
       output += string(self.description, mg_newline(), $
-                       format='(%"DESCRIPTION %s%s")')
+                       format='(%"description %s%s")')
     endif
 
     if (self.version ne '') then begin
-      output += string(self.version, mg_newline(), format='(%"VERSION %s%s")')
+      output += string(self.version, mg_newline(), format='(%"version %s%s")')
     endif
 
     if (self.source ne '') then begin
-      output += string(self.source, mg_newline(), format='(%"SOURCE %s%s")')
+      output += string(self.source, mg_newline(), format='(%"source %s%s")')
     endif
 
     output += string(self.build_date, mg_newline(), $
-                     format='(%"BUILD_DATE %s%s")')
+                     format='(%"build_date %s%s")')
 
     output += mg_newline()
   endif
@@ -329,14 +333,16 @@ function mg_dlm::output_dlm, no_header=no_header
   foreach r, self.routines do begin
     r->getProperty, name=name, $
                     prefix=prefix, $
-                    return_type=returnType, $
+                    is_function=is_function, $
+                    has_keywords=has_keywords, $
                     n_min_parameters=nMinParameters, $
                     n_max_parameters=nMaxParameters
-    format = string(strlen(name) > 30, format='(%"(\%\"\%-10s \%-%ds \%4d \%4d\%s\")")')
-    output += string(returnType eq 0L ? 'PROCEDURE' : 'FUNCTION', $
+    format = string(strlen(name) > 30, format='(%"(\%\"\%-10s \%-%ds \%4d \%4d\%s\%s\")")')
+    output += string(is_function ? 'function' : 'procedure', $
                      strupcase(prefix + name), $
                      nMinParameters, $
                      nMaxParameters, $
+                     keyword_set(has_keywords) ? '  keywords' : '', $
                      mg_newline(), $
                      format=format)
   endforeach
@@ -507,11 +513,11 @@ end
 
 
 ;+
-; Adds a wrapper routine to the DLM.
+; Adds a routine to the DLM.
 ;
 ; :Params:
-;    routine : in, required, type=routine object
-;       routine object to add to the DLM
+;   routine : in, required, type=routine object
+;     routine object to add to the DLM
 ;-
 pro mg_dlm::addRoutine, routine
   compile_opt strictarr
@@ -519,6 +525,68 @@ pro mg_dlm::addRoutine, routine
   self.routines->add, routine
   routine->getProperty, return_type=returnType
   if (returnType eq 0L) then self.nProcedures++ else self.nFunctions++
+end
+
+
+;+
+; Add a routine to the DLM.
+;
+; :Params:
+;   s : in, required, type=string
+;     routine code as a string
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties of `MG_Routine` class
+;-
+pro mg_dlm::addRoutineFromString, s, n_parameters=n_parameters, _extra=e
+  compile_opt strictarr
+
+  case n_elements(n_parameters) of
+    0: begin
+        n_min_parameters = 0L
+        n_max_parameters = 0L
+      end
+    1: begin
+        n_min_parameters = n_parameters[0]
+        n_max_parameters = n_parameters[0]
+      end
+    else: begin  ; i.e., 2 or more
+        n_min_parameters = n_parameters[0]
+        n_max_parameters = n_parameters[1]
+      end
+  endcase
+
+  routine = mg_routine(s, $
+                       n_min_parameters=n_min_parameters, $
+                       n_max_parameters=n_max_parameters, $
+                       _extra=e)
+
+  self.routines->add, routine
+  if (keyword_set(is_function)) then self.nFunctions++ else self.nProcedures++
+end
+
+
+;+
+; Add a routine defined a file to the DLM.
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename of file containing C code for routine
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties of `MG_Routine` class
+;-
+pro mg_dlm::addRoutineFromFile, filename, n_parameters=n_parameters, _extra=e
+  compile_opt strictarr
+
+  s = strarr(file_lines(filename))
+  openr, lun, filename, /get_lun
+  readf, lun, s
+  free_lun, lun
+
+  self->addRoutineFromString, mg_strmerge(s), n_parameters=n_parameters, _extra=e
 end
 
 

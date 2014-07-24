@@ -49,6 +49,8 @@ pro mg_routinebinding::getProperty, name=name, $
                                     cprefix=cprefix, $
                                     return_type=returnType, $
                                     return_pointer=returnPointer, $
+                                    is_function=isFunction, $
+                                    has_keywords=has_keywords, $
                                     n_min_parameters=nMinParameters, $
                                     n_max_parameters=nMaxParameters, $
                                     prototype=prototype
@@ -59,6 +61,8 @@ pro mg_routinebinding::getProperty, name=name, $
   if (arg_present(cprefix)) then cprefix = self.cprefix
   if (arg_present(returnType)) then returnType = *self.returnType
   if (arg_present(returnPointer)) then returnPointer = self.returnPointer
+  if (arg_present(isFunction)) then isFunction = *self.returnType ne 0L
+  if (arg_present(has_keywords)) then has_keywords = 0L
   if (arg_present(nMinParameters)) then nMinParameters = n_elements(self.parameters)
   if (arg_present(nMaxParameters)) then nMaxParameters = n_elements(self.parameters)
   if (arg_present(prototype)) then prototype = self.prototype
@@ -72,7 +76,7 @@ end
 ;    string
 ;
 ; :Keywords:
-;    preamble
+;    preamble : in, optional, type=string/strarr
 ;      string/string array of code to be inserted after declarations, but before
 ;      argument checking
 ;-
