@@ -36,7 +36,7 @@
 ;    Next, a wrapper to access the value of a `#define` constant is also
 ;    created::
 ;
-;       f->addPoundDefineAccessor, 'IDL_TYP_UNDEF', type=3L
+;       f->addVariableAccessor, 'IDL_TYP_UNDEF', type=3L
 ;
 ;    The `write` method writes the `.c` and `.dlm` files::
 ;
@@ -671,12 +671,12 @@ end
 ;    type : in, required, type=long
 ;       `SIZE` type code for `#define` value
 ;-
-pro mg_dlm::addPoundDefineAccessor, name, type=type
+pro mg_dlm::addVariableAccessor, name, type=type
   compile_opt strictarr
 
-  self->addRoutine, mg_routinePoundDefineAccessor(name=name, $
-                                                  prefix=self.prefix, $
-                                                  return_type=type)
+  self->addRoutine, mg_routineVariableAccessor(name=name, $
+                                               prefix=self.prefix, $
+                                               return_type=type)
 end
 
 
@@ -817,7 +817,7 @@ f->addRoutineFromPrototype, 'char *IDL_TypeNameFunc(int type)'
 f->addRoutineFromPrototype, 'void IDL_TTYReset()'
 f->addRoutineFromPrototype, 'IDL_LONG64 IDL_SysRtnNumEnabled(int is_function, int enabled)'
 
-f->addPoundDefineAccessor, 'IDL_TYP_UNDEF', type=3L
+f->addVariableAccessor, 'IDL_TYP_UNDEF', type=3L
 
 f->write
 f->build, /show_all_output

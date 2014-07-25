@@ -47,7 +47,7 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
   dlm->addRoutinesFromHeaderFile, filepath('mg_gsl_randist_bindings.h', $
                                            root=mg_src_root())
 
-  dlm->addPoundDefineAccessor, 'M_EULER', type=5L
+  dlm->addVariableAccessor, 'M_EULER', type=5L
 
   dlm->addRoutineFromFile, filepath('mg_gsl_randomu.c', root=mg_src_root()), $
                            name='mg_gsl_randomu', $
@@ -62,7 +62,7 @@ pro mg_make_gsl_bindings, header_directory=header_directory, $
   readf, lun, rng_types
   free_lun, lun
 
-  foreach t, rng_types do dlm->addPoundDefineAccessor, t, type=14L
+  foreach t, rng_types do dlm->addVariableAccessor, t, type=14L
 
   dlm->write
   dlm->build, show_all_output=keyword_set(show_all_output)

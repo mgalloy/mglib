@@ -1,34 +1,35 @@
 ; docformat = 'rst'
 
 ;+
-; Class representing a wrapper for a routine.
+; Class representing a wrapper for a routine to access a variable or pound
+; define constant.
 ;
 ; :Private:
 ;
 ; :Properties:
-;    name
-;       name of routine to wrap
-;    prefix
-;       prefix to add to routine for name of wrapper routine
-;    prototype
-;       prototype line for the routine, if available
-;    return_type
-;       `SIZE` type code indicating return type of routine
-;    n_min_parameters
-;       minimum number of parameters for routine
-;    n_max_parameters
-;       maximum number of parameters for routine
+;   name
+;     name of routine to wrap
+;   prefix
+;     prefix to add to routine for name of wrapper routine
+;   prototype
+;     prototype line for the routine, if available
+;   return_type
+;     `SIZE` type code indicating return type of routine
+;   n_min_parameters
+;     minimum number of parameters for routine
+;   n_max_parameters
+;     maximum number of parameters for routine
 ;-
 
 
 ;+
 ; Set properties.
 ;-
-pro mg_routinePoundDefineAccessor::setProperty, name=name, $
-                                                prefix=prefix, $
-                                                cprefix=cprefix, $
-                                                return_type=returnType, $
-                                                prototype=prototype
+pro mg_routineVariableAccessor::setProperty, name=name, $
+                                             prefix=prefix, $
+                                             cprefix=cprefix, $
+                                             return_type=returnType, $
+                                             prototype=prototype
   compile_opt strictarr
 
   if (n_elements(name) gt 0L) then self.name = name
@@ -46,15 +47,15 @@ end
 ;+
 ; Get properties.
 ;-
-pro mg_routinePoundDefineAccessor::getProperty, name=name, $
-                                                prefix=prefix, $
-                                                cprefix=cprefix, $
-                                                return_type=returnType, $
-                                                is_function=is_function, $
-                                                has_keywords=has_keywords, $
-                                                n_min_parameters=nMinParameters, $
-                                                n_max_parameters=nMaxParameters, $
-                                                prototype=prototype
+pro mg_routineVariableAccessor::getProperty, name=name, $
+                                             prefix=prefix, $
+                                             cprefix=cprefix, $
+                                             return_type=returnType, $
+                                             is_function=is_function, $
+                                             has_keywords=has_keywords, $
+                                             n_min_parameters=nMinParameters, $
+                                             n_max_parameters=nMaxParameters, $
+                                             prototype=prototype
   compile_opt strictarr
 
   if (arg_present(name)) then name = self.name
@@ -80,7 +81,7 @@ end
 ;      string/string array of code to be inserted after declarations, but before
 ;      argument checking
 ;-
-function mg_routinePoundDefineAccessor::output, preamble=preamble
+function mg_routineVariableAccessor::output, preamble=preamble
   compile_opt strictarr
 
   output = ''
@@ -120,7 +121,7 @@ end
 ;+
 ; Free resources.
 ;-
-pro mg_routinePoundDefineAccessor::cleanup
+pro mg_routineVariableAccessor::cleanup
   compile_opt strictarr
 
   ptr_free, self.returnType
@@ -133,7 +134,7 @@ end
 ; :Returns:
 ;    1 for success, 0 for failure
 ;-
-function mg_routinePoundDefineAccessor::init, _extra=e
+function mg_routineVariableAccessor::init, _extra=e
   compile_opt strictarr
 
   self.prefix = 'GET_'
@@ -158,10 +159,10 @@ end
 ;    returnType
 ;       type code for return value of the routine
 ;-
-pro mg_routinePoundDefineAccessor__define
+pro mg_routineVariableAccessor__define
   compile_opt strictarr
 
-  define = { mg_routinePoundDefineAccessor, $
+  define = { mg_routineVariableAccessor, $
              name: '', $
              prefix: '', $
              cprefix: '', $
