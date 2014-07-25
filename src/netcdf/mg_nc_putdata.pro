@@ -111,9 +111,10 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                               long=type eq 3, $
                               float=type eq 4, $
                               double=type eq 5, $
-                              string=type eq 7, $
+                              char=type eq 7, $
                               ushort=type eq 12, $
-                              ulong=type eq 13)
+                              ulong=type eq 13, $
+                              uint64=type eq 15)
   endif
 
   ncdf_varput, parent_id, variable_id, data
