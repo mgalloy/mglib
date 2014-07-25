@@ -35,5 +35,7 @@ function mg_nc_typedecl, dataType
     'long': return, 'lonarr'
     'float': return, 'fltarr'
     'double': return, 'dblarr'
+    'ulong64': return, 'ulon64arr'
+    else: return, '<unknown>'
   endcase
 end
