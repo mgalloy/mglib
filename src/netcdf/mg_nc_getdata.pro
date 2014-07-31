@@ -4,10 +4,6 @@
 ; Routine for extracting datasets, slices of datasets, or attributes from
 ; an netCDF file with simple notation.
 ;
-; :Todo:
-;   better error messages when items not found
-;   access for global attributes
-;
 ; :Categories:
 ;   file i/o, netcdf, sdf
 ;
