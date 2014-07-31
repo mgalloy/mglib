@@ -45,6 +45,8 @@ end
 ; :Keywords:
 ;   ticks : out, optional, type=long
 ;     set to a named variable to return the number of tick marks
+;   degrees : in, optional, type=boolean
+;     set to use increments of 360 instead of 100
 ;-
 function mg_ticks_tickinc, diff, $
                            potential_increments, $

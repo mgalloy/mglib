@@ -19,6 +19,8 @@
 ;     set to return group names
 ;   variables : in, optional, type=boolean
 ;     set to return variable names
+;   count : out, optional, type=integer
+;     set to a named variable to get the number of items returned
 ;   error : out, optional, type=long
 ;     error value, 0 indicates success
 ;-

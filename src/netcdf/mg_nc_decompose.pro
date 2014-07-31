@@ -5,6 +5,9 @@
 ;
 ; :Private:
 ;
+; :Returns:
+;   long netCDF variable identifier
+;
 ; :Params:
 ;   parent_id : in, required, type=long
 ;     identifier for parent group
@@ -43,6 +46,8 @@ end
 ;     element type code for parent element, can only 2 or 3
 ;   parent_id : out, optional, type=long
 ;     netCDF identifier for parent element
+;   group_id : out, optional, type=long
+;     netCDF identifier for parent group
 ;   element_name : out, optional, type=string
 ;     name of the element being described
 ;   write : in, optional, type=boolean
