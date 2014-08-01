@@ -64,6 +64,10 @@ if (IDLdoc_FOUND)
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_userdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
+  add_custom_target(bookdoc
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_bookdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
   add_custom_target(upload_userdoc
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/upload_userdoc.sh ${CMAKE_CURRENT_BINARY_DIR}
   )
@@ -84,7 +88,7 @@ if (mgunit_FOUND)
 endif ()
 
 set_directory_properties(PROPERTIES
-  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;mglib-test-results.html")
+  ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;api-bookdocs;mglib-test-results.html")
 
 
 # setup installer
