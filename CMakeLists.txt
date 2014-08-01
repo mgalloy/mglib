@@ -58,18 +58,42 @@ endif ()
 if (IDLdoc_FOUND)
   add_custom_target(doc
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_doc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT build developer API documentation
   )
 
   add_custom_target(userdoc
     COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_userdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT build user API documentation
   )
 
-  add_custom_target(bookdoc
-    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_bookdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+  find_package(LATEX)
+
+  set(TEX_BASENAME "index")
+  set(TEX_CLEAN_FILES "${TEX_BASENAME}.log;${TEX_BASENAME}.aux;${TEX_BASENAME}.idx;${TEX_BASENAME}.out;${TEX_BASENAME}.toc;${TEX_BASENAME}.blg")
+
+  if (PDFLATEX_COMPILER)
+    get_filename_component(LATEX_BINDIR "${PDFLATEX_COMPILER}" PATH)
+    set(XELATEX_COMPILER "${LATEX_BINDIR}/xelatex")
+  endif ()
+
+  if (EXISTS "${XELATEX_COMPILER}")
+    message(STATUS "Generating docs with ${XELATEX_COMPILER}")
+
+    set(TEX_CMD TEXINPUTS="${IDLdoc_DIR}/resources:" ${XELATEX_COMPILER} -interaction=batchmode ${CMAKE_CURRENT_BINARY_DIR}/api-bookdocs/index.tex)
+
+    set_directory_properties(PROPERTIES
+      ADDITIONAL_MAKE_CLEAN_FILES "${TEX_CLEAN_FILES}"
+    )
+
+    add_custom_target(bookdoc
+      COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_bookdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}\; cd ${CMAKE_CURRENT_BINARY_DIR}/api-bookdocs\; ${TEX_CMD}\; ${TEX_CMD}\; ${TEX_CMD}
+      COMMENT build user API documentation in LaTeX
+    )
+  endif ()
 
   add_custom_target(upload_userdoc
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/upload_userdoc.sh ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT upload user documentation to idldev.com:~/docs.idldev.com/mglib
   )
 
   add_custom_target(dcdoc
