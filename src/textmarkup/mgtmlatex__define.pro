@@ -43,7 +43,11 @@ function mgtmlatex::_preTag, type, newline=newline, tag=tag
         if (strlowcase(ext) eq 'svg') then src = strmid(src, 0, dotpos) + '.pdf'
         return, '\hspace{0.5em}' + string([13B, 10B, 13B, 10B]) + '\includegraphics[scale=0.6]{' + location + src + '}'
       end
-    'link': return, ''
+    'link': begin
+        href = tag->getAttribute('reference')
+        use_href = strmid(href, 0, 7) eq 'http://'
+        return, use_href ? ('\href{' + mg_escape_latex(href) + '}{') : ''
+      end
     'listing': return, '\begin{verbatim}'
     'heading1': return, '\subsection{'
     'paragraph': return, ''
@@ -84,7 +88,8 @@ function mgtmlatex::_postTag, type, newline=newline, tag=tag
     'embed': return, string([13B, 10B, 13B, 10B]) + '\hspace{0.5em}'
     'link': begin
         href = tag->getAttribute('reference')
-        return, href eq '' ? '' : ' ({\tt ' + mg_escape_latex(href) + '})'
+        use_href = strmid(href, 0, 7) eq 'http://'
+        return, use_href ? '}' : ''
       end
     'listing': return, '\end{verbatim}'
     'heading1': return, '}'
