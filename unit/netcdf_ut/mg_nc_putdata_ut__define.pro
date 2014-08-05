@@ -207,6 +207,26 @@ function mg_nc_putdata_ut::test_rootattr_withslash
 end
 
 
+function mg_nc_putdata_ut::test_2dvar
+  compile_opt strictarr
+
+  standard = dindgen(2, 10)
+  mg_nc_putdata, self.test_filename, 'example_2dvar', standard, $
+                 dim_names=['nv', 'lat'], error=err
+  assert, err eq 0, 'MG_NC_PUTDATA: error = %d', err
+
+  result = mg_nc_getdata(self.test_filename, 'example_2dvar', error=err)
+  assert, err eq 0, 'MG_NC_GETDATA: error = %d', err
+
+  result_type = size(result, /type)
+  assert, result_type eq 5L, 'incorrect type: %d', result_type
+
+  assert, array_equal(result, standard), 'incorrect value'
+
+  return, 1
+end
+
+
 pro mg_nc_putdata_ut__define
   compile_opt strictarr
 
