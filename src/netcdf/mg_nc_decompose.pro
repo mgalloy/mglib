@@ -141,6 +141,7 @@ function mg_nc_decompose, file_id, descriptor, $
   if (new_group_id ne -1L) then begin
     if (has_attribute) then begin
       parent_type = 3L
+      group_id = new_group_id
       parent_id = new_group_id
       element_name = strmid(descriptor, dotpos + 1)
       return, 1L

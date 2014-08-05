@@ -280,19 +280,22 @@ function mg_nc_getdata_getattributedata, group_id, parent_id, attname, $
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
+    !quiet = old_quiet
     return, !null
   endif
+
+  old_quiet = !quiet
+  ;!quiet = 1
 
   if (keyword_set(global)) then begin
     ncdf_attget, group_id, attname, attr_value, /global
     attr_info = ncdf_attinq(group_id, attname, /global)
   endif else begin
-    old_quiet = !quiet
-    !quiet = 1
     ncdf_attget, group_id, parent_id, attname, attr_value
     attr_info = ncdf_attinq(group_id, parent_id, attname)
-    !quiet = old_quiet
   endelse
+
+  !quiet = old_quiet
 
   case attr_info.datatype of
     'CHAR': attr_value = string(attr_value)
@@ -323,7 +326,7 @@ end
 ;   error : out, optional, type=long
 ;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattribute, group_id, parent_id, attname, error=error
+function mg_nc_getdata_getattribute, file_id, group_id, parent_id, attname, error=error
   compile_opt strictarr
 
   catch, error
@@ -382,19 +385,9 @@ function mg_nc_getdata, filename, descriptor, bounds=bounds, error=error
       end
     1: begin
          ; attribute
-         case parent_type of
-           2: begin
-               result = mg_nc_getdata_getattribute(group_id, parent_id, $
-                                                   element_name, $
-                                                   error=error)
-             end
-           3: begin
-               result = mg_nc_getdata_getattribute(group_id, group_id, $
-                                                   element_name, $
-                                                   error=error)
-             end
-           else:
-         endcase
+         result = mg_nc_getdata_getattribute(file_id, group_id, parent_id, $
+                                             element_name, $
+                                             error=error)
          if (error) then begin
            if (~arg_present(error)) then message, 'attribute not found', /informational
          endif
