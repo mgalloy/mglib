@@ -40,6 +40,21 @@ function mg_julian2cf_ut::test_epoch_1234567890
 end
 
 
+function mg_julian2cf_ut::test_epoch_15000day
+  compile_opt strictarr
+
+  cf_t = 15000.0D
+  julian_t = julday(1, 26, 2011, 0, 0, 0)
+  cf_units = 'days since 1970-01-01 00:00'
+
+  error = mg_julian2cf(julian_t, units=cf_units) - cf_t
+  assert, abs(error) lt 2.e-5, $
+         'invalid CF time conversion, error = %f', error
+
+  return, 1
+end
+
+
 pro mg_julian2cf_ut__define
   compile_opt strictarr
 

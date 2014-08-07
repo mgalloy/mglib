@@ -41,6 +41,21 @@ function mg_julian2cf_ut::test_epoch_1234567890
 end
 
 
+function mg_cf2julian_ut::test_epoch_15000day
+  compile_opt strictarr
+
+  cf_t = 15000.0D
+  julian_t = julday(1, 26, 2011, 0, 0, 0)
+  cf_units = 'days since 1970-01-01 00:00'
+
+  error = julian_t - mg_cf2julian(cf_t, units=cf_units)
+  assert, abs(error) lt 2.e-5, $
+         'invalid Julian day conversion, error = %f', error
+
+  return, 1
+end
+
+
 function mg_cf2julian_ut::test_days_since_2000
   compile_opt strictarr
 
