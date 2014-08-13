@@ -12,8 +12,6 @@
 ;           2      2.0000000
 ;
 ; :Params:
-;   lun : in, required, type=integer
-;     logical unit number to output to
 ;   p1 : in, optional, type=any array
 ;     first array to print
 ;   p2 : in, optional, type=any array
