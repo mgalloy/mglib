@@ -445,9 +445,12 @@ function mg_h5_getdata, filename, variable, bounds=bounds, error=error
 
   fileId = h5f_open(filename)
 
-  tokens = strsplit(variable, '.', escape='\', count=ndots)
+  slashPos = strpos(variable, '/', /reverse_search)
 
-  if (ndots eq 1L) then begin
+  basename = strmid(variable, slashPos + 1)
+  dotPos = strpos(basename, '.', /reverse_search)
+
+  if (dotPos eq -1L) then begin
     ; variable
     bracketPos = strpos(variable, '[')
     if (bracketPos eq -1L) then begin

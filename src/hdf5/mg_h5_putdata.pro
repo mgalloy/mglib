@@ -324,15 +324,19 @@ pro mg_h5_putdata, filename, name, data, reference=reference
   compile_opt strictarr
   on_error, 2
 
-  dotPos = strpos(name, '.', /reverse_search)
+  slashPos = strpos(name, '/', /reverse_search)
+
+  basename = strmid(name, slashPos + 1)
+  dotPos = strpos(basename, '.', /reverse_search)
+
   if (dotPos eq -1L) then begin
     ; write variable
     mg_h5_putdata_putvariable, filename, name, data, $
                                reference=reference
   endif else begin
     ; write attribute
-    path = strmid(name, 0, dotPos)
-    attname = strmid(name, dotPos + 1L)
+    path = strmid(name, 0, slashPos + 1L + dotPos)
+    attname = strmid(name, slashPos + 1L + dotPos + 1L)
     mg_h5_putdata_putattribute, filename, path, attname, data, $
                                 reference=reference
   endelse
