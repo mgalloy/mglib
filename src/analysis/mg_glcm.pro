@@ -1,33 +1,5 @@
 ; docformat = 'rst'
 
-;+
-; Determines the number of values of a given type.
-;
-; :Private:
-;
-; :Returns:
-;   long, unsigned long 64
-;
-; :Params:
-;   type_code : in, required, type=long
-;     `SIZE` type code of data
-;-
-function mg_glcm_size, type_code
-  compile_opt strictarr
-  on_error, 2
-
-  case type_code of
-    1: return, 2L^8
-    2: return, 2L^16
-    3: return, 2ULL^32
-    12: return, 2L^16
-    13: return, 2ULL^32
-    14: return, 2ULL^64
-    15: return, 2ULL^64
-    else: message, 'unable to compute for given type'
-  endcase
-end
-
 
 ;+
 ; Computes the grey-level co-occurence matrix as defined
@@ -39,25 +11,40 @@ end
 ; :Params:
 ;   m : in, required, type=integer array
 ;     input matrix
-;   x : in, required, type=integer
+;   x : in, optional, type=integer, default=1
 ;     shift in columns
-;   y : in, required, type=integer
+;   y : in, optional, type=integer, default=0
 ;     shift in rows
+;
+; :Params:
+;   symmetric : in, optional, type=boolean
+;     set to indicate that the ordering of the reference pixel and offset pixel
+;     does not matter
 ;-
-function mg_glcm, m, x, y
+function mg_glcm, m, x, y, symmetric=symmetric, n_levels=n_levels
   compile_opt strictarr
 
   dims = size(m, /dimensions)
-  result_dim = mg_glcm_size(size(m, /type))
-  result = lonarr(result_dim, result_dim)
+
+  range = mg_range(m)
+  r = range[1] - range[0]
+  _x = n_elements(x) eq 0L ? 1L : x
+  _y = n_elements(x) eq 0L ? 0L : y
+  _n_levels = n_elements(n_levels) eq 0L ? (r + 1L) : n_levels
+  result = lonarr(_n_levels, _n_levels)
 
   for row = 0L, dims[1] - 1L do begin
     if (row + y lt dims[1]) then begin
       for col = 0L, dims[0] - 1L do begin
         if (col + x lt dims[0]) then begin
           i = m[col, row]
-          j = m[col + x, row + y]
-          result[j, i]++
+          j = m[col + _x, row + _y]
+
+          i_index = floor((i - range[0]) * (_n_levels - 0.5) / r)
+          j_index = floor((j - range[0]) * (_n_levels - 0.5) / r)
+
+          result[j_index, i_index]++
+          if (keyword_set(symmetric)) then result[i_index, j_index]++
         endif
       endfor
     endif
