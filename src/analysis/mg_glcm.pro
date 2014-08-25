@@ -44,7 +44,7 @@ function mg_glcm, m, x, y, symmetric=symmetric, n_levels=n_levels
           j_index = floor((j - range[0]) * (_n_levels - 0.5) / r)
 
           result[j_index, i_index]++
-          if (keyword_set(symmetric)) then result[i_index, j_index]++
+          if (keyword_set(symmetric) && ) then result[i_index, j_index]++
         endif
       endfor
     endif
