@@ -44,7 +44,7 @@ function mg_glcm, m, x, y, symmetric=symmetric, n_levels=n_levels
           j_index = floor((j - range[0]) * (_n_levels - 0.5) / r)
 
           result[j_index, i_index]++
-          if (keyword_set(symmetric) && ) then result[i_index, j_index]++
+          if (keyword_set(symmetric)) then result[i_index, j_index]++
         endif
       endfor
     endif
@@ -61,6 +61,12 @@ im = [[0B, 0B, 1B, 1B], $
       [0B, 2B, 2B, 2B], $
       [2B, 2B, 3B, 3B]]
 
-glcm = mg_glcm(im, 1, 0)
+glcm = mg_glcm(im, 1, 0, /symmetric)
+
+; compute contrast as defined by http://www.fp.ucalgary.ca/mhallbey/tutorial.htm
+p = glcm / total(glcm)
+n = (size(glcm, /dimensions))[0]
+weights = (lindgen(n) # (lonarr(n) + 1L) - (lonarr(4) + 1L) # lindgen(4))^2
+contrast = p * weights
 
 end
