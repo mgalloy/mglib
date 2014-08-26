@@ -67,6 +67,6 @@ glcm = mg_glcm(im, 1, 0, /symmetric)
 p = glcm / total(glcm)
 n = (size(glcm, /dimensions))[0]
 weights = (lindgen(n) # (lonarr(n) + 1L) - (lonarr(4) + 1L) # lindgen(4))^2
-contrast = p * weights
+contrast = total(p * weights, /preserve_type)
 
 end
