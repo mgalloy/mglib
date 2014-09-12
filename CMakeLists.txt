@@ -97,7 +97,7 @@ if (IDLdoc_FOUND)
   )
 
   add_custom_target(dcdoc
-    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${CMAKE_CURRENT_SOURCE_DIR}/lib${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_dcdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${IDL_EXECUTABLE} -IDL_STARTUP "\"\"" -IDL_PATH "+${CMAKE_CURRENT_SOURCE_DIR}/src${SEP_CHAR}${CMAKE_CURRENT_SOURCE_DIR}${SEP_CHAR}+${IDLdoc_DIR}${SEP_CHAR}\"<IDL_DEFAULT>\"" -e mg_dcdoc_library -args ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
   add_custom_target(dcdoc_dist
