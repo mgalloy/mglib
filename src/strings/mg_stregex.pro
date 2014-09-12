@@ -1,28 +1,36 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper for STREGEX which includes a FIND_ALL keyword to find all
+; Wrapper for `STREGEX` which includes a `FIND_ALL` keyword to find all
 ; occurrences within a scalar string.
 ;
 ; :Returns:
-;    long/lonarr/string/strarr
+;   long/lonarr/string/strarr
 ;
 ; :Params:
-;    str
-;    re
+;   str : in, required, type=string
+;     string to parse
+;   re : in, required, type=string
+;     regular expression
 ;
 ; :Keywords:
-;    boolean
-;    extract
-;    length
-;    subexpr
-;    fold_case
-;    find_all : in, optional, type=boolean
-;       find all matches of the regular expression in the string instead of
-;       just the first
-;    url : in, optional, type=boolean
-;       set to specify a regular expression which matches URLs; do not specify
-;       re parameter if URL is set
+;   boolean : in, optional, type=boolean
+;     set to return `0B` or `1B` if regular expression is found
+;   extract : in, optional, type=boolean
+;     set to extract strings from `str` instead of returning offsets
+;   length : out, optional, type=lonarr
+;     set to a named variable to return the length of the matches
+;   subexpr : in, optional, type=boolean
+;     set to indicate that the regular expression contains subexpressions that
+;     should be matched and returned
+;   fold_case : in, optional, type=boolean
+;     set to do a case-insensitive parse
+;   find_all : in, optional, type=boolean
+;     find all matches of the regular expression in the string instead of just
+;     the first
+;   url : in, optional, type=boolean
+;     set to specify a regular expression which matches URLs; do not specify
+;     `re` parameter if URL is set
 ;-
 function mg_stregex, str, re, boolean=boolean, extract=extract, $
                      length=length, subexpr=subexpr, fold_case=foldCase, $

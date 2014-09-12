@@ -12,6 +12,9 @@
 ;
 ; :Private:
 ;
+; :Returns:
+;   unsigned long
+;
 ; :Params:
 ;   x : in, required, type=unsigned long
 ;     first arg
@@ -30,6 +33,9 @@ end
 ;
 ; :Private:
 ;
+; :Returns:
+;   unsigned long
+;
 ; :Params:
 ;   x : in, required, type=unsigned long
 ;     first arg
@@ -47,6 +53,9 @@ end
 ; Third round helper routine.
 ;
 ; :Private:
+;
+; :Returns:
+;   unsigned long
 ;
 ; :Params:
 ;   x : in, required, type=unsigned long

@@ -1,9 +1,24 @@
 ; docformat = 'rst'
 
+;+
+;
+; :Uses:
+;   execute
+;
+; :Returns:
+;
+; :Params:
+;   str : in, required, type=string
+;     string to read from
+;
+; :Keywords:
+;   format : in, required, type=string
+;     format string
+;-
 function mg_reads, str, format=format
   compile_opt strictarr
 
-  tokens = strsplit(format, '%', /extract, count=ntokens)
+  tokens = strsplit(format, '%', /extract, count=ntokens, /preserve_null)
   if (strpos(format, '%') eq -1L) then ntokens = 0L
 
   re = '^[[:digit:]]*.?[[:digit:]]*([a-zA-Z])'

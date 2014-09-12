@@ -5,6 +5,9 @@
 ;+
 ; Convert a time value from Julian date to `CF conventions <cfconventions.org>`.
 ;
+; :Returns:
+;   double/`dblarr`
+;
 ; :Params:
 ;   jd : in, required, type=numeric
 ;     Julian date

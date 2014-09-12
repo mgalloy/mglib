@@ -5,6 +5,9 @@
 ; Convert a time value from `CF conventions <cfconventions.org>` to a Julian
 ; date.
 ;
+; :Returns:
+;   double/`dblarr`
+;
 ; :Params:
 ;   cf_time : in, required, type=numeric
 ;     time in seconds/minutes/hours/days since a starting time

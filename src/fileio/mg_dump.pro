@@ -5,6 +5,9 @@
 ;
 ; :Private:
 ;
+; :Returns:
+;   string
+;
 ; :Params:
 ;    type : in, required, type=string
 ;       extension

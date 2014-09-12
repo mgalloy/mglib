@@ -158,6 +158,18 @@ end
 
 ;= Lifecycle methods
 
+;+
+; Initialize string hash object.
+;
+; :Returns:
+;   1 for success, 0 for failure
+;
+; :Keywords:
+;   fold_case : in, optional, type=boolean
+;     set to do case-insensitive lookup
+;   _extra : in, optional, type=keywords
+;     keywords to `hash::init`
+;-
 function mg_string_hash::init, p1, p2, fold_case=fold_case, _extra=e
   compile_opt strictarr
 

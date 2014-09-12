@@ -14,9 +14,13 @@
 ;   backproject : in, optional, type=boolean
 ;     set to perform backprojection instead of forward Radon transform
 ;   rho : in, optional, type=fltarr
-;   nrho
+;     array of rhos
+;   nrho : in, out, optional, type=integer, default=100
+;     input for forward transform, output for backprojection
 ;   theta : in, optional, type=fltarr
-;   ntheta
+;     array of thetas
+;   ntheta : in, out, optional, type=integer, default=180
+;     input for forward transform, output for backprojection
 ;   dx : in, optional, type=float, default=1.0
 ;     increment in x
 ;   dy : in, optional, type=float, default=1.0

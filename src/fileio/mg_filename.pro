@@ -3,40 +3,43 @@
 ;+
 ; Compose and/or decompose a filename.
 ;
+; :Returns:
+;   string
+;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_filename
+;     IDL> .run mg_filename
 ;
-;    It should do::
+;   It should do::
 ;
-;       IDL> f = mg_filename('a.dat', subdir=['b', 'c'], $
-;       IDL>                 basename=basename, extension=extension, $
-;       IDL>                 dirname=dirname, directories=directories)
-;       IDL>
-;       IDL> print, f, format='(%"Filename:  %s")'
-;       Filename:  b/c/a.dat
-;       IDL>
-;       IDL> print, basename, format='(%"Basename:  %s")'
-;       Basename:  a.dat
-;       IDL> print, extension, format='(%"Extension: %s")'
-;       Extension: dat
-;       IDL>
-;       IDL> print, dirname, format='(%"Directory: %s")'
-;       Directory: b/c/
-;       IDL> print, strjoin(directories, ', '), format='(%"Directories: %s")'
-;       Directories: b, c
+;      IDL> f = mg_filename('a.dat', subdir=['b', 'c'], $
+;      IDL>                 basename=basename, extension=extension, $
+;      IDL>                 dirname=dirname, directories=directories)
+;      IDL>
+;      IDL> print, f, format='(%"Filename:  %s")'
+;      Filename:  b/c/a.dat
+;      IDL>
+;      IDL> print, basename, format='(%"Basename:  %s")'
+;      Basename:  a.dat
+;      IDL> print, extension, format='(%"Extension: %s")'
+;      Extension: dat
+;      IDL>
+;      IDL> print, dirname, format='(%"Directory: %s")'
+;      Directory: b/c/
+;      IDL> print, strjoin(directories, ', '), format='(%"Directories: %s")'
+;      Directories: b, c
 ;
 ; :Params:
-;    filename : in, optional, type=string
-;       filename/basename
+;   filename : in, optional, type=string
+;     filename/basename
 ;
 ; :Keywords:
-;    object : out, optional, type=object
-;       object reference of the underlying `MGffFilename` object; this object
-;       will be destroyed if it is not requested using this keyword
-;    _ref_extra : in, out, optional, type=keywords
-;       keywords to `MGffFilename::init`
+;   object : out, optional, type=object
+;     object reference of the underlying `MGffFilename` object; this object
+;     will be destroyed if it is not requested using this keyword
+;   _ref_extra : in, out, optional, type=keywords
+;     keywords to `MGffFilename::init`
 ;-
 function mg_filename, filename, object=object, _ref_extra=e
   compile_opt strictarr

@@ -5,6 +5,9 @@
 ;
 ; :Private:
 ;
+; :Returns:
+;   array of same type as input arrays
+;
 ; :Params:
 ;   arr1 : in, required, type=numeric array
 ;     first array to merge
