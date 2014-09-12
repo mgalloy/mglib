@@ -16,10 +16,13 @@
 ;   y : in, optional, type=integer, default=0
 ;     shift in rows
 ;
-; :Params:
+; :Keywords:
 ;   symmetric : in, optional, type=boolean
 ;     set to indicate that the ordering of the reference pixel and offset pixel
 ;     does not matter
+;   n_levels : in, required, type=integer
+;     number of grey levels to use; default is the difference between maximum
+;     and minimum plus 1
 ;-
 function mg_glcm, m, x, y, symmetric=symmetric, n_levels=n_levels
   compile_opt strictarr
