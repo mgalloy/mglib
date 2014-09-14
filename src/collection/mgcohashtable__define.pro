@@ -2,24 +2,23 @@
 
 ;+
 ; A hash table which can hash any kind of IDL variables. To hash objects,
-; simply make sure each object implements the hashCode method. See the help
-; for the calcHashCode method for details.
+; simply make sure each object implements the `hashCode` method. See the help
+; for the `calcHashCode` method for details.
 ;
 ; :Categories:
-;    collection
+;   collection
 ;
 ; :Author:
-;    Michael D. Galloy
+;   Michael D. Galloy
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mgcohashtable__define
+;     IDL> .run mgcohashtable__define
 ;-
 
 
-; Operator overloading methods
-
+;= operator overloading methods
 
 ;+
 ; Allows hash table access with brackets.
@@ -27,13 +26,34 @@
 ; :Examples:
 ;   Try::
 ;
-;      IDL> h = obj_new('MGcoHashTable', key_type=7, value_type=4)
-;      IDL> h->put, 'Boulder', 72.0
-;      IDL> print, h['Boulder']
-;            72.0000
+;     IDL> h = obj_new('MGcoHashTable', key_type=7, value_type=4)
+;     IDL> h->put, 'Boulder', 72.0
+;     IDL> print, h['Boulder']
+;           72.0000
 ;
 ; :Returns:
-;    elements of the same type as the array list
+;   elements of the same type as the array list
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 function mgcohashtable::_overloadBracketsRightSide, isRange, $
                                                     ss1, ss2, ss3, ss4, $
@@ -57,10 +77,34 @@ end
 ; :Examples:
 ;   Try::
 ;
-;      IDL> h = obj_new('MGcoHashTable', key_type=7, value_type=4)
-;      IDL> h['Boulder'] = 72.0
-;      IDL> print, h['Boulder']
-;            72.0000
+;     IDL> h = obj_new('MGcoHashTable', key_type=7, value_type=4)
+;     IDL> h['Boulder'] = 72.0
+;     IDL> print, h['Boulder']
+;           72.0000
+; :Params:
+;   objref : in, required, type=objref
+;     should be self
+;   value : in, required, type=any
+;     value to assign to the array list
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 pro mgcohashtable::_overloadBracketsLeftSide, objref, value, isRange, $
                                               ss1, ss2, ss3, ss4, $
@@ -79,7 +123,13 @@ end
 ; Concatenate two hash tables.
 ;
 ; :Returns:
-;    MGcoHashTable object
+;   `MGcoHashTable` object
+;
+; :Params:
+;   left : in, required, type=MGcoHashtable
+;     a hash table to concatenate
+;   right : in, required, type=MGcoHashtable
+;     a hash table to concatenate
 ;-
 function mgcohashtable::_overloadPlus, left, right
   compile_opt strictarr
@@ -109,12 +159,12 @@ end
 ; Helper method to find the position of a key.
 ;
 ; :Params:
-;    key : in, required, type=key type
-;       key to find position of
-;    hcode : out, optional, type=long
-;       hash code of the key
-;    keyIndex : out, optional, type=long
-;       index within list at hash code
+;   key : in, required, type=key type
+;     key to find position of
+;   hcode : out, optional, type=long
+;     hash code of the key
+;   keyIndex : out, optional, type=long
+;     index within list at hash code
 ;-
 pro mgcohashtable::_findKeyPos, key, hcode, keyIndex
   compile_opt strictarr
@@ -138,16 +188,16 @@ end
 ; Finds the next key in the hash, if present.
 ;
 ; :Returns:
-;    next key, or -1L if last key
+;   next key, or -1L if last key
 ;
 ; :Params:
-;    key : in, required, type=key type or undefined
-;       key to "increment"
+;   key : in, required, type=key type or undefined
+;     key to "increment"
 ;
 ; :Keywords:
-;    done : out, optional, type=boolean
-;       set to a named variable to return if a next key is present, 0 if it is
-;       and if not, i.e., done
+;   done : out, optional, type=boolean
+;     set to a named variable to return if a next key is present, 0 if it is
+;     and if not, i.e., done
 ;-
 function mgcohashtable::_findNextKey, key, done=done
   compile_opt strictarr
@@ -187,14 +237,14 @@ end
 ; Allows an array list to be used in a FOREACH loop.
 ;
 ; :Returns:
-;    1 if there is an item to return, 0 if not
+;   1 if there is an item to return, 0 if not
 ;
 ; :Params:
-;    value : out, required, type=list type
-;       value to return as the loop
-;    key : in, out, optional, type=undefined/long
-;       key is undefined for first element, otherwise the index of the last
-;       element returned
+;   value : out, required, type=list type
+;     value to return as the loop
+;   key : in, out, optional, type=undefined/long
+;     key is undefined for first element, otherwise the index of the last
+;     element returned
 ;-
 function mgcohashtable::_overloadForeach, value, key
   compile_opt strictarr
@@ -210,11 +260,11 @@ end
 
 
 ;+
-; Returns the elements to print. Called by PRINT to determine what should be
+; Returns the elements to print. Called by `PRINT` to determine what should be
 ; displayed.
 ;
 ; :Returns:
-;    array of elements of the type of the array list
+;   array of elements of the type of the array list
 ;-
 function mgcohashtable::_overloadPrint
   compile_opt strictarr
@@ -255,14 +305,14 @@ end
 
 
 ;+
-; Returns a string describing the array list. Called by the HELP routine.
+; Returns a string describing the array list. Called by the `HELP` routine.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of the variable to use when outputting help information
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
 ;-
 function mgcohashtable::_overloadHelp, varname
   compile_opt strictarr
@@ -279,11 +329,11 @@ end
 
 
 ;+
-; Returns the number of elements in the array list. Called by SIZE to retrieve
-; information about the size of the variable.
+; Returns the number of elements in the array list. Called by `SIZE` to
+; retrieve information about the size of the variable.
 ;
 ; :Returns:
-;    long
+;   long
 ;-
 function mgcohashtable::_overloadSize
   compile_opt strictarr
@@ -292,6 +342,19 @@ function mgcohashtable::_overloadSize
 end
 
 
+;= property access
+
+;+
+; Retrieve properties of the hash table.
+;
+; :Keywords:
+;   key_type : out, optional, type=long
+;     `SIZE` type code for keys
+;   value_type : out, optional, type=long
+;     `SIZE` type code for values
+;   count : out, optional, type=long
+;     number of elements in the hash table
+;-
 pro mgcohashtable::getProperty, key_type=keyType, value_type=valueType, $
                                 count=count
   compile_opt strictarr
@@ -302,6 +365,8 @@ pro mgcohashtable::getProperty, key_type=keyType, value_type=valueType, $
 end
 
 
+;= helper methods
+
 ;+
 ; Returns an array with the same number of elements as the hash array.  The
 ; value each element of the array is the number of elements in that "bin" of
@@ -311,7 +376,7 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    long array
+;   `lonarr`
 ;-
 function mgcohashtable::_getHistogram
   compile_opt strictarr
@@ -329,11 +394,12 @@ end
 
 
 ;+
-; Prints keys and values to a given LUN. Prints to STDOUT if LUN not given.
+; Prints keys and values to a given `LUN`. Prints to `STDOUT` if `LUN` not
+; given.
 ;
 ; :Params:
-;    lun : in, optional, type=LUN, default=-1
-;       logical unit number for output
+;   lun : in, optional, type=LUN, default=-1
+;     logical unit number for output
 ;-
 pro mgcohashtable::print, lun
   compile_opt strictarr
@@ -355,11 +421,11 @@ end
 ; Returns an array of the keys of the hash table.
 ;
 ; :Returns:
-;    an array of the keys of the hash table or -1 if no keys
+;   an array of the keys of the hash table or -1 if no keys
 ;
 ; :Keywords:
-;    count : out, optional, type=integral
-;       number of keys in the hash table
+;   count : out, optional, type=integral
+;     number of keys in the hash table
 ;-
 function mgcohashtable::keys, count=count
   compile_opt strictarr
@@ -386,11 +452,11 @@ end
 ; Returns an array of the values of the hash table.
 ;
 ; :Returns:
-;    an array of the values of the hash table or -1 if no values
+;   an array of the values of the hash table or -1 if no values
 ;
 ; :Keywords:
-;    count : out, optional, type=integral
-;       number of values in the hash table
+;   count : out, optional, type=integral
+;     number of values in the hash table
 ;-
 function mgcohashtable::values, count=count
   compile_opt strictarr
@@ -414,27 +480,27 @@ end
 
 
 ;+
-; Calculates the hash code of the given key.  The index of the array element
+; Calculates the hash code of the given key. The index of the array element
 ; the key's value will be stored in will be the hash code value MOD the array
 ; size.
 ;
 ; If a hash tbale of object references is desired, then the objects should
-; implement the hashCode method.  This function should accept no parameters
+; implement the hashCode method. This function should accept no parameters
 ; and return an unsigned long.
 ;
 ; This method should not normally be called directly.
 ;
-; If the given default hash function is not doing well (use the _getHistogram
+; If the given default hash function is not doing well (use the `_getHistogram`
 ; method to find out how well it's spreading out the keys), subclass this
 ; class and implement a more appropriate hash function.
 ;
 ; :Returns:
-;    hash code (unsigned long integer); 0 if null pointer or object, undefined
-;    variable; or an object that does not implement hashCode
+;   hash code (unsigned long integer); 0 if null pointer or object, undefined
+;   variable; or an object that does not implement hashCode
 ;
 ; :Params:
-;    key : in, type=key type
-;       key to find hash code of
+;   key : in, type=key type
+;     key to find hash code of
 ;-
 function mgcohashtable::_calcHashCode, key
   compile_opt strictarr
@@ -488,17 +554,17 @@ end
 ; Finds the value associated with the given key.
 ;
 ; :Returns:
-;    the value of the associated key or -1L if not found
+;   the value of the associated key or -1L if not found
 ;
 ; :Params:
-;    key : in, type=key type
-;       key to look up
+;   key : in, type=key type
+;     key to look up
 ;
 ; :Keywords:
-;    default : in, optional, type=any
-;       value to return if key is not present
-;    found : out, optional, type=boolean
-;       true if value found for given key
+;   default : in, optional, type=any
+;     value to return if key is not present
+;   found : out, optional, type=boolean
+;     true if value found for given key
 ;-
 function mgcohashtable::get, key, default=default, found=found
   compile_opt strictarr
@@ -535,15 +601,15 @@ end
 ; key to `default` if the key is not found.
 ;
 ; :Returns:
-;    the value of the associated key or -1L if not found
+;   the value of the associated key or -1L if not found
 ;
 ; :Params:
-;    key : in, type=key type
-;       key to look up
+;   key : in, type=key type
+;     key to look up
 ;
 ; :Keywords:
-;    default : in, optional, type=any
-;       value to return and set the value for the key if key is not present
+;   default : in, optional, type=any
+;     value to return and set the value for the key if key is not present
 ;-
 function mgcohashtable::setdefault, key, default=default
   compile_opt strictarr
@@ -558,14 +624,14 @@ end
 ; Removes the value associated with the given key.
 ;
 ; :Params:
-;    key : in, optional, type=key type
-;       key to look up; not needed if ALL is set
+;   key : in, optional, type=key type
+;     key to look up; not needed if ALL is set
 ;
 ; :Keywords:
-;    all : in, optional, type=boolean
-;       set to remove all key-value pairs
-;    found : out, optional, type=boolean
-;       true if value found for given key
+;   all : in, optional, type=boolean
+;     set to remove all key-value pairs
+;   found : out, optional, type=boolean
+;     true if value found for given key
 ;-
 pro mgcohashtable::remove, key, all=all, found=found
   compile_opt strictarr
@@ -617,8 +683,8 @@ end
 ; this hash table if they are in present in `hashtable`).
 ;
 ; :Params:
-;    hashtable : in, required, type=MGcoHashTable
-;       MGcoHashTable to update this hash table with
+;   hashtable : in, required, type=MGcoHashTable
+;     `MGcoHashTable` to update this hash table with
 ;-
 pro mgcohashtable::update, hashtable
   compile_opt strictarr
@@ -633,15 +699,15 @@ end
 ; if it is already in the hash table.
 ;
 ; :Params:
-;    key : in, required, type=key type
-;       key to place in the table
-;    value : in, required, type=value type
-;       value to place in the table
+;   key : in, required, type=key type
+;     key to place in the table
+;   value : in, required, type=value type
+;     value to place in the table
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       pass a named variable that is set to true if the key was already in
-;       the table and is updated
+;   found : out, optional, type=boolean
+;     pass a named variable that is set to true if the key was already in
+;     the table and is updated
 ;-
 pro mgcohashtable::put, key, value, found=found
   compile_opt strictarr
@@ -701,7 +767,7 @@ end
 ; Find the number of key-value pairs in the hash table
 ;
 ; :Returns:
-;    the number of key-value pairs in the hash table
+;   the number of key-value pairs in the hash table
 ;-
 function mgcohashtable::count
   compile_opt strictarr
@@ -723,7 +789,7 @@ end
 ; Determines if the hash table is empty.
 ;
 ; :Returns:
-;    0 if the table is empty, 1 if it contains any key-value pairs
+;   0 if the table is empty, 1 if it contains any key-value pairs
 ;-
 function mgcohashtable::isEmpty
   compile_opt strictarr
@@ -740,6 +806,8 @@ function mgcohashtable::isEmpty
   return, 1B
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Frees hash table resources, but the resources contained by the hash table.
@@ -759,19 +827,19 @@ end
 ; Create a hash table.
 ;
 ; :Returns:
-;    1 if successful; 0 otherwise
+;   1 if successful; 0 otherwise
 ;
 ; :Keywords:
-;    array_size : in, optional, type=integral, default=101
-;       the size of the hash table; generally a prime is a good choice
-;    key_type : in, type=0-15
-;       type code for keys; key_type or key_example must be present
-;    value_type : in, type=0-15
-;       type code for values; value_type or key_example must be present
-;    key_example : in, type=key type
-;       example of key type; key_type or key_example must be present
-;    value_example : in, type=value type
-;       example of value type; value_type or value_example must be present
+;   array_size : in, optional, type=integral, default=101
+;     the size of the hash table; generally a prime is a good choice
+;   key_type : in, type=0-15
+;     type code for keys; key_type or key_example must be present
+;   value_type : in, type=0-15
+;     type code for values; value_type or key_example must be present
+;   key_example : in, type=key type
+;     example of key type; key_type or key_example must be present
+;   value_example : in, type=value type
+;     example of value type; value_type or value_example must be present
 ;-
 function mgcohashtable::init, array_size=arraySize, $
                               key_type=keyType, $
@@ -814,24 +882,24 @@ end
 ; Hash table implementation.
 ;
 ; :Fields:
-;    keyArray
-;       pointer to array of keys; type of array is specified by KEY_TYPE field
-;       for non-structures and by KEY_EXAMPLE field for structures
-;    valueArray
-;       pointer to array of values; type of array is specified VALUE_TYPE
-;       field for non-structures and by VALUE_EXAMPLE field for structures
-;    arraySize
-;       size of the key and value arrays
-;    keyType
-;       SIZE type of keys; if 8 (structures), examine KEY_EXAMPLE to find type
-;       of structure
-;    valueType
-;       SIZE type of keys; if 8 (structures), examine VALUE_EXAMPLE to find
-;       type of structure
-;    keyExample
-;       pointer to example structure defining the key type
-;    valueExample
-;       pointer to example structure defining the value type
+;   keyArray
+;     pointer to array of keys; type of array is specified by `KEY_TYPE` field
+;     for non-structures and by `KEY_EXAMPLE` field for structures
+;   valueArray
+;     pointer to array of values; type of array is specified `VALUE_TYPE`
+;     field for non-structures and by `VALUE_EXAMPLE` field for structures
+;   arraySize
+;     size of the key and value arrays
+;   keyType
+;     `SIZE` type of keys; if 8 (structures), examine `KEY_EXAMPLE` to find type
+;     of structure
+;   valueType
+;     `SIZE` type of keys; if 8 (structures), examine `VALUE_EXAMPLE` to find
+;     type of structure
+;   keyExample
+;     pointer to example structure defining the key type
+;   valueExample
+;     pointer to example structure defining the value type
 ;-
 pro mgcohashtable__define
   compile_opt strictarr
