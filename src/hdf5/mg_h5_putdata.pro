@@ -4,57 +4,57 @@
 ; Write a variable or attribute to an HDF 5 file with a simple notation.
 ;
 ; :Categories:
-;    file i/o, hdf5, sdf
+;   file i/o, hdf5, sdf
 ;
 ; :Examples:
-;    For example, the following creates an HDF5 file::
+;   For example, the following creates an HDF5 file::
 ;
-;       IDL> filename = 'test.h5'
-;       IDL> mg_h5_putdata, filename, 'scalar', 1.0
-;       IDL> mg_h5_putdata, fid, 'array', findgen(10)
-;       IDL> mg_h5_putdata, filename, 'group/another_scalar', 1.0
-;       IDL> mg_h5_putdata, filename, 'group/another_array', findgen(10)
-;       IDL> mg_h5_putdata, filename, 'array.attribute', 'Attribute of an array'
+;     IDL> filename = 'test.h5'
+;     IDL> mg_h5_putdata, filename, 'scalar', 1.0
+;     IDL> mg_h5_putdata, fid, 'array', findgen(10)
+;     IDL> mg_h5_putdata, filename, 'group/another_scalar', 1.0
+;     IDL> mg_h5_putdata, filename, 'group/another_array', findgen(10)
+;     IDL> mg_h5_putdata, filename, 'array.attribute', 'Attribute of an array'
 ;
-;    To browse the results::
+;   To browse the results::
 ;
-;       IDL> ok = h5_browser(filename)
+;     IDL> ok = h5_browser(filename)
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;
 ; :Copyright:
-;    This library is released under a BSD-type license.
+;   This library is released under a BSD-type license.
 ;
-;    Copyright (c) 2007-2012, Michael Galloy <mgalloy@idldev.com>
+;   Copyright (c) 2007-2012, Michael Galloy <mgalloy@idldev.com>
 ;
-;    All rights reserved.
+;   All rights reserved.
 ;
-;    Redistribution and use in source and binary forms, with or without
-;    modification, are permitted provided that the following conditions are
-;    met:
+;   Redistribution and use in source and binary forms, with or without
+;   modification, are permitted provided that the following conditions are
+;   met:
 ;
-;        a. Redistributions of source code must retain the above copyright
-;           notice, this list of conditions and the following disclaimer.
-;        b. Redistributions in binary form must reproduce the above copyright
-;           notice, this list of conditions and the following disclaimer in
-;           the documentation and/or other materials provided with the
-;           distribution.
-;        c. Neither the name of Michael Galloy nor the names of its
-;           contributors may be used to endorse or promote products derived
-;           from this software without specific prior written permission.
+;     a. Redistributions of source code must retain the above copyright
+;        notice, this list of conditions and the following disclaimer.
+;     b. Redistributions in binary form must reproduce the above copyright
+;        notice, this list of conditions and the following disclaimer in
+;        the documentation and/or other materials provided with the
+;        distribution.
+;     c. Neither the name of Michael Galloy nor the names of its
+;        contributors may be used to endorse or promote products derived
+;        from this software without specific prior written permission.
 ;
-;    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-;    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-;    THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-;    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-;    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-;    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-;    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-;    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-;    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-;    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-;    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+;   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;   PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+;   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+;   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+;   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+;   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;-
 
 ;+
@@ -63,7 +63,7 @@
 ; :Private:
 ;
 ; :Returns:
-;    reference identifier
+;   reference identifier
 ;
 ; :Params:
 ;   file_id : in, required, type=ulong64
@@ -98,13 +98,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    1 if exists, 0 if it doesn't
+;   1 if exists, 0 if it doesn't
 ;
 ; :Params:
-;    loc : in, required, type=long
-;       file or group identifier
-;    name : in, required, type=string
-;       name of object to check
+;   loc : in, required, type=long
+;     file or group identifier
+;   name : in, required, type=string
+;     name of object to check
 ;-
 function mg_h5_putdata_varexists, loc, name
   compile_opt strictarr
@@ -118,18 +118,18 @@ function mg_h5_putdata_varexists, loc, name
 end
 
 
-; +
+;+
 ; Write a variable to a file.
 ;
 ; :Private:
 ;
 ; :Params:
-;    fildename : in, required, type=long
-;       HDF5 filename to write variable into
-;    name : in, required, type=string
-;       name of variable in HDF5 file
-;    data : in, optional, type=any
-;       IDL variable to write
+;   fildename : in, required, type=long
+;     HDF5 filename to write variable into
+;   name : in, required, type=string
+;     name of variable in HDF5 file
+;   data : in, optional, type=any
+;     IDL variable to write
 ;
 ; :Keywords:
 ;   reference : in, optional, type=boolean
@@ -204,12 +204,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    id : in, required, type=long
-;       identifier of group, dataset, or type to attach the attribute to
-;    attname : in, required, type=string
-;       name of attribute to write
-;    attvalue : in, required, type=any
-;       value of attribute to write
+;   id : in, required, type=long
+;     identifier of group, dataset, or type to attach the attribute to
+;   attname : in, required, type=string
+;     name of attribute to write
+;   attvalue : in, required, type=any
+;     value of attribute to write
 ;
 ; :Keywords:
 ;   reference : in, optional, type=boolean
@@ -246,14 +246,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    filename : in, required, type=long
-;       HDF5 filename to write variable into
-;    loc : in, required, type=string
-;       name of variable in HDF5 file
-;    attname : in, required, type=string
-;       name of attribute to write
-;    attvalue : in, optional, type=any
-;       IDL variable to write
+;   filename : in, required, type=long
+;     HDF5 filename to write variable into
+;   loc : in, required, type=string
+;     name of variable in HDF5 file
+;   attname : in, required, type=string
+;     name of attribute to write
+;   attvalue : in, optional, type=any
+;     IDL variable to write
 ;
 ; :Keywords:
 ;   reference : in, optional, type=boolean

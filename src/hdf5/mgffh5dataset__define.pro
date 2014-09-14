@@ -249,6 +249,9 @@ end
 ; Helper method to convert information about a dimension's range into a three
 ; element vector: `[start, stop, stride]`.
 ;
+; :Returns:
+;   lonarr(3)
+;
 ; :Params:
 ;   isRange : in, required, type=boolean
 ;     boolean indicating whether the dimension is a range or a single index

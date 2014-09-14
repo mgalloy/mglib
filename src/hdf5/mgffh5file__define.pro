@@ -1,20 +1,24 @@
 ; docformat = 'rst'
 
 ;+
+; Represents an HDF 5 file.
+;
 ; :Categories:
-;    file i/o, hdf5, sdf
+;   file i/o, hdf5, sdf
 ;
 ; :Requires:
-;    IDL 8.0
+;   IDL 8.0
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;
 ; :Properties:
-;    filename
-;       filename of the HDF 5 file
+;   filename
+;     filename of the HDF 5 file
 ;-
 
+
+;= property access
 
 ;+
 ; Get properties
@@ -26,6 +30,8 @@ pro mgffh5file::getProperty, filename=filename, _ref_extra=e
   if (n_elements(e) gt 0L) then self->MGffH5Base::getProperty, _extra=e
 end
 
+
+;= helper routines
 
 ;+
 ; Dumps the contents of the file.
@@ -53,8 +59,8 @@ end
 ; :Private:
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 pro mgffh5file::_open, error=error
   compile_opt strictarr
@@ -75,8 +81,8 @@ end
 ; :Private:
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 pro mgffh5file::_close, error=error
   compile_opt strictarr
@@ -96,13 +102,16 @@ end
 ;
 ; :Private:
 ;
+; :Returns:
+;   `H5F_STAT` structure
+;
 ; :Params:
-;    name : in, required, type=string
-;       name of child object
+;   name : in, required, type=string
+;     name of child object
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 function mgffh5file::_statObject, name, error=error
   compile_opt strictarr
@@ -126,17 +135,19 @@ function mgffh5file::_statObject, name, error=error
 end
 
 
+;= operator overload methods
+
 ;+
 ; Output for `HELP` for file.
 ;
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of variable containing group object
+;   varname : in, required, type=string
+;     name of variable containing group object
 ;-
 function mgffh5file::_overloadHelp, varname
   compile_opt strictarr
@@ -153,7 +164,7 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mgffh5file::_overloadPrint
   compile_opt strictarr
@@ -181,10 +192,34 @@ end
 ; :Private:
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       h = mg_h5(file_which('hdf5_test.h5'))
-;       d = h['2D int array']
+;     h = mg_h5(file_which('hdf5_test.h5'))
+;     d = h['2D int array']
+;
+; :Returns:
+;   group/variable object
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 function mgffh5file::_overloadBracketsRightSide, isRange, $
                                                  ss1, ss2, ss3, ss4, $
@@ -219,6 +254,8 @@ function mgffh5file::_overloadBracketsRightSide, isRange, $
 end
 
 
+;= lifecycle method
+
 ;+
 ; Free resources of the HDF 5 file, including its children.
 ;-
@@ -234,7 +271,13 @@ end
 ; Creates HDF 5 object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of the HDF 5 file
+;   _extra : in, optional, type=keywords
+;     keywords to `MGffH5Base::init`
 ;-
 function mgffh5file::init, filename=filename, _extra=e
   compile_opt strictarr
@@ -257,10 +300,10 @@ end
 ; Define instance variables and class inheritance.
 ;
 ; :Fields:
-;    filename
-;       name of HDF 5 file
-;    children
-;       `IDL_Container` of children group/dataset objects
+;   filename
+;     name of HDF 5 file
+;   children
+;     `IDL_Container` of children group/dataset objects
 ;-
 pro mgffh5file__define
   compile_opt strictarr
