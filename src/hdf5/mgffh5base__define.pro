@@ -4,14 +4,18 @@
 ; Common functionality for HDF 5 classes.
 ;
 ; :Properties:
-;    parent
-;       parent MGffH5 object
-;    identifier
-;       HDF 5 identifier for object
-;    name
-;       name of the object
+;   parent
+;     parent MGffH5 object
+;   identifier
+;     HDF 5 identifier for object
+;   name
+;     name of the object
+;   fullname
+;     full name of the object (including path)
 ;-
 
+
+;= property access
 
 ;+
 ; Get properties.
@@ -32,18 +36,23 @@ pro mgffh5base::getProperty, parent=parent, identifier=identifier, $
 end
 
 
+;= overload operator methods
+
 ;+
-; HELP overload common routine.
+; `HELP` overload common routine.
+;
+; :Returns:
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of variable to provide HELP for
+;   varname : in, required, type=string
+;     name of variable to provide HELP for
 ;
 ; :Keywords:
-;    type : in, optional, type=string, default='NC_BASE'
-;       type for object
-;    specs : in, optional, type=string, default='<undefined>'
-;       specs for object, depending on object type
+;   type : in, optional, type=string, default='NC_BASE'
+;     type for object
+;   specs : in, optional, type=string, default='<undefined>'
+;     specs for object, depending on object type
 ;-
 function mgffh5base::_overloadHelp, varname, type=type, specs=specs
   compile_opt strictarr
@@ -55,11 +64,13 @@ function mgffh5base::_overloadHelp, varname, type=type, specs=specs
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Creates HDF 5 object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;-
 function mgffh5base::init, parent=parent, identifier=identifier, name=name
   compile_opt strictarr
@@ -77,8 +88,12 @@ end
 ; Define instance variables and class inheritance.
 ;
 ; :Fields:
-;    id
-;       HDF 5 identifier for object
+;   parent
+;     parent `MGffH5` object
+;   id
+;     HDF 5 identifier for object
+;   name
+;     name of the object
 ;-
 pro mgffh5base__define
   compile_opt strictarr
