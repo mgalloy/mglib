@@ -4,18 +4,22 @@
 ; Object representing an HDF 5 group.
 ;
 ; :Categories:
-;    file i/o, hdf5, sdf
+;   file i/o, hdf5, sdf
 ;
 ; :Requires:
-;    IDL 8.0
+;   IDL 8.0
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;-
 
 
 ;+
 ; Get properties
+;
+; :Keywords:
+;   _ref_extra : out, optional, type=keywords
+;     properties of `MGffH5Base`
 ;-
 pro mgffh5group::getProperty, _ref_extra=e
   compile_opt strictarr
@@ -30,8 +34,8 @@ end
 ; :Private:
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 pro mgffh5group::_open, error=error
   compile_opt strictarr
@@ -53,8 +57,8 @@ end
 ; :Private:
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 pro mgffh5group::_close, error=error
   compile_opt strictarr
@@ -74,13 +78,16 @@ end
 ;
 ; :Private:
 ;
+; :Returns:
+;   `H5F_STAT` structure
+;
 ; :Params:
-;    name : in, required, type=string
-;       name of child object
+;   name : in, required, type=string
+;     name of child object
 ;
 ; :Keywords:
-;    error : out, optional, type=long
-;       error code: 0 for none
+;   error : out, optional, type=long
+;     error code: 0 for none
 ;-
 function mgffh5group::_statObject, name, error=error
   compile_opt strictarr
@@ -108,11 +115,11 @@ end
 ; Output for `HELP` for group.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of variable containing group object
+;   varname : in, required, type=string
+;     name of variable containing group object
 ;-
 function mgffh5group::_overloadHelp, varname
   compile_opt strictarr
@@ -130,7 +137,7 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mgffh5group::_overloadPrint
   compile_opt strictarr
@@ -161,11 +168,35 @@ end
 ;
 ; :Private:
 ;
-; :Examples:
-;    For example::
+; :Returns:
+;   variable object
 ;
-;       h = mg_h5(file_which('hdf5_test.h5'))
-;       d = h['2D int array']
+; :Examples:
+;   For example::
+;
+;     h = mg_h5(file_which('hdf5_test.h5'))
+;     d = h['2D int array']
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 function mgffh5group::_overloadBracketsRightSide, isRange, $
                                                   ss1, ss2, ss3, ss4, $
@@ -200,6 +231,8 @@ function mgffh5group::_overloadBracketsRightSide, isRange, $
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Free resources.
 ;-
@@ -215,7 +248,11 @@ end
 ; Create a group object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `MGffH5Base::init`
 ;-
 function mgffh5group::init, _extra=e
   compile_opt strictarr
@@ -236,8 +273,8 @@ end
 ; Define instance variables and class inheritance.
 ;
 ; :Fields:
-;    children
-;       `IDL_Container` containing children groups/datasets
+;   children
+;     `IDL_Container` containing children groups/datasets
 ;-
 pro mgffh5group__define
   compile_opt strictarr

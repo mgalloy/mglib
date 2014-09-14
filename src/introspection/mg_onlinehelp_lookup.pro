@@ -1,7 +1,12 @@
 ; docformat = 'rst'
 
 ;+
+; Returns the routines with online help in the IDL distribution.
+;
 ; :Private:
+;
+; :Returns:
+;   `strarr`
 ;-
 function mg_onlinehelp_lookup_routines
   compile_opt strictarr
