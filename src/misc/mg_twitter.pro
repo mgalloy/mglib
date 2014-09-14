@@ -4,11 +4,22 @@
 ; Very simple Twitter client.
 ;
 ; :Todo:
-;    Needs to add support for direct messages received, but must keep a list
-;    of messages then to sort them by ID (since regular messages and direct
-;    messages are returned via two different API calls).
+;   Needs to add support for direct messages received, but must keep a list
+;   of messages then to sort them by ID (since regular messages and direct
+;   messages are returned via two different API calls).
 ;-
 
+;= access properties
+
+;+
+; Get property values.
+;
+; :Private:
+;
+; :Keywords:
+;   latest_id : out, optional, type=unsigned long64
+;     identifier of the latest read tweet
+;-
 pro mgfftwitterstatuses::getProperty, latest_id=latestId
   compile_opt strictarr
 
@@ -16,6 +27,11 @@ pro mgfftwitterstatuses::getProperty, latest_id=latestId
 end
 
 
+;= parse XML
+
+;+
+; :Private:
+;-
 pro mgfftwitterstatuses::startElement, uri, local, qname, attname, attvalue
   compile_opt strictarr
 
@@ -33,6 +49,9 @@ pro mgfftwitterstatuses::startElement, uri, local, qname, attname, attvalue
 end
 
 
+;+
+; :Private:
+;-
 pro mgfftwitterstatuses::endElement, uri, local, qname
   compile_opt strictarr
 
@@ -55,6 +74,9 @@ pro mgfftwitterstatuses::endElement, uri, local, qname
 end
 
 
+;+
+; :Private:
+;-
 pro mgfftwitterstatuses::characters, chars
   compile_opt strictarr
 
@@ -70,6 +92,11 @@ pro mgfftwitterstatuses::characters, chars
 end
 
 
+;= lifecycle methods
+
+;+
+; :Private:
+;-
 function mgfftwitterstatuses::init, username=username, _extra=e
 
   if (~self->IDLffXMLSAX::init(_extra=e)) then return, 0
@@ -79,6 +106,9 @@ function mgfftwitterstatuses::init, username=username, _extra=e
 end
 
 
+;+
+; :Private:
+;-
 pro mgfftwitterstatuses__define
   compile_opt strictarr
 
@@ -96,6 +126,22 @@ pro mgfftwitterstatuses__define
 end
 
 
+;+
+; Display tweets in Twitter timeline since last called.
+;
+; :Bugs:
+;   no longer valid after Twitter API changes
+;
+; :Params:
+;   username : in, required, type=string
+;     Twitter username
+;   password : in, required, type=string
+;     Twitter password
+;
+; :Keywords:
+;   count : in, optional, type=integer, default=20
+;     number of tweets to show
+;-
 pro mg_twitter, username, password, count=count
   compile_opt strictarr
 
