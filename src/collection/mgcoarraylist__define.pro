@@ -7,42 +7,43 @@
 ; type.
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;
 ; :Version:
-;    1.1
+;   1.1
 ;
 ; :Properties:
-;    type
-;       type code as in `SIZE` function to specify the type of elements in the
-;       list; `TYPE` or `EXAMPLE` keyword must be used when initializing the
-;       array list
-;    block_size
-;       initial size of the data array; defaults to 1000 if not specified
-;    example
-;       type defined by an example instead of a type code (required for array
-;       lists of structures)
-;    count
-;       number of elements in the array list
-;    _ref_extra
-;       keywords to `MGcoAbstractList::getProperty`
+;   type
+;     type code as in `SIZE` function to specify the type of elements in the
+;     list; `TYPE` or `EXAMPLE` keyword must be used when initializing the
+;     array list
+;   block_size
+;     initial size of the data array; defaults to 1000 if not specified
+;   example
+;     type defined by an example instead of a type code (required for array
+;     lists of structures)
+;   count
+;     number of elements in the array list
+;   _ref_extra
+;     keywords to `MGcoAbstractList::getProperty`
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       a = obj_new('MGcoArrayList', type=7)
+;     a = obj_new('MGcoArrayList', type=7)
 ;
-;       a->add, 'a'
-;       a->add, ['b', 'c', 'd']
+;     a->add, 'a'
+;     a->add, ['b', 'c', 'd']
 ;
-;       print, a->count()
-;       print, a->get(/all)
-;       print, a->get(position=1)
+;     print, a->count()
+;     print, a->get(/all)
+;     print, a->get(position=1)
 ;
-;       obj_destroy, a
+;     obj_destroy, a
 ;-
 
-; Overloading operator methods
+
+;= Overloading operator methods
 
 ;+
 ; Allows array index access with brackets.
@@ -50,18 +51,39 @@
 ; :Examples:
 ;   Try::
 ;
-;      IDL> a = obj_new('MGcoArrayList', type=4)
-;      IDL> a->add, findgen(10)
-;      IDL> print, a[0:5:1]
+;     IDL> a = obj_new('MGcoArrayList', type=4)
+;     IDL> a->add, findgen(10)
+;     IDL> print, a[0:5:1]
 ;
 ; :Bugs:
-;    when using an index array to index an array list, out-of-bounds indices
-;    larger than the last element's index are not handled property -- they do
-;    not return the last element (negative indices will return the first
-;    element, though)
+;   when using an index array to index an array list, out-of-bounds indices
+;   larger than the last element's index are not handled property -- they do
+;   not return the last element (negative indices will return the first
+;   element, though)
 ;
 ; :Returns:
-;    elements of the same type as the array list
+;   elements of the same type as the array list
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 function mgcoarraylist::_overloadBracketsRightSide, isRange, $
                                                     ss1, ss2, ss3, ss4, $
@@ -95,12 +117,37 @@ end
 ; :Examples:
 ;   Try::
 ;
-;      IDL> a = obj_new('MGcoArrayList', type=4)
-;      IDL> a->add, findgen(10)
-;      IDL> a[0:-3:2] = findgen(4)
-;      IDL> print, a
-;            0.00000      1.00000      1.00000      3.00000      2.00000
-;            5.00000      3.00000      7.00000      8.00000      9.00000
+;     IDL> a = obj_new('MGcoArrayList', type=4)
+;     IDL> a->add, findgen(10)
+;     IDL> a[0:-3:2] = findgen(4)
+;     IDL> print, a
+;           0.00000      1.00000      1.00000      3.00000      2.00000
+;           5.00000      3.00000      7.00000      8.00000      9.00000
+;
+; :Params:
+;   objref : in, required, type=objref
+;     should be self
+;   value : in, required, type=any
+;     value to assign to the array list
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
 ;-
 pro mgcoarraylist::_overloadBracketsLeftSide, objref, value, isRange, $
                                               ss1, ss2, ss3, ss4, $
@@ -128,7 +175,13 @@ end
 ; Concatenate two array lists.
 ;
 ; :Returns:
-;    MGcoArrayList object
+;   `MGcoArrayList` object
+;
+; :Params:
+;   left : in, required, type=MGcoArrayList
+;     an array list to concatenate
+;   right : in, required, type=MGcoArrayList
+;     an array list to concatenate
 ;-
 function mgcoarraylist::_overloadPlus, left, right
   compile_opt strictarr
@@ -162,13 +215,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    array of same type as elements
+;   array of same type as elements
 ;
 ; :Params:
-;    elements : in, required, type=real numeric type
-;       elements to repeat
-;    mult : in, required, type=integer
-;       multiplier indicating how many times to repeat elements
+;   elements : in, required, type=real numeric type
+;     elements to repeat
+;   mult : in, required, type=integer
+;     multiplier indicating how many times to repeat elements
 ;-
 function mgcoarraylist::_repeatNumeric, elements, mult
   compile_opt strictarr
@@ -185,13 +238,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    array of same type as elements
+;   array of same type as elements
 ;
 ; :Params:
-;    elements : in, required, type=real numeric type
-;       elements to repeat
-;    mult : in, required, type=integer
-;       multiplier indicating how many times to repeat elements
+;   elements : in, required, type=real numeric type
+;     elements to repeat
+;   mult : in, required, type=integer
+;     multiplier indicating how many times to repeat elements
 ;-
 function mgcoarraylist::_repeatNonNumeric, elements, mult
   compile_opt strictarr
@@ -212,13 +265,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    array of same type as elements
+;   array of same type as elements
 ;
 ; :Params:
-;    elements : in, required, type=real numeric type
-;       elements to repeat
-;    mult : in, required, type=integer
-;       multiplier indicating how many times to repeat elements
+;   elements : in, required, type=real numeric type
+;     elements to repeat
+;   mult : in, required, type=integer
+;     multiplier indicating how many times to repeat elements
 ;-
 function mgcoarraylist::_repeatStructure, elements, mult
   compile_opt strictarr
@@ -236,7 +289,13 @@ end
 ; Repeat an array list a given number of times.
 ;
 ; :Returns:
-;    MGcoArrayList object
+;   `MGcoArrayList` object
+;
+; :Params:
+;   left : in, required, type=MGcoArrayList/integer
+;     an array list to repeat or a multiplier
+;   right : in, required, type=MGcoArrayList/integer
+;     an array list to repeat or a multiplier
 ;-
 function mgcoarraylist::_overloadAsterisk, left, right
   compile_opt strictarr
@@ -290,17 +349,17 @@ end
 
 
 ;+
-; Allows an array list to be used in a FOREACH loop.
+; Allows an array list to be used in a `FOREACH` loop.
 ;
 ; :Returns:
-;    1 if there is an item to return, 0 if not
+;   1 if there is an item to return, 0 if not
 ;
 ; :Params:
-;    value : out, required, type=list type
-;       value to return as the loop
-;    key : in, out, optional, type=undefined/long
-;       key is undefined for first element, otherwise the index of the last
-;       element returned
+;   value : out, required, type=list type
+;     value to return as the loop
+;   key : in, out, optional, type=undefined/long
+;     key is undefined for first element, otherwise the index of the last
+;     element returned
 ;-
 function mgcoarraylist::_overloadForeach, value, key
   compile_opt strictarr
@@ -314,11 +373,11 @@ end
 
 
 ;+
-; Returns the elements to print. Called by PRINT to determine what should be
+; Returns the elements to print. Called by `PRINT` to determine what should be
 ; displayed.
 ;
 ; :Returns:
-;    array of elements of the type of the array list
+;   array of elements of the type of the array list
 ;-
 function mgcoarraylist::_overloadPrint
   compile_opt strictarr
@@ -328,14 +387,14 @@ end
 
 
 ;+
-; Returns a string describing the array list. Called by the HELP routine.
+; Returns a string describing the array list. Called by the `HELP` routine.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    varname : in, required, type=string
-;       name of the variable to use when outputting help information
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
 ;-
 function mgcoarraylist::_overloadHelp, varname
   compile_opt strictarr
@@ -351,11 +410,11 @@ end
 
 
 ;+
-; Returns the number of elements in the array list. Called by SIZE to retrieve
-; information about the size of the variable.
+; Returns the number of elements in the array list. Called by `SIZE` to
+; retrieve information about the size of the variable.
 ;
 ; :Returns:
-;    long
+;   long
 ;-
 function mgcoarraylist::_overloadSize
   compile_opt strictarr
@@ -364,8 +423,22 @@ function mgcoarraylist::_overloadSize
 end
 
 
+;= property access
+
 ;+
 ; Get properties of the list.
+;
+; :Keywords:
+;   type : out, optional, type=long
+;     `SIZE` type code for elements in the array list
+;   block_size : out, optional, type=long
+;     size of a block
+;   example : out, optional, type=any
+;     example element of the type of the array list
+;   count : out, optional, type=long
+;     number of elements in the array list
+;   _ref_extra : out, optional, type=keywords
+;     properties of `MGcoAbstractList`
 ;-
 pro mgcoarraylist::getProperty, type=type, block_size=blockSize, $
                                 example=example, count=count, _ref_extra=e
@@ -386,6 +459,12 @@ end
 
 ;+
 ; Set properties of the list.
+;
+; :Keywords:
+;   type : in, optional, type=long
+;     `SIZE` type code for elements in the array list
+;   block_size : in, optional, type=long
+;     size of a block
 ;-
 pro mgcoarraylist::setProperty, type=type, block_size=blockSize
   compile_opt strictarr
@@ -417,18 +496,20 @@ pro mgcoarraylist::setProperty, type=type, block_size=blockSize
 end
 
 
+;= helper methods
+
 ;+
 ; Remove specified elements from the list.
 ;
 ; :Params:
-;    elements : in, optional, type=type of list
-;       elements of the list to remove
+;   elements : in, optional, type=type of list
+;     elements of the list to remove
 ;
 ; :Keywords:
-;    position : in, optional, type=long
-;       set to a scalar or vector array of indices to remove from the list
-;    all : in, optional, type=boolean
-;       set to remove all elements of the list
+;   position : in, optional, type=long
+;     set to a scalar or vector array of indices to remove from the list
+;   all : in, optional, type=boolean
+;     set to remove all elements of the list
 ;-
 pro mgcoarraylist::remove, elements, position=position, all=all
   compile_opt strictarr
@@ -485,10 +566,10 @@ end
 ; Move an element of the list to another position.
 ;
 ; :Params:
-;    source : in, required, type=long
-;       index of the element to move
-;    destination : in, required, type=long
-;       index of position to move element
+;   source : in, required, type=long
+;     index of the element to move
+;   destination : in, required, type=long
+;     index of position to move element
 ;-
 pro mgcoarraylist::move, source, destination
   compile_opt strictarr, logical_predicate
@@ -516,16 +597,17 @@ end
 ;+
 ; Determines whether a list contains specified elements.
 ;
-; :Returns: 1B if contained or 0B if otherwise
+; :Returns:
+;   1B if contained or 0B if otherwise
 ;
 ; :Params:
-;    elements : in, required, type=type of list
-;       scalar or vector of elements of the same type as the list
+;   elements : in, required, type=type of list
+;     scalar or vector of elements of the same type as the list
 ;
 ; :Keywords:
-;    position : out, optional, type=long
-;       set to a named variable that will return the position of the first
-;       instance of the corresponding element of the specified elements
+;   position : out, optional, type=long
+;     set to a named variable that will return the position of the first
+;     instance of the corresponding element of the specified elements
 ;-
 function mgcoarraylist::isContained, elements, position=position
   compile_opt strictarr, logical_predicate
@@ -548,13 +630,13 @@ end
 ; Add elements to the list.
 ;
 ; :Params:
-;    elements : in, required, type=list type
-;       scalar or vector array of the same type as the list
+;   elements : in, required, type=list type
+;     scalar or vector array of the same type as the list
 ;
 ; :Keywords:
-;    position : in, optional, type=long/lonarr, default=end of list
-;       index or index array to insert elements at; if array, must match
-;       number of elements
+;   position : in, optional, type=long/lonarr, default=end of list
+;     index or index array to insert elements at; if array, must match
+;     number of elements
 ;-
 pro mgcoarraylist::add, elements, position=position
   compile_opt strictarr
@@ -600,21 +682,22 @@ end
 
 ;+
 ; Private method to screen for given class(es). Indices returned are indices
-; POSITION (or data array if ALL is set).
+; `POSITION` (or data array if `ALL` is set).
 ;
 ; :Private:
 ;
-; :Returns: index array or -1L if none
+; :Returns:
+;   index array or -1L if none
 ;
 ; :Keywords:
-;    position : in, optional, type=lonarr
-;       indices of elements to check
-;    isa : in, required, type=string/strarr
-;       classes to check objects for
-;    count : out, optional, type=long
-;       number of matched items
-;    all : in, optional, type=boolean
-;       screen from all elements
+;   position : in, optional, type=lonarr
+;     indices of elements to check
+;   isa : in, required, type=string/strarr
+;     classes to check objects for
+;   count : out, optional, type=long
+;     number of matched items
+;   all : in, optional, type=boolean
+;     screen from all elements
 ;-
 function mgcoarraylist::isaGet, position=position, isa=isa, all=all, $
                                 count=count
@@ -643,20 +726,21 @@ end
 ;+
 ; Get elements of the list.
 ;
-; :Returns: element(s) of the list or -1L if no elements to return
+; :Returns:
+;   element(s) of the list or -1L if no elements to return
 ;
 ; :Keywords:
-;    all : in, optional, type=boolean
-;       set to return all elements
-;    position : in, optional, type=long/lonarr
-;       set to an index or an index array of elements to return; defaults to 0
-;       if ALL keyword not set
-;    count : out, optional, type=integer
-;       set to a named variable to get the number of elements returned by this
-;       function
-;    isa : in, optional, type=string/strarr
-;       classname(s) of objects to return; only allowable if list type is
-;       object
+;   all : in, optional, type=boolean
+;     set to return all elements
+;   position : in, optional, type=long/lonarr
+;     set to an index or an index array of elements to return; defaults to 0
+;     if `ALL` keyword not set
+;   count : out, optional, type=integer
+;     set to a named variable to get the number of elements returned by this
+;     function
+;   isa : in, optional, type=string/strarr
+;     classname(s) of objects to return; only allowable if list type is
+;     object
 ;-
 function mgcoarraylist::get, all=all, position=position, count=count, isa=isa
   compile_opt strictarr
@@ -710,7 +794,8 @@ end
 ;+
 ; Returns the number of elements in the list.
 ;
-; :Returns: long integer
+; :Returns:
+;   long
 ;-
 function mgcoarraylist::count
   compile_opt strictarr
@@ -720,7 +805,7 @@ end
 
 
 ;+
-; Creates an iterator to iterate through the elements of the ArrayList. The
+; Creates an iterator to iterate through the elements of the array list. The
 ; destruction of the iterator is the responsibility of the caller of this
 ; method.
 ;
@@ -733,6 +818,8 @@ function mgcoarraylist::iterator
   return, obj_new('MGcoArrayListIterator', self)
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Cleanup list resources.
@@ -753,11 +840,19 @@ end
 ; Create a list.
 ;
 ; :Returns:
-;    1B for succes, 0B otherwise
+;   1B for succes, 0B otherwise
 ;
 ; :Params:
-;    elements : in, optional, type=any
-;       scalar or array of original value(s) of the array list
+;   elements : in, optional, type=any
+;     scalar or array of original value(s) of the array list
+;
+; :Keywords:
+;   type : in, optional, type=long
+;     `SIZE` type code for elements in the array list
+;   block_size : in, optional, type=long
+;     size of a block
+;   example : in, optional, type=any
+;     example element of the type of the array list
 ;-
 function mgcoarraylist::init, elements, $
                               type=type, example=example, $
@@ -805,16 +900,16 @@ end
 ; :Categories: object, collection
 ;
 ; :Fields:
-;    pData
-;       pointer to the data array
-;    nUsed
-;       number of elements of the list actually in use
-;    type
-;       SIZE type code of the data array
-;    blockSize
-;       size of the data array
-;    pExample
-;       used if list of structures to specify the structure
+;   pData
+;     pointer to the data array
+;   nUsed
+;     number of elements of the list actually in use
+;   type
+;     `SIZE` type code of the data array
+;   blockSize
+;     size of the data array
+;   pExample
+;     used if list of structures to specify the structure
 ;-
 pro mgcoarraylist__define
   compile_opt strictarr
