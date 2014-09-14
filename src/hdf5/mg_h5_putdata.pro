@@ -124,7 +124,7 @@ end
 ; :Private:
 ;
 ; :Params:
-;   fildename : in, required, type=long
+;   filename : in, required, type=long
 ;     HDF5 filename to write variable into
 ;   name : in, required, type=string
 ;     name of variable in HDF5 file
