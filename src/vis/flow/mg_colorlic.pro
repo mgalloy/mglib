@@ -5,27 +5,29 @@
 ; field.
 ;
 ; :Examples:
-;    The following creates a color LIC visualization::
+;   The following creates a color LIC visualization::
 ;
-;       restore, filepath('globalwinds.dat', subdir=['examples','data'])
-;       loadct, 3
-;       mg_image, mg_colorlic(u, v, scale=4), /new_window, /no_axes
+;     restore, filepath('globalwinds.dat', subdir=['examples','data'])
+;     loadct, 3
+;     mg_image, mg_colorlic(u, v, scale=4), /new_window, /no_axes
 ;
-;    This looks like:
+;   This looks like:
 ;
-;    .. image:: colorlic-example.png
+;   .. image:: colorlic-example.png
 ;
 ; :Params:
-;    u : in, required, type="fltarr(m, n)"
-;       x-coordinates of vector field
-;    v : in, required, type="fltarr(m, n)"
-;       y-coordinates of vector field
+;   u : in, required, type="fltarr(m, n)"
+;     x-coordinates of vector field
+;   v : in, required, type="fltarr(m, n)"
+;     y-coordinates of vector field
 ;
 ; :Keywords:
-;    scale : in, optional, type=long, default=1L
-;       factor to REBIN u and v by
-;    _extra : in, optional, type=keywords
-;       keywords to `MG_LIC` or `MG_MAKETRUE`
+;   scale : in, optional, type=long, default=1L
+;     factor to REBIN u and v by
+;   log : in, optional, type=boolean
+;     set to use log scale for image values
+;   _extra : in, optional, type=keywords
+;     keywords to `MG_LIC` or `MG_MAKETRUE`
 ;-
 function mg_colorlic, u, v, scale=scale, log=log, _extra=e
   compile_opt strictarr
