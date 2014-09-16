@@ -12,12 +12,17 @@
 ;-
 
 
+;= operator overloading methods
+
 ;+
 ; Print the help string for all the regular variables in a .sav file.
 ;
+; :Returns:
+;   string
+;
 ; :Params:
-;    varname : in, required, type=any
-;       variable to find declaration statement for
+;   varname : in, required, type=any
+;     variable to find declaration statement for
 ;-
 function mg_savefile::_overloadHelp, varname
   compile_opt strictarr
@@ -61,7 +66,7 @@ end
 ; Returns names of each type of save file item in the file.
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mg_savefile::_overloadPrint
   compile_opt strictarr
@@ -154,13 +159,13 @@ end
 ; Allow hash-like subscripting to retrieve variable values.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    isRange : in, required, type=lonarr
-;       whether each corresponding index is a range
-;    ss1 : in, required, type=string
-;       name of variable to extract
+;   isRange : in, required, type=lonarr
+;     whether each corresponding index is a range
+;   ss1 : in, required, type=string
+;     name of variable to extract
 ;-
 function mg_savefile::_overloadBracketsRightSide, isRange, ss1
   compile_opt strictarr
@@ -173,14 +178,18 @@ end
 
 
 ;+
-; Return a particular item in the .sav file.
+; Return a particular item in the `.sav` file.
 ;
 ; :Returns:
-;    save file item, if a standard variable
+;   save file item, if a standard variable
+;
+; :Params:
+;   saveitem : in, required, type=string
+;     name of item to retrieve
 ;
 ; :Keywords:
-;    _ref_extra : in, out, optional, type=keywords
-;       keywords to IDL_Savefile::restore
+;   _ref_extra : in, out, optional, type=keywords
+;     keywords to IDL_Savefile::restore
 ;-
 function mg_savefile::get, saveitem, _ref_extra=e
   compile_opt strictarr
@@ -197,16 +206,18 @@ end
 
 
 ;+
+; Create a save file object.
+;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Params:
-;    filename : in, optional, type=string
-;       filename of save file
+;   filename : in, optional, type=string
+;     filename of save file
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       keywords to IDL_Savefile
+;   _extra : in, optional, type=keywords
+;     keywords to `IDL_Savefile`
 ;-
 function mg_savefile::init, filename, _extra=e
   compile_opt strictarr

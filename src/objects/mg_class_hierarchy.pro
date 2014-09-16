@@ -4,14 +4,14 @@
 ; Retrieves or prints a class hierarchy for an object or classname.
 ;
 ; :Examples:
-;    For example, a list object can be inspected like::
+;   For example, a list object can be inspected like::
 ;
-;       IDL> lst = list()
-;       IDL> mg_class_hierarchy, lst
-;       LIST
-;         IDL_CONTAINER
-;         COLLECTION
-;           IDL_OBJECT
+;     IDL> lst = list()
+;     IDL> mg_class_hierarchy, lst
+;     LIST
+;       IDL_CONTAINER
+;       COLLECTION
+;         IDL_OBJECT
 ;-
 
 
@@ -21,9 +21,9 @@
 ; :Private:
 ;
 ; :Params:
-;    hierarchy : in, required, type=hash
-;       nested hash with keys of superclass names and values of hierarchy
-;       for that superclass
+;   hierarchy : in, required, type=hash
+;     nested hash with keys of superclass names and values of hierarchy
+;     for that superclass
 ;-
 pro mg_class_hierarchy_cleanup, hierarchy
   compile_opt strictarr
@@ -42,9 +42,13 @@ end
 ; :Private:
 ;
 ; :Params:
-;    hierarchy : in, required, type=hash
-;       nested hash with keys of superclass names and values of hierarchy
-;       for that superclass
+;   hierarchy : in, required, type=hash
+;     nested hash with keys of superclass names and values of hierarchy
+;     for that superclass
+;
+; :Keywords:
+;   indent : in, optional, type=string, default=''
+;     prefix to indent output by
 ;-
 pro mg_class_hierarchy_print, hierarchy, indent=indent
   compile_opt strictarr
@@ -64,11 +68,11 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    hash
+;   hash
 ;
 ; :Params:
-;    object : in, required, type=objref or string
-;       object or string classname to find superclasses for
+;   object : in, required, type=objref or string
+;     object or string classname to find superclasses for
 ;-
 function mg_class_hierarchy_helper, object
   compile_opt strictarr
@@ -88,15 +92,15 @@ end
 ; Retrieves or prints a class hierarchy for an object or classname.
 ;
 ; :Params:
-;    object : in, required, type=objref or string
-;       object or string classname to find superclasses for
+;   object : in, required, type=objref or string
+;     object or string classname to find superclasses for
 ;
 ; :Keywords:
-;    hierarchy : out, optional, type=hash
-;       nested hash with keys of superclass names and values of hierarchy
-;       for that superclass
-;    no_print : in, optional, type=boolean
-;       set to not print the hierarchy
+;   hierarchy : out, optional, type=hash
+;     nested hash with keys of superclass names and values of hierarchy
+;     for that superclass
+;   no_print : in, optional, type=boolean
+;     set to not print the hierarchy
 ;-
 pro mg_class_hierarchy, object, hierarchy=hierarchy, no_print=no_print
   compile_opt strictarr
