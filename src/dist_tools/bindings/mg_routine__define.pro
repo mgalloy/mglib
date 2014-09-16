@@ -98,7 +98,15 @@ end
 ; Create routine binding.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
+;
+; :Params:
+;   code : in, required, type=string
+;     code
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties
 ;-
 function mg_routine::init, code, _extra=e
   compile_opt strictarr

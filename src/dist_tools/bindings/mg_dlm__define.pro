@@ -536,6 +536,8 @@ end
 ;     routine code as a string
 ;
 ; :Keywords:
+;   n_parameters : in, optional, type=integer, default='[0, 0]'
+;     number of parameters for routine, can be `[min, max]`
 ;   _extra : in, optional, type=keywords
 ;     properties of `MG_Routine` class
 ;-
@@ -575,6 +577,8 @@ end
 ;     filename of file containing C code for routine
 ;
 ; :Keywords:
+;   n_parameters : in, optional, type=integer, default='[0, 0]'
+;     number of parameters for routine, can be `[min, max]`
 ;   _extra : in, optional, type=keywords
 ;     properties of `MG_Routine` class
 ;-
@@ -594,8 +598,8 @@ end
 ; Adds a wrapper routine defined by a prototype given by a string to the DLM.
 ;
 ; :Params:
-;    proto : in, required, type=string
-;       prototype of the routine to add to the DLM
+;   proto : in, required, type=string
+;     prototype of the routine to add to the DLM
 ;-
 pro mg_dlm::addRoutineFromPrototype, proto
   compile_opt strictarr
@@ -636,8 +640,8 @@ end
 ; Adds wrapper routines from a header file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       header filename
+;   filename : in, required, type=string
+;     header filename
 ;-
 pro mg_dlm::addRoutinesFromHeaderFile, filename
   compile_opt strictarr
@@ -664,12 +668,12 @@ end
 ; Adds wrapper routine to access the given `#define` value.
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of `#define`
+;   name : in, required, type=string
+;     name of `#define`
 ;
 ; :Keywords:
-;    type : in, required, type=long
-;       `SIZE` type code for `#define` value
+;   type : in, required, type=long
+;     `SIZE` type code for `#define` value
 ;-
 pro mg_dlm::addVariableAccessor, name, type=type
   compile_opt strictarr
@@ -730,38 +734,38 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    prefix
-;      string to add before each routine name, i.e., `MG_`
-;    basename
-;       basename (including possible path) for `.c` and `.dlm` files
-;    name
-;       name in DLM header
-;    description
-;       description in DLM header
-;    version
-;       version in DLM header
-;    source
-;       source in DLM header
-;    build_date
-;       date in DLM header
-;    routines
-;       `LIST` of routine objects
-;    nFunctions
-;       the number of functions added to the DLM
-;    nProcedures
-;       the number of procedures added to the DLM
-;    systemIncludes
-;       `LIST` of system include names
-;    userIncludes
-;       `LIST` of user include names
-;    includeDirs
-;       `LIST` of include directories
-;    libDirs
-;       `LIST` of lib directories
-;    sharedLibFiles
-;       `LIST` of shared lib files
-;    staticLibFiles
-;       `LIST` of static lib files
+;   prefix
+;     string to add before each routine name, i.e., `MG_`
+;   basename
+;     basename (including possible path) for `.c` and `.dlm` files
+;   name
+;     name in DLM header
+;   description
+;     description in DLM header
+;   version
+;     version in DLM header
+;   source
+;     source in DLM header
+;   build_date
+;     date in DLM header
+;   routines
+;     `LIST` of routine objects
+;   nFunctions
+;     the number of functions added to the DLM
+;   nProcedures
+;     the number of procedures added to the DLM
+;   systemIncludes
+;     `LIST` of system include names
+;   userIncludes
+;     `LIST` of user include names
+;   includeDirs
+;     `LIST` of include directories
+;   libDirs
+;     `LIST` of lib directories
+;   sharedLibFiles
+;     `LIST` of shared lib files
+;   staticLibFiles
+;     `LIST` of static lib files
 ;-
 pro mg_dlm__define
   compile_opt strictarr

@@ -1,7 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; @returns strarr
+; Finds required packages.
+;
+; :Returns:
+;   string
 ;-
 function mg_find_packages
   compile_opt strictarr
