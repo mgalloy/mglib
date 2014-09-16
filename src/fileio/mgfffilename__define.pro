@@ -3,20 +3,20 @@
 ;+
 ; This class represents a filename (or directory name).
 ;
-; This class corrects many of the errors found in FILEPATH, FILE_DIRNAME, and
-; FILE_BASENAME.
+; This class corrects many of the errors found in `FILEPATH`, `FILE_DIRNAME`,
+; and `FILE_BASENAME`.
 ;
 ; :Properties:
-;    dirname
-;       characters before the last path separator in the filename; empty if no
-;       path separator
-;    directories
-;       array of directories as listed in dirname
-;    basename
-;       characters after the last path separator in the filename; the entire
-;       filename if no path separator
-;    extension
-;       characters after the last dot in the basename
+;   dirname
+;     characters before the last path separator in the filename; empty if no
+;     path separator
+;   directories
+;     array of directories as listed in dirname
+;   basename
+;     characters after the last path separator in the filename; the entire
+;     filename if no path separator
+;   extension
+;     characters after the last dot in the basename
 ;-
 
 
@@ -77,20 +77,20 @@ end
 ; not specified (unlike `FILEPATH`).
 ;
 ; :Params:
-;    basename : in, optional, type=string, default=''
-;       basename or full filename of filename
+;   basename : in, optional, type=string, default=''
+;     basename or full filename of filename
 ;
 ; :Keywords:
-;    clock_basename : in, optional, type=boolean
-;       set to use `basename` as a C-style format string to insert the number
-;       of milliseconds since 1 January 1970 into
-;    subdirectory : in, optional, type=string/strarr, default=''
-;       subdirectory or subdirectories
-;    root_dir : in, optional, type=string, default=''
-;       root directory
-;    tmp : in, optional, type=boolean
-;       set to ignore `ROOT_DIR` keyword and use a root directory specially
-;       designated for temporary files
+;   clock_basename : in, optional, type=boolean
+;     set to use `basename` as a C-style format string to insert the number
+;     of milliseconds since 1 January 1970 into
+;   subdirectory : in, optional, type=string/strarr, default=''
+;     subdirectory or subdirectories
+;   root_dir : in, optional, type=string, default=''
+;     root directory
+;   tmp : in, optional, type=boolean
+;     set to ignore `ROOT_DIR` keyword and use a root directory specially
+;     designated for temporary files
 ;-
 pro mgfffilename::compose, basename, clock_basename=clockBasename, $
                            subdirectory=subdirectory, $
@@ -126,12 +126,12 @@ end
 ; Returns the filename as a string.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Keywords:
-;    format : in, optional, type=string
-;       format string with a single string specifier in it (%s or A, depending
-;       on the format type) in it
+;   format : in, optional, type=string
+;     format string with a single string specifier in it (%s or A, depending
+;     on the format type) in it
 ;-
 function mgfffilename::toString, format=format
   compile_opt strictarr
@@ -152,13 +152,16 @@ end
 ;+
 ; Create a filename object.
 ;
+; :Returns:
+;   1 for success, 0 otherwise
+;
 ; :Params:
-;    basename : in, optional, type=string
-;       basename or full filename of the new filename object
+;   basename : in, optional, type=string
+;     basename or full filename of the new filename object
 ;
 ; :Keywords:
-;    _ref_extra : in, out, optional, type=keywords
-;       input keywords to ::compose and output keywords to ::getProperty
+;   _ref_extra : in, out, optional, type=keywords
+;     input keywords to ::compose and output keywords to ::getProperty
 ;-
 function mgfffilename::init, basename, _ref_extra=e
   compile_opt strictarr
@@ -174,8 +177,8 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    filename
-;       filename this object represents
+;   filename
+;     filename this object represents
 ;-
 pro mgfffilename__define
   compile_opt strictarr

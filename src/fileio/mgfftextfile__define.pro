@@ -3,6 +3,17 @@
 
 ;= Operator overloaded methods
 
+;+
+; Returns a string describing the text file object. Called by the `HELP`
+; routine.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
+;-
 function mgfftextfile::_overloadHelp, varname
   compile_opt strictarr
 
@@ -11,6 +22,19 @@ function mgfftextfile::_overloadHelp, varname
 end
 
 
+;+
+; Allows array index access with brackets.
+;
+; :Returns:
+;   `strarr`
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;-
 function mgfftextfile::_overloadBracketsRightSide, isRange, ss1
   compile_opt strictarr
   on_error, 2
@@ -42,6 +66,34 @@ function mgfftextfile::_overloadBracketsRightSide, isRange, ss1
 end
 
 
+;+
+; Allows setting values of the text file by array index.
+;
+; :Params:
+;   objref : in, required, type=objref
+;     should be self
+;   value : in, required, type=any
+;     value to assign to the array list
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
+;-
 pro mgfftextfile::_overloadBracketsLeftSide, objref, value, isRange, $
                                              ss1, ss2, ss3, ss4, $
                                              ss5, ss6, ss7, ss8
@@ -55,6 +107,19 @@ pro mgfftextfile::_overloadBracketsLeftSide, objref, value, isRange, $
 end
 
 
+;+
+; Allows a text file to be used in a `FOREACH` loop.
+;
+; :Returns:
+;   1 if there is an item to return, 0 if not
+;
+; :Params:
+;   line : out, required, type=list type
+;     value to return as the loop
+;   file_ptr : in, out, optional, type=undefined/long
+;     `file_ptr` is undefined for first element, otherwise the index of the
+;     last element returned
+;-
 function mgfftextfile::_overloadForeach, line, file_ptr
   compile_opt strictarr
   on_error, 2
@@ -79,6 +144,17 @@ end
 
 ;= Property methods
 
+;+
+; Set properties.
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of text file
+;   read : in, optional, type=boolean
+;     set to indicate the text file is read only
+;   write : in, optional, type=boolean
+;     set to indicate the text file is writable
+;-
 pro mgfftextfile::setProperty, filename=filename, read=read, write=write
   compile_opt strictarr
 
@@ -104,6 +180,9 @@ pro mgfftextfile::setProperty, filename=filename, read=read, write=write
 end
 
 
+;+
+; Get properties.
+;-
 pro mgfftextfile::getProperty
   compile_opt strictarr
 
@@ -112,6 +191,16 @@ end
 
 ;= Lifecycle methods
 
+;+
+; Create a text file object.
+;
+; :Returns:
+;   1 if successful, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties
+;-
 function mgfftextfile::init, _extra=e
   compile_opt strictarr
 
@@ -124,6 +213,8 @@ end
 
 
 ;+
+; Define instance variables of text file object.
+;
 ; :Fields:
 ;   filename
 ;     filename of text file

@@ -1,8 +1,38 @@
 ; docformat = 'rst'
 
 
+;+
+; Object representing a binary file.
+;
+; :Properties:
+;   dimensions
+;     dimensions of data in file
+;   filename
+;     filename of binary file
+;   read
+;     set to indicate the file is read only
+;   size
+;     size in bytes of file
+;   type
+;     `SIZE` type code of data in file
+;   write
+;     set to indicate the file is writable
+;-
+
+
 ;= Operator overloaded methods
 
+;+
+; Returns a string describing the binary file object. Called by the `HELP`
+; routine.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
+;-
 function mgffbinaryfile::_overloadHelp, varname
   compile_opt strictarr
 
@@ -12,6 +42,33 @@ function mgffbinaryfile::_overloadHelp, varname
 end
 
 
+;+
+; Allows array index access with brackets.
+;
+; :Returns:
+;   array of type given by `TYPE` property
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss3 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss4 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss5 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss6 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss7 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss8 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;-
 function mgffbinaryfile::_overloadBracketsRightSide, isRange, $
                                                      ss1, ss2, ss3, ss4, $
                                                      ss5, ss6, ss7, ss8
@@ -26,32 +83,34 @@ function mgffbinaryfile::_overloadBracketsRightSide, isRange, $
 end
 
 
-function mgffbinaryfile::read, type=type, dimensions=dimensions
-  compile_opt strictarr
-
-  if (~self.read) then message, 'file not opened for reading'
-
-  _type = n_elements(type) eq 0L ? self.type : type
-
-  if (n_elements(dimensions) eq 0L) then begin
-    info = fstat(self.lun)
-    if (product(*self.dimensions) le (info.size - info.cur_ptr + 1L)) then begin
-      _dimensions = *self.dimensions
-    endif else begin
-      _dimensions = [(info.size - info.cur_ptr + 1L) / mg_typesize(_type)]
-    endelse
-  endif else begin
-    _dimensions = dimensions
-  endelse
-
-  result = make_array(type=_type, dimension=_dimensions)
-
-  readu, self.lun, result
-
-  return, result
-end
-
-
+;+
+; Allows setting values of the binary file by array index.
+;
+; :Params:
+;   objref : in, required, type=objref
+;     should be self
+;   value : in, required, type=any
+;     value to assign to the array list
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=any
+;     not used
+;   ss3 : in, optional, type=any
+;     not used
+;   ss4 : in, optional, type=any
+;     not used
+;   ss5 : in, optional, type=any
+;     not used
+;   ss6 : in, optional, type=any
+;     not used
+;   ss7 : in, optional, type=any
+;     not used
+;   ss8 : in, optional, type=any
+;     not used
+;-
 pro mgffbinaryfile::_overloadBracketsLeftSide, objref, value, isRange, $
                                                ss1, ss2, ss3, ss4, $
                                                ss5, ss6, ss7, ss8
@@ -66,6 +125,9 @@ end
 
 ;= Property methods
 
+;+
+; Get properties.
+;-
 pro mgffbinaryfile::getProperty, filename=filename, type=type, size=size
   compile_opt strictarr
 
@@ -78,6 +140,9 @@ pro mgffbinaryfile::getProperty, filename=filename, type=type, size=size
 end
 
 
+;+
+; Set properties.
+;-
 pro mgffbinaryfile::setProperty, filename=filename, $
                                  type=type, dimensions=dimensions, $
                                  read=read, write=write
@@ -112,8 +177,51 @@ pro mgffbinaryfile::setProperty, filename=filename, $
 end
 
 
+;= helper routines
+
+;+
+; Read data from binary file.
+;
+; :Returns:
+;   array of type `TYPE`
+;
+; :Keywords:
+;   type : in, optional, type=integer, default=TYPE property
+;     `SIZE` type code of returned array
+;   dimensions : in, optional, type=lonarr, default=DIMENSIONS property
+;     dimensions of returned array
+;-
+function mgffbinaryfile::read, type=type, dimensions=dimensions
+  compile_opt strictarr
+
+  if (~self.read) then message, 'file not opened for reading'
+
+  _type = n_elements(type) eq 0L ? self.type : type
+
+  if (n_elements(dimensions) eq 0L) then begin
+    info = fstat(self.lun)
+    if (product(*self.dimensions) le (info.size - info.cur_ptr + 1L)) then begin
+      _dimensions = *self.dimensions
+    endif else begin
+      _dimensions = [(info.size - info.cur_ptr + 1L) / mg_typesize(_type)]
+    endelse
+  endif else begin
+    _dimensions = dimensions
+  endelse
+
+  result = make_array(type=_type, dimension=_dimensions)
+
+  readu, self.lun, result
+
+  return, result
+end
+
+
 ;= Lifecycle methods
 
+;+
+; Free resources.
+;-
 pro mgffbinaryfile::cleanup
   compile_opt strictarr
 
@@ -124,6 +232,16 @@ pro mgffbinaryfile::cleanup
 end
 
 
+;+
+; Create binary file object.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties
+;-
 function mgffbinaryfile::init, _extra=e
   compile_opt strictarr
 
@@ -142,6 +260,9 @@ function mgffbinaryfile::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mgffbinaryfile__define
   compile_opt strictarr
 

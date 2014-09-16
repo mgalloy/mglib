@@ -10,6 +10,27 @@
 ;
 ; :Returns:
 ;    `bytarr`
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss2 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss3 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss4 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss5 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss6 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss7 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;   ss8 : in, optional, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
 ;-
 function mgfffile::_overloadBracketsRightSide, isRange, $
                                                ss1, ss2, ss3, ss4, $

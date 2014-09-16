@@ -134,24 +134,8 @@ end
 ;     of indices
 ;   ss1 : in, required, type=long/lonarr
 ;     scalar subscript index value, an index array, or a subscript range
-;   ss2 : in, optional, type=any
-;     not used
-;   ss3 : in, optional, type=any
-;     not used
-;   ss4 : in, optional, type=any
-;     not used
-;   ss5 : in, optional, type=any
-;     not used
-;   ss6 : in, optional, type=any
-;     not used
-;   ss7 : in, optional, type=any
-;     not used
-;   ss8 : in, optional, type=any
-;     not used
 ;-
-pro mgcoarraylist::_overloadBracketsLeftSide, objref, value, isRange, $
-                                              ss1, ss2, ss3, ss4, $
-                                              ss5, ss6, ss7, ss8
+pro mgcoarraylist::_overloadBracketsLeftSide, objref, value, isRange, ss1
   compile_opt strictarr
 
   if (isRange[0]) then begin

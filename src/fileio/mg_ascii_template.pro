@@ -47,31 +47,111 @@
 ;      34.6980
 ;          NaN          NaN          NaN          NaN          NaN          NaN          NaN
 ;      31.2281
-;IDL> print, d.field1
-;2-9 y 10-19 y 20-29 y 30-39 y 40-49 y 50-59 y 60-69 y 70-79 y
-;IDL> print, transpose(d.field1)
-;2-9 y
-;10-19 y
-;20-29 y
-;30-39 y
-;40-49 y
-;50-59 y
-;60-69 y
-;70-79 y
 
-function mg_ascii_template, data_start=dataStart, $
+
+;+
+; Programmatically creates a structure of the type returned by
+; `ASCII_TEMPLATE`.
+;
+; :Examples:
+;   For example, read an ASCII file from the IDL distribution::
+;
+;     filename = file_which('ascii.txt')
+;
+;   The first few rows of the file looks like::
+;
+;     This file contains ASCII format weather data in a comma delimited table
+;     with comments prefaced by the "%" character. The columns represent:
+;     Longitude, latitude, elevation (in feet), temperature (in degrees F),
+;     dew point (in degrees  F), wind speed (knots), wind direction (degrees)
+;
+;     -156.9500, 20.7833, 399, 68, 64, 10, 60
+;     -116.9667, 33.9333, 692, 77, 50, 8, 270
+;     -104.2545, 32.3340, 1003, 87, 50, 10, 340
+;
+;   Define the row using a structure to specify the names, types, and sizes of
+;   the fields::
+;
+;     row = { fdata: fltarr(2), ldata: lonarr(5) }
+;
+;   Use the row definition and where the data starts to define the template::
+;
+;     t = mg_ascii_template(data_start=5, example_row=row)
+;
+;   Finally, read the data with the template::
+;
+;     d = read_ascii(filename, template=t)
+;
+; :Returns:
+;   structure
+;
+; :Keywords:
+;   data_start : in, optional, type=integer, default=0
+;     offset of where dat begins
+;   delimiter : in, optional, type=byte, default=44B
+;     delimiter between values
+;   missing_value : in, optional, type=float, default=!values.f_nan
+;     value to replace missing data with
+;   comment_symbol : in, optional, type=string
+;     prefix to comment lines
+;   example_row : in, optional, type=structure
+;     structure defining the data values in a row
+;-
+function mg_ascii_template, data_start=data_start, $
                             delimiter=delimiter, $
-                            missing_value=missingValue
+                            missing_value=missing_value, $
+                            comment_symbol=comment_symbol, $
+                            example_row=example_row
   compile_opt strictarr
 
-  _dataStart = n_elements(dataStart) eq 0L ? 0L : long(dataStart)
+  _data_start = n_elements(data_start) eq 0L ? 0L : long(data_start)
   _delimiter = n_elements(delimiter) eq 0L ? 44B : byte(delimiter)
-  _missingValue = n_elements(missingValue) eq 0L ? !values.f_nan : missingValue
+  _missing_value = n_elements(missing_value) eq 0L ? !values.f_nan : missing_value
+  _comment_symbol = n_elements(comment_symbol) eq 0L ? '' : comment_symbol
 
-  ; TODO: finish adding the other fields
+  _example_row = example_row
+
+  fieldcount = n_tags(_example_row)
+  n_cols = 0L
+  for t = 0L, fieldcount - 1L do begin
+    n_cols += n_elements(_example_row.(t))
+  endfor
+
+  field_types = lonarr(n_cols)
+  field_names = strarr(n_cols)
+  _field_names = tag_names(_example_row)
+  field_locations = lonarr(n_cols)
+  field_groups = lonarr(n_cols)
+
+  i = 0L
+  for t = 0L, n_tags(_example_row) - 1L do begin
+    fieldwidth = n_elements(_example_row.(t))
+    field_types[i:i + fieldwidth - 1] = size(_example_row.(t), /type)
+    field_names[i:i + fieldwidth - 1] = _field_names[t]
+    field_groups[i:i + fieldwidth - 1] = i
+
+    i += fieldwidth
+  endfor
 
   return, { version: 1.0, $
-            datastart: _dataStart, $
-            delimiter: _delimiter $
+            datastart: _data_start, $
+            delimiter: _delimiter, $
+            missingvalue: _missing_value, $
+            commentsymbol: _comment_symbol, $
+            fieldcount: [n_cols], $
+            fieldtypes: field_types, $
+            fieldnames: field_names, $
+            fieldlocations: field_locations, $
+            fieldgroups: field_groups $
           }
+end
+
+
+; main-level example program
+
+filename = file_which('ascii.txt')
+row = { fdata: fltarr(2), ldata: lonarr(5) }
+t = mg_ascii_template(data_start=5, example_row=row)
+d = read_ascii(filename, template=t)
+
 end
