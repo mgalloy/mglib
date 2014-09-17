@@ -1,5 +1,21 @@
 ; docformat = 'rst'
 
+
+;+
+; Create an x3d scatter plot.
+;
+; :Params:
+;   x : in, required, type=fltarr
+;     x-coorinate of points to plot
+;   y : in, required, type=fltarr
+;     y-coorinate of points to plot
+;   z : in, required, type=fltarr
+;     z-coorinate of points to plot
+;
+; :Keywords:
+;   filename : in, optional, type=string, default=x3d_scatter.html
+;     output filename
+;-
 pro mg_x3d_scatter, x, y, z, filename=filename
   compile_opt strictarr
 

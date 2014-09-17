@@ -5,14 +5,14 @@
 ; a modern browser.
 ;
 ; :Properties:
-;    dimensions
-;       dimensions of output graphic
-;    filename
-;       filename to send output to
-;    graphics_tree
-;       graphics hierarchy to draw by default
-;    indent
-;       string to indent lines in the output by; default is to use two spaces
+;   dimensions
+;     dimensions of output graphic
+;   filename
+;     filename to send output to
+;   graphics_tree
+;     graphics hierarchy to draw by default
+;   indent
+;     string to indent lines in the output by; default is to use two spaces
 ;-
 
 
@@ -21,13 +21,13 @@
 ; `FILENAME` property.
 ;
 ; :Params:
-;    tree : in, optional, type=objref
-;       object graphics hierarchy to draw; optional, but then `GRAPHICS_TREE`
-;       property must be set
+;   tree : in, optional, type=objref
+;     object graphics hierarchy to draw; optional, but then `GRAPHICS_TREE`
+;     property must be set
 ;
 ; :Keywords:
-;    full_html : in, optional, type=boolean
-;       set to write an entire HTML file instead of just the w3dom content
+;   full_html : in, optional, type=boolean
+;     set to write an entire HTML file instead of just the w3dom content
 ;-
 pro mggrx3d::draw, tree, full_html=full_html
   compile_opt strictarr
@@ -104,12 +104,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tree : in, required, type=objref
-;       object graphics hierarchy to draw
+;   tree : in, required, type=objref
+;     object graphics hierarchy to draw
 ;
 ; :Keywords:
-;    indent : in, optional, type=string, default=''
-;       indent string
+;   indent : in, optional, type=string, default=''
+;     indent string
 ;-
 pro mggrx3d::_traverse, tree, indent=indent
   compile_opt strictarr
@@ -136,12 +136,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tree : in, required, type=objref
-;       object graphics hierarchy to draw
+;   tree : in, required, type=objref
+;     object graphics hierarchy to draw
 ;
 ; :Keywords:
-;    indent : in, required, type=string
-;       indent string
+;   indent : in, required, type=string
+;     indent string
 ;-
 pro mggrx3d::_writeIDLgrView, tree, indent=indent
   compile_opt strictarr
@@ -172,12 +172,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tree : in, required, type=objref
-;       object graphics hierarchy to draw
+;   tree : in, required, type=objref
+;     object graphics hierarchy to draw
 ;
 ; :Keywords:
-;    indent : in, required, type=string
-;       indent string
+;   indent : in, required, type=string
+;     indent string
 ;-
 pro mggrx3d::_writeIDLgrModel, tree, indent=indent
   compile_opt strictarr
@@ -202,12 +202,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tree : in, required, type=objref
-;       object graphics hierarchy to draw
+;   tree : in, required, type=objref
+;     object graphics hierarchy to draw
 ;
 ; :Keywords:
-;    indent : in, required, type=string
-;       indent string
+;   indent : in, required, type=string
+;     indent string
 ;-
 pro mggrx3d::_writeIDLgrPolygon, tree, indent=indent
   compile_opt strictarr
@@ -217,6 +217,23 @@ pro mggrx3d::_writeIDLgrPolygon, tree, indent=indent
 end
 
 
+;+
+; Write a polygon.
+;
+; :Private:
+;
+; :Params:
+;   pts : in, required, type="fltarr(3, n)"
+;     data points
+;   polygons : in, required, type=lonarr(m)
+;     connectivity list specified in IDL's scheme
+;   color : in, required, type=bytarr(3)
+;     color of polygon
+;
+; :Keywords:
+;   indent : in, required, type=string
+;     indent string
+;-
 pro mggrx3d::_writePolygon, pts, polygons, color, indent=indent
   compile_opt strictarr
   ;normals = compute_mesh_normals(vertices, polygons)
@@ -315,11 +332,11 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    `lonarr(n)`
+;   `lonarr(n)`
 ;
 ; :Params:
-;    conn : in, required, type=lonarr(n)
-;       connectivity list specified in IDL's scheme
+;   conn : in, required, type=lonarr(n)
+;     connectivity list specified in IDL's scheme
 ;-
 function mggrx3d::_convertPolygons, conn
   compile_opt strictarr
