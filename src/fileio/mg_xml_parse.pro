@@ -14,6 +14,24 @@
 ;    { numlist: replicate({ number: 0}, 2) }
 ;-
 
+
+;= IDLffXMLSAX parser methods
+
+;+
+; Called to process the opening of a tag.
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
+;-
 pro mgffxmlparser::startElement, uri, local, name, attName, attValue
   compile_opt strictarr
 
@@ -36,18 +54,44 @@ pro mgffxmlparser::startElement, uri, local, name, attName, attValue
 end
 
 
+;+
+; Called to process the closing of a tag.
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
+;-
 pro mgffxmlparser::endElement, uri, local, name
   compile_opt strictarr
 
 end
 
 
+;+
+; Called to process character data in an XML file.
+;
+; :Params:
+;   chars : in, required, type=string
+;     characters detected by parser
+;-
 pro mgffxmlparser::characters, chars
   compile_opt strictarr
 
 end
 
 
+;= helper methods
+
+;+
+; Get result.
+;
+; :Returns:
+;   structure
+;-
 function mgffxmlparser::getResult
   compile_opt strictarr
 
@@ -55,6 +99,11 @@ function mgffxmlparser::getResult
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mgffxmlparser::cleanup
   compile_opt strictarr
 
@@ -63,6 +112,16 @@ pro mgffxmlparser::cleanup
 end
 
 
+;+
+; Creates an XML parser.
+;
+; :Returns:
+;   1 if successful, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     `IDLffSMLSAX::init` keywords
+;-
 function mgffxmlparser::init, _extra=e
   compile_opt strictarr
 
@@ -74,6 +133,9 @@ function mgffxmlparser::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mgffxmlparser__define
   compile_opt strictarr
 
@@ -88,17 +150,17 @@ end
 ; Parse an XML file into a structure.
 ;
 ; :Returns:
-;    structure
+;   structure
 ;
 ; :Params:
-;    input : in, required, type=string
-;       filename, URL or actual contents of the XML to parse
+;   input : in, required, type=string
+;     filename, URL or actual contents of the XML to parse
 ;
 ; :Keywords:
-;    url : in, optional, type=boolean
-;       set to specify that input is an URL
-;    xml_string : in, optional, type=boolean
-;       set to specify that input is a string containing XML
+;   url : in, optional, type=boolean
+;     set to specify that input is an URL
+;   xml_string : in, optional, type=boolean
+;     set to specify that input is a string containing XML
 ;-
 function mg_xml_parse, input, url=url, xml_string=xmlString
   compile_opt strictarr

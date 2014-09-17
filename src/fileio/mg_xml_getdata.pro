@@ -4,6 +4,23 @@
 ; Returns an individual element or attribute's value.
 ;-
 
+;= IDLffXMLSAX parser methods
+
+;+
+; Called to process the opening of a tag.
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
+;-
 pro mgffxmlitemparser::startElement, uri, local, name, attName, attValue
   compile_opt strictarr
 
@@ -27,6 +44,17 @@ pro mgffxmlitemparser::startElement, uri, local, name, attName, attValue
 end
 
 
+;+
+; Called to process the closing of a tag.
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
+;-
 pro mgffxmlitemparser::endElement, uri, local, name
   compile_opt strictarr
 
@@ -35,6 +63,13 @@ pro mgffxmlitemparser::endElement, uri, local, name
 end
 
 
+;+
+; Called to process character data in an XML file.
+;
+; :Params:
+;   chars : in, required, type=string
+;     characters detected by parser
+;-
 pro mgffxmlitemparser::characters, chars
   compile_opt strictarr
 
@@ -45,6 +80,15 @@ pro mgffxmlitemparser::characters, chars
 end
 
 
+;= helper methods
+
+;+
+; Set the search item.
+;
+; :Params:
+;   item : in, required, type=string
+;     set the item to search for
+;-
 pro mgffxmlitemparser::setItem, item
   compile_opt strictarr
   on_error, 2
@@ -63,6 +107,16 @@ pro mgffxmlitemparser::setItem, item
 end
 
 
+;+
+; Get result.
+;
+; :Returns:
+;   string
+;
+; :Keywords:
+;   found : out, optional, type=boolean
+;     set to a named variable to retrieve whether the result was found
+;-
 function mgffxmlitemparser::getResult, found=found
   compile_opt strictarr
 
@@ -71,6 +125,11 @@ function mgffxmlitemparser::getResult, found=found
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mgffxmlitemparser::cleanup
   compile_opt strictarr
 
@@ -79,6 +138,16 @@ pro mgffxmlitemparser::cleanup
 end
 
 
+;+
+; Creates an XML item parser.
+;
+; :Returns:
+;   1 if successful, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     `IDLffSMLSAX::init` keywords
+;-
 function mgffxmlitemparser::init, _extra=e
   compile_opt strictarr
 
@@ -90,6 +159,9 @@ function mgffxmlitemparser::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mgffxmlitemparser__define
   compile_opt strictarr
 
@@ -108,32 +180,32 @@ end
 ; Returns a specific element or attribute's value from an XML file.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    input : in, required, type=string
-;       filename, URL or actual contents of the XML to parse
-;    item : in, required, type=string
-;       item from the file to retrieve; using the notation that / separates
-;       elements, [n] are used to indicate the nth element of that type, and .
-;       indicates an attribute, for example, in the file::
+;   input : in, required, type=string
+;     filename, URL or actual contents of the XML to parse
+;   item : in, required, type=string
+;     item from the file to retrieve; using the notation that / separates
+;     elements, [n] are used to indicate the nth element of that type, and .
+;     indicates an attribute, for example, in the file::
 ;
-;          <numlist>
-;            <number>0</number>
-;            <number attr="int">1</number>
-;            <number>2</number>
-;          </numlist>
+;       <numlist>
+;         <number>0</number>
+;         <number attr="int">1</number>
+;         <number>2</number>
+;       </numlist>
 ;
-;       Then "/numlist/number[1].attr" returns "int". If no index is given,
-;       [0] is assumed.
+;     Then "/numlist/number[1].attr" returns "int". If no index is given,
+;     [0] is assumed.
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       returns 1 if the item was found, 0 if not
-;    url : in, optional, type=boolean
-;       set to specify that input is an URL
-;    xml_string : in, optional, type=boolean
-;       set to specify that input is a string containing XML
+;   found : out, optional, type=boolean
+;     returns 1 if the item was found, 0 if not
+;   url : in, optional, type=boolean
+;     set to specify that input is an URL
+;   xml_string : in, optional, type=boolean
+;     set to specify that input is a string containing XML
 ;-
 function mg_xml_getdata, input, item, found=found, $
                          url=url, xml_string=xmlString
