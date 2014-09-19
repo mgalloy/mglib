@@ -1,6 +1,27 @@
 ; docformat = 'rst'
 
-pro mg_prowl, msg, application=application, event=event, apikey=apikey, error=error
+;+
+; Send a message via Prowl.
+;
+; :Params:
+;   msg : in, optional, type=string
+;     message to send
+;
+; :Keywords:
+;   application : in, optional, type=string, default='MG_PROWL'
+;     name of application to send message as
+;   event : in, optional, type=string, default=''
+;     Prowl event
+;   apikey : in, required, type=string
+;     Prowl API key
+;   error : out, optional, type=string
+;     error message if failure
+;-
+pro mg_prowl, msg, $
+              application=application, $
+              event=event, $
+              apikey=apikey, $
+              error=error
   compile_opt strictarr
   on_error, 2
 
@@ -20,7 +41,7 @@ pro mg_prowl, msg, application=application, event=event, apikey=apikey, error=er
   url = string(apidomain, _app, _event, _msg, _apikey, format=urlFormat)
 
   content = mg_get_url_content(url, ssl_verify_peer=0, $
-                               error_message=errorMsg, $
+                               error_message=error, $
                                response_code=responseCode, $
                                response_header=responseHeader)
 end

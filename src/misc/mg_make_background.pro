@@ -3,6 +3,9 @@
 ;+
 ; Make a random (but smoothed) background texture.
 ;
+; :Returns:
+;   `fltarr(xsize, ysize)`
+;
 ; :Params:
 ;   xsize : in, required, type=long
 ;     width of image

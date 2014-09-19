@@ -1,13 +1,13 @@
 ; docformat = 'rst'
 
 ;+
-; Base class for objects to add a few introspection methods such as ::help
-; and ::toString.
+; Base class for objects to add a few introspection methods such as `::help`
+; and `::toString`.
 ;-
 
 
 ;+
-; Display internal help output with OBJECTS set for this object (so it shows
+; Display internal help output with `OBJECTS` set for this object (so it shows
 ; instance data as well).
 ;-
 pro mg_object::help
@@ -19,10 +19,10 @@ end
 
 ;+
 ; Returns a string representation of the object. By default, it returns the
-; string that is displayed when an object is PRINTed.
+; string that is displayed when an object is `PRINT`ed.
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mg_object::toString
   compile_opt strictarr
@@ -33,7 +33,21 @@ function mg_object::toString
 end
 
 
-
+;+
+; Returns information about the class.
+;
+; :Returns:
+;   `strarr`
+;
+; :Params:
+;   classname : in, required, type=string
+;     name of the class to find information about
+;
+; :Keywords:
+;   output : in, required, type=string
+;     `HELP` output to parse
+;   function_start : in, optional
+;-
 function mg_object::_getClassInfo, classname, output=output, $
                                    function_start=functionStart
   compile_opt strictarr, hidden
@@ -92,6 +106,19 @@ function mg_object::_getClassInfo, classname, output=output, $
 end
 
 
+;= operator overloading methods
+
+
+;+
+; Returns a string describing the object. Called by the `HELP` routine.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
+;-
 function mg_object::_overloadHelp, varname
   compile_opt strictarr
 

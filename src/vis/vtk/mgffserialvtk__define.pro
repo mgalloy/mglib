@@ -1,14 +1,16 @@
+; docformat = 'rst'
+
 ;+
 ; Reads connectivity list section and returns the connectivity list.
 ;
 ; :Returns:
-;    `lonarr`
+;   `lonarr`
 ;
 ; :Params:
-;    nItems : in, required, type=integer
-;       the number of polygons
-;    size : in, required, type=integer
-;       total number of elements in the connectivity list
+;   nItems : in, required, type=integer
+;     the number of polygons
+;   size : in, required, type=integer
+;     total number of elements in the connectivity list
 ;-
 function mgffserialvtk::readConnectivityListSection, nItems, size
   compile_opt strictarr
@@ -24,13 +26,13 @@ end
 ; Reads a `POINTS` section and returns the points.
 ;
 ; :Returns:
-;    `(3, nPoints)` array of given type
+;   `(3, nPoints)` array of given type
 ;
 ; :Params:
-;    nPoints : in, required, type=integer
-;       number of points
-;    type : in, required, type=integer
-;       IDL type code for the data type of the points
+;   nPoints : in, required, type=integer
+;     number of points
+;   type : in, required, type=integer
+;     IDL type code for the data type of the points
 ;-
 function mgffserialvtk::readPointsSection, nPoints, type
   compile_opt strictarr
@@ -47,7 +49,7 @@ end
 ; Reads the sections of a POLYDATA dataset.
 ;
 ; :Returns:
-;    object
+;   object
 ;-
 pro mgffserialvtk::readPolydataDataset
   compile_opt strictarr, logical_predicate
@@ -121,6 +123,19 @@ pro mgffserialvtk::readPolydataDataset
 end
 
 
+;+
+; Reads a texture coordinates attribute.
+;
+; :Params:
+;   nPoints : in, required, type=integer
+;     number of points
+;   dataName : in, optional, type=string
+;     name of data
+;   dim : in, required, type=lonarr
+;     dimensions
+;   dataType : in, required, type=integer
+;     IDL type code for the data type of the points
+;-
 pro mgffserialvtk::readTextureCoordinatesAttribute, nPoints, dataName, dim, $
     dataType
   compile_opt strictarr
@@ -133,6 +148,17 @@ pro mgffserialvtk::readTextureCoordinatesAttribute, nPoints, dataName, dim, $
 end
 
 
+;+
+; Reads a vectors attribute.
+;
+; :Params:
+;   nPoints : in, required, type=integer
+;     number of points
+;   dataName : in, optional, type=string
+;     name of data
+;   dataType : in, required, type=integer
+;     IDL type code for the data type of the points
+;-
 pro mgffserialvtk::readVectorsAttribute, nPoints, dataName, dataType
   compile_opt strictarr
 
@@ -145,6 +171,19 @@ pro mgffserialvtk::readVectorsAttribute, nPoints, dataName, dataType
 end
 
 
+;+
+; Reads a scalars attribute.
+;
+; :Params:
+;   nPoints : in, required, type=integer
+;     number of points
+;   dataName : in, optional, type=string
+;     name of data
+;   dataType : in, required, type=integer
+;     IDL type code for the data type of the points
+;   numComp : in, required, type=integer
+;     number of components
+;-
 pro readScalarsAttribute, nPoints, dataName, dataType, numComp
   compile_opt strictarr
 
@@ -160,6 +199,17 @@ pro readScalarsAttribute, nPoints, dataName, dataType, numComp
 end
 
 
+;+
+; Read normals attribute.
+;
+; :Params:
+;   nPoints : in, required, type=integer
+;     number of points
+;   dataName : in, optional, type=string
+;     name of data
+;   dataType : in, required, type=integer
+;     IDL type code for the data type of the points
+;-
 pro mgffserialvtk::readNormalsAttribute, nPoints, dataName, dataType
   compile_opt strictarr
 
@@ -172,6 +222,13 @@ pro mgffserialvtk::readNormalsAttribute, nPoints, dataName, dataType
 end
 
 
+;+
+; Reads cell data.
+;
+; :Params:
+;   nCells : in, required, type=long
+;     number of cells
+;-
 pro mgffserialvtk::readCellData, nCells
   compile_opt strictarr
 
@@ -200,6 +257,13 @@ pro mgffserialvtk::readCellData, nCells
 end
 
 
+;+
+; Reads point data.
+;
+; :Params:
+;   nPoints : in, required, type=long
+;     number of points
+;-
 pro mgffserialvtk::readPointData, nPoints
   compile_opt strictarr
 
@@ -248,6 +312,16 @@ pro mgffserialvtk::readPointData, nPoints
 end
 
 
+;+
+; Read a dataset.
+;
+; :Private:
+;
+; :Params:
+;   datasetType : in, required, type=string
+;     type of dataset: structured_points, structured_grid, rectilinear_grid,
+;     polydata, unstructured_grid, or field
+;-
 pro mgffserialvtk::readDataset, datasetType
   compile_opt strictarr
 
@@ -262,6 +336,9 @@ pro mgffserialvtk::readDataset, datasetType
 end
 
 
+;+
+; Read the top level line.
+;-
 pro mgffserialvtk::readTopLevelLine
   compile_opt strictarr
 
@@ -278,6 +355,12 @@ pro mgffserialvtk::readTopLevelLine
 end
 
 
+;+
+; Read a serial VTK file.
+;
+; :Returns:
+;   object graphics atom
+;-
 function mgffserialvtk::read
   compile_opt strictarr
 
@@ -318,12 +401,12 @@ end
 ; Converts a VTK type into an IDL type code.
 ;
 ; :Returns:
-;    integer
+;   integer
 ;
 ; :Params:
-;    vtkType : in, required, type=string
-;       one of the VTK types: bit, unsigned_char, char, unsigned_short, short,
-;       unsigned_int, int, unsigned_long, long, float, double
+;   vtkType : in, required, type=string
+;     one of the VTK types: bit, unsigned_char, char, unsigned_short, short,
+;     unsigned_int, int, unsigned_long, long, float, double
 ;-
 function mgffserialvtk::convertVtkTypeToIdlType, vtkType
   compile_opt strictarr
@@ -346,6 +429,13 @@ function mgffserialvtk::convertVtkTypeToIdlType, vtkType
 end
 
 
+;+
+; Put back a line;
+;
+; :Params:
+;   line : in, required, type=string
+;     line to put back
+;-
 pro mgffserialvtk::putBackLine, line
   compile_opt strictarr
   on_error, 2
@@ -359,6 +449,14 @@ pro mgffserialvtk::putBackLine, line
 end
 
 
+;+
+; Returns the next line of the file.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;-
 function mgffserialvtk::getLine
   compile_opt strictarr
 
@@ -377,8 +475,8 @@ end
 ; Reads any already dimensioned variable.
 ;
 ; :Params:
-;    data : in, out, required, type=any
-;       IDL variable type to be used with READU or READF
+;   data : in, out, required, type=any
+;     IDL variable type to be used with READU or READF
 ;-
 pro mgffserialvtk::getData, data
   compile_opt strictarr
@@ -391,18 +489,21 @@ pro mgffserialvtk::getData, data
 end
 
 
+;= property access
+
 ;+
 ; Get properties of the object.
 ;
 ; :Keywords:
-;    version : out, optional, type=string
-;       version of the VTK data file
-;    file_type : out, optional, type=string
-;       either ASCII or BINARY
-;    header : out, optional, type=string
-;       comments about file
+;   version : out, optional, type=string
+;     version of the VTK data file
+;   file_type : out, optional, type=string
+;     either ASCII or BINARY
+;   header : out, optional, type=string
+;     comments about file
 ;-
-pro mgffserialvtk::getProperty, version=version, file_type=fileType, $
+pro mgffserialvtk::getProperty, version=version, $
+                                file_type=fileType, $
                                 header=header
   compile_opt strictarr
 
@@ -411,6 +512,8 @@ pro mgffserialvtk::getProperty, version=version, file_type=fileType, $
   header = self.header
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources of object.
@@ -422,16 +525,19 @@ pro mgffserialvtk::cleanup
 end
 
 
-
 ;+
 ; Initialize object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;    =1 for success, 0 for failure
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of VTK serial data file
+;   filename : in, required, type=string
+;     filename of VTK serial data file
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `OPENR`
 ;-
 function mgffserialvtk::init, filename, _extra=e
   compile_opt strictarr
@@ -449,8 +555,8 @@ end
 ; Define member variables for the class.
 ;
 ; :Fields:
-;    version
-;       VTK data file version
+;   version
+;     VTK data file version
 ;-
 pro mgffserialvtk__define
   compile_opt strictarr

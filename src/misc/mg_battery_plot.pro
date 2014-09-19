@@ -3,6 +3,16 @@
 
 ; 1400386980,MaxCapacity = 9016,CurrentCapacity = 4773,DesignCapacity = 8440,CycleCount = 5
 
+;+
+; Extract one value from a section of the battery log line.
+;
+; :Returns:
+;   long
+;
+; :Params:
+;   s : in, required, type=string
+;     single `name = value` section of the battery log line
+;-
 function mg_battery_plot_extract_number, s
   compile_opt strictarr
   
@@ -11,6 +21,16 @@ function mg_battery_plot_extract_number, s
 end
 
 
+;+
+; Extract battery information from a line in the battery log file.
+;
+; :Returns:
+;   `lonarr(5)`
+;
+; :Params:
+;   line : in, required, type=string
+;     parse readings from battery info line
+;-
 function mg_battery_plot_extract, line
   compile_opt strictarr
 
@@ -27,6 +47,9 @@ function mg_battery_plot_extract, line
 end
 
 
+;+
+; Make plot of battery data created from running `battery.sh` script on OS X.
+;-
 pro mg_battery_plot
   compile_opt strictarr
 

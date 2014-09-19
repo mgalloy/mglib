@@ -6,7 +6,7 @@
 ; :Private:
 ;
 ; :Returns:
-;   status code, 0 for failure, 1 for success
+;   status code: 0 for failure, 1 for success
 ;
 ; :Params:
 ;   pdata : in, required, type=pointer
@@ -73,7 +73,7 @@ end
 ; :Private:
 ;
 ; :Returns:
-;   status code, 0 for failure, 1 for success
+;   status code: 0 for failure, 1 for success
 ;
 ; :Params:
 ;   header : in, required, type=structure
@@ -151,7 +151,25 @@ end
 ; :Private:
 ;
 ; :Returns:
-;   status code, 0 for failure, 1 for success
+;   status code: 0 for failure, 1 for success
+;
+; :Params:
+;   compHdr : in, required, type=structure
+;     compression header
+;   compTrailer : in, required, type=structure
+;     compression trailer
+;   compressed_size : in, required, type=integer
+;     compressed size
+;   filename : in, required, type=string
+;     filename of output
+;   local_hdr_offset : in, required, type=integer
+;     offset
+;   num_centralDir : in, optional, type=integer
+;     unused
+;
+; :Keywords:
+;   central_dir : out, required, type=bytarr
+;     central header
 ;-
 function mg_zip_centralheader, compHdr, $
                                compTrailer, $
@@ -226,10 +244,24 @@ end
 
 
 ;+
+; End central header.
+;
 ; :Private:
 ;
 ; :Returns:
-;   status code, 0 for failure, 1 for success
+;   status code: 0 for failure, 1 for success
+;
+; :Params:
+;   centralDirSize : in, required, type=integer
+;     size of central dir
+;   centralDir_offset : in, required, type=integer
+;     offset
+;   num_centralDir : in, required, type=integer
+;     size of central dir header
+;
+; :Keywords:
+;   end_central_dir : out, required, type=bytarr
+;     end of central header
 ;-
 function mg_zip_endcentralheader, centralDirSize, $
                                   centralDir_offset, $
@@ -263,7 +295,7 @@ function mg_zip_endcentralheader, centralDirSize, $
     zipsupp_endCentralDir.central_dir_size =  byte(long(centralDirSize), 0, 4)
     zipsupp_endCentralDir.central_dir_start = byte(long(centralDir_offset), 0, 4)
   endelse
-  
+
   supp_endCentralDir = byte([zipsupp_endCentralDir.signature, $
                              zipsupp_endCentralDir.disk_num, $
                              zipsupp_endCentralDir.central_dir_disk, $
@@ -273,7 +305,7 @@ function mg_zip_endcentralheader, centralDirSize, $
                              zipsupp_endCentralDir.central_dir_start, $
                              zipsupp_endCentralDir.comment_len $
                             ])
-    
+
   return, 1
 end
 

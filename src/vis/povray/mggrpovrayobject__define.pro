@@ -7,7 +7,7 @@
 ; :Private:
 ;
 ; :Categories:
-;    object graphics
+;   object graphics
 ;-
 
 ;+
@@ -17,18 +17,18 @@
 ; :Private:
 ;
 ; :Returns:
-;    POV-Ray string representation of a color
+;   POV-Ray string representation of a color
 ;
 ; :Params:
-;    color : in, required, type=bytarr(3)
-;       object graphics style color
+;   color : in, required, type=bytarr(3)
+;     object graphics style color
 ;
 ; :Keywords:
-;     alpha_channel : in, optional, type=float
-;        value from 0.0 (completely transparent) to 1.0 (completely opaque)
-;     filter : in, optional, type=boolean
-;        set to use filter transparency instead of transmittance or
-;        non-filtering transparency
+;   alpha_channel : in, optional, type=float
+;     value from 0.0 (completely transparent) to 1.0 (completely opaque)
+;   filter : in, optional, type=boolean
+;     set to use filter transparency instead of transmittance or
+;     non-filtering transparency
 ;-
 function mggrpovrayobject::_getRgb, color, alpha_channel=alphaChannel, $
                                     filter=filter
@@ -54,10 +54,10 @@ end
 ; :Private:
 ;
 ; :Params:
-;    lun : in, required, type=long
-;       logical unit number to write to
-;    transform : in, required, type="fltarr(4, 4)"
-;       object graphics transformation matrix
+;   lun : in, required, type=long
+;     logical unit number to write to
+;   transform : in, required, type="fltarr(4, 4)"
+;     object graphics transformation matrix
 ;-
 pro mggrpovrayobject::_writeTransform, lun, transform
   compile_opt strictarr
@@ -80,14 +80,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    lun : in, required, type=long
-;       lun for output file
-;    vertices : in, required, type="fltarr(n, 3)"
-;       vertices data
+;   lun : in, required, type=long
+;     lun for output file
+;   vertices : in, required, type="fltarr(n, 3)"
+;     vertices data
 ;
 ; :Keywords:
-;    name : in, required, type=string
-;       name of section
+;   name : in, required, type=string
+;     name of section
 ;-
 pro mggrpovrayobject::_writeVertices, lun, vertices, name=name
   compile_opt strictarr
@@ -109,6 +109,9 @@ end
 
 ;+
 ; Initialize `MGgrPOVRayObject`.
+;
+; :Returns:
+;   1 for success, 0 otherwise
 ;-
 function mggrpovrayobject::init
   compile_opt strictarr
@@ -123,9 +126,9 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    lightIntensityMultiplier
-;       conversion factor to convert IDL light intensity to a POV-Ray light
-;       intensity
+;   lightIntensityMultiplier
+;     conversion factor to convert IDL light intensity to a POV-Ray light
+;     intensity
 ;-
 pro mggrpovrayobject__define
   compile_opt strictarr

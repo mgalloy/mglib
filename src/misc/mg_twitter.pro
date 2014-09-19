@@ -30,7 +30,21 @@ end
 ;= parse XML
 
 ;+
+; Called to process the opening of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   qname : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
 ;-
 pro mgfftwitterstatuses::startElement, uri, local, qname, attname, attvalue
   compile_opt strictarr
@@ -50,7 +64,17 @@ end
 
 
 ;+
+; Called to process the closing of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   qname : in, required, type=string
+;     element name
 ;-
 pro mgfftwitterstatuses::endElement, uri, local, qname
   compile_opt strictarr
@@ -75,7 +99,13 @@ end
 
 
 ;+
+; Called to process character data in an XML file.
+;
 ; :Private:
+;
+; :Params:
+;   chars : in, required, type=string
+;     characters detected by parser
 ;-
 pro mgfftwitterstatuses::characters, chars
   compile_opt strictarr
@@ -95,7 +125,18 @@ end
 ;= lifecycle methods
 
 ;+
+; Create twitter status object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   username : in, optional, type=string, default=''
+;     Twitter username
+;   _extra : in, optional, type=keywords
+;     keywords to `IDLffXMLSAX::init`
 ;-
 function mgfftwitterstatuses::init, username=username, _extra=e
 
@@ -107,6 +148,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mgfftwitterstatuses__define

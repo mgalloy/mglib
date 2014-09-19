@@ -60,6 +60,10 @@ end
 
 ;+
 ; Load netCDF files corresponding to filenames.
+;
+; :Params:
+;   filenames : in, optional, type=string/strarr
+;     filenames of files to load
 ;-
 pro mg_nc_browser::loadFiles, filenames
   compile_opt strictarr

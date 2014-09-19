@@ -61,6 +61,8 @@
 
 ;+
 ; Print the information collected during the parsing.
+;
+; :Private:
 ;-
 pro mgffweatherparser::print
   compile_opt strictarr, hidden
@@ -78,7 +80,21 @@ end
 
 
 ;+
-; Called by the parser when an XML tag is started.
+; Called to process the opening of a tag.
+;
+; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   qname : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
 ;-
 pro mgffweatherparser::startElement, uri, local, qname, attName, attValue
   compile_opt strictarr, hidden
@@ -122,6 +138,8 @@ end
 ;+
 ; Initialize the weather parser object.
 ;
+; :Private:
+;
 ; :Returns:
 ;    1 for success, 0 for failure
 ;
@@ -142,6 +160,8 @@ end
 
 ;+
 ; Define inheritance from IDLffXMLSAX and the instance variables.
+;
+; :Private:
 ;-
 pro mgffweatherparser__define
   compile_opt strictarr, hidden

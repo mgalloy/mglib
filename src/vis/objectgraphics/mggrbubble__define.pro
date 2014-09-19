@@ -2,30 +2,32 @@
 
 ;+
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mggrbubble__define
+;     IDL> .run mggrbubble__define
 ;
-;    This should produce:
+;   This should produce:
 ;
-;    .. image:: bubbles.png
+;   .. image:: bubbles.png
 ;
 ; :Properties:
-;    size : type=float
-;       sizes of bubble; size of radius unless AREA is set, in which case it
-;       is the size of the area of the bubble
-;    area : type=boolean
-;       set to specify SIZE as areas instead of radii
-;    color : type=color
-;       color of the interior of the bubbles
-;    border_color : type=color
-;       color of the bubble border
-;    _extra : type=keywords
-;       IDLgrPolygon or IDLgrPolyline properties
-;    _ref_extra : type=keywords
-;       IDLgrPolygon or IDLgrPolyline properties
+;   size : type=float
+;     sizes of bubble; size of radius unless AREA is set, in which case it
+;     is the size of the area of the bubble
+;   area : type=boolean
+;     set to specify SIZE as areas instead of radii
+;   color : type=color
+;     color of the interior of the bubbles
+;   border_color : type=color
+;     color of the bubble border
+;   _extra : type=keywords
+;     IDLgrPolygon or IDLgrPolyline properties
+;   _ref_extra : type=keywords
+;     IDLgrPolygon or IDLgrPolyline properties
 ;-
 
+
+;= helper methods
 
 ;+
 ; Helper routine to calculate the bubble's border.
@@ -33,10 +35,10 @@
 ; :Private:
 ;
 ; :Keywords:
-;    x : out, optional, type=fltarr
-;       x-coordinates of bubble border
-;    y : out, optional, type=fltarr
-;       y-coordinates of bubble border
+;   x : out, optional, type=fltarr
+;     x-coordinates of bubble border
+;   y : out, optional, type=fltarr
+;     y-coordinates of bubble border
 ;-
 pro mggrbubble::_calculate, x=_x, y=_y
   compile_opt strictarr
@@ -48,6 +50,8 @@ pro mggrbubble::_calculate, x=_x, y=_y
   _y = self.y + r * sin(t)
 end
 
+
+;= property access
 
 ;+
 ; Get bubble properties.
@@ -123,27 +127,34 @@ pro mggrbubble::setProperty, size=size, area=area, $
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Create a bubble.
 ;
+; :Returns:
+;   1 for success, 0 otherwise
+;
 ; :Params:
-;    x : in, required, type=float
-;       x-coordinate of center of bubble
-;    y : in, required, type=float
-;       y-coordinate of center of bubble
-;    z : in, optional, type=float, default=1.0
-;       z-coordinate of center of bubble
+;   x : in, required, type=float
+;     x-coordinate of center of bubble
+;   y : in, required, type=float
+;     y-coordinate of center of bubble
+;   z : in, optional, type=float, default=1.0
+;     z-coordinate of center of bubble
 ;
 ; :Keywords:
-;    size : in, optional, type=float/fltarr
-;       sizes of bubble; size of radius unless AREA is set, in which case it
-;       is the size of the area of the bubble
-;    area : in, optional, type=boolean
-;       set to specify SIZE as areas instead of radii
-;    color : in, optional, type=color, default=0B
-;       color of bubble
-;    border_color : in, optional, type=color, default=0B
-;       color of bubble edge
+;   size : in, optional, type=float/fltarr
+;     sizes of bubble; size of radius unless AREA is set, in which case it
+;     is the size of the area of the bubble
+;   area : in, optional, type=boolean
+;     set to specify SIZE as areas instead of radii
+;   color : in, optional, type=color, default=0B
+;     color of bubble
+;   border_color : in, optional, type=color, default=0B
+;     color of bubble edge
+;   _extra : in, optional, type=keywords
+;     keyword to `IDLgrModel::init`
 ;-
 function mggrbubble::init, x, y, z, size=size, area=area, $
                            color=color, border_color=borderColor, _extra=e
@@ -181,16 +192,16 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    n
-;       number of points in the border of the bubble
-;    x
-;       x-coordinate of the center of the bubble
-;    y
-;       y-coordinate of the center of the bubble
-;    size
-;       size of the bubble
-;    area
-;       flag indicating whether size is a radius or the area of the bubble
+;   n
+;     number of points in the border of the bubble
+;   x
+;     x-coordinate of the center of the bubble
+;   y
+;     y-coordinate of the center of the bubble
+;   size
+;     size of the bubble
+;   area
+;     flag indicating whether size is a radius or the area of the bubble
 ;-
 pro mggrbubble__define
   compile_opt strictarr

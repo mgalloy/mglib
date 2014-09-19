@@ -5,23 +5,23 @@
 ;
 ; Here's a good reference for making these types of tables::
 ;
-;    http://i-ocean.blogspot.com/2008/10/using-spots-and-rings-in-tables.html
+;   http://i-ocean.blogspot.com/2008/10/using-spots-and-rings-in-tables.html
 ;
 ; :Todo:
-;    * height/width ratio needs some work
-;    * there are several magic numbers: should these be calculated in some way
-;      or be set through keywords?
-;    * should normalize by row or column, not by the entire data matrix
-;    * might need to calculate area of annulus instead of radii
+;   * height/width ratio needs some work
+;   * there are several magic numbers: should these be calculated in some way
+;     or be set through keywords?
+;   * should normalize by row or column, not by the entire data matrix
+;   * might need to calculate area of annulus instead of radii
 ;
 ; :Examples:
-;    Run the main-level example program at the end of this file with::
+;   Run the main-level example program at the end of this file with::
 ;
-;       IDL> .run mg_spotmatrix
+;     IDL> .run mg_spotmatrix
 ;
-;    This should produce:
+;   This should produce:
 ;
-;    .. image:: spotmatrix.png
+;   .. image:: spotmatrix.png
 ;-
 
 
@@ -29,12 +29,16 @@
 ; Make a circle, filled in proportionally to its normalized value.
 ;
 ; :Params:
-;    val : in, required, type=float
-;       normalized value
-;    x : in, required, type=float
-;       x value for center of glyph
-;    y : in, required, type=float
-;       y value for center of glyph
+;   val : in, required, type=float
+;     normalized value
+;   x : in, required, type=float
+;     x value for center of glyph
+;   y : in, required, type=float
+;     y value for center of glyph
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `POLYFILL`
 ;-
 pro mg_spotmatrix_makeglyph, val, x, y, _extra=e
   compile_opt strictarr
@@ -57,14 +61,23 @@ end
 ; Create spot matrix table.
 ;
 ; :Params:
-;    data : in, required, type="fltarr(n, m)"
-;       data to present in tabular format
-;    colTitles : in, required, type=strarr(n)
-;       column headers
-;    rowTitles : in, required, type=strarr(m)
-;       row headers
+;   data : in, required, type="fltarr(n, m)"
+;     data to present in tabular format
+;   colTitles : in, required, type=strarr(n)
+;     column headers
+;   rowTitles : in, required, type=strarr(m)
+;     row headers
+;
+; :Keywords:
+;   color : in, optional, type=integer
+;     color of axes
+;   title_color : in, optional, type=integer
+;     color of title
+;   _extra : in, optional, type=keywords
+;     keywords to `PLOT`, `XYOUTS`, and/or `POLYFILL`
 ;-
-pro mg_spotmatrix, data, colTitles, rowTitles, color=color, title_color=titleColor, _extra=e
+pro mg_spotmatrix, data, colTitles, rowTitles, $
+                   color=color, title_color=titleColor, _extra=e
   compile_opt strictarr
 
   ; normal data

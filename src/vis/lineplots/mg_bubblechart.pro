@@ -4,13 +4,13 @@
 ; Create a simple bubblechart.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_bubblechart
+;     IDL> .run mg_bubblechart
 ;
-;    This should produce the following:
+;   This should produce the following:
 ;
-;    .. image:: bubblechart.png
+;   .. image:: bubblechart.png
 ;-
 
 
@@ -18,16 +18,18 @@
 ; Plot the bubbles.
 ;
 ; :Params:
-;    x : in, required, type=fltarr
-;    y: in, required, type=fltarr
+;   x : in, required, type=fltarr
+;     x-coorindates of bubble centers
+;   y : in, required, type=fltarr
+;     y-coorindates of bubble centers
 ;
 ; :Keywords:
-;    size : in, required, type=fltarr
-;       array of bubble sizes
-;    color : in, required, type=bytarr/lonarr
-;       array of color values
-;    _extra : in, optional, type=keywords
-;       POLYFILL keywords
+;   size : in, required, type=fltarr
+;     array of bubble sizes
+;   color : in, required, type=bytarr/lonarr
+;     array of color values
+;   _extra : in, optional, type=keywords
+;     `POLYFILL` keywords
 ;-
 pro mg_bubblechart_overplot, x, y, size=size, color=color, _extra=e
   compile_opt strictarr
@@ -48,6 +50,27 @@ end
 
 
 ;+
+; Make bubble chart.
+;
+; :Params:
+;   x : in, required, type=fltarr
+;     x-coorindates of bubble centers
+;   y : in, required, type=fltarr
+;     y-coorindates of bubble centers
+;
+; :Keywords:
+;   size : in, required, type=fltarr
+;     array of bubble sizes
+;   area : in, optional, type=boolean
+;     set to indicate `SIZE` is an area not a radius
+;   color : in, required, type=bytarr/lonarr
+;     array of color values
+;   axes_color : in, optional, type=integer
+;     color of axes
+;   overplot : in, optional, type=boolean
+;     set to overplot
+;   _extra : in, optional, type=keywords
+;     `PLOT` and/or `POLYFILL` keywords
 ;-
 pro mg_bubblechart, x, y, size=size, area=area, $
                     color=color, axes_color=axesColor, $

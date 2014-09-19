@@ -29,6 +29,12 @@
 ;     attribute identifier, set to file identifier if `GLOBAL` is set
 ;   attnum : in, required, type=long
 ;     attribute index
+;
+; :Keywords:
+;   global : in, optional, type=boolean
+;     set for global attributes
+;   indent : in, optional, type=string, default=''
+;     indent prefix
 ;-
 function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
                                       indent=indent
@@ -88,6 +94,8 @@ function mgffncbase::_printAttribute, parent_id, id, attnum, global=global, $
 end
 
 
+;= property access
+
 ;+
 ; Get properties.
 ;-
@@ -110,8 +118,13 @@ pro mgffncbase::setProperty
 end
 
 
+;= operator overloading methods
+
 ;+
 ; `HELP` overload common routine.
+;
+; :Returns:
+;   string
 ;
 ; :Params:
 ;   varname : in, required, type=string
@@ -132,6 +145,8 @@ function mgffncbase::_overloadHelp, varname, type=type, specs=specs
   return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources.

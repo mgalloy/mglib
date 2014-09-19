@@ -5,6 +5,15 @@
 ; color names
 ;-
 
+;+
+; Widget dialog for picking a color.
+;
+; :Returns:
+;   integer status
+;
+; :Bugs:
+;   not implemented
+;-
 function mg_dialog_pickcolor
   compile_opt strictarr
 

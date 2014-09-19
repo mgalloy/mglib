@@ -7,13 +7,13 @@
 ; :Private:
 ;
 ; :Returns:
-;    color name as string
+;   color name as string
 ;
 ; :Params:
-;    node : in, required, type=object
-;       object with a `getProperty` method
-;    attrname : in, required, type=string
-;       name of attribute (property) to retrieve
+;   node : in, required, type=object
+;     object with a `getProperty` method
+;   attrname : in, required, type=string
+;     name of attribute (property) to retrieve
 ;-
 function mg_graph2dot_getattr, node, attrname
   compile_opt strictarr
@@ -40,13 +40,13 @@ end
 ; `dot language <http://www.graphviz.org/content/dot-language>`
 ;
 ; :Todo:
-;    handle more node, edge, and graph attributes
+;   handle more node, edge, and graph attributes
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of `.dot` file to write
-;    graph : in, required, type=IDL_Container
-;       `IDL_Container` of objects with `CHILDREN` and `NAME` properties
+;   filename : in, required, type=string
+;     filename of `.dot` file to write
+;   graph : in, required, type=IDL_Container
+;     `IDL_Container` of objects with `CHILDREN` and `NAME` properties
 ;-
 pro mg_graph2dot, filename, graph
   compile_opt strictarr

@@ -5,21 +5,35 @@
 ; by Sidharth Thakur and Theresa-Marie Rhyne.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_datavase
+;     IDL> .run mg_datavase
 ;
-;    This should produce the following:
+;   This should produce the following:
 ;
-;    .. image:: datavase.png
+;   .. image:: datavase.png
 ;-
 
 ;+
+; Create a datavase plot.
+;
 ; :Params:
-;    x : in, required, type=fltarr(n)
-;       independent variable
-;    data : in, required, type="fltarr(m, n)"
-;       m data sets of n elements each
+;   x : in, required, type=fltarr(n)
+;     independent variable
+;   data : in, required, type="fltarr(m, n)"
+;     `m` data sets of `n` elements each
+;
+; :Keywords:
+;   xstyle : in, optional, type=integer default=0
+;     style bitmask for x-axis
+;   ystyle : in, optional, type=integer default=0
+;     style bitmask for y-axis
+;   axes_color : in, optional, type=integer
+;     color for axes
+;   colors : in, optional, type=integer, default='ffffff'x
+;     colors for each dataset
+;   _extra : in, optional, type=keywords
+;     keywords to `PLOT`
 ;-
 pro mg_datavase, x, data, $
                  xstyle=xstyle, ystyle=ystyle, $

@@ -1,5 +1,23 @@
 ; docformat = 'rst'
 
+;+
+; Get a message for a given general response code.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   code : in, required, type=integer
+;     response code
+;
+; :Keywords:
+;   description : in, optional, type=boolean
+;     set to return a full description message instead of a name
+;   found : out, optional, type=boolean
+;     set to a named variable to retrieve whether the status code was found
+;-
 function mg_responsecode_message_general, code, description=description, found=found
   compile_opt strictarr
 
@@ -87,6 +105,18 @@ function mg_responsecode_message_general, code, description=description, found=f
 end
 
 
+;+
+; Get a message for a given HTTP response code.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   code : in, required, type=integer
+;     response code
+;-
 function mg_responsecode_message_http, code
   compile_opt strictarr
 
@@ -150,6 +180,19 @@ function mg_responsecode_message_http, code
   endcase
 end
 
+
+;+
+; Get a message for a given FTP response code.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   code : in, required, type=integer
+;     response code
+;-
 function mg_responsecode_message_ftp, code
   compile_opt strictarr
 
@@ -210,6 +253,22 @@ function mg_responsecode_message_ftp, code
 end
 
 
+;+
+; Get a message for a given response code.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   code : in, required, type=integer
+;     response code
+;
+; :Keywords:
+;   description : in, optional, type=boolean
+;     set to return a full description message instead of a name
+;   ftp : in, optional, type=boolean
+;     set to return FTP response codes
+;-
 function mg_responsecode_message, code, description=description, ftp=ftp
   compile_opt strictarr
 

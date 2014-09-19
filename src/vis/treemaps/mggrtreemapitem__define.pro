@@ -1,5 +1,26 @@
 ; docformat = 'rst'
 
+
+;+
+; Treemap item object.
+;
+; :Properties:
+;   size
+;     size of item
+;   bounds
+;     `MGgrRect` giving bounds
+;   depth
+;     depth of item
+;   order
+;     order of item
+;-
+
+
+;= property access
+
+;+
+; Get properties.
+;-
 pro mggrtreemapitem::getProperty, size=size, bounds=bounds, depth=depth, $
                                   order=order
   compile_opt strictarr
@@ -11,8 +32,11 @@ pro mggrtreemapitem::getProperty, size=size, bounds=bounds, depth=depth, $
 end
 
 
+;+
+; Set properties.
+;-
 pro mggrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
-                                   order=order
+                                  order=order
   compile_opt strictarr
 
   if (n_elements(size) gt 0L) then self.size = size
@@ -22,6 +46,11 @@ pro mggrtreemapitem::setProperty, size=size, bounds=bounds, depth=depth, $
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mggrtreemapitem::cleanup
   compile_opt strictarr
 
@@ -29,6 +58,12 @@ pro mggrtreemapitem::cleanup
 end
 
 
+;+
+; Create treemap item object.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;-
 function mggrtreemapitem::init, size=size, bounds=bounds, $
                                 depth=depth, order=order
   compile_opt strictarr
@@ -37,6 +72,9 @@ function mggrtreemapitem::init, size=size, bounds=bounds, $
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mggrtreemapitem__define
   compile_opt strictarr
 

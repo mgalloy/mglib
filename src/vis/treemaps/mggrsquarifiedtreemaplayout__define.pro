@@ -1,19 +1,29 @@
 ; docformat = 'rst'
 
-pro mggrsquarifiedtreemaplayout::getProperty, name=name, description=description
-  compile_opt strictarr
-
-  if (arg_present(name)) then name = 'Squarified'
-  if (arg_present(description)) then description = 'Algorithm used by J.J. van Wijk'
-end
-
-
-pro mggrsquarifiedtreemaplayout::setProperty
-  compile_opt strictarr
-
-end
+;+
+; Squarified treemap layout.
+;
+; :Properties:
+;   name
+;     name of layout
+;   description
+;     description of layout
+;-
 
 
+;+
+; Layout.
+;
+; :Params:
+;   items : in, required, type=list
+;     list of objects with a `SIZE` property
+;   startPos : in, required, type=integer
+;     start index of `items`
+;   endPos : in, required, type=integer
+;     end index of `items`
+;   bounds : in, required, type=`MGgrRect`
+;     rectangle to slice layout with
+;-
 pro mggrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
   compile_opt strictarr
 
@@ -65,6 +75,18 @@ pro mggrsquarifiedtreemaplayout::layout, items, startPos, endPos, bounds
 end
 
 
+;+
+; Calculate aspect ratio.
+;
+; :Returns:
+;   float
+;
+; :Params:
+;   big : in, required, type=float
+;   small : in, required, type=float
+;   a : in, required, type=float
+;   b : in, required, type=float
+;-
 function mggrsquarifiedtreemaplayout::aspect, big, small, a, b
   compile_opt strictarr
 
@@ -72,6 +94,19 @@ function mggrsquarifiedtreemaplayout::aspect, big, small, a, b
 end
 
 
+;+
+; Calculate value which normalizes aspect ratios less than 1, or aspect ratio
+; itself if bigger than 1.
+;
+; :Returns:
+;   float
+;
+; :Params:
+;   big : in, required, type=float
+;   small : in, required, type=float
+;   a : in, required, type=float
+;   b : in, required, type=float
+;-
 function mggrsquarifiedtreemaplayout::normAspect, big, small, a, b
   compile_opt strictarr
 
@@ -80,6 +115,20 @@ function mggrsquarifiedtreemaplayout::normAspect, big, small, a, b
 end
 
 
+;+
+; Find total size of items.
+;
+; :Returns:
+;   float
+;
+; :Params:
+;   items : in, required, type=list
+;     list of objects with a `SIZE` property
+;   startPos : in, required, type=integer
+;     start index of `items`
+;   endPos : in, required, type=integer
+;     end index of `items`
+;-
 function mggrsquarifiedtreemaplayout::sum, items, startPos, endPos
   compile_opt strictarr
 
@@ -93,6 +142,33 @@ function mggrsquarifiedtreemaplayout::sum, items, startPos, endPos
 end
 
 
+;= property access
+
+;+
+; Get properties.
+;-
+pro mggrsquarifiedtreemaplayout::getProperty, name=name, description=description
+  compile_opt strictarr
+
+  if (arg_present(name)) then name = 'Squarified'
+  if (arg_present(description)) then description = 'Algorithm used by J.J. van Wijk'
+end
+
+
+;+
+; Set properties.
+;-
+pro mggrsquarifiedtreemaplayout::setProperty
+  compile_opt strictarr
+
+end
+
+
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mggrsquarifiedtreemaplayout::cleanup
   compile_opt strictarr
 
@@ -100,6 +176,12 @@ pro mggrsquarifiedtreemaplayout::cleanup
 end
 
 
+;+
+; Create squarified treemap layout object.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;-
 function mggrsquarifiedtreemaplayout::init
   compile_opt strictarr
 
@@ -107,6 +189,9 @@ function mggrsquarifiedtreemaplayout::init
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mggrsquarifiedtreemaplayout__define
   compile_opt strictarr
 

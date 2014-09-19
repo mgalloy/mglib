@@ -31,8 +31,25 @@
 ;    Michael Galloy
 ;-
 
+
+;= IDLffXMLSAX parser methods
+
 ;+
+; Called to process the opening of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
 ;-
 pro mg_xml_browser_parser::startElement, uri, local, name, attName, attValue
   compile_opt strictarr
@@ -47,7 +64,17 @@ end
 
 
 ;+
+; Called to process the closing of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   name : in, required, type=string
+;     element name
 ;-
 pro mg_xml_browser_parser::endElement, uri, local, name
   compile_opt strictarr
@@ -57,7 +84,13 @@ end
 
 
 ;+
+; Called to process character data in an XML file.
+;
 ; :Private:
+;
+; :Params:
+;   chars : in, required, type=string
+;     characters detected by parser
 ;-
 pro mg_xml_browser_parser::characters, chars
   compile_opt strictarr
@@ -69,7 +102,16 @@ end
 
 
 ;+
+; Create an XML browser parser.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   root : in, required, type=long
+;     `WIDGET_TREE` widget identifier
 ;-
 function mg_xml_browser_parser::init, root=root
   compile_opt strictarr
@@ -82,6 +124,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_xml_browser_parser__define
@@ -94,18 +138,20 @@ pro mg_xml_browser_parser__define
 end
 
 
+;= widget helper routines
+
 ;+
 ; Resize the browser to the given size.
 ;
 ; :Private:
 ;
 ; :Params:
-;    tlb : in, required, type=long
-;       widget identifier of top-level base
-;    x : in, required, type=long
-;       new xsize of the tlb
-;    y : in, required, type=long
-;       new ysize of the tlb
+;   tlb : in, required, type=long
+;     widget identifier of top-level base
+;   x : in, required, type=long
+;     new xsize of the tlb
+;   y : in, required, type=long
+;     new ysize of the tlb
 ;-
 pro mg_xml_browser_resize, tlb, x, y
   compile_opt strictarr
@@ -131,12 +177,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tlb : in, required, type=long
-;       widget identifier of top-level base
+;   tlb : in, required, type=long
+;     widget identifier of top-level base
 ;
 ; :Keywords:
-;    expand : in, optional, type=boolean
-;       set to 1 to expand widget tree, 0 to contract it
+;   expand : in, optional, type=boolean
+;     set to 1 to expand widget tree, 0 to contract it
 ;-
 pro mg_xml_browser_expand, tlb, expand=expand
   compile_opt strictarr
@@ -152,8 +198,8 @@ end
 ; :Private:
 ;
 ; :Params:
-;    event : in, required, type=structure
-;       events from any of the widgets in the browser
+;   event : in, required, type=structure
+;     events from any of the widgets in the browser
 ;-
 pro mg_xml_browser_event, event
   compile_opt strictarr
@@ -179,14 +225,16 @@ end
 ; :Private:
 ;
 ; :Params:
-;    tlb : in, required, type=long
-;       top-level base widget identifier
+;   tlb : in, required, type=long
+;      top-level base widget identifier
 ;-
 pro mg_xml_browser_cleanup, tlb
   compile_opt strictarr
 
 end
 
+
+;= main routine
 
 ;+
 ; Start a widget program to browse an XML file.

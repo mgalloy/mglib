@@ -1,19 +1,21 @@
 ; docformat = 'rst'
 
 ;+
-; MG_TIMELINE is a timeline creation routine which creates a PostScript output
+; `MG_TIMELINE` is a timeline creation routine which creates a PostScript output
 ; file from an XML input file.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_timeline
+;     IDL> .run mg_timeline
 ;
-;    This should produce a timeline; below is a small section of it:
+;   This should produce a timeline; below is a small section of it:
 ;
-;    .. image:: athletic-thumbnail.png
+;   .. image:: athletic-thumbnail.png
 ;-
 
+
+;= helper routines
 
 ;+
 ; Helper routine to convert dates like "1-1-2009" to Julian dates.
@@ -21,11 +23,11 @@
 ; :Private:
 ;
 ; :Returns:
-;    double
+;   double
 ;
 ; :Params:
-;    date : in, required, type=string
-;       date like "1-1-2009"
+;   date : in, required, type=string
+;     date like "1-1-2009"
 ;-
 function mg_timeline_julday, date
   compile_opt strictarr
@@ -34,7 +36,12 @@ function mg_timeline_julday, date
   return, julday(long(tokens[0]), long(tokens[1]), long(tokens[2]), 0., 0., 0.)
 end
 
+
+;= property access for MG_TimelineText
+
 ;+
+; Get properties.
+;
 ; :Private:
 ;-
 pro mg_timelinetext::getProperty, text=text, color=color, date=date, $
@@ -50,6 +57,8 @@ end
 
 
 ;+
+; Set properties.
+;
 ; :Private:
 ;-
 pro mg_timelinetext::setProperty, text=text, color=color, date=date, $
@@ -64,7 +73,11 @@ pro mg_timelinetext::setProperty, text=text, color=color, date=date, $
 end
 
 
+;= lifecycle methods for MG_TimelineText
+
 ;+
+; Free resources.
+;
 ; :Private:
 ;-
 pro mg_timelinetext::cleanup
@@ -75,7 +88,12 @@ end
 
 
 ;+
+; Create timeline text object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
 ;-
 function mg_timelinetext::init
   compile_opt strictarr
@@ -87,6 +105,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_timelinetext__define
@@ -102,7 +122,11 @@ pro mg_timelinetext__define
 end
 
 
+;= property access for MG_TimelineActivity
+
 ;+
+; Get properties.
+;
 ; :Private:
 ;-
 pro mg_timelineactivity::getProperty, name=name, color=color, value=value, $
@@ -119,6 +143,8 @@ end
 
 
 ;+
+; Set properties.
+;
 ; :Private:
 ;-
 pro mg_timelineactivity::setProperty, name=name, color=color, value=value, $
@@ -134,7 +160,11 @@ pro mg_timelineactivity::setProperty, name=name, color=color, value=value, $
 end
 
 
+;= lifecycle methods for MG_TimelineActivity
+
 ;+
+; Free resources.
+;
 ; :Private:
 ;-
 pro mg_timelineactivity::cleanup
@@ -145,7 +175,12 @@ end
 
 
 ;+
+; Create a timeline activity object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
 ;-
 function mg_timelineactivity::init
   compile_opt strictarr
@@ -160,6 +195,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_timelineactivity__define
@@ -176,7 +213,11 @@ pro mg_timelineactivity__define
 end
 
 
+;= property access for MG_TimelineInterval
+
 ;+
+; Get properties.
+;
 ; :Private:
 ;-
 pro mg_timelineinterval::getProperty, name=name, color=color, $
@@ -193,6 +234,8 @@ end
 
 
 ;+
+; Set properties.
+;
 ; :Private:
 ;-
 pro mg_timelineinterval::setProperty, name=name, color=color, $
@@ -208,7 +251,11 @@ pro mg_timelineinterval::setProperty, name=name, color=color, $
 end
 
 
+;= lifecycle methods for MG_TimelineInterval
+
 ;+
+; Free resources.
+;
 ; :Private:
 ;-
 pro mg_timelineinterval::cleanup
@@ -219,7 +266,12 @@ end
 
 
 ;+
+; Create a timeline interval object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
 ;-
 function mg_timelineinterval::init
   compile_opt strictarr
@@ -231,6 +283,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_timelineinterval__define
@@ -246,7 +300,11 @@ pro mg_timelineinterval__define
 end
 
 
+;= property access for MG_TimelineEvent
+
 ;+
+; Get properties.
+;
 ; :Private:
 ;-
 pro mg_timelineevent::getProperty, text=text, color=color, date=date, level=level
@@ -260,6 +318,8 @@ end
 
 
 ;+
+; Set properties.
+;
 ; :Private:
 ;-
 pro mg_timelineevent::setProperty, text=text, color=color, date=date, level=level
@@ -272,7 +332,11 @@ pro mg_timelineevent::setProperty, text=text, color=color, date=date, level=leve
 end
 
 
+;= lifecycle methods for MG_TimelineEvent
+
 ;+
+; Free resources.
+;
 ; :Private:
 ;-
 pro mg_timelineevent::cleanup
@@ -283,7 +347,12 @@ end
 
 
 ;+
+; Create timeline event object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
 ;-
 function mg_timelineevent::init
   compile_opt strictarr
@@ -295,6 +364,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_timelineevent__define
@@ -309,7 +380,11 @@ pro mg_timelineevent__define
 end
 
 
+;= property access for MG_Timeline
+
 ;+
+; Get properties.
+;
 ; :Private:
 ;-
 pro mg_timeline::getProperty, start_date=startDate, end_date=endDate, $
@@ -332,8 +407,24 @@ pro mg_timeline::getProperty, start_date=startDate, end_date=endDate, $
 end
 
 
+;= IDLffXMLSAX parser methods for MG_Timeline
+
 ;+
+; Called to process the opening of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   qname : in, required, type=string
+;     element name
+;   attName : in, optional, type=strarr
+;     names of attributes
+;   attValue : in, optional, type=strarr
+;     attribute values
 ;-
 pro mg_timeline::startElement, uri, local, qname, attname, attvalue
   compile_opt strictarr
@@ -442,7 +533,17 @@ end
 
 
 ;+
+; Called to process the closing of a tag.
+;
 ; :Private:
+;
+; :Params:
+;   uri : in, required, type=string
+;     namespace URI
+;   local : in, required, type=string
+;     element name with prefix removed
+;   qname : in, required, type=string
+;     element name
 ;-
 pro mg_timeline::endElement, uri, local, qname
   compile_opt strictarr
@@ -459,7 +560,13 @@ end
 
 
 ;+
+; Called to process character data in an XML file.
+;
 ; :Private:
+;
+; :Params:
+;   chars : in, required, type=string
+;     characters detected by parser
 ;-
 pro mg_timeline::characters, chars
   compile_opt strictarr
@@ -481,7 +588,11 @@ pro mg_timeline::characters, chars
 end
 
 
+;= lifecycle methods for MG_Timeline
+
 ;+
+; Free resources.
+;
 ; :Private:
 ;-
 pro mg_timeline::cleanup
@@ -492,7 +603,16 @@ end
 
 
 ;+
+; Create timeline object.
+;
 ; :Private:
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `IDLffXMLSAX::init`
 ;-
 function mg_timeline::init, _extra=e
   compile_opt strictarr
@@ -514,6 +634,8 @@ end
 
 
 ;+
+; Define instance variables.
+;
 ; :Private:
 ;-
 pro mg_timeline__define
@@ -542,10 +664,10 @@ end
 ; Create a timeline from the given input file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       input XML file
-;    outputFilename : in, required, type=string
-;       name of PostScript output file
+;   filename : in, required, type=string
+;     input XML file
+;   outputFilename : in, required, type=string
+;     name of PostScript output file
 ;-
 pro mg_timeline, filename, outputFilename
   compile_opt strictarr

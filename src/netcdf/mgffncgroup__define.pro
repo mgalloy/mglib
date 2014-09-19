@@ -39,7 +39,7 @@
 ;   found : out, optional, type=boolean
 ;     set to a named variable to get whether the attribute was found
 ;-
-function mgffncvariable::_getAttribute, name, found=found
+function mgffncgroup::_getAttribute, name, found=found
   compile_opt strictarr
 
   found = 0B
@@ -58,6 +58,8 @@ function mgffncvariable::_getAttribute, name, found=found
   return, !null
 end
 
+
+;= property access
 
 ;+
 ; Get properties.

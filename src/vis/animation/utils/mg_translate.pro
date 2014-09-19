@@ -1,10 +1,18 @@
+; docformat = 'rst'
+
 ;+
 ; Compute a transformation matrix representing a translation.
 ;
-; @returns fltarr(4, 4)
-; @param x {in}{required}{type=float} amount to translate target in x-direction
-; @param y {in}{required}{type=float} amount to translate target in y-direction
-; @param z {in}{required}{type=float} amount to translate target in z-direction
+; :Returns:
+;   `fltarr(4, 4)`
+;
+; :Params:
+;   x : in, required, type=float
+;     amount to translate target in x-direction
+;   y : in, required, type=float
+;     amount to translate target in y-direction
+;   z : in, required, type=float
+;     amount to translate target in z-direction
 ;-
 function mg_translate, x, y, z
   compile_opt strictarr

@@ -22,7 +22,7 @@ end
 ; Create IDL_Object object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;-
 function idl_object::init
   compile_opt strictarr
@@ -35,12 +35,12 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    idl_object_top
-;       just to match IDL's IDL_Object
-;    __obj__
-;       just to match IDL's IDL_Object
-;    idl_object_bottom
-;       just to match IDL's IDL_Object
+;   idl_object_top
+;     just to match IDL's IDL_Object
+;   __obj__
+;     just to match IDL's IDL_Object
+;   idl_object_bottom
+;     just to match IDL's IDL_Object
 ;-
 pro idl_object__define
   compile_opt strictarr

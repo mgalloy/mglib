@@ -4,39 +4,45 @@
 ; Create an image of a pie chart using the Google Charts API.
 ;
 ; :Requires:
-;    IDL 6.4
+;   IDL 6.4
 ;
 ; :Examples:
-;    Running the main-level example at the end of this file::
+;   Running the main-level example at the end of this file::
 ;
-;       IDL> .run mg_gc_barchart
+;     IDL> .run mg_gc_barchart
 ;
-;    produces:
+;   produces:
 ;
-;    .. image:: profiles_barchart.png
+;   .. image:: profiles_barchart.png
 ;
 ; :Returns:
-;    bytarr(3, xsize, ysize)
+;   `bytarr(3, xsize, ysize)`
 ;
 ; :Params:
-;    data : in, required, type=fltarr
-;       vector of values of slices
+;   data : in, required, type=fltarr
+;     vector of values of slices
 ;
 ; :Keywords:
-;    dimensions : in, optional, type=lonarr, default="[200, 100]"
-;       size of output image
-;    title : in, optional, type=string or strarr
-;       title of the chart
-;    horizontal : in, optional, type=boolean, default=0
-;       set to create horizontal vars
-;    vertical : in, optional, type=boolean, default=1
-;       set to create vertical bars; the default
-;    label : in, optional, type=strarr
-;       labels for pie slices
-;    color : in, optional, type=lonarr
-;       colors of the slices
-;    url : out, optional, type=string
-;       URL used by Google Charts API
+;   dimensions : in, optional, type=lonarr, default="[200, 100]"
+;     size of output image
+;   title : in, optional, type=string or strarr
+;     title of the chart
+;   horizontal : in, optional, type=boolean, default=0
+;     set to create horizontal vars
+;   vertical : in, optional, type=boolean, default=1
+;     set to create vertical bars; the default
+;   label : in, optional, type=strarr
+;     labels for pie slices
+;   color : in, optional, type=lonarr
+;     colors of the slices
+;   bar_width : in, optional, type=numeric, default=10
+;     width of bar
+;   bar_spacing : in, optional, type=numeric, default=5
+;     space between bars
+;   group_spacing : in, optional, type=numeric, default=10
+;     space between groups
+;   url : out, optional, type=string
+;      URL used by Google Charts API
 ;-
 function mg_gc_barchart, data, dimensions=dimensions, title=title, $
                          horizontal=horizontal, vertical=vertical, $

@@ -1,5 +1,20 @@
 ; docformat = 'rst'
 
+;+
+; Create a treemap.
+;
+; :Todo:
+;   not implemented
+;
+; :Params:
+;   items : in, required, type=collection
+;
+; :Keywords:
+;   vertices : out, optional, type="fltarr(2, n)"
+;     vertices of treemap
+;   polygons : out, optional, type=lonarr
+;     connectivity list
+;-
 pro mg_treemap, items, vertices=vertices, polygons=polygons
   compile_opt strictarr
 

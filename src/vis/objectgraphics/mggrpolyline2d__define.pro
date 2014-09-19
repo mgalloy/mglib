@@ -1,5 +1,20 @@
 ; docformat = 'rst'
 
+
+;+
+; Create the polyline atoms.
+;
+; :Private:
+;
+; :Todo:
+;   implement
+;
+; :Params:
+;   x : in, required, type=fltarr
+;     x-coordinates of lines
+;   y : in, required, type=fltarr
+;     y-coordinates of lines
+;-
 pro mggrpolyline2d::_create, x, y
   compile_opt strictarr
 
@@ -13,6 +28,24 @@ pro mggrpolyline2d::_create, x, y
 end
 
 
+;= lifecycle methods
+
+;+
+; Create polyline object.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Params:
+;   x : in, required, type=fltarr
+;     x-coordinates of lines
+;   y : in, required, type=fltarr
+;     y-coordinates of lines
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `IDLgrSurface::init`
+;-
 function mggrpolyline2d::init, x, y, _extra=e
   compile_opt strictarr
 
@@ -24,6 +57,9 @@ function mggrpolyline2d::init, x, y, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mggrpolyline2d__define
   compile_opt strictarr
 

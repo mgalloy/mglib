@@ -3,27 +3,30 @@
 ;+
 ; Factory function to create an array of bubbles.
 ;
+; :Returns:
+;   `objarr`
+;
 ; :Params:
-;    x : in, required, type=fltarr
-;       x-coordinates of bubbles to create
-;    y : in, required, type=fltarr
-;       y-coordinates of bubbles to create
+;   x : in, required, type=fltarr
+;     x-coordinates of bubbles to create
+;   y : in, required, type=fltarr
+;     y-coordinates of bubbles to create
 ;
 ; :Keywords:
-;    sizes : in, optional, type=float/fltarr
-;       sizes of bubbles to cycle through; size of radius unless AREA is set,
-;       in which case it is the size of the area of the bubble
-;    area : in, optional, type=boolean
-;       set to specify SIZES as areas instead of radii
-;    colors : in, optional, type=bytarr
-;       colors to cycle through, can be a 1-dimensional array of indices or
-;       2-dimensional (i.e., m x 3) array of RGB color values
-;    border_colors : in, optional, type=bytarr
-;       colors to cycle through for the bubble border, can be a 1-dimensional
-;       array of indices or 2-dimensional (i.e., m x 3) array of RGB color
-;       values
-;    _extra : in, optional, type=keywords
-;       keywords to `MGgrBubble`::init
+;   sizes : in, optional, type=float/fltarr
+;     sizes of bubbles to cycle through; size of radius unless AREA is set,
+;     in which case it is the size of the area of the bubble
+;   area : in, optional, type=boolean
+;     set to specify SIZES as areas instead of radii
+;   colors : in, optional, type=bytarr
+;     colors to cycle through, can be a 1-dimensional array of indices or
+;     2-dimensional (i.e., m x 3) array of RGB color values
+;   border_colors : in, optional, type=bytarr
+;     colors to cycle through for the bubble border, can be a 1-dimensional
+;     array of indices or 2-dimensional (i.e., m x 3) array of RGB color
+;     values
+;   _extra : in, optional, type=keywords
+;     keywords to `MGgrBubble`::init
 ;-
 function mg_create_bubbles, x, y, sizes=sizes, area=area, $
                             colors=colors, border_colors=borderColors, $

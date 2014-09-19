@@ -5,11 +5,15 @@
 ; characters with backslashes.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    line : in, required, type=string
-;       line to filter
+;   line : in, required, type=string
+;     line to filter
+;
+; :Keywords:
+;   code : in, optional, type=boolean
+;     set to not escape
 ;-
 function mg_escape_latex, line, code=code
   compile_opt strictarr

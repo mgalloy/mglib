@@ -4,14 +4,14 @@
 ; Object that converts strings to values that are safe to use in URLs.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mgneturlquoter__define
+;     IDL> .run mgneturlquoter__define
 ;
 ; :Properties:
-;    safe : type=string
-;       string of characters that don't need to be replaced, i.e., they are
-;       safe to use in an URL; the default is `/`
+;   safe : type=string
+;     string of characters that don't need to be replaced, i.e., they are
+;     safe to use in an URL; the default is `/`
 ;-
 
 ;+
@@ -21,12 +21,15 @@
 ; :Examples:
 ;   For example::
 ;
-;      IDL> print, quoter->quote('/Boulder, CO.html')
-;      /Boulder%2C%20CO.html
+;     IDL> print, quoter->quote('/Boulder, CO.html')
+;     /Boulder%2C%20CO.html
+;
+; :Returns:
+;   string
 ;
 ; :Params:
-;    str : in, required, type=string
-;       string to convert
+;   str : in, required, type=string
+;     string to convert
 ;-
 function mgneturlquoter::quote, str
   compile_opt strictarr
@@ -47,12 +50,15 @@ end
 ; :Examples:
 ;   For example::
 ;
-;      IDL> print, quoter->quotePlus('/Boulder, CO.html')
-;      /Boulder%2C+CO.html
+;     IDL> print, quoter->quotePlus('/Boulder, CO.html')
+;     /Boulder%2C+CO.html
+;
+; :Returns:
+;   string
 ;
 ; :Params:
-;    str : in, required, type=string
-;       string to convert
+;   str : in, required, type=string
+;     string to convert
 ;-
 function mgneturlquoter::quotePlus, str
   compile_opt strictarr
@@ -75,12 +81,15 @@ end
 ; :Examples:
 ;   For example::
 ;
-;      IDL> print, quoter->unquote('/Boulder%2C%20CO.html')
-;      /Boulder, CO.html
+;     IDL> print, quoter->unquote('/Boulder%2C%20CO.html')
+;     /Boulder, CO.html
 ;
-;; :Params:
-;    str : in, required, type=string
-;       string to convert
+; :Returns:
+;   string
+;
+; :Params:
+;   str : in, required, type=string
+;     string to convert
 ;-
 function mgneturlquoter::unquote, str
   compile_opt strictarr
@@ -96,6 +105,7 @@ function mgneturlquoter::unquote, str
   endif else return, str
 end
 
+
 ;+
 ; Replace `%xx` escape sequences by their single-character equivalent and
 ; replace `+` sign with space.
@@ -103,12 +113,15 @@ end
 ; :Examples:
 ;   For example::
 ;
-;      IDL> print, quoter->unquotePlus('/Boulder%2C+CO.html')
-;      /Boulder, CO.html
+;     IDL> print, quoter->unquotePlus('/Boulder%2C+CO.html')
+;     /Boulder, CO.html
+;
+; :Returns:
+;   string
 ;
 ; :Params:
-;    str : in, required, type=string
-;       string to convert
+;   str : in, required, type=string
+;     string to convert
 ;-
 function mgneturlquoter::unquotePlus, str
   compile_opt strictarr
@@ -123,11 +136,13 @@ function mgneturlquoter::unquotePlus, str
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Create a quoter object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;-
 function mgneturlquoter::init, safe=safe
   compile_opt strictarr

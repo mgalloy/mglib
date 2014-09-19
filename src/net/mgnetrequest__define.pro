@@ -5,45 +5,45 @@
 ; TRACE, and CONNECT.
 ;
 ; :Todo:
-;    Things to do:
+;   Things to do:
 ;
-;       * handle HTTPS requests besides GET, PUT, and POST
-;       * handle proxies
-;       * write some tests
+;     * handle HTTPS requests besides GET, PUT, and POST
+;     * handle proxies
+;     * write some tests
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       b = obj_new('MGnetRequest', 'brightkite.com/people/mgalloy.xml')
-;       b->setProperty, debug=1
-;       r = b->get(response_header=h)
-;       obj_destroy, b
+;     b = obj_new('MGnetRequest', 'brightkite.com/people/mgalloy.xml')
+;     b->setProperty, debug=1
+;     r = b->get(response_header=h)
+;     obj_destroy, b
 ;
 ; :Properties:
-;    debug : type=boolean
-;       set to print debugging messages to standard output
+;   debug : type=boolean
+;     set to print debugging messages to standard output
 ;-
 
 
 ;+
-; Callback function when using IDLnetURL object.
+; Callback function when using `IDLnetURL` object.
 ;
-; :private:
+; :Private:
 ;
 ; :Returns:
-;    1 for success
+;   1 for success
 ;
 ; :Params:
-;    status : in, required, type=string
-;       status message
-;    progress : in, required, type=lonarr
-;       information about the progress of the call in a lon64arr(5)::
+;   status : in, required, type=string
+;     status message
+;   progress : in, required, type=lonarr
+;     information about the progress of the call in a `lon64arr(5)`::
 ;
-;          [isValid, isChunked, nBytesDownloaded, nBytesToBeUploaded, nBytesUploaded]
+;       [isValid, isChunked, nBytesDownloaded, nBytesToBeUploaded, nBytesUploaded]
 ;
-;    request : in, required, type=object
-;       CALLBACK_DATA variable from IDLnetURL, in our case an MGnetRequest
-;       object
+;   request : in, required, type=object
+;     `CALLBACK_DATA` variable from `IDLnetURL`, in our case an `MGnetRequest`
+;     object
 ;-
 function mgnetrequest_callback, status, progress, request
   compile_opt strictarr
@@ -64,10 +64,10 @@ end
 ; standard output.
 ;
 ; :Params:
-;    lun : in, required, type=long
-;       logical unit number of the socket connection to send the output to
-;    s : in, required, type=any
-;       variable to be printed
+;   lun : in, required, type=long
+;     logical unit number of the socket connection to send the output to
+;   s : in, required, type=any
+;     variable to be printed
 ;-
 pro mgnetrequest::_printf, lun, s
   compile_opt strictarr
@@ -80,9 +80,11 @@ end
 ;+
 ; Send the headers in the headers hash table to the given LUN.
 ;
+; :Private:
+;
 ; :Params:
-;    lun : in, required, type=long
-;       logical unit number of the socket/file to send the headers to
+;   lun : in, required, type=long
+;     logical unit number of the socket/file to send the headers to
 ;-
 pro mgnetrequest::_sendHeaders, lun
   compile_opt strictarr
@@ -101,6 +103,15 @@ pro mgnetrequest::_sendHeaders, lun
 end
 
 
+;+
+; Send headers via an `IDLnetURL` object.
+;
+; :Private:
+;
+; :Params:
+;   netURL : in, required, type=IDLnetURL
+;     `IDLnetURL` to use in emulation mode
+;-
 pro mgnetrequest::_sendHeadersNetUrl, netUrl
   compile_opt strictarr
 
@@ -129,18 +140,18 @@ end
 ; Connect via IDLnetURL instead of SOCKET.
 ;
 ; :Returns:
-;    strarr representing the body of the response to the request
+;   `strarr` representing the body of the response to the request
 ;
 ; :Params:
-;    method : in, required, type=string
-;       method to use to send the request: GET, PUT, POST, HEAD, DELETE,
-;       OPTIONS, TRACE, or CONNECT
-;    data : in, optional, type=any
-;       data to send in PUT and POST methods
+;   method : in, required, type=string
+;     method to use to send the request: GET, PUT, POST, HEAD, DELETE,
+;     OPTIONS, TRACE, or CONNECT
+;   data : in, optional, type=any
+;     data to send in PUT and POST methods
 ;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::_sendNetUrl, method, data, $
                                     response_header=responseHeaderArray
@@ -190,18 +201,18 @@ end
 ; General method for sending a request.
 ;
 ; :Returns:
-;    strarr representing the body of the response to the request
+;   `strarr` representing the body of the response to the request
 ;
 ; :Params:
-;    method : in, required, type=string
-;       method to use to send the request: GET, PUT, POST, HEAD, DELETE,
-;       OPTIONS, TRACE, or CONNECT
-;    data : in, optional, type=any
-;       data to send in PUT and POST methods
+;   method : in, required, type=string
+;     method to use to send the request: GET, PUT, POST, HEAD, DELETE,
+;     OPTIONS, TRACE, or CONNECT
+;   data : in, optional, type=any
+;     data to send in PUT and POST methods
 ;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::_send, method, data, response_header=responseHeaderArray
   compile_opt strictarr
@@ -259,9 +270,12 @@ end
 ;+
 ; Send a GET request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::get, response_header=responseHeaderArray
   compile_opt strictarr
@@ -278,9 +292,12 @@ end
 ;+
 ; Send a HEAD request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::head, response_header=responseHeaderArray
   compile_opt strictarr
@@ -293,11 +310,18 @@ end
 ; Send a PUT request.
 ;
 ; :Todo:
-;    add content body of request
+;   add content body of request
+;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
+; :Params:
+;   data : in, required, type=strarr
+;     data to send in PUT request
 ;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::put, data, response_header=responseHeaderArray
   compile_opt strictarr
@@ -315,15 +339,18 @@ end
 ; Send a POST request.
 ;
 ; :Todo:
-;    add content body of request
+;   add content body of request
+;
+; :Returns:
+;   `strarr` representing the body of the response to the request
 ;
 ; :Params:
-;    data : in, required, type=any
-;       data to be transferred
+;   data : in, required, type=any
+;     data to be transferred
 ;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::post, data, response_header=responseHeaderArray
   compile_opt strictarr
@@ -340,9 +367,12 @@ end
 ;+
 ; Send a DELETE request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::delete, response_header=responseHeaderArray
   compile_opt strictarr
@@ -358,9 +388,12 @@ end
 ;+
 ; Send a OPTIONS request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::options, response_header=responseHeaderArray
   compile_opt strictarr
@@ -376,9 +409,12 @@ end
 ;+
 ; Send a TRACE request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::trace, response_header=responseHeaderArray
   compile_opt strictarr
@@ -394,9 +430,12 @@ end
 ;+
 ; Send a CONNECT request.
 ;
+; :Returns:
+;   `strarr` representing the body of the response to the request
+;
 ; :Keywords:
-;    response_header : out, optional, type=strarr
-;       header of the response
+;   response_header : out, optional, type=strarr
+;     header of the response
 ;-
 function mgnetrequest::connect, response_header=responseHeaderArray
   compile_opt strictarr
@@ -414,10 +453,10 @@ end
 ; request, then it is replaced by the next value.
 ;
 ; :Params:
-;    key : in, required, type=string
-;       header field name
-;    value : in, required, type=string
-;       header field value
+;   key : in, required, type=string
+;     header field name
+;   value : in, required, type=string
+;     header field value
 ;-
 pro mgnetrequest::addHeader, key, value
   compile_opt strictarr
@@ -425,6 +464,8 @@ pro mgnetrequest::addHeader, key, value
   self.headers->put, key, value
 end
 
+
+;= property access
 
 ;+
 ; Get property values.
@@ -446,6 +487,8 @@ pro mgnetrequest::setProperty, debug=debug
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Free resources.
 ;-
@@ -459,15 +502,18 @@ end
 ;+
 ; Create a request object.
 ;
+; :Returns:
+;   1 for success, 0 otherwise
+;
 ; :Params:
-;    url_param : in, optional, type=string
-;       URL to send request to; either url_param parameter or URL keyword must
-;       be set to the URL to send the request to
+;   url_param : in, optional, type=string
+;     URL to send request to; either url_param parameter or URL keyword must
+;     be set to the URL to send the request to
 ;
 ; :Keywords:
-;    url : in, optional, type=string
-;       URL to send request to; either url_param parameter or URL keyword must
-;       be set to the URL to send the request to
+;   url : in, optional, type=string
+;     URL to send request to; either url_param parameter or URL keyword must
+;     be set to the URL to send the request to
 ;-
 function mgnetrequest::init, url_param, url=url, debug=debug
   compile_opt strictarr
@@ -506,16 +552,18 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    version
-;       MGnetRequest version
-;    url
-;       URL for request
-;    port
-;       port for request
-;    headers
-;       hash table of headers
-;    debug
-;       prints out header information sent and received if debug field is set
+;   version
+;     `MGnetRequest` version
+;   url
+;     URL for request
+;   port
+;     port for request
+;   scheme
+;     URL scheme, e.g., http://
+;   headers
+;     hash table of headers
+;   debug
+;     prints out header information sent and received if debug field is set
 ;-
 pro mgnetrequest__define
   compile_opt strictarr

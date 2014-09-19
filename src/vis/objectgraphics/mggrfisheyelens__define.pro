@@ -1,5 +1,25 @@
 ; docformat = 'rst'
 
+;+
+; Fisheye lens for object graphics system.
+;
+; :Properties:
+;   center
+;     location of center of fisheye lens
+;   radius
+;     radius of fisheye lens
+;   _extra
+;     properties of `IDLgrView`
+;   _ref_extra
+;     properties of `IDLgrView`
+;-
+
+
+;= helper methods
+
+;+
+; Update view.
+;-
 pro mggrfisheyelens::update
   compile_opt strictarr
   on_error, 2
@@ -34,6 +54,11 @@ pro mggrfisheyelens::update
 end
 
 
+;= property access
+
+;+
+; Set properties.
+;-
 pro mggrfisheyelens::setProperty, center=center, radius=radius, _extra=e
   compile_opt strictarr
 
@@ -44,6 +69,9 @@ pro mggrfisheyelens::setProperty, center=center, radius=radius, _extra=e
 end
 
 
+;+
+; Get properties.
+;-
 pro mggrfisheyelens::getProperty, center=center, radius=radius, _ref_extra=e
   compile_opt strictarr
 
@@ -54,6 +82,11 @@ pro mggrfisheyelens::getProperty, center=center, radius=radius, _ref_extra=e
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mggrfisheyelens::cleanup
   compile_opt strictarr
 
@@ -61,6 +94,16 @@ pro mggrfisheyelens::cleanup
 end
 
 
+;+
+; Create a fisheye lens.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `IDLgrView::init`
+;-
 function mggrfisheyelens::init, _extra=e
   compile_opt strictarr
 
@@ -75,6 +118,9 @@ function mggrfisheyelens::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mggrfisheyelens__define
   compile_opt strictarr
 

@@ -14,9 +14,37 @@
 
 ;= Operator overloading methods
 
-
-pro mg_string_hash::_overloadBracketsLeftSide, o, val, is_range, ss1, ss2, $
-                                               ss3, ss4, ss5, ss6, ss7, ss8
+;+
+; Allows setting values of the string hash by array index.
+;
+; :Params:
+;   objref : in, required, type=objref
+;     should be self
+;   value : in, required, type=any
+;     value to assign to the array list
+;   is_range : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=string
+;     hash key
+;   ss2 : in, required, type=string
+;     hash key
+;   ss3 : in, required, type=string
+;     hash key
+;   ss4 : in, required, type=string
+;     hash key
+;   ss5 : in, required, type=string
+;     hash key
+;   ss6 : in, required, type=string
+;     hash key
+;   ss7 : in, required, type=string
+;     hash key
+;   ss8 : in, required, type=string
+;     hash key
+;-
+pro mg_string_hash::_overloadBracketsLeftSide, objref, value, is_range, $
+                                               ss1, ss2, ss3, ss4, $
+                                               ss5, ss6, ss7, ss8
   compile_opt strictarr
   on_error, 2
 
@@ -74,6 +102,33 @@ pro mg_string_hash::_overloadBracketsLeftSide, o, val, is_range, ss1, ss2, $
 end
 
 
+;+
+; Allows hash access with brackets.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   is_range : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=string
+;     hash key
+;   ss2 : in, required, type=string
+;     hash key
+;   ss3 : in, required, type=string
+;     hash key
+;   ss4 : in, required, type=string
+;     hash key
+;   ss5 : in, required, type=string
+;     hash key
+;   ss6 : in, required, type=string
+;     hash key
+;   ss7 : in, required, type=string
+;     hash key
+;   ss8 : in, required, type=string
+;     hash key
+;-
 function mg_string_hash::_overloadBracketsRightSide, is_range, ss1, ss2, ss3, $
                                                      ss4, ss5, ss6, ss7, ss8
   compile_opt strictarr
@@ -134,6 +189,16 @@ end
 ;= Public methods
 
 
+;+
+; Determines if the hash has the given keys.
+;
+; :Returns:
+;   byte/`bytarr`
+;
+; :Params:
+;   keys : in, required, type=list/string/strarr
+;     keys to check
+;-
 function mg_string_hash::hasKeys, keys
   compile_opt strictarr
   on_error, 2
@@ -152,7 +217,7 @@ function mg_string_hash::hasKeys, keys
     else: message, 'invalid key type'
   endcase
 
-  return, self->hash::hasKeys()
+  return, self->hash::hasKey(_keys)
 end
 
 
@@ -164,16 +229,22 @@ end
 ; :Returns:
 ;   1 for success, 0 for failure
 ;
+; :Params:
+;   keys : in, optional, type=string/strarr/list
+;     keys
+;   values : in, optional, type=string/strarr/list
+;     values
+;
 ; :Keywords:
 ;   fold_case : in, optional, type=boolean
 ;     set to do case-insensitive lookup
 ;   _extra : in, optional, type=keywords
 ;     keywords to `hash::init`
 ;-
-function mg_string_hash::init, p1, p2, fold_case=fold_case, _extra=e
+function mg_string_hash::init, keys, values, fold_case=fold_case, _extra=e
   compile_opt strictarr
 
-  if (~self->hash::init(p1, p2, _extra=e)) then return, 0
+  if (~self->hash::init(keys, values, _extra=e)) then return, 0
 
   self.fold_case = keyword_set(fold_case)
 

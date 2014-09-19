@@ -1,7 +1,16 @@
 ; docformat = 'rst'
 
 ;+
+; Get date from date line.
+;
 ; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   line : in, required, type=string
+;     date line
 ;-
 function mg_updater_getdate, line
   compile_opt strictarr
@@ -13,7 +22,20 @@ end
 
 
 ;+
+; Get version from the version line.
+;
 ; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   line : in, required, type=string
+;     version line
+;
+; :Keywords:
+;   name : in, required, type=string
+;     name of package
 ;-
 function mg_updater_getversion, line, name=name
   compile_opt strictarr
@@ -25,7 +47,20 @@ end
 
 
 ;+
+; Parse response to web request.
+;
 ; :Private:
+;
+; :Returns:
+;   array of structures of type `{ version: '', date: '', description: '' }`
+;
+; :Params:
+;   content : in, required, type=strarr
+;     text content from web request
+;
+; :Keywords:
+;   name : in, required, type=string
+;     package name
 ;-
 function mg_updater_parser, content, name=name
   compile_opt strictarr

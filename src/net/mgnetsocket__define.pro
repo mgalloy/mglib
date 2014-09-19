@@ -27,41 +27,59 @@
 ;    (the default) no swapping is performed.
 ;
 ; :Categories:
-;    networking
+;   networking
 ;
 ; :Examples:
-;    Try the main-level program at the end of this file::
+;   Try the main-level program at the end of this file::
 ;
-;       IDL> .run mgnetsocket__define
+;     IDL> .run mgnetsocket__define
 ;
 ; :History:
-;    Original written by Randall Frank in idl_sock.c in his idl_tools DLM
-;    Modified by Rick Towler, 20 July 2007
-;    Modified by Michael Galloy
+;   Original written by Randall Frank in idl_sock.c in his idl_tools DLM
+;   Modified by Rick Towler, 20 July 2007
+;   Modified by Michael Galloy
 ;
 ; :Properties:
-;    localhost
-;    localport
-;    open
-;       true if the socket is open, false if not
-;    remotehost
-;    remoteport
-;    type
-;       type of connection: 'LISTEN_TCP', 'UDP', 'IO_TCP', 'PEERED_UDP'
+;   localhost
+;   localport
+;   open
+;     true if the socket is open, false if not
+;   remotehost
+;   remoteport
+;   type
+;     type of connection: 'LISTEN_TCP', 'UDP', 'IO_TCP', 'PEERED_UDP'
 ;-
 
 
 ;+
 ;  Connect to a TCP socket listener on a specified host and port or
 ;  opens a UDP socket and sets its default destination host and port.
+;
+; :Returns:
+;   status code, 1 for success
+;
+; :Params:
+;   destHost : in, required, type=string
+;     destination host
+;   destPort : in, required, type=integer
+;     destination port
+;
+; :Keywords:
+;   buffer : out, optional, type=bytarr
+;     buffer to write into
+;   localPort : in, optional, type=integer, default=0$
+;     set local port
+;   nodelay : in, optional, type=boolean
+;     set to connect with no delay
+;   udp : in, optional, type=boolean
+;     set to connect via UDP instead of TCP
 ;-
 function mgnetsocket::connect, destHost, $
                                destPort, $
                                buffer=buffer, $
                                localPort=locPort, $
                                nodelay=nodelay, $
-                               udp=udp, $
-                               tcp=tcp
+                               udp=udp
   compile_opt strictarr
 
   ;  check if socket is currently open
@@ -131,17 +149,18 @@ end
 ; port for you.
 ;
 ; :Returns:
+;   integer status code
 ;
 ; :Params:
-;    locPort : in, optional, type=long
-;       port to create; the OS will select an open port if this parameter is
-;       undefined or set to 0
+;   locPort : in, optional, type=long
+;     port to create; the OS will select an open port if this parameter is
+;     undefined or set to 0
 ;
 ; :Keywords:
-;    tcp : in, optional, type=boolean
-;       set to create a TCP port
-;    udp : in, optional, type=boolean
-;       set to create a UDP port
+;   tcp : in, optional, type=boolean
+;     set to create a TCP port
+;   udp : in, optional, type=boolean
+;     set to create a UDP port
 ;-
 function mgnetsocket::createPort, locPort, tcp=tcp, udp=udp
   compile_opt strictarr
@@ -183,13 +202,15 @@ end
 ; I/O can be performed.
 ;
 ; :Returns:
-;    MGnetSocket object
+;   `MGnetSocket` object
 ;
 ; :Keywords:
-;    buffer
-;    nodelay
-;    timeout : in, optional, type=long, default=0L
-;       timeout
+;   buffer : out, optional, type=bytarr
+;     buffer to write into
+;   nodelay : in, optional, type=boolean
+;     set to connect with no delay
+;   timeout : in, optional, type=long, default=0L
+;     timeout
 ;-
 function mgnetsocket::accept, buffer=buffer, nodelay=nodelay, timeout=timeout
   compile_opt strictarr
@@ -234,11 +255,11 @@ end
 ; Send data.
 ;
 ; :Returns:
-;    number of bytes send
+;   number of bytes sent
 ;
 ; :Params:
-;    data : in, required, type=array
-;       data to send
+;   data : in, required, type=array
+;     data to send
 ;-
 function mgnetsocket::send, data
   compile_opt strictarr
@@ -271,15 +292,15 @@ end
 ; Send data to a specified host and port.
 ;
 ; :Returns:
-;    number of bytes sent
+;   number of bytes sent
 ;
 ; :Params:
-;    data : in, required, type=array
-;       data to send
-;    destHost : in, required, type=string or ulong
-;       host to sent data to specified as a hostname or host identifier
-;    destPort : in, required, type=long
-;       host port
+;  data : in, required, type=array
+;    data to send
+;  destHost : in, required, type=string or ulong
+;    host to sent data to specified as a hostname or host identifier
+;  destPort : in, required, type=long
+;    host port
 ;-
 function mgnetsocket::sendTo, data, destHost, destPort
   compile_opt strictarr
@@ -312,15 +333,15 @@ end
 ; Receive data.
 ;
 ; :Returns:
-;    number of bytes received as a long; errors will return a negative value
+;   number of bytes received as a long; errors will return a negative value
 ;
 ; :Keywords:
-;    byteswap : in, optional, type=boolean
-;       set to swap the byte order of the returned data
-;    data : out, optional, type=array
-;       set to a named variable to return the received data
-;    tobuffer : in, optional, type=boolean
-;       set to put data in buffer to be read later by readBuffer method
+;   byteswap : in, optional, type=boolean
+;     set to swap the byte order of the returned data
+;   data : out, optional, type=array
+;     set to a named variable to return the received data
+;   tobuffer : in, optional, type=boolean
+;     set to put data in buffer to be read later by readBuffer method
 ;-
 function mgnetsocket::receive, byteswap=byteswap, $
                                data=data, $
@@ -375,27 +396,27 @@ end
 ; Returns NaN if the buffer is empty.
 ;
 ; :Returns:
-;    array of the type specified by the TYPE keyword
+;   array of the type specified by the TYPE keyword
 ;
 ; :Params:
-;    nbytes : out, optional, type=long
-;       number of bytes read
+;   nbytes : out, optional, type=long
+;     number of bytes read
 ;
 ; :Keywords:
-;    type : in, optional, type=string, default=''
-;       type of data: 'integer', 'double', 'float', 'long', 'string', 'uint',
-;       'ulong', 'l64', or 'ul64'; if not specified or not one of the above
-;       types, data is returned as bytes
-;    peek : in, optional, type=boolean
-;       set the peek keyword to "take a peek" at data but not remove it from
-;       the buffer
-;    skipbytes : in, optional, type=long
-;       bytes to skip at the beginning of the buffer
-;    byteswap : in, optional, type=boolean
-;       set to swap endianness of data
-;    nels : in, out, optional, type=long
-;       the number of elements read; if not specified, as many elements as
-;       possible are read
+;   type : in, optional, type=string, default=''
+;     type of data: 'integer', 'double', 'float', 'long', 'string', 'uint',
+;     'ulong', 'l64', or 'ul64'; if not specified or not one of the above
+;     types, data is returned as bytes
+;   peek : in, optional, type=boolean
+;     set the peek keyword to "take a peek" at data but not remove it from
+;     the buffer
+;   skipbytes : in, optional, type=long
+;     bytes to skip at the beginning of the buffer
+;   byteswap : in, optional, type=boolean
+;     set to swap endianness of data
+;   nels : in, out, optional, type=long
+;     the number of elements read; if not specified, as many elements as
+;     possible are read
 ;-
 function mgnetsocket::readBuffer, nbytes, $
                                   byteswap=byteswap, $
@@ -527,11 +548,11 @@ end
 ; Return a host ID as ULONG given a string hostname.
 ;
 ; :Returns:
-;    long
+;   long
 ;
 ; :Params:
-;    name : in, optional, type=string
-;       hostname
+;   name : in, optional, type=string
+;     hostname
 ;-
 function mgnetsocket::name2Host, name
   compile_opt strictarr
@@ -559,11 +580,11 @@ end
 ; Return a hostname as string given a ULONG host ID.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    hostId : in, optional, type=ulong
-;       host identifier
+;   hostId : in, optional, type=ulong
+;     host identifier
 ;-
 function mgnetsocket::host2Name, hostId
   compile_opt strictarr
@@ -591,7 +612,7 @@ end
 ; Return the number of bytes waiting in the socket buffer.
 ;
 ; :Returns:
-;    long
+;   long
 ;-
 function mgnetsocket::check
   compile_opt strictarr
@@ -620,6 +641,8 @@ pro mgnetsocket::close
   *self.buffer = 0B
 end
 
+
+;= property access
 
 ;+
 ; Set properties of the socket.
@@ -667,6 +690,8 @@ pro mgnetsocket::getProperty, localhost=locHost, $
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Free resources held by the socket object.
 ;-
@@ -685,11 +710,11 @@ end
 ; Create a socket object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Params:
-;    sockId : in, optional, type=long
-;       socket identifier
+;   sockId : in, optional, type=long
+;     socket identifier
 ;-
 function mgnetsocket::init, sockId
   compile_opt strictarr
@@ -717,21 +742,21 @@ end
 ; Defines instance variables.
 ;
 ; :Fields:
-;    buffer
-;       buffer of read data
-;    bsize
-;       size of buffer in bytes
-;    sockId
-;       socket identififer
-;    type
-;       type code: 0 => 'LISTEN_TCP', 1 => 'UDP', 2 => 'IO_TCP', 3 =>
-;       'PEERED_UDP'
-;    hostId
-;       host identifier
-;    locPort
-;       local port
-;    destPort
-;       destination port
+;   buffer
+;     buffer of read data
+;   bsize
+;     size of buffer in bytes
+;   sockId
+;     socket identififer
+;   type
+;     type code: 0 => 'LISTEN_TCP', 1 => 'UDP', 2 => 'IO_TCP', 3 =>
+;     'PEERED_UDP'
+;   hostId
+;     host identifier
+;   locPort
+;     local port
+;   destPort
+;     destination port
 ;-
 pro mgnetsocket__define
   compile_opt strictarr

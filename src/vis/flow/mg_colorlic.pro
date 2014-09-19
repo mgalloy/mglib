@@ -15,6 +15,9 @@
 ;
 ;   .. image:: colorlic-example.png
 ;
+; :Returns:
+;   `bytarr(3, m, n)`
+;
 ; :Params:
 ;   u : in, required, type="fltarr(m, n)"
 ;     x-coordinates of vector field

@@ -11,16 +11,18 @@
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    type : in, required, type=string
-;       type of `MGtmNode`
+;   type : in, required, type=string
+;     type of `MGtmNode`
 ;
 ; :Keywords:
-;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added
-;       at the given node
+;   newline : out, optional, type=boolean, default=0
+;     set to a named variable to get whether a newline should be added
+;     at the given node
+;   tag : in, required, type=`MGtmTag` object
+;     tag object
 ;-
 function mgtmlatex::_preTag, type, newline=newline, tag=tag
   compile_opt strictarr
@@ -66,16 +68,18 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    type : in, required, type=string
+;   type : in, required, type=string
 ;       type of `MGtmNode`
 ;
 ; :Keywords:
-;    newline : out, optional, type=boolean, default=0
-;       set to a named variable to get whether a newline should be added
-;       at the given node
+;   newline : out, optional, type=boolean, default=0
+;     set to a named variable to get whether a newline should be added
+;     at the given node
+;   tag : in, required, type=`MGtmTag` object
+;     tag object
 ;-
 function mgtmlatex::_postTag, type, newline=newline, tag=tag
   compile_opt strictarr

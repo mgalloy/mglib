@@ -13,7 +13,22 @@
 ;     names of child variables
 ;   groups
 ;     names of child groups
+;   name
+;     variable name
+;   data_type
+;     `SIZE` type code for variable
+;   n_dimensions
+;     number of dimensions of variable
+;   n_attributes
+;     number of attributes for variable
+;   dimensions
+;     dimensions of variable
+;   _ref_extra
+;     properties of `MGffNCBase`
 ;-
+
+
+;= helper methods
 
 ;+
 ; Compute the hyperslab arguments from the bounds.
@@ -84,6 +99,8 @@ function mgffncvariable::_getAttribute, name, found=found
 end
 
 
+;= property access
+
 ;+
 ; Get properties.
 ;-
@@ -136,6 +153,8 @@ pro mgffncvariable::getProperty, attributes=attributes, $
   if (n_elements(e) gt 0L) then self->MGffNCBase::getProperty, _extra=e
 end
 
+
+;= operator overloading methods
 
 ;+
 ; Returns the output display by HELP on an object of the class.
@@ -307,6 +326,8 @@ function mgffncvariable::_overloadBracketsRightSide, isRange, $
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Free resources.
 ;-
@@ -321,7 +342,11 @@ end
 ; Create a netCDF variable object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `MGffNCBase::init`
 ;-
 function mgffncvariable::init, _extra=e
   compile_opt strictarr

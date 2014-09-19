@@ -83,11 +83,14 @@ end
 ;+
 ; Count number of occurrences of a substring in a string.
 ;
+; :Returns:
+;   long
+;
 ; :Params:
-;    input : in, required, type=string
-;       string to search
-;    substr : in, required, type=string
-;       substring to search for
+;   input : in, required, type=string
+;     string to search
+;   substr : in, required, type=string
+;     substring to search for
 ;-
 function mg_strcnt, input, substr
   compile_opt strictarr

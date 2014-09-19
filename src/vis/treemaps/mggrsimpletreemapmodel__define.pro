@@ -1,5 +1,21 @@
 ; docformat = 'rst'
 
+;+
+; Simple tree map model.
+;
+; :Properties:
+;   items
+;     list of `MGgrRect` items
+;   bounds
+;     `MGgrRect` representing bounds
+;-
+
+
+;= property access
+
+;+
+; Get properties.
+;-
 pro mggrsimpletreemapmodel::getProperty, items=items, bounds=bounds
   compile_opt strictarr
 
@@ -8,6 +24,9 @@ pro mggrsimpletreemapmodel::getProperty, items=items, bounds=bounds
 end
 
 
+;+
+; Set properties.
+;-
 pro mggrsimpletreemapmodel::setProperty, items=items, bounds=bounds
   compile_opt strictarr
 
@@ -16,6 +35,11 @@ pro mggrsimpletreemapmodel::setProperty, items=items, bounds=bounds
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mggrsimpletreemapmodel::cleanup
   compile_opt strictarr
 
@@ -23,6 +47,12 @@ pro mggrsimpletreemapmodel::cleanup
 end
 
 
+;+
+; Create simple treemap model.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;-
 function mggrsimpletreemapmodel::init, items=items, bounds=bounds
   compile_opt strictarr
 
@@ -37,10 +67,10 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    items
-;       IDL_Container of TreemapItems
-;    bounds
-;       Rect of bounds
+;   items
+;     `IDL_Container` of TreemapItems
+;   bounds
+;     Rect of bounds
 ;-
 pro mggrsimpletreemapmodel__define
   compile_opt strictarr

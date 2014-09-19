@@ -8,48 +8,52 @@
 ; object graphics hierarchies. Only objects of the following classes are
 ; supported::
 ;
-;    IDLgrScene                          svg element
-;    IDLgrViewGroup                      svg element
-;    IDLgrView                           svg element
-;    IDLgrModel                          g element
-;    IDLgrText (and IDLgrFont)           text element
-;    IDLgrPolygon (and IDLgrPattern)     path element (TODO: handle patterns)
-;    IDLgrPolyline (and IDLgrSymbol)     path element (TODO: handle symbols)
-;    IDLgrPlot                           path element
-;    IDLgrAxis
-;    IDLgrImage                          image element
+;   IDLgrScene                          svg element
+;   IDLgrViewGroup                      svg element
+;   IDLgrView                           svg element
+;   IDLgrModel                          g element
+;   IDLgrText (and IDLgrFont)           text element
+;   IDLgrPolygon (and IDLgrPattern)     path element (TODO: handle patterns)
+;   IDLgrPolyline (and IDLgrSymbol)     path element (TODO: handle symbols)
+;   IDLgrPlot                           path element
+;   IDLgrAxis
+;   IDLgrImage                          image element
 ;
 ; :Examples:
-;    Run the main-level program at the end of this file to see an example::
+;   Run the main-level program at the end of this file to see an example::
 ;
-;       IDL> .run mggrsvg__define
+;     IDL> .run mggrsvg__define
 ;
-;    This should produce the following:
+;   This should produce the following:
 ;
-;    .. embed:: triangle.svg
+;   .. embed:: triangle.svg
 ;
 ; :Properties:
-;    filename
-;       filename of file to write to
-;    graphics_tree
-;       default picture to draw
-;    dimensions
-;       dimensions of the drawing canvas in units specified by the EM, EX, PX,
-;       PT, PC, CM, MM, INCHES, PERCENTAGE property at the same time as the
-;       DIMENSIONS property is set; if no dimensions are specified, the canvas
-;       is scaled to fill the available area
+;   filename
+;     filename of file to write to
+;   graphics_tree
+;     default picture to draw
+;   dimensions
+;     dimensions of the drawing canvas in units specified by the `EM`, `EX`,
+;     `PX`, `PT`, `PC`, `CM`, `MM`, `INCHES`, `PERCENTAGE` property at the same
+;     time as the `DIMENSIONS` property is set; if no dimensions are specified,
+;     the canvas is scaled to fill the available area
 ;-
 
+
+;= helper methods
 
 ;+
 ; Return a valid SVG specification for a color.
 ;
+; :Private:
+;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    color : in, required, type=bytarr(3)
-;       color to convert
+;   color : in, required, type=bytarr(3)
+;     color to convert
 ;-
 function mggrsvg::_getRgb, color
   compile_opt strictarr
@@ -59,14 +63,22 @@ end
 
 
 ;+
-; Returns the VIEWPLANE_RECT for the view that contains the item.
+; Returns the `VIEWPLANE_RECT` for the view that contains the item.
+;
+; :Private:
 ;
 ; :Returns:
-;    fltarr(4) or -1L
+;   `fltarr(4)` or `-1L`
 ;
 ; :Params:
-;    tree : in, required, type=object
-;       object in the object graphics hierarchy
+;   tree : in, required, type=object
+;      object in the object graphics hierarchy
+;
+; :Keywords:
+;   dimensions : in, optional, type=lonarr(2)
+;     dimension of view
+;   dimension_units : in, optional, type=string
+;     units of dimensions: px, in, cm, or %
 ;-
 function mggrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
   compile_opt strictarr
@@ -100,6 +112,22 @@ function mggrsvg::_getVpr, tree, dimensions=dims, dimension_units=dimUnits
 end
 
 
+;+
+; Convert units.
+;
+; :Private:
+;
+; :Returns:
+;   float
+;
+; :Params:
+;   x : in, required, type=numeric
+;     value to convert
+;   xUnits : in, required, type=string
+;     units of `x`: em, ex, %, pt, pc, mm, cm, in, or px
+;   outUnits : in, required, type=string
+;     units to convert to: em, ex, %, pt, pc, mm, cm, in, or px
+;-
 function mggrsvg::_convertUnits, x, xUnits, outUnits
   compile_opt strictarr
   on_error, 2
@@ -134,6 +162,22 @@ function mggrsvg::_convertUnits, x, xUnits, outUnits
 end
 
 
+;+
+; Transform coordinates using `[XY]COORD_CONV` of tree.
+;
+; :Private:
+;
+; :Returns:
+;   `fltarr(2, n)`
+;
+; :Params:
+;   data : in, required, type="fltarr(2, n)"
+;     data to transform
+;
+; :Keywords:
+;   tree : in, required, type=object
+;     object graphics hierarchy
+;-
 function mggrsvg::_transformCoords, data, tree=tree
   compile_opt strictarr
 
@@ -158,17 +202,19 @@ end
 
 
 ;+
-; Handle IDLgrScene objects.
+; Handle `IDLgrScene` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    scene : in, required, type=object
-;       IDLgrScene object graphics element
+;   scene : in, required, type=object
+;     `IDLgrScene` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleScene, scene, lun=lun, indent=indent
   compile_opt strictarr
@@ -178,17 +224,19 @@ end
 
 
 ;+
-; Handle IDLgrViewGroup objects.
+; Handle `IDLgrViewGroup` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    viewgroup : in, required, type=object
-;       IDLgrViewGroup object graphics element
+;   viewgroup : in, required, type=object
+;     `IDLgrViewGroup` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleViewgroup, viewgroup, lun=lun, indent=indent
   compile_opt strictarr
@@ -198,17 +246,19 @@ end
 
 
 ;+
-; Handle IDLgrView objects.
+; Handle `IDLgrView` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    view : in, required, type=object
-;       IDLgrView object graphics element
+;   view : in, required, type=object
+;     `IDLgrView` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleView, view, lun=lun, indent=indent
   compile_opt strictarr
@@ -239,17 +289,19 @@ end
 
 
 ;+
-; Handle IDLgrModel objects.
+; Handle `IDLgrModel` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    model : in, required, type=object
-;       IDLgrModel object graphics element
+;   model : in, required, type=object
+;     `IDLgrModel` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleModel, model, lun=lun, indent=indent
   compile_opt strictarr
@@ -278,17 +330,19 @@ end
 
 
 ;+
-; Handle IDLgrPolyline objects.
+; Handle `IDLgrPolyline` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    polyline : in, required, type=object
-;       IDLgrPolyline object graphics element
+;   polyline : in, required, type=object
+;     IDLgrPolyline object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handlePolyline, polyline, lun=lun, indent=indent
   compile_opt strictarr
@@ -316,17 +370,19 @@ end
 
 
 ;+
-; Handle IDLgrPolygon objects.
+; Handle `IDLgrPolygon` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    polygon : in, required, type=object
-;       IDLgrPolygon object graphics element
+;   polygon : in, required, type=object
+;     `IDLgrPolygon` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handlePolygon, polygon, lun=lun, indent=indent
   compile_opt strictarr
@@ -349,17 +405,19 @@ end
 
 
 ;+
-; Handle IDLgrText objects.
+; Handle `IDLgrText` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    text : in, required, type=object
-;       IDLgrText object graphics element
+;   text : in, required, type=object
+;     `IDLgrText` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleText, text, lun=lun, indent=indent
   compile_opt strictarr
@@ -386,17 +444,19 @@ end
 
 
 ;+
-; Handle IDLgrImage objects.
+; Handle `IDLgrImage` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    image : in, required, type=object
-;       IDLgrImage object graphics element
+;   image : in, required, type=object
+;     `IDLgrImage` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleImage, image, lun=lun, indent=indent
   compile_opt strictarr
@@ -429,17 +489,19 @@ end
 
 
 ;+
-; Handle IDLgrPlot objects.
+; Handle `IDLgrPlot` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    plot : in, required, type=object
-;       IDLgrPlot object graphics element
+;   plot : in, required, type=object
+;     `IDLgrPlot` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handlePlot, plot, lun=lun, indent=indent
   compile_opt strictarr
@@ -449,17 +511,19 @@ end
 
 
 ;+
-; Handle IDLgrAxis objects.
+; Handle `IDLgrAxis` objects.
+;
+; :Private:
 ;
 ; :Params:
-;    axis : in, required, type=object
-;       IDLgrAxis object graphics element
+;   axis : in, required, type=object
+;     `IDLgrAxis` object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_handleAxis, axis, lun=lun, indent=indent
   compile_opt strictarr
@@ -472,15 +536,17 @@ end
 ; Routine which is recursively called to traverse the object graphics
 ; hierarchy.
 ;
+; :Private:
+;
 ; :Params:
-;    tree : in, required, type=object
-;       object graphics element
+;   tree : in, required, type=object
+;     object graphics element
 ;
 ; :Keywords:
-;    lun : in, required, type=long
-;       logical unit number of file to write output to
-;    indent : in, required, type=string
-;       string to prefix each line of output by
+;   lun : in, required, type=long
+;     logical unit number of file to write output to
+;   indent : in, required, type=string
+;     string to prefix each line of output by
 ;-
 pro mggrsvg::_traverse, tree, lun=lun, indent=indent
   compile_opt strictarr
@@ -506,12 +572,14 @@ pro mggrsvg::_traverse, tree, lun=lun, indent=indent
 end
 
 
+;= graphics atom methods
+
 ;+
 ; Write the object graphics rooted at the specified scene or view.
 ;
 ; :Params:
-;    tree : in, optional, type=object
-;       scene or view object
+;   tree : in, optional, type=object
+;     scene or view object
 ;-
 pro mggrsvg::draw, tree
   compile_opt strictarr
@@ -533,6 +601,8 @@ pro mggrsvg::draw, tree
   free_lun, lun
 end
 
+
+;= property access
 
 ;+
 ; Set properties.
@@ -579,6 +649,8 @@ pro mggrsvg::getProperty, filename=filename, graphics_tree=graphicsTree, $
 end
 
 
+;= lifecycle methods
+
 ;+
 ; Free resources.
 ;-
@@ -593,11 +665,11 @@ end
 ; Create an SVG destination.
 ;
 ; :Returns:
-;    1 if successful, 0 if fails
+;   1 if successful, 0 if fails
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       any properties of the class
+;   _extra : in, optional, type=keywords
+;     any properties of the class
 ;-
 function mggrsvg::init, _extra=e
   compile_opt strictarr
@@ -614,8 +686,8 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    graphicsTree
-;       graphics tree to tree if none is provided to draw method
+;   graphicsTree
+;     graphics tree to tree if none is provided to draw method
 ;-
 pro mggrsvg__define
   compile_opt strictarr

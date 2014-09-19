@@ -6,13 +6,13 @@
 ; specified, the empty string will be returned.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    s : in, optional, type=string
-;       string to process
-;    param : in, optional, type=string
-;       parameter name
+;   s : in, optional, type=string
+;     string to process
+;   param : in, optional, type=string
+;     parameter name
 ;-
 function mg_gc_base_processstr, s, param
   compile_opt strictarr
@@ -34,55 +34,59 @@ end
 ; Interface to Google Charts API. Returns an image to display. The Google
 ; Charts API is documented at::
 ;
-;    http://code.google.com/apis/chart/
+;   http://code.google.com/apis/chart/
 ;
 ; :Requires:
-;    IDL 6.4
+;   IDL 6.4
 ;
 ; :Examples:
-;    An example of using the routine is given in a main-level program at the
-;    end of this file. Run it using::
+;   An example of using the routine is given in a main-level program at the
+;   end of this file. Run it using::
 ;
-;       IDL> .run mg_gc_base
+;     IDL> .run mg_gc_base
 ;
-;    It produces:
+;   It produces:
 ;
-;    .. image:: gc_piechart.png
+;   .. image:: gc_piechart.png
 ;
 ; :Returns:
-;    bytarr(3, xsize, ysize)
+;   `bytarr(3, xsize, ysize)`
 ;
 ; :Keywords:
-;    type : in, required, type=string
-;       type of chart required, options are: lc (line chart), lxy (xy points),
-;       ls (sparkline), bhs, bvs, bhg, bvg, p (pie chart), p3 (3D pie chart),
-;       v (Venn diagram), s (scatter plot), r (radar), t (map),
-;       gom (Google-o-meter)
-;    data : in, required, type=numeric
-;       array of data to displayed
-;    range : in, optional, type=fltarr
-;       range of data
-;    label : in, optional, type=strarr
-;       chart labels (depending on type)
-;    dimensions : in, optional, type=lonarr(2), default="[200, 100]"
-;       size of returned image
-;    color : in, optional, type=lonarr
-;       colors of the chart
-;    background : in, optional, type=long
-;       color of background
-;    alpha_channel : in, optional, type=float
-;       transparency of chart: 0.0 for completely transparent, 1.0 for
-;       completely opaque
-;    title : in, optional, type=string or strarr
-;       title of the chart
-;    legend_labels : in, optional, type=strarr
-;       string array of labels for sets
-;    legend_position : in, optional, type=string
-;       position of legend: t (top), b (bottom), r (right), or l (left)
-;    axis_labels : in, optional, type=string
-;       position of axis labels: t (top), b (bottom), r (right), or l (left)
-;    url : out, optional, type=string
-;       URL used by Google Charts API
+;   type : in, required, type=string
+;     type of chart required, options are: lc (line chart), lxy (xy points),
+;     ls (sparkline), bhs, bvs, bhg, bvg, p (pie chart), p3 (3D pie chart),
+;     v (Venn diagram), s (scatter plot), r (radar), t (map),
+;     gom (Google-o-meter)
+;   data : in, required, type=numeric
+;     array of data to displayed
+;   range : in, optional, type=fltarr
+;     range of data
+;   label : in, optional, type=strarr
+;     chart labels (depending on type)
+;   dimensions : in, optional, type=lonarr(2), default="[200, 100]"
+;     size of returned image
+;   color : in, optional, type=lonarr
+;     colors of the chart
+;   background : in, optional, type=long
+;     color of background
+;   alpha_channel : in, optional, type=float
+;     transparency of chart: 0.0 for completely transparent, 1.0 for
+;     completely opaque
+;   title : in, optional, type=string or strarr
+;     title of the chart
+;   legend_labels : in, optional, type=strarr
+;     string array of labels for sets
+;   legend_position : in, optional, type=string
+;     position of legend: t (top), b (bottom), r (right), or l (left)
+;   axis_labels : in, optional, type=string
+;     position of axis labels: t (top), b (bottom), r (right), or l (left)
+;   bar_sizes : in, optional, type=numeric array
+;     bar sizes
+;   url : out, optional, type=string
+;     URL used by Google Charts API
+;   just_url : in, optional, type=boolean
+;     set to just returned the URL via the `URL` keyword, not an image
 ;-
 function mg_gc_base, type=type, $
                      data=data, $

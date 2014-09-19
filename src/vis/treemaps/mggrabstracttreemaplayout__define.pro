@@ -1,5 +1,27 @@
 ; docformat = 'rst'
 
+;+
+; Abstract parent class for treemap layout subclasses.
+;-
+
+;= helper routines
+
+;+
+; Find total size of items.
+;
+; :Private:
+;
+; :Returns:
+;   float
+;
+; :Params:
+;   items : in, required, type=list
+;     list of objects with a `SIZE` property
+;   startPos : in, required, type=integer
+;     start index of `items`
+;   endPos : in, required, type=integer
+;     end index of `items`
+;-
 function mggrabstracttreemaplayout__totalSize, items, startPos, endPos
   compile_opt strictarr
 
@@ -13,6 +35,27 @@ function mggrabstracttreemaplayout__totalSize, items, startPos, endPos
 end
 
 
+;+
+; Slice layout.
+;
+; :Private:
+;
+; :Params:
+;   items : in, required, type=list
+;     list of objects with a `SIZE` property
+;   startPos : in, required, type=integer
+;     start index of `items`
+;   endPos : in, required, type=integer
+;     end index of `items`
+;   bounds : in, required, type=`MGgrRect`
+;     rectangle to slice layout with
+;
+; :Keywords:
+;   vertical : in, optional, type=boolean
+;     set to slice vertically
+;   ascending : in, optional, type=boolean
+;     set to slice in ascending order
+;-
 pro mggrabstracttreemaplayout__sliceLayout, items, startPos, endPos, bounds, vertical=vertical, ascending=ascending
   compile_opt strictarr
 
@@ -43,6 +86,16 @@ pro mggrabstracttreemaplayout__sliceLayout, items, startPos, endPos, bounds, ver
 end
 
 
+;+
+; Sort items in descending order of size.
+;
+; :Returns:
+;   list
+;
+; :Params:
+;   items : in, required, type=list
+;     items to sort
+;-
 function mggrabstracttreemaplayout::sortDescending, items
   compile_opt strictarr
 
@@ -68,11 +121,15 @@ end
 
 
 ;+
+; Layout items.
+;
 ; :Abstract:
 ;
 ; :Params:
-;    model : in, required, type=MGgrTreemapModel
-;    bounds : in, required, type=MGgrRect
+;   model : in, required, type=`MGgrTreemapModel`
+;     model
+;   bounds : in, required, type=`MGgrRect`
+;     bounds
 ;-
 pro mggrabstracttreemaplayout::layout, model, bounds
   compile_opt strictarr
@@ -82,6 +139,11 @@ end
 
 ; TODO: implement rest of methods
 
+;= lifecycle methods
+
+;+
+; Define instance variables.
+;-
 pro mggrabstracttreemaplayout__define
   compile_opt strictarr
 

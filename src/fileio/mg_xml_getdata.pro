@@ -9,6 +9,8 @@
 ;+
 ; Called to process the opening of a tag.
 ;
+; :Private:
+;
 ; :Params:
 ;   uri : in, required, type=string
 ;     namespace URI
@@ -47,6 +49,8 @@ end
 ;+
 ; Called to process the closing of a tag.
 ;
+; :Private:
+;
 ; :Params:
 ;   uri : in, required, type=string
 ;     namespace URI
@@ -65,6 +69,8 @@ end
 
 ;+
 ; Called to process character data in an XML file.
+;
+; :Private:
 ;
 ; :Params:
 ;   chars : in, required, type=string

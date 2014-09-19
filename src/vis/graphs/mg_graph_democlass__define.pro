@@ -1,5 +1,35 @@
 ; docformat = 'rst'
 
+;+
+; Example class for creating a graph.
+;
+; :Properties:
+;   name
+;     graph name
+;   children
+;     array of child nodes
+;   color
+;     graph color
+;-
+
+;+
+; Add a child node.
+;
+; :Params:
+;   node : in, required, type=`MG_GRAPH_DEMOCLASS` object
+;     child node
+;-
+pro mg_graph_democlass::addChild, node
+  compile_opt strictarr
+
+  self.children->add, node
+end
+
+;= property access
+
+;+
+; Get properties.
+;-
 pro mg_graph_democlass::getProperty, name=name, $
                                      children=children, $
                                      color=color
@@ -15,6 +45,9 @@ pro mg_graph_democlass::getProperty, name=name, $
 end
 
 
+;+
+; Set properties.
+;-
 pro mg_graph_democlass::setProperty, name=name, color=color
   compile_opt strictarr
 
@@ -23,13 +56,11 @@ pro mg_graph_democlass::setProperty, name=name, color=color
 end
 
 
-pro mg_graph_democlass::addChild, node
-  compile_opt strictarr
+;= lifecycle methods
 
-  self.children->add, node
-end
-
-
+;+
+; Free resources.
+;-
 pro mg_graph_democlass::cleanup
   compile_opt strictarr
 
@@ -37,6 +68,16 @@ pro mg_graph_democlass::cleanup
 end
 
 
+;+
+; Create graph demo class.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     properties
+;-
 function mg_graph_democlass::init, _extra=e
   compile_opt strictarr
 
@@ -48,6 +89,9 @@ function mg_graph_democlass::init, _extra=e
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mg_graph_democlass__define
   compile_opt strictarr
 

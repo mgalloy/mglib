@@ -315,8 +315,10 @@ end
 ;   attribute value
 ;
 ; :Params:
-;   group_id : in, required, type=long
+;   file_id : in, required, type=long
 ;     netCDF file identifier of the file to read
+;   group_id : in, required, type=long
+;     netCDF group identifier
 ;   parent_id : in, required, type=long
 ;     parent group/variable identifier
 ;   attname : in, required, type=string
@@ -326,7 +328,8 @@ end
 ;   error : out, optional, type=long
 ;     error value, 0 indicates success
 ;-
-function mg_nc_getdata_getattribute, file_id, group_id, parent_id, attname, error=error
+function mg_nc_getdata_getattribute, file_id, group_id, parent_id, attname, $
+                                     error=error
   compile_opt strictarr
 
   catch, error

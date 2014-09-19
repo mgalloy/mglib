@@ -1,22 +1,26 @@
 ; docformat = 'rst'
 
 ;+
+; Collection object representing a set.
+;
 ; :Requires:
 ;    IDL 8.0
 ;-
 
 
+;= operator overloading methods
+
 ;+
 ; Handle iterating over the elements in a set.
 ;
 ; :Returns:
-;    1 if there is a current element to retrieve, 0 if not
+;   1 if there is a current element to retrieve, 0 if not
 ;
 ; :Params:
-;    value : in, required, type=scalar numeric
-;       return value for the iteration
-;    key : in, required, type=undefined or long
-;       undefined on initial item and row index for subsequent calls
+;   value : in, required, type=scalar numeric
+;     return value for the iteration
+;   key : in, required, type=undefined or long
+;     undefined on initial item and row index for subsequent calls
 ;-
 function mgcoset::_overloadForeach, value, key
   compile_opt strictarr
@@ -32,7 +36,7 @@ end
 ; Returns the number of elements in the set
 ;
 ; :Returns:
-;    number of elements in the set
+;   number of elements in the set
 ;-
 function mgcoset::_overloadSize
   compile_opt strictarr
@@ -45,13 +49,13 @@ end
 ; Performance set difference.
 ;
 ; :Returns:
-;    a new set
+;   `MGcoSet` object
 ;
 ; :Params:
-;    left : in, required, type=set or other iterable
-;       left-side operand
-;    right : in, required, type=set or other iterable
-;       right-side operand
+;   left : in, required, type=set or other iterable
+;     left-side operand
+;   right : in, required, type=set or other iterable
+;     right-side operand
 ;-
 function mgcoset::_overloadMinus, left, right
   compile_opt strictarr
@@ -69,13 +73,13 @@ end
 ; Performance set union.
 ;
 ; :Returns:
-;    a new set
+;   `MGcoSet` object
 ;
 ; :Params:
-;    left : in, required, type=set or other iterable
-;       left-side operand
-;    right : in, required, type=set or other iterable
-;       right-side operand
+;   left : in, required, type=set or other iterable
+;     left-side operand
+;   right : in, required, type=set or other iterable
+;     right-side operand
 ;-
 function mgcoset::_overloadPlus, left, right
   compile_opt strictarr
@@ -93,13 +97,13 @@ end
 ; Performance set union.
 ;
 ; :Returns:
-;    a new set
+;   `MGcoSet` object
 ;
 ; :Params:
-;    left : in, required, type=set or other iterable
-;       left-side operand
-;    right : in, required, type=set or other iterable
-;       right-side operand
+;   left : in, required, type=set or other iterable
+;     left-side operand
+;   right : in, required, type=set or other iterable
+;     right-side operand
 ;-
 function mgcoset::_overloadOr, left, right
   compile_opt strictarr
@@ -112,13 +116,13 @@ end
 ; Performance set union.
 ;
 ; :Returns:
-;    a new set
+;   `MGcoSet` object
 ;
 ; :Params:
-;    left : in, required, type=set or other iterable
-;       left-side operand
-;    right : in, required, type=set or other iterable
-;       right-side operand
+;   left : in, required, type=set or other iterable
+;     left-side operand
+;   right : in, required, type=set or other iterable
+;     right-side operand
 ;-
 function mgcoset::_overloadAnd, left, right
   compile_opt strictarr
@@ -142,9 +146,20 @@ function mgcoset::_overloadAnd, left, right
 end
 
 
-function mgcoset::_overloadBracketsRightSide, isRange, $
-                                              ss1, ss2, ss3, ss4, $
-                                              ss5, ss6, ss7, ss8
+;+
+; Allows array index access with brackets.
+;
+; :Returns:
+;   elements of the same type as the set
+;
+; :Params:
+;   isRange : in, required, type=lonarr(8)
+;     indicates whether the i-th parameter is a index range or a scalar/array
+;     of indices
+;   ss1 : in, required, type=long/lonarr
+;     scalar subscript index value, an index array, or a subscript range
+;-
+function mgcoset::_overloadBracketsRightSide, isRange, ss1
   compile_opt strictarr
   on_error, 2
 
@@ -154,6 +169,12 @@ function mgcoset::_overloadBracketsRightSide, isRange, $
 end
 
 
+;+
+; Evaluates set for truth. True if set contains any values, false otherwise.
+;
+; :Returns:
+;   byte
+;-
 function mgcoset::_overloadIsTrue
   compile_opt strictarr
 
@@ -161,6 +182,13 @@ function mgcoset::_overloadIsTrue
 end
 
 
+;+
+; Returns the elements to print. Called by `PRINT` to determine what should be
+; displayed.
+;
+; :Returns:
+;   array of elements of the type of the array list
+;-
 function mgcoset::_overloadPrint
   compile_opt strictarr
 
@@ -168,6 +196,16 @@ function mgcoset::_overloadPrint
 end
 
 
+;+
+; Returns a string describing the set. Called by the `HELP` routine.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of the variable to use when outputting help information
+;-
 function mgcoset::_overloadHelp, varname
   compile_opt strictarr
 
@@ -179,6 +217,18 @@ function mgcoset::_overloadHelp, varname
 end
 
 
+;= helper methods
+
+;+
+; Determine if a set contains a given element.
+;
+; :Returns:
+;   byte
+;
+; :Params:
+;   el : in, required, type=any
+;     element to determine if the set contains
+;-
 function mgcoset::contains, el
   compile_opt strictarr
 
@@ -186,6 +236,17 @@ function mgcoset::contains, el
 end
 
 
+;+
+; Remove elements from the set.
+;
+; :Params:
+;   elements : in, optional, type=any
+;     elements to remove
+;
+; :Keywords:
+;   all : in, optional, type=boolean
+;     set to remove all elements from the set
+;-
 pro mgcoset::remove, elements, all=all
   compile_opt strictarr
 
@@ -193,6 +254,13 @@ pro mgcoset::remove, elements, all=all
 end
 
 
+;+
+; Add elements to the set.
+;
+; :Params:
+;   elements : in, optional, type=any
+;     elements to add to the set
+;-
 pro mgcoset::add, elements
   compile_opt strictarr
 
@@ -201,6 +269,11 @@ pro mgcoset::add, elements
 end
 
 
+;= lifecycle methods
+
+;+
+; Free resources.
+;-
 pro mgcoset::cleanup
   compile_opt strictarr
 
@@ -208,6 +281,16 @@ pro mgcoset::cleanup
 end
 
 
+;+
+; Create set object.
+;
+; :Returns:
+;   1 if successful, 0 otherwise
+;
+; :Params:
+;   elements : in, optional, type=any
+;     elements to initialize set with
+;-
 function mgcoset::init, elements
   compile_opt strictarr
 
@@ -218,6 +301,9 @@ function mgcoset::init, elements
 end
 
 
+;+
+; Define instance variables.
+;-
 pro mgcoset__define
   compile_opt strictarr
 

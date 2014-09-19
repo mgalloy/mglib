@@ -4,28 +4,28 @@
 ; Writes a sparkline plot to a PNG file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of PNG file to write
-;    data : in, required, type=numeric vector
-;       y data to plot
+;   filename : in, required, type=string
+;     filename of PNG file to write
+;   data : in, required, type=numeric vector
+;     y data to plot
 ;
 ; :Keywords:
-;    xsize : in, optional, type=integer, default=n_elements(data)
-;       xsize in pixels of the output image
-;    ysize : in, optional, type=integer, default=12
-;       ysize in pixels of the output image
-;    yrange : in, optional, type=fltarr(2)
-;       range of data; default is the min and max of the data
-;    color : in, optional, type=bytarr(3) or index, default="[0, 0, 0] or 0"
-;       color of the plot
-;    endpoint_color : in, optional, type=bytarr(3) or index, default=same as color
-;       color of the endpoint of the plot
-;    background : in, optional, type=bytarr(3) or index, default="[255, 255, 255] or 255"
-;       background color for the plot
-;    band_range : in, optional, type=fltarr(2)
-;       [min, max] for band
-;    band_color : in, optional, type=bytarr(3)
-;       color of band
+;   xsize : in, optional, type=integer, default=n_elements(data)
+;     xsize in pixels of the output image
+;   ysize : in, optional, type=integer, default=12
+;     ysize in pixels of the output image
+;   yrange : in, optional, type=fltarr(2)
+;     range of data; default is the min and max of the data
+;   color : in, optional, type=bytarr(3) or index, default="[0, 0, 0] or 0"
+;     color of the plot
+;   endpoint_color : in, optional, type=bytarr(3) or index, default=same as color
+;     color of the endpoint of the plot
+;   background : in, optional, type=bytarr(3) or index, default="[255, 255, 255] or 255"
+;     background color for the plot
+;   band_range : in, optional, type=fltarr(2)
+;     [min, max] for band
+;   band_color : in, optional, type=bytarr(3)
+;     color of band
 ;-
 pro mg_sparkline, filename, data, xsize=xsize, ysize=ysize, yrange=yrange, $
                   color=color, background=background, $

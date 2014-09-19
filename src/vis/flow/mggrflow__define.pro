@@ -1,33 +1,38 @@
 ; docformat = 'rst'
 
 ;+
+; Object graphics atom representing a flow visualization.
+;
 ; :Examples:
-;    Run the main-level program at the end of this file for an example of the
-;    usage::
+;   Run the main-level program at the end of this file for an example of the
+;   usage::
 ;
-;       IDL> .run mggrflow__define
+;     IDL> .run mggrflow__define
 ;
-;    This should display:
+;   This should display:
 ;
-;    .. image:: og-flow.png
+;   .. image:: og-flow.png
 ;-
 
 ;+
 ; Create a flow display.
 ;
+; :Returns:
+;   1 for success, 0 otherwise
+;
 ; :Params:
-;    u : in, required, type="fltarr(m, n)"
-;       x component at each point of the vector field; must be a 2D array
-;    v : in, required, type="fltarr(m, n)"
-;       y component at each point of the vector field; must be a 2D array
-;    x : in, optional, type=fltarr(m)
-;       x axis values
-;    y : in, optional, type=fltarr(n)
-;       y axis values
+;   u : in, required, type="fltarr(m, n)"
+;     x component at each point of the vector field; must be a 2D array
+;   v : in, required, type="fltarr(m, n)"
+;     y component at each point of the vector field; must be a 2D array
+;   x : in, optional, type=fltarr(m)
+;     x axis values
+;   y : in, optional, type=fltarr(n)
+;     y axis values
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       keywords to `IDLgrPolyline::init` or `MG_VEL`
+;   _extra : in, optional, type=keywords
+;     keywords to `IDLgrPolyline::init` or `MG_VEL`
 ;-
 function mggrflow::init, u, v, x, y, _extra=e
   compile_opt strictarr
