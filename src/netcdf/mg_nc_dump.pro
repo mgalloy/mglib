@@ -6,15 +6,15 @@
 ; and groups.
 ;
 ; :Categories:
-;    file i/o, netcdf, sdf
+;   file i/o, netcdf, sdf
 ;
 ; :Examples:
-;    See the attached main-level program for a simple example::
+;   See the attached main-level program for a simple example::
 ;
-;       IDL> .run mg_nc_dump
+;     IDL> .run mg_nc_dump
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;-
 
 
@@ -22,8 +22,8 @@
 ; Parse and display a simple hierarchy of contents of a netCDF file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       netCDF file to parse
+;   filename : in, required, type=string
+;     netCDF file to parse
 ;-
 pro mg_nc_dump, filename
   compile_opt strictarr

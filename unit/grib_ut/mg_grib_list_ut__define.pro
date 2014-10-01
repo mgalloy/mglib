@@ -1,0 +1,35 @@
+; docformat = 'rst'
+
+pro mg_grib_list_ut::setup
+  compile_opt strictarr
+end
+
+
+pro mg_grib_list_ut::teardown
+  compile_opt strictarr
+end
+
+
+function mg_grib_list_ut::test_sample
+  compile_opt strictarr
+
+  filename = filepath('atl.grb2', root='.')
+
+  for r = 1, grib_count(filename) do begin
+    grib_list, filename, r, output=output
+    keys = mg_grib_list(filename, record=r, count=count)
+    assert, array_equal(output[1, *], keys), $
+            'incorrect keys for record %d', r
+    assert, count eq n_elements(output[1, *]), $
+            'incorrect number of keys for record %d: %d', r, count
+  endfor
+
+  return, 1
+end
+
+
+pro mg_grib_list_ut__define
+  compile_opt strictarr
+
+  define = { mg_grib_list_ut, inherits MGutLibTestCase }
+end
