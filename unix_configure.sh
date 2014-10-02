@@ -14,5 +14,6 @@ cmake \
   -DGSL_LIBRARY_DIR=$HOME/lib \
   -DIDLdoc_DIR=~/projects/idldoc/src \
   -Dmgunit_DIR=~/projects/mgunit/src \
+  -Didlwave_DIR=~/software/idlwave \
   ..
 

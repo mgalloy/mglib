@@ -34,7 +34,7 @@ message(STATUS "Build date = ${mglib_BUILD_DATE}")
 find_package(IDL REQUIRED)
 find_package(IDLdoc)
 find_package(mgunit)
-
+find_package(idlwave)
 
 # always need IDL's include files
 include_directories(${IDL_INCLUDE_DIR})
@@ -114,6 +114,11 @@ endif ()
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;api-bookdocs;mglib-test-results.html")
 
+if (idlwave_FOUND)
+  add_custom_target(idlwave_catalog
+    COMMAND ${idlwave_DIR}/idlwave_catalog -v mglib
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
+endif ()
 
 # setup installer
 

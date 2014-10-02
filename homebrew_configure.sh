@@ -19,5 +19,6 @@ cmake \
   -DZEROMQ_LIBRARY_DIR=/usr/local/lib \
   -DIDLdoc_DIR=~/projects/idldoc/src \
   -Dmgunit_DIR=~/projects/mgunit/src \
+  -Didlwave_DIR=~/software/idlwave \
   ..
 
