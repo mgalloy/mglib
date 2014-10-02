@@ -4,13 +4,13 @@
 ; Display a listing of the contents of a `.sav` file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of a `.sav` file
+;   filename : in, required, type=string
+;     filename of a `.sav` file
 ;
 ; :Keywords:
-;    verbose : in, optional, type=boolean
-;       set to display information about file such as description, system type
-;       and IDL version where file was created, etc.
+;   verbose : in, optional, type=boolean
+;     set to display information about file such as description, system type
+;     and IDL version where file was created, etc.
 ;-
 pro mg_save_dump, filename, verbose=verbose
   compile_opt strictarr

@@ -9,16 +9,17 @@
 ;   string
 ;
 ; :Params:
-;    type : in, required, type=string
-;       extension
+;   type : in, required, type=string
+;     extension
 ;-
 function mg_dump_typename, type
   compile_opt strictarr
 
   case type of
-    '.nc': return, 'netCDF'
+    '.grb2': return, 'GRIB'
     '.h5': return, 'HDF5'
     '.hdf': return, 'HDF'
+    '.nc': return, 'netCDF'
     '.sav': return, 'save file'
     else: return, ''
   endcase
@@ -30,12 +31,12 @@ end
 ; the file.
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       file to examine
+;   filename : in, required, type=string
+;     file to examine
 ;
 ; :Keywords:
-;    verbose : in, optional, type=boolean
-;       set to display more metadata information about file
+;   verbose : in, optional, type=boolean
+;     set to display more metadata information about file
 ;-
 pro mg_dump, filename, verbose=verbose
   compile_opt strictarr
@@ -46,9 +47,10 @@ pro mg_dump, filename, verbose=verbose
   if (type ne '') then print, type_name, format='(%"File is of type: %s")'
 
   case type of
-    '.nc': mg_nc_dump, filename
+    '.grb2': mg_grib_dump, filename
     '.h5': mg_h5_dump, filename
     '.hdf': mg_hdf_dump, filename
+    '.nc': mg_nc_dump, filename
     '.sav': mg_save_dump, filename, verbose=verbose
     else: message, 'unknown file type', /informational
   endcase

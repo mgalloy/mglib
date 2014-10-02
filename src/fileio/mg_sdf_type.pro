@@ -1,16 +1,47 @@
 ; docformat = 'rst'
 
+
+;+
+; Determine if the file is a GRIB file.
+;
+; :Private:
+;
+; :Returns:
+;   `0B` or `1B`
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename to examine
+;-
+function mg_sdf_type_is_grib, filename
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, 0B
+  endif
+
+  id = grib_open(filename)
+  handle = grib_new_from_file(file)
+  grib_release, handle
+  grib_close, id
+
+  return, 1B
+end
+
+
 ;+
 ; Determine if the file is a netCDF file.
 ;
 ; :Private:
 ;
 ; :Returns:
-;    0B or 1B
+;   `0B` or `1B`
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename to examine
+;   filename : in, required, type=string
+;     filename to examine
 ;-
 function mg_sdf_type_is_ncdf, filename
   compile_opt strictarr
@@ -34,11 +65,11 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    0B or 1B
+;   `0B` or `1B`
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename to examine
+;   filename : in, required, type=string
+;     filename to examine
 ;-
 function mg_sdf_type_is_save, filename
   compile_opt strictarr
@@ -60,18 +91,18 @@ end
 ; Determine the type of scientific data format file given by the filename.
 ;
 ; :Returns:
-;    string, returns empty string if file format is not found, otherwise
-;    returns appropriate extension for file, i.e., `.nc`, `.h5`, `.hdf`, or
-;    `.sav`
+;   string, returns empty string if file format is not found, otherwise
+;   returns appropriate extension for file, i.e., `.grb2`, `.nc`, `.h5`,
+;   `.hdf`, or `.sav`
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename to examine
+;   filename : in, required, type=string
+;     filename to examine
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       set to a named variable to retrieve whether a format was found for the
-;       file
+;   found : out, optional, type=boolean
+;     set to a named variable to retrieve whether a format was found for the
+;     file
 ;-
 function mg_sdf_type, filename, found=found
   compile_opt strictarr
@@ -89,9 +120,9 @@ function mg_sdf_type, filename, found=found
 
   ; test type given by extension, if it matches known extensions
   case ext of
-    '.nc': begin
-        is_ncdf = mg_sdf_type_is_ncdf(filename)
-        if (is_ncdf) then return, ext
+    '.grb2': begin
+        is_grib = mg_sdf_type_is_grib(filename)
+        if (is_grib) then return, ext
       end
     '.h5': begin
         is_h5 = h5f_is_hdf5(filename)
@@ -100,6 +131,10 @@ function mg_sdf_type, filename, found=found
     '.hdf': begin
         is_hdf = hdf_ishdf(filename)
         if (is_hdf) then return, ext
+      end
+    '.nc': begin
+        is_ncdf = mg_sdf_type_is_ncdf(filename)
+        if (is_ncdf) then return, ext
       end
     '.sav': begin
         is_save = mg_sdf_type_is_save(filename)
@@ -110,6 +145,9 @@ function mg_sdf_type, filename, found=found
 
   ; if not known extension or does not match its extension, try all known
   ; types
+
+  is_grib = mg_sdf_type_is_grib(filename)
+  if (is_grib) then return, '.grb2'
 
   is_ncdf = mg_sdf_type_is_ncdf(filename)
   if (is_ncdf) then return, '.nc'

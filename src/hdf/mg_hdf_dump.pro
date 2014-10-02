@@ -119,9 +119,6 @@ end
 
 ; main-level example program
 
-filename = '~/data/modis/MOD021KM.A2010019.1235.005.2010259102219.hdf'
-mg_hdf_dump, filename
-
 mg_hdf_dump, filepath('vattr_example.hdf', subdir=['examples', 'data'])
 
 end
