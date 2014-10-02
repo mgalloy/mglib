@@ -159,3 +159,7 @@ add_custom_target(dist
 if (IDLdoc_FOUND)
   add_dependencies(dist doc userdoc)
 endif ()
+
+if (idlwave_FOUND)
+  set(CPACK_INSTALL_SCRIPT ${CMAKE_SOURCE_DIR}/idlwave_catalog.cmake)
+endif ()
