@@ -41,6 +41,7 @@ include_directories(${IDL_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/dist_tools)
 
 add_subdirectory(src)
+add_subdirectory(scripts)
 
 file(GLOB_RECURSE PRO_FILES "src/*.pro")
 file(GLOB_RECURSE C_FILES "src/*.c")
@@ -115,10 +116,11 @@ set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "api-docs;api-userdocs;api-dcdocs;api-bookdocs;mglib-test-results.html")
 
 if (idlwave_FOUND)
+  configure_file("idlwave_catalog.cmake.in" "idlwave_catalog.cmake" @ONLY)
   add_custom_target(idlwave_catalog
     COMMAND ${idlwave_DIR}/idlwave_catalog -v mglib
     WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
-endif ()
+  endif ()
 
 # setup installer
 
@@ -158,8 +160,4 @@ add_custom_target(dist
 
 if (IDLdoc_FOUND)
   add_dependencies(dist doc userdoc)
-endif ()
-
-if (idlwave_FOUND)
-  set(CPACK_INSTALL_SCRIPT ${CMAKE_SOURCE_DIR}/idlwave_catalog.cmake)
 endif ()
