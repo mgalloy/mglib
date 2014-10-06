@@ -1,5 +1,16 @@
 ; docformat = 'rst'
 
+function mg_cmp_version_ut::test_builddiffers
+  compile_opt strictarr
+
+  cmp = mg_cmp_version('1.1.0+buildinfo', '1.1.0+20141006')
+
+  assert, cmp eq 0, 'incorrect comparison'
+
+  return, 1
+end
+
+
 function mg_cmp_version_ut::test_tie
   compile_opt strictarr
 
@@ -17,7 +28,7 @@ end
 function mg_cmp_version_ut::test_basic
   compile_opt strictarr
 
-  versions = ['0.1', '1.0alpha', '1.0beta', '1.0rc1', '1.0rc2', '1.0', $
+  versions = ['0.1', '1.0-alpha', '1.0-beta', '1.0-rc1', '1.0-rc2', '1.0', $
               '2.0', '2.0.1', '2.0.2']
 
   for i = 0L, n_elements(versions) - 1L do begin
