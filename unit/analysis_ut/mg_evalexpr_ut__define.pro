@@ -116,6 +116,24 @@ function mg_evalexpr_ut::test_error1
 end
 
 
+function mg_evalexpr_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_evalexpr', $
+                            'mg_evalexpr_parse', $
+                            'mg_evalexpr_lookup', $
+                            'mg_evalexpr_expr', $
+                            'mg_evalexpr_superscript', $
+                            'mg_evalexpr_term', $
+                            'mg_evalexpr_factor'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_evalexpr_ut__define
   compile_opt strictarr
 
