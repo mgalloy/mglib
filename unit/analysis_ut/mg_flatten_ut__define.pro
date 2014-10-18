@@ -12,6 +12,17 @@ function mg_flatten_ut::test_basic
 end
 
 
+function mg_flatten_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_flatten', /is_function
+
+  return, 1
+end
+
+
 pro mg_flatten_ut__define
   compile_opt strictarr
 

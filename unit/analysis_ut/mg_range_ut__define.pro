@@ -22,6 +22,17 @@ function mg_range_ut::test_same
 end
 
 
+function mg_range_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_range', /is_function
+
+  return, 1
+end
+
+
 pro mg_range_ut__define
   compile_opt strictarr
 

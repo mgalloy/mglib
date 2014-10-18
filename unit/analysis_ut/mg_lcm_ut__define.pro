@@ -38,6 +38,17 @@ function mg_lcm_ut::test_zero
 end
 
 
+function mg_lcm_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_lcm', /is_function
+
+  return, 1
+end
+
+
 pro mg_lcm_ut__define
   compile_opt strictarr
 

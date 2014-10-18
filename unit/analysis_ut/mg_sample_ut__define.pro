@@ -63,6 +63,17 @@ function mg_sample_ut::test2
 end
 
 
+function mg_sample_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_sample', /is_function
+
+  return, 1
+end
+
+
 pro mg_sample_ut__define
   compile_opt strictarr
 

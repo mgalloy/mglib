@@ -63,6 +63,17 @@ function mg_hist_nd_ut::test_geo
 end
 
 
+function mg_hist_nd_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_hist_nd', /is_function
+
+  return, 1
+end
+
+
 pro mg_hist_nd_ut__define
   compile_opt strictarr
 

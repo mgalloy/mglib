@@ -12,6 +12,17 @@ function mg_sort_ut::test1
 end
 
 
+function mg_sort_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_sort', /is_function
+
+  return, 1
+end
+
+
 pro mg_sort_ut__define
   compile_opt strictarr
 

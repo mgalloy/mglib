@@ -34,6 +34,17 @@ function mg_reduce_reverse_indices_ut::test_basic
 end
 
 
+function mg_reduce_reverse_indices_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_reduce_reverse_indices', /is_function
+
+  return, 1
+end
+
+
 pro mg_reduce_reverse_indices_ut__define
   compile_opt strictarr
 

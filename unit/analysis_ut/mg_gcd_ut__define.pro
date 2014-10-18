@@ -28,6 +28,17 @@ function mg_gcd_ut::test3
 end
 
 
+function mg_gcd_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_gcd', /is_function
+
+  return, 1
+end
+
+
 function mg_gcd_ut::test_zero
   compile_opt strictarr
 

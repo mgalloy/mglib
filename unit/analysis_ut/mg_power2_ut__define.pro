@@ -37,6 +37,17 @@ function mg_power2_ut::test2
 end
 
 
+function mg_power2_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_power2', /is_function
+
+  return, 1
+end
+
+
 pro mg_power2_ut__define
   compile_opt strictarr
 

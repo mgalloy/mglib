@@ -40,6 +40,17 @@ function mg_epoch2julian_ut::test_1234567890
 end
 
 
+function mg_epoch2julian_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_epoch2julian', /is_function
+
+  return, 1
+end
+
+
 pro mg_epoch2julian_ut__define
   compile_opt strictarr
 

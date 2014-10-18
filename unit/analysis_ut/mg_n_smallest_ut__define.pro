@@ -28,6 +28,17 @@ function mg_n_smallest_ut::test_basic
 end
 
 
+function mg_n_smallest_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_n_smallest', /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Tests for MG_N_SMALLEST.
 ;-

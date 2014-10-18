@@ -55,6 +55,17 @@ function mg_julian2cf_ut::test_epoch_15000day
 end
 
 
+function mg_julian2cf_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_julian2cf', /is_function
+
+  return, 1
+end
+
+
 pro mg_julian2cf_ut__define
   compile_opt strictarr
 

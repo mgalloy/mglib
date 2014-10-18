@@ -62,6 +62,24 @@ function mganrandom_ut::test_gaussians
 end
 
 
+function mganrandom_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mganrandom__define', 'mganrandom::cleanup']
+  self->addTestingRoutine, ['mganrandom::init', $
+                            'mganrandom::getGaussians', $
+                            'mganrandom::getIntegers', $
+                            'mganrandom::getSequence', $
+                            'mganrandom::_convertData', $
+                            'mganrandom::_getData'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mganrandom_ut__define
   compile_opt strictarr
 

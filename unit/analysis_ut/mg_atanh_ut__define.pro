@@ -18,6 +18,17 @@ function mg_atanh_ut::test2
 end
 
 
+function mg_atanh_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_atanh', /is_function
+
+  return, 1
+end
+
+
 pro mg_atanh_ut__define
   compile_opt strictarr
 

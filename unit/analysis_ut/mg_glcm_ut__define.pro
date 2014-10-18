@@ -62,6 +62,17 @@ function mg_glcm_ut::test_n_levels
 end
 
 
+function mg_glcm_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_glcm', /is_function
+
+  return, 1
+end
+
+
 pro mg_glcm_ut__define
   compile_opt strictarr
 

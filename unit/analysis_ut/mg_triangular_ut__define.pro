@@ -66,6 +66,17 @@ function mg_triangular_ut::test_lower_strict
 end
 
 
+function mg_triangular_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_triangular', /is_function
+
+  return, 1
+end
+
+
 pro mg_triangular_ut__define
   compile_opt strictarr
 

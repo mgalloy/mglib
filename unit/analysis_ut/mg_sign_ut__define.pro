@@ -26,6 +26,17 @@ function mg_sign_ut::test_elements
 end
 
 
+function mg_sign_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_sign', /is_function
+
+  return, 1
+end
+
+
 pro mg_sign_ut__define
   compile_opt strictarr
 

@@ -28,6 +28,17 @@ function mg_factor_ut::test_twofactors
 end
 
 
+function mg_factor_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_factor', /is_function
+
+  return, 1
+end
+
+
 function mg_factor_ut::test_large
   compile_opt strictarr
 

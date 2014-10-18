@@ -1,5 +1,8 @@
 ; docformat = 'rst'
 
+; define empty setup/teardown because IDL initializes a GRIB system that would
+; be detected as a memory leak by mgunit
+
 pro mg_grib_getdata_ut::setup
   compile_opt strictarr
 end
@@ -13,7 +16,7 @@ end
 function mg_grib_getdata_ut::test_scalars
   compile_opt strictarr
 
-  filename = filepath('atl.grb2', root='.')
+  filename = filepath('atl.grb2', root=mg_src_root())
 
   keys = ['Ni', 'radius', 'masterDir']
   standards = hash()
@@ -34,7 +37,7 @@ end
 function mg_grib_getdata_ut::test_array
   compile_opt strictarr
 
-  filename = filepath('atl.grb2', root='.')
+  filename = filepath('atl.grb2', root=mg_src_root())
   key = 'values'
 
   file = grib_open(filename)
@@ -51,6 +54,17 @@ function mg_grib_getdata_ut::test_array
   endfor
 
   grib_close, file
+
+  return, 1
+end
+
+
+function mg_grib_getdata_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_grib_getdata', /is_function
 
   return, 1
 end

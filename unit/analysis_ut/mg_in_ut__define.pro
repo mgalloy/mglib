@@ -34,6 +34,17 @@ function mg_in_ut::test_string_not
 end
 
 
+function mg_in_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_in', /is_function
+
+  return, 1
+end
+
+
 pro mg_in_ut__define
   compile_opt strictarr
 
