@@ -57,10 +57,10 @@ function mg_cmp_version_decompose, version, $
     vparts = vparts[0:2]
   endif
 
-  version = lonarr(3)
-  version[0] = long(vparts)
+  _version = lonarr(3)
+  _version[0] = long(vparts)
 
-  return, version
+  return, _version
 end
 
 
