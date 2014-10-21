@@ -29,6 +29,44 @@ function mgcohashtable_ut::test_simple
 end
 
 
+function mgcohashtable_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgcohashtable__define', $
+                            'mgcohashtable::cleanup', $
+                            'mgcohashtable::put', $
+                            'mgcohashtable::update', $
+                            'mgcohashtable::remove', $
+                            'mgcohashtable::print', $
+                            'mgcohashtable::getProperty', $
+                            'mgcohashtable::_overloadBracketsLeftSide', $
+                            'mgcohashtable::_findKeyPos']
+  self->addTestingRoutine, ['mgcohashtable::init', $
+                            'mgcohashtable::isEmpty', $
+                            'mgcohashtable::count', $
+                            'mgcohashtable::setdefault', $
+                            'mgcohashtable::get', $
+                            'mgcohashtable::_calchashcode', $
+                            'mgcohashtable::values', $
+                            'mgcohashtable::keys', $
+                            'mgcohashtable::_getHistogram', $
+                            'mgcohashtable::_overloadSize', $
+                            'mgcohashtable::_overloadHelp', $
+                            'mgcohashtable::_overloadPrint', $
+                            'mgcohashtable::_overloadForeach', $
+                            'mgcohashtable::_findNextKey', $
+                            'mgcohashtable::_repeatNonNumeric', $
+                            'mgcohashtable::_repeatNumeric', $
+                            'mgcohashtable::_overloadPlus', $
+                            'mgcohashtable::_overloadBracketsRightSide'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Hash table tests.
 ;-

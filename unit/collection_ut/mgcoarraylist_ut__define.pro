@@ -41,6 +41,41 @@ function mgcoarraylist_ut::test_add_consecutive
 end
 
 
+function mgcoarraylist_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgcoarraylist__define', $
+                            'mgcoarraylist::cleanup', $
+                            'mgcoarraylist::add', $
+                            'mgcoarraylist::move', $
+                            'mgcoarraylist::remove', $
+                            'mgcoarraylist::setProperty', $
+                            'mgcoarraylist::getProperty', $
+                            'mgcoarraylist::_overloadBracketsLeftSide']
+  self->addTestingRoutine, ['mgcoarraylist::init', $
+                            'mgcoarraylist::iterator', $
+                            'mgcoarraylist::count', $
+                            'mgcoarraylist::get', $
+                            'mgcoarraylist::isaGet', $
+                            'mgcoarraylist::isContained', $
+                            'mgcoarraylist::_overloadSize', $
+                            'mgcoarraylist::_overloadHelp', $
+                            'mgcoarraylist::_overloadPrint', $
+                            'mgcoarraylist::_overloadForeach', $
+                            'mgcoarraylist::_overloadAsterisk', $
+                            'mgcoarraylist::_repeatStructure', $
+                            'mgcoarraylist::_repeatNonNumeric', $
+                            'mgcoarraylist::_repeatNumeric', $
+                            'mgcoarraylist::_overloadPlus', $
+                            'mgcoarraylist::_overloadBracketsRightSide'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Test array list.
 ;-
