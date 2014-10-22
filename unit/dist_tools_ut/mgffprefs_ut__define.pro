@@ -192,6 +192,17 @@ function mgffprefs_ut::init, _extra=e
                         'Readme text', 1)
   self.configdir = filepath('', subdir='prefs', root=appdir)
 
+  self->addTestingRoutine, ['mgffprefs__define', $
+                            'mgffprefs::cleanup', $
+                            'mgffprefs::getProperty', $
+                            'mgffprefs::clear', $
+                            'mgffprefs::set']
+  self->addTestingRoutine, ['mgffprefs::init', $
+                            'mgffprefs::_getAppDir', $
+                            'mgffprefs::_prefnameToFilename', $
+                            'mgffprefs::get'], $
+                           /is_function
+
   return, 1
 end
 

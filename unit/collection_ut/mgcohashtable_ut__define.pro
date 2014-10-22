@@ -57,8 +57,6 @@ function mgcohashtable_ut::init, _extra=e
                             'mgcohashtable::_overloadPrint', $
                             'mgcohashtable::_overloadForeach', $
                             'mgcohashtable::_findNextKey', $
-                            'mgcohashtable::_repeatNonNumeric', $
-                            'mgcohashtable::_repeatNumeric', $
                             'mgcohashtable::_overloadPlus', $
                             'mgcohashtable::_overloadBracketsRightSide'], $
                            /is_function

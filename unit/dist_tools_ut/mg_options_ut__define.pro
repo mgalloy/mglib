@@ -41,6 +41,34 @@ function mg_options_ut::test_longForms
 end
 
 
+function mg_options_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_options__define', $
+                            'mg_options::cleanup', $
+                            'mg_options::addParams', $
+                            'mg_options::addOption', $
+                            'mg_options::parseArgs', $
+                            'mg_options::_displayVersion', $
+                            'mg_options::_displayHelp', $
+                            'mg_opt__define', $
+                            'mg_opt::setValue', $
+                            'mg_opt::getProperty', $
+                            'mg_opt::setProperty']
+  self->addTestingRoutine, ['mg_options::init', $
+                            'mg_options::get', $
+                            'mg_opt::init', $
+                            'mg_opt::getValue', $
+                            'mg_opt::getHelp', $
+                            'mg_opt::isPresent'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Define instance variables.
 ;-

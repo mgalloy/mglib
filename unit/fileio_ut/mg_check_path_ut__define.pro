@@ -43,6 +43,17 @@ function mg_check_path_ut::test_unknown_path
 end
 
 
+function mg_check_path_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_check_path', /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Test `MG_CHECK_PATH`.
 ;-

@@ -5,71 +5,71 @@
 ; persistent across IDL sessions on the same computer.
 ;
 ; :Examples:
-;    The main-level program at the end of this file has an example use of
-;    `MGffPrefs`. To run it, type::
+;   The main-level program at the end of this file has an example use of
+;   `MGffPrefs`. To run it, type::
 ;
-;       IDL> .run mgffprefs__define
+;     IDL> .run mgffprefs__define
 ;
-;    The code creates an `MFffPrefs` object and uses the `set` and `get`
-;    methods to set and retrieve a preference.
+;   The code creates an `MFffPrefs` object and uses the `set` and `get`
+;   methods to set and retrieve a preference.
 ;
-;    Creating the `MGffPrefs` requires setting the `AUTHOR_NAME` and
-;    `APP_NAME` properties so that the `APP_DIRECTORY`, where the prefence
-;    value files are stored, can be specified::
+;   Creating the `MGffPrefs` requires setting the `AUTHOR_NAME` and
+;   `APP_NAME` properties so that the `APP_DIRECTORY`, where the prefence
+;   value files are stored, can be specified::
 ;
-;       authorName = 'mgffprefs_demo'
-;       appName = 'mgffprefs_demo'
-;       prefs = obj_new('mgffprefs', author_name=authorName, app_name=appName)
+;     authorName = 'mgffprefs_demo'
+;     appName = 'mgffprefs_demo'
+;     prefs = obj_new('mgffprefs', author_name=authorName, app_name=appName)
 ;
-;    We can now set a preference value, remember the preference name is
-;    case-insensitive, but the value is stored exactly::
+;   We can now set a preference value, remember the preference name is
+;   case-insensitive, but the value is stored exactly::
 ;
-;       prefs->set, 'name', 'Michael'
+;     prefs->set, 'name', 'Michael'
 ;
-;    The preferences object can now be destroyed to show the preferences are
-;    persistent between IDL sessions::
+;   The preferences object can now be destroyed to show the preferences are
+;   persistent between IDL sessions::
 ;
-;       obj_destroy, prefs
+;     obj_destroy, prefs
 ;
-;    A new `MGffPrefs` object is created with the same `AUTHOR_NAME` and
-;    `APP_NAME` values::
+;   A new `MGffPrefs` object is created with the same `AUTHOR_NAME` and
+;   `APP_NAME` values::
 ;
-;       prefs = obj_new('mgffprefs', author_name=authorName, app_name=appName)
+;     prefs = obj_new('mgffprefs', author_name=authorName, app_name=appName)
 ;
-;    The "name" preference can now be retrieved::
+;   The "name" preference can now be retrieved::
 ;
-;       name = prefs->get('name', found=found)
+;     name = prefs->get('name', found=found)
 ;
-;    We can retrieve the `APP_DIRECTORY` property to know where the preference
-;    files are stored::
+;   We can retrieve the `APP_DIRECTORY` property to know where the preference
+;   files are stored::
 ;
-;       prefs->getProperty, app_directory=appdir
+;     prefs->getProperty, app_directory=appdir
 ;
-;    We are done with the `MGffPrefs` object::
+;   We are done with the `MGffPrefs` object::
 ;
-;       obj_destroy, prefs
+;     obj_destroy, prefs
 ;
-;    Print the preference value::
+;   Print the preference value::
 ;
-;       print, name, format='(%"Preference value for name: %s")'
+;     print, name, format='(%"Preference value for name: %s")'
 ;
-;    We can manually clean out the entire directory for our preferences::
+;   We can manually clean out the entire directory for our preferences::
 ;
-;       file_delete, file_dirname(appdir), /recursive, /allow_nonexistent, /quiet
+;     file_delete, file_dirname(appdir), /recursive, /allow_nonexistent, /quiet
 ;
-;    Individual preferences can be cleared with the `clear` method.
+;   Individual preferences can be cleared with the `clear` method.
 ;
 ; :Properties:
-;    author_name
-;       short name of the author
-;    app_name
-;       short name of the application
-;    author_description
-;       full name of the author
-;    app_description
-;       full name of the application
-;    app_directory
-;       location of the directory for the application using these preferences
+;   author_name
+;     short name of the author
+;   app_name
+;     short name of the application
+;   author_description
+;     full name of the author
+;   app_description
+;     full name of the application
+;   app_directory
+;     location of the directory for the application using these preferences
 ;-
 
 
@@ -77,10 +77,10 @@
 ; Save the value of a preference.
 ;
 ; :Params:
-;    prefname : in, required, type=string
-;       case-insensitive name of preference to retrieve
-;    prefvalue : in, required, type=any
-;       value of the preference
+;   prefname : in, required, type=string
+;     case-insensitive name of preference to retrieve
+;   prefvalue : in, required, type=any
+;     value of the preference
 ;-
 pro mgffprefs::set, prefname, prefvalue
   compile_opt strictarr
@@ -95,8 +95,8 @@ end
 ; Clear the value of a preference.
 ;
 ; :Params:
-;    prefname : in, required, type=string
-;       case-insensitive name of preference to retrieve
+;   prefname : in, required, type=string
+;     case-insensitive name of preference to retrieve
 ;-
 pro mgffprefs::clear, prefname
   compile_opt strictarr
@@ -110,22 +110,22 @@ end
 ; Retrieve the value of a preference.
 ;
 ; :Returns:
-;    preference value
+;   preference value
 ;
 ; :Params:
-;    prefname : in, required, type=string
-;       case-insensitive name of preference to retrieve
+;   prefname : in, required, type=string
+;     case-insensitive name of preference to retrieve
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       set to a named variable to return whether the preference was found
-;    default : in, optional, type=any
-;       default value to use if no preference value is found for the given
-;       preference name
-;    names : in, optional, type=boolean
-;       set to return a list of the preference names instead of a value; names
-;       may not agree exactly with the names given in the set method because
-;       they have been modified to make valid filename
+;   found : out, optional, type=boolean
+;     set to a named variable to return whether the preference was found
+;   default : in, optional, type=any
+;     default value to use if no preference value is found for the given
+;     preference name
+;   names : in, optional, type=boolean
+;     set to return a list of the preference names instead of a value; names
+;     may not agree exactly with the names given in the set method because
+;     they have been modified to make valid filename
 ;-
 function mgffprefs::get, prefname, found=found, default=default, names=names
   compile_opt strictarr
@@ -161,11 +161,11 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    prefname : in, required, type=string
-;       name of preference
+;   prefname : in, required, type=string
+;     name of preference
 ;-
 function mgffprefs::_prefnameToFilename, prefname
   compile_opt strictarr
@@ -180,19 +180,19 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    authorName : in, required, type=string
-;       short name of the author
-;    appName : in, required, type=string
-;       short application name
+;   authorName : in, required, type=string
+;     short name of the author
+;   appName : in, required, type=string
+;     short application name
 ;
 ; :Keywords:
-;    author_description : in, optional, type=string
-;       full name of the author
-;    app_description : in, optional, type=string
-;       full name of the application
+;   author_description : in, optional, type=string
+;     full name of the author
+;   app_description : in, optional, type=string
+;     full name of the application
 ;-
 function mgffprefs::_getAppDir, authorName, appName, $
                                 author_description=authorDescription, $
@@ -242,17 +242,17 @@ end
 ; Initialize a prefs object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Keywords:
-;    author_name : in, required, type=string
-;       short name of the author
-;    app_name : in, required, type=string
-;       short name of the application
-;    author_description : in, optional, type=string
-;       full name of the author
-;    app_description : in, optional, type=string
-;       full name of the application
+;   author_name : in, required, type=string
+;     short name of the author
+;   app_name : in, required, type=string
+;     short name of the application
+;   author_description : in, optional, type=string
+;     full name of the author
+;   app_description : in, optional, type=string
+;     full name of the application
 ;-
 function mgffprefs::init, author_name=authorName, app_name=appName, $
                           author_description=authorDescription, $
@@ -276,8 +276,8 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    appdir
-;       directory to place preference files
+;   appdir
+;     directory to place preference files
 ;-
 pro mgffprefs__define
   compile_opt strictarr

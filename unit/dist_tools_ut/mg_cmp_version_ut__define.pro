@@ -47,6 +47,17 @@ function mg_cmp_version_ut::test_basic
 end
 
 
+function mg_resolve_routine_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_resolve_routine'
+
+  return, 1
+end
+
+
 ;+
 ; Define member variables.
 ;-

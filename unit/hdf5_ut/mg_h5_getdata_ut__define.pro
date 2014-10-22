@@ -51,6 +51,24 @@ function mg_h5_getdata_ut::test_variableslice
 end
 
 
+function mg_h5_getdata_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_h5_getdata', $
+                            'mg_h5_getdata_getattribute', $
+                            'mg_h5_getdata_getattributedata', $
+                            'mg_h5_getdata_getvariable', $
+                            'mg_h5_getdata_convertbounds', $
+                            'mg_h5_getdata_convertbounds_1d'], $
+                           /is_function
+  self->addTestingRoutine, 'mg_h5_getdata_computeslab'
+
+  return, 1
+end
+
+
 pro mg_h5_getdata_ut__define
   compile_opt strictarr
 

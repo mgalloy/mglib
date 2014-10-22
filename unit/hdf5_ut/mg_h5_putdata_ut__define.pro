@@ -41,6 +41,23 @@ function mg_h5_putdata_ut::test_data
 end
 
 
+function mg_h5_putdata_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_h5_putdata', $
+                            'mg_h5_putdata_putattribute', $
+                            'mg_h5_putdata_putattributedata', $
+                            'mg_h5_putdata_putvariable']
+  self->addTestingRoutine, ['mg_h5_putdata_varexists', $
+                            'mg_h5_putdata_getreference'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_h5_putdata_ut__define
   compile_opt strictarr
 

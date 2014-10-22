@@ -4,42 +4,42 @@
 ; An object to facilitate parsing of command line options.
 ;
 ; :Examples:
-;    Try::
+;   Try::
 ;
-;       ; create options object
-;       opts = obj_new('mg_options', app_name='mg_options_example', version='1.0')
+;     ; create options object
+;     opts = obj_new('mg_options', app_name='mg_options_example', version='1.0')
 ;
-;       ; setup options
-;       opts->addOption, 'verbose', 'v', $
-;                        /boolean, $
-;                        help='set to print a verbose greeting'
-;       opts->addOption, 'name', 'n', help='name of user to greet', default='Mike', $
+;     ; setup options
+;     opts->addOption, 'verbose', 'v', $
+;                      /boolean, $
+;                      help='set to print a verbose greeting'
+;     opts->addOption, 'name', 'n', help='name of user to greet', default='Mike', $
 ;                        metavar='user''s name'
 ;
-;       ; parse the options
-;       opts->parseArgs, error_message=errorMsg
+;     ; parse the options
+;     opts->parseArgs, error_message=errorMsg
 ;
-;       if (errorMsg ne '') then begin
-;         oldQuiet = !quiet
-;         !quiet = 0
-;         message, errorMsg, /informational, /noname
-;         !quiet = oldQuiet
-;       end
+;     if (errorMsg ne '') then begin
+;       oldQuiet = !quiet
+;       !quiet = 0
+;       message, errorMsg, /informational, /noname
+;       !quiet = oldQuiet
+;     end
 ;
-;       if (errorMsg eq '' && ~opts->get('help') && ~opts->get('version')) then begin
-;         print, (opts->get('verbose') ? 'Greetings and salutations' : 'Hello'), $
-;                opts->get('name'), $
-;                format='(%"%s, %s!")'
-;       endif
+;     if (errorMsg eq '' && ~opts->get('help') && ~opts->get('version')) then begin
+;       print, (opts->get('verbose') ? 'Greetings and salutations' : 'Hello'), $
+;              opts->get('name'), $
+;              format='(%"%s, %s!")'
+;     endif
 ;
-;       ; destroy the options when done
-;       obj_destroy, opts
+;     ; destroy the options when done
+;     obj_destroy, opts
 ;
 ; :Uses:
-;    `MGcoHashTable`
+;   `MGcoHashTable`
 ;
 ; :Requires:
-;    IDL 6.2
+;   IDL 6.2
 ;-
 
 
@@ -117,7 +117,7 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;-
 function mg_opt::getHelp
   compile_opt strictarr
@@ -132,11 +132,11 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string (normally) or byte (if boolean)
+;   string (normally) or byte (if boolean)
 ;
 ; :Keywords:
-;    present : out, optional, type=boolean
-;       set to a named variable to determine if the option is present
+;   present : out, optional, type=boolean
+;     set to a named variable to determine if the option is present
 ;-
 function mg_opt::getValue, present=present
   compile_opt strictarr
@@ -157,8 +157,8 @@ end
 ; :Private:
 ;
 ; :Params:
-;    value : in, optional, type=string
-;       value of the option
+;   value : in, optional, type=string
+;     value of the option
 ;-
 pro mg_opt::setValue, value
   compile_opt strictarr
@@ -181,20 +181,20 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Keywords:
-;    long_name : in, required, type=string
-;       long name of the option
-;    boolean : in, optional, type=boolean
-;       set to indicate the option is boolean i.e. it does not take a value,
-;       being present "sets" it
-;    help : in, optional, type=string, default=''
-;       help text to display for the option
-;    default : in, optional, type=string, default=''
-;       default value of the option
-;    metavar : in, optional, type=string
-;       text to display in the help for non-boolean option values
+;   long_name : in, required, type=string
+;     long name of the option
+;   boolean : in, optional, type=boolean
+;     set to indicate the option is boolean i.e. it does not take a value,
+;     being present "sets" it
+;   help : in, optional, type=string, default=''
+;     help text to display for the option
+;   default : in, optional, type=string, default=''
+;     default value of the option
+;   metavar : in, optional, type=string
+;     text to display in the help for non-boolean option values
 ;-
 function mg_opt::init, long_name=longName, boolean=boolean, $
                        help=help, default=default, metavar=metavar
@@ -216,22 +216,22 @@ end
 ; :Private:
 ;
 ; :Fields:
-;    longName
-;       long name of the option
-;    shortName
-;       single character abbreviation for the option
-;    value
-;       value of the option
-;    present
-;       true if value has been set
-;    boolean
-;       true if option is a boolean type option
-;    metavar
-;       text to display in the help for non-boolean option values
-;    help
-;       text to print for the option if help is asked for
-;    default
-;       default value if value is not present
+;   longName
+;     long name of the option
+;   shortName
+;     single character abbreviation for the option
+;   value
+;     value of the option
+;   present
+;     true if value has been set
+;   boolean
+;     true if option is a boolean type option
+;   metavar
+;     text to display in the help for non-boolean option values
+;   help
+;     text to print for the option if help is asked for
+;   default
+;     default value if value is not present
 ;-
 pro mg_opt__define
   compile_opt strictarr
@@ -254,19 +254,19 @@ end
 ; Get value of option.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    optname : in, required, type=string
-;       long name of option
+;   optname : in, required, type=string
+;     long name of option
 ;
 ; :Keywords:
-;    params : in, optional, type=boolean
-;       set to return parameters
-;    n_params : out, optional, type=long
-;       number of parameters returned, only used if PARAMS is set
-;    present : out, optional, type=boolean
-;       set to a named variable to determine if the option was present
+;   params : in, optional, type=boolean
+;     set to return parameters
+;   n_params : out, optional, type=long
+;     number of parameters returned, only used if PARAMS is set
+;   present : out, optional, type=boolean
+;     set to a named variable to determine if the option was present
 ;-
 function mg_options::get, optname, params=params, n_params=nparams, $
                           present=present
@@ -347,7 +347,6 @@ end
 ; Print version information.
 ;
 ; :Private:
-
 ;-
 pro mg_options::_displayVersion
   compile_opt strictarr
@@ -360,13 +359,13 @@ end
 ; Parse arguments.
 ;
 ; :Params:
-;    args : in, optional, type=strarr, default=command_line_args()
-;       string array of arguments
+;   args : in, optional, type=strarr, default=command_line_args()
+;     string array of arguments
 ;
 ; :Keywords:
-;    error_message : out, optional, type=string
-;       set to a named variable to receive any error message generated from
-;       parsing the parameters
+;   error_message : out, optional, type=string
+;     set to a named variable to receive any error message generated from
+;     parsing the parameters
 ;-
 pro mg_options::parseArgs, args, error_message=errorMsg
   compile_opt strictarr
@@ -480,20 +479,20 @@ end
 ; Add the definition of an option to the parser.
 ;
 ; :Params:
-;    longForm : in, required, type=string
-;       long name of the option, used with two dashes i.e. --help
-;    shortForm : in, optional, type=string
-;       single character name of an option, used with a single dash i.e. -h
+;   longForm : in, required, type=string
+;     long name of the option, used with two dashes i.e. --help
+;   shortForm : in, optional, type=string
+;     single character name of an option, used with a single dash i.e. -h
 ;
 ; :Keywords:
-;    boolean : in, optional, type=boolean
-;       set to indicate the option is a boolean switch
-;    help : in, optional, type=string
-;       help text for the option
-;    default : in, optional, type=string
-;       default value
-;    metavar : in, optional, type=string
-;       text to display in the help for non-boolean option values
+;   boolean : in, optional, type=boolean
+;     set to indicate the option is a boolean switch
+;   help : in, optional, type=string
+;     help text for the option
+;   default : in, optional, type=string
+;     default value
+;   metavar : in, optional, type=string
+;     text to display in the help for non-boolean option values
 ;-
 pro mg_options::addOption, longForm, shortForm, help=help, default=default, $
                            boolean=boolean, metavar=metavar
@@ -514,9 +513,9 @@ end
 ; Add a range of positional parameters.
 ;
 ; :Params:
-;    nparamsRange : in, required, type=lonarr(2)
-;       valid range for number of positional parameters, use -1 for the max
-;       value to allow an unlimited number of parameters
+;   nparamsRange : in, required, type=lonarr(2)
+;     valid range for number of positional parameters, use -1 for the max
+;     value to allow an unlimited number of parameters
 ;-
 pro mg_options::addParams, nparamsRange
   compile_opt strictarr
@@ -553,13 +552,13 @@ end
 ; Create option parsing object.
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Keywords:
-;    app_name : in, optional, type=string, default=''
-;       application name
-;    version : in, optional, type=string
-;       version of the application
+;   app_name : in, optional, type=string, default=''
+;     application name
+;   version : in, optional, type=string
+;     version of the application
 ;-
 function mg_options::init, app_name=appname, version=version
   compile_opt strictarr
@@ -584,10 +583,10 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    longOptions
-;       hash table of options keyed on long name of option
-;    shortOptions
-;       hash table of options keyed on short name of option, if present
+;   longOptions
+;     hash table of options keyed on long name of option
+;   shortOptions
+;     hash table of options keyed on short name of option, if present
 ;-
 pro mg_options__define
   compile_opt strictarr
@@ -608,11 +607,11 @@ end
 ;+
 ; Execute this program with something like::
 ;
-;    idl -IDL_QUIET 1 -quiet -e ".run mg_options__define" -args --verbose --name=Mike
+;   idl -IDL_QUIET 1 -quiet -e ".run mg_options__define" -args --verbose --name=Mike
 ;
 ; or::
 ;
-;    idl -IDL_QUIET 1 -quiet -e ".run mg_options__define" -args --help
+;   idl -IDL_QUIET 1 -quiet -e ".run mg_options__define" -args --help
 ;-
 
 ; create options object

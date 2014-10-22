@@ -31,6 +31,21 @@ function mg_resolve_routine_ut::test_notfound
 end
 
 
+function mg_cmp_version_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_cmp_version', $
+                            'mg_cmp_version_decompose', $
+                            'mg_cmp_version_cmp', $
+                            'mg_cmp_version_isinteger'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Define member variables.
 ;-

@@ -1,6 +1,18 @@
 ; docformat = 'rst'
 
 
+;+
+; Determine if the input string represents an integer.
+;
+; :Private:
+;
+; :Returns:
+;   boolean
+;
+; :Params:
+;   p1 : in, required, type=string
+;     input string
+;-
 function mg_cmp_version_isinteger, p1
   compile_opt strictarr
 
@@ -8,6 +20,20 @@ function mg_cmp_version_isinteger, p1
 end
 
 
+;+
+; Compare a place in a version number.
+;
+; :Private:
+;
+; :Returns:
+;   0 for equal, 1 for p1 gt p2, -1 for p1 lt p2
+;
+; :Params:
+;   p1 : in, required, type=string
+;     one digit of a version number
+;   p2 : in, required, type=string
+;     one digit of a version number
+;-
 function mg_cmp_version_cmp, p1, p2
   compile_opt strictarr
 
@@ -38,6 +64,20 @@ end
 ;
 ; :Returns:
 ;   `lonarr(3)`
+;
+; :Params:
+;   version : in, required, type=string
+;     version string of the form '1.2.3' or '1.2.3-prereleaseinfo+buildinfo'
+;
+; :Keywords:
+;   build_info : out, optional, type=string
+;     set to a named variable to return the build information if present in the
+;     version string
+;   prerelease_info : out, optional, type=string
+;     set to a named variable to return the prerelease information if present
+;     in the version string
+;   error : out, optional, type=long
+;     set to a named variable to return the error status, 0 for no error
 ;-
 function mg_cmp_version_decompose, version, $
                                    build_info=build_info, $
@@ -45,6 +85,7 @@ function mg_cmp_version_decompose, version, $
                                    error=error
   compile_opt strictarr
 
+  error = 0L
   re = '([[:digit:]\.]+)-?([^\+]*)\+?(.*)'
   tokens = stregex(version, re, /extract, /subexpr)
 

@@ -242,6 +242,33 @@ function mg_read_config_ut::test_case
 end
 
 
+function mg_read_config_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgffoptions__define', $
+                            'mgffoptions::cleanup', $
+                            'mgffoptions::put', $
+                            'mgffoptions::getProperty', $
+                            'mgffoptions::_overloadBracketsLeftSide']
+  self->addTestingRoutine, ['mg_read_config', $
+                            'mgffoptions::init', $
+                            'mgffoptions::get', $
+                            'mgffoptions::options', $
+                            'mgffoptions::has_option', $
+                            'mgffoptions::has_section', $
+                            'mgffoptions::_overloadPrint', $
+                            'mgffoptions::_overloadHelp', $
+                            'mgffoptions::_overloadForeach', $
+                            'mgffoptions::_overloadBracketsRightSide'], $
+                           /is_function
+
+  return, 1
+end
+
+
+
 ;+
 ; Test `MG_READ_CONFIG`.
 ;-

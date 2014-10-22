@@ -13,6 +13,17 @@ function mg_platform_extension_ut::test_basic
 end
 
 
+function mg_platform_extension_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_platform_extension', /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Define member variables.
 ;-

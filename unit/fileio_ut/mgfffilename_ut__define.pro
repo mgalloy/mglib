@@ -128,6 +128,24 @@ function mgfffilename_ut::test_decompose_noSubdirs
 end
 
 
+function mgfffilename_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgfffilename__define', $
+                            'mgfffilename::cleanup', $
+                            'mgfffilename::compose', $
+                            'mgfffilename::getProperty', $
+                            'mgfffilename::setProperty']
+  self->addTestingRoutine, ['mgfffilename::init', $
+                            'mgfffilename::toString'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Test array list.
 ;-
