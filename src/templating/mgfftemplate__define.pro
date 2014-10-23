@@ -5,45 +5,47 @@
 ; structures or objects.
 ;
 ; :Examples:
-;    The typical template use from a template file looks something like::
+;   The typical template use from a template file looks something like::
 ;
-;       template = obj_new('MGffTemplate', template_filename)
-;       template->process, data, output_filename
-;       obj_destroy, template
+;     template = obj_new('MGffTemplate', template_filename)
+;     template->process, data, output_filename
+;     obj_destroy, template
 ;
 ; :Todo:
-;    Allow a C format code specification string as in::
+;   Allow a C format code specification string as in::
 ;
-;       [% "%0.1f" % temp %]
+;     [% "%0.1f" % temp %]
 ;
-;    The format specification could be a variable itself, as in::
+;   The format specification could be a variable itself, as in::
 ;
-;       [% format % temp %]
+;     [% format % temp %]
 ;
-;    where the template was processed with variables like::
+;   where the template was processed with variables like::
 ;
-;       { format: '%0.1f', temp: 77. }
+;     { format: '%0.1f', temp: 77. }
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;
 ;
 ; :Requires:
-;    IDL 6.1
+;   IDL 6.1
 ;
 ; :Uses:
-;    `MGffTokenizer`
+;   `MGffTokenizer`
 ;
 ; :Categories:
-;    input/output
+;   input/output
 ;
 ; :Properties:
-;    spaces
-;       number of spaces to indent the include
-;    string_array
-;       set to indicate that `template_filename` is actually a string array
-;       containing the template
+;   spaces
+;     number of spaces to indent the include
+;   string_array
+;     set to indicate that `template_filename` is actually a string array
+;     containing the template
 ;-
+
+;= MGffForTemplate implementation
 
 ;+
 ; Implements the getVariable method. This routine returns a value of a
@@ -53,15 +55,15 @@
 ; :Private:
 ;
 ; :Returns:
-;    any type
+;   any type
 ;
 ; :Params:
-;    name : in, required,type=string
-;       name of the variable
+;   name : in, required,type=string
+;     name of the variable
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       true if the variable was found
+;   found : out, optional, type=boolean
+;     true if the variable was found
 ;-
 function mgfffortemplate::getVariable, name, found=found
   compile_opt strictarr
@@ -85,8 +87,8 @@ end
 ; :Private:
 ;
 ; :Params:
-;    value : in, required, type=any
-;       new value of the FOREACH loop index variable
+;   value : in, required, type=any
+;     new value of the FOREACH loop index variable
 ;-
 pro mgfffortemplate::setVariable, value
   compile_opt strictarr
@@ -113,13 +115,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    1 for success, 0 for failure
+;   1 for success, 0 for failure
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of the FOREACH loop index variable
-;    value : in, required, type=any
-;       initial value for the FOREACH loop index variable
+;   name : in, required, type=string
+;     name of the FOREACH loop index variable
+;   value : in, required, type=any
+;     initial value for the FOREACH loop index variable
 ;-
 function mgfffortemplate::init, name, value
   compile_opt strictarr
@@ -138,10 +140,10 @@ end
 ; :Private:
 ;
 ; :Fields:
-;    name
-;       name of the FOREACH loop index variable.
-;    value
-;       pointer to the value of the FOREACH loop index variable.
+;   name
+;     name of the FOREACH loop index variable.
+;   value
+;     pointer to the value of the FOREACH loop index variable.
 ;-
 pro mgfffortemplate__define
   compile_opt strictarr
@@ -153,6 +155,8 @@ pro mgfffortemplate__define
 end
 
 
+;= MGffCompoundTemplate implementation
+
 ;+
 ; Implements the getVariable method. This routine returns a value of a
 ; variable given the variable's name as a string. This routine checks its
@@ -161,15 +165,15 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    any type
+;   any type
 ;
 ; :Params:
-;    name : in, required, type=string
-;       name of the variable
+;   name : in, required, type=string
+;     name of the variable
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       true if the variable was found
+;   found : out, optional, type=boolean
+;     true if the variable was found
 ;-
 function mgffcompoundtemplate::getVariable, name, found=found
   compile_opt strictarr
@@ -230,13 +234,13 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    1L
+;   1L
 ;
 ; :Params:
-;    template1 : in, required, type=object
-;       an object which implements the getVariable method
-;    template2 : in, required, type=object
-;       an object which implements the getVariable method or a structure
+;   template1 : in, required, type=object
+;     an object which implements the `getVariable` method
+;   template2 : in, required, type=object
+;     an object which implements the `getVariable` method or a structure
 ;-
 function mgffcompoundtemplate::init, template1, template2
   compile_opt strictarr
@@ -266,10 +270,10 @@ end
 ; :Private:
 ;
 ; :Fields:
-;    template1
-;       a subobject implementing the getVariable method
-;    template2
-;       a subobject implementing the getVariable method
+;   template1
+;     a subobject implementing the `getVariable` method
+;   template2
+;     a subobject implementing the `getVariable` method
 ;-
 pro mgffcompoundtemplate__define
   compile_opt strictarr
@@ -280,6 +284,8 @@ pro mgffcompoundtemplate__define
            }
 end
 
+
+;= MGffTemplate implementation
 
 ;+
 ; Make a string array which has an empty first element and all the rest are
@@ -311,14 +317,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    lun : in, required, type=LUN
-;       logical unit number to direct output to, -3 means /dev/null
-;    data : in, required, type=any
-;       data to print
+;   lun : in, required, type=LUN
+;     logical unit number to direct output to, -3 means /dev/null
+;   data : in, required, type=any
+;     data to print
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       keywords to PRINTF
+;   _extra : in, optional, type=keywords
+;     keywords to `PRINTF`
 ;-
 pro mgfftemplate::_printf, lun, data, _extra=e
   compile_opt strictarr
@@ -353,10 +359,10 @@ end
 ; :Private:
 ;
 ; :Params:
-;    mgfftemplate$variables : in, required, type=structure
-;       anonymous structure of variables
-;    mgfftemplate$output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   mgfftemplate$variables : in, required, type=structure
+;     anonymous structure of variables
+;   mgfftemplate$output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;-
 pro mgfftemplate::_process_if, mgfftemplate$variables, mgfftemplate$output_lun
   compile_opt strictarr, logical_predicate
@@ -407,10 +413,10 @@ end
 ; :Private:
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       anonymous structure of variables
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   variables : in, required, type=structure
+;     anonymous structure of variables
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;-
 pro mgfftemplate::_process_foreach, variables, output_lun
   compile_opt strictarr
@@ -487,14 +493,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       anonymous structure of variables
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   variables : in, required, type=structure
+;     anonymous structure of variables
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;
 ; :Keywords:
-;    spaces : in, optional, type=integer, default=0
-;       number of spaces to indent the include
+;   spaces : in, optional, type=integer, default=0
+;     number of spaces to indent the include
 ;-
 pro mgfftemplate::_process_include, variables, output_lun, spaces=spaces
   compile_opt strictarr
@@ -543,14 +549,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       anonymous structure of variables
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   variables : in, required, type=structure
+;     anonymous structure of variables
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;
 ; :Keywords:
-;    spaces : in, optional, type=integer, default=0
-;       number of spaces to indent the include
+;   spaces : in, optional, type=integer, default=0
+;     number of spaces to indent the include
 ;-
 pro mgfftemplate::_process_include_template, variables, output_lun, spaces=spaces
   compile_opt strictarr
@@ -601,12 +607,12 @@ end
 ; :Private:
 ;
 ; :Params:
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;
 ; :Keywords:
-;    spaces : in, optional, type=integer, default=0
-;       number of spaces to indent the include
+;   spaces : in, optional, type=integer, default=0
+;     number of spaces to indent the include
 ;-
 pro mgfftemplate::_process_insert, output_lun, spaces=spaces
   compile_opt strictarr
@@ -646,10 +652,10 @@ end
 ; :Private:
 ;
 ; :Params:
-;    variables : in, required, type=object
-;       object with getVariable method
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   variables : in, required, type=object
+;     object with getVariable method
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;-
 pro mgfftemplate::_process_scope, variables, output_lun
     compile_opt strictarr
@@ -688,17 +694,17 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    value of variable or -1L if not found
+;   value of variable or -1L if not found
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       icalstructure of variables
-;    name : in, required, type=string
-;       name of a variable
+;   variables : in, required, type=structure
+;     structure of variables
+;   name : in, required, type=string
+;     name of a variable
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       true if name is a variable in variables structure
+;   found : out, optional, type=boolean
+;     true if name is a variable in variables structure
 ;-
 function mgfftemplate::_getVariable, variables, name, found=found
   compile_opt strictarr
@@ -738,22 +744,22 @@ end
 ; :Private:
 ;
 ; :Params:
-;    mgfftemplate$expression : in, required, type=string
-;       expression containing variable names to insert value of
-;    mgfftemplate$variables : in, required, type=structure
-;       anonymous structure of variables
-;    mgfftemplate$output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   mgfftemplate$expression : in, required, type=string
+;     expression containing variable names to insert value of
+;   mgfftemplate$variables : in, required, type=structure
+;     anonymous structure of variables
+;   mgfftemplate$output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;
 ; :Keywords:
-;    post_delim : out, optional, type=string
-;       delimiter after the returned token
-;    value : out, optional, type=any
-;       value of the expression evaluated
-;    found : out, optional, type=boolean
-;       true if the expression was evaluated without error
-;    spaces : in, optional, type=integer, default=0
-;       number of spaces to indent the include
+;   post_delim : out, optional, type=string
+;     delimiter after the returned token
+;   value : out, optional, type=any
+;     value of the expression evaluated
+;   found : out, optional, type=boolean
+;     true if the expression was evaluated without error
+;   spaces : in, optional, type=integer, default=0
+;     number of spaces to indent the include
 ;-
 pro mgfftemplate::_process_variable, mgfftemplate$expression, $
                                      mgfftemplate$variables, $
@@ -820,14 +826,14 @@ end
 ; :Private:
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       anonymous structure of variables
-;    output_lun : in, required, type=LUN
-;       logical unit number of output file
+;   variables : in, required, type=structure
+;     anonymous structure of variables
+;   output_lun : in, required, type=LUN
+;     logical unit number of output file
 ;
 ; :Keywords:
-;    else_clause : out, optional, type=boolean
-;       returns 1 if an [% ELSE %] directive was just processed
+;   else_clause : out, optional, type=boolean
+;     returns 1 if an `[% ELSE %]` directive was just processed
 ;-
 pro mgfftemplate::_process_tokens, variables, output_lun, $
                                    else_clause=else_clause
@@ -875,19 +881,21 @@ pro mgfftemplate::_process_tokens, variables, output_lun, $
 end
 
 
+;= MGffTemplate public interface
+
 ;+
 ; Process the template with the given variables and send output to the given
 ; filename.
 ;
 ; :Params:
-;    variables : in, required, type=structure
-;       either a structure or an object with getVariable method
-;    output_filename : in, optional, type=string
-;       filename of the output file
+;   variables : in, required, type=structure
+;     either a structure or an object with getVariable method
+;   output_filename : in, optional, type=string
+;     filename of the output file
 ;
 ; :Keywords:
-;    lun : in, optional, type=long
-;       logical unit number of an already open file to send output to
+;   lun : in, optional, type=long
+;     logical unit number of an already open file to send output to
 ;-
 pro mgfftemplate::process, variables, output_filename, lun=output_lun
   compile_opt strictarr
@@ -913,6 +921,8 @@ pro mgfftemplate::reset
 end
 
 
+;= MGffTemplate lifecycle methods
+
 ;+
 ; Frees resources.
 ;-
@@ -928,18 +938,18 @@ end
 ; times with different sets of data sent to the process method.
 ;
 ; :Returns:
-;    1 for success, 0 otherwise
+;   1 for success, 0 otherwise
 ;
 ; :Params:
-;    template_filename : in, required, type=string
-;       filename of the template file
+;   template_filename : in, required, type=string
+;     filename of the template file
 ;
 ; :Keywords:
-;    spaces : in, optional, type=integer, default=0
-;       number of spaces to indent the include
-;    string_array : in, optional, type=boolean
-;       set to indicate that `template_filename` is actually a string array
-;       containing the template
+;   spaces : in, optional, type=integer, default=0
+;     number of spaces to indent the include
+;   string_array : in, optional, type=boolean
+;     set to indicate that `template_filename` is actually a string array
+;     containing the template
 ;-
 function mgfftemplate::init, template_filename, spaces=spaces, $
                              string_array=stringArray
@@ -972,10 +982,10 @@ end
 ; Define instance variables.
 ;
 ; :Fields:
-;    templateFilename
-;       filename of the template file
-;    tokenizer
-;       `MGffTokenizer` used to break a template into tokens
+;   templateFilename
+;     filename of the template file
+;   tokenizer
+;     `MGffTokenizer` used to break a template into tokens
 ;-
 pro mgfftemplate__define
   compile_opt strictarr
