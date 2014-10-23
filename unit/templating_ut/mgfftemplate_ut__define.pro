@@ -312,6 +312,43 @@ function mgfftemplate_ut::test_simple
 end
 
 
+function mgfftemplate_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgfftemplate__define', $
+                            'mgfftemplate::cleanup', $
+                            'mgfftemplate::reset', $
+                            'mgfftemplate::process', $
+                            'mgfftemplate::_process_tokens', $
+                            'mgfftemplate::_process_variable', $
+                            'mgfftemplate::_process_scope', $
+                            'mgfftemplate::_process_insert', $
+                            'mgfftemplate::_process_include_template', $
+                            'mgfftemplate::_process_include', $
+                            'mgfftemplate::_copyFile', $
+                            'mgfftemplate::_process_foreach', $
+                            'mgfftemplate::_process_if', $
+                            'mgfftemplate::_printf', $
+                            'mgffcompoundtemplate__define', $
+                            'mgffcompoundtemplate::cleanup', $
+                            'mgfffortemplate__define', $
+                            'mgfffortemplate::cleanup', $
+                            'mgfffortemplate::setVariable']
+  self->addTestingRoutine, ['mgfftemplate::init', $
+                            'mgfftemplate::_getVariable', $
+                            'mgfftemplate_makespace', $
+                            'mgffcompoundtemplate::init', $
+                            'mgffcompoundtemplate::getVariable', $
+                            'mgfffortemplate::init', $
+                            'mgfffortemplate::getVariable'], $
+                           /is_function
+
+  return, 1
+end
+
+
 ;+
 ; Unit tests fo MGffTemplate.
 ;-
