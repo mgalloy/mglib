@@ -31,6 +31,16 @@ function mg_round_ut::test_basic
 end
 
 
+function mg_round_ut::test_error
+  compile_opt strictarr
+  @error_is_pass
+
+  r = mg_round()
+
+  return, 1
+end
+
+
 function mg_round_ut::init, _extra=e
   compile_opt strictarr
 

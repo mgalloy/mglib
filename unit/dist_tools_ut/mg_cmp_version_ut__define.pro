@@ -47,12 +47,24 @@ function mg_cmp_version_ut::test_basic
 end
 
 
-function mg_resolve_routine_ut::init, _extra=e
+function mg_cmp_version_ut::test_too_many_parts
+  compile_opt strictarr
+
+  result = mg_cmp_version('1.1.0.1', '1.1.0.2', error=error)
+  assert, error gt 0L, 'too many version parts not detected'
+
+  return, 1
+end
+
+
+function mg_cmp_version_ut::init, _extra=e
   compile_opt strictarr
 
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
 
-  self->addTestingRoutine, 'mg_resolve_routine'
+  self->addTestingRoutine, ['mg_cmp_version', $
+                            'mg_cmp_version_decompose'], $
+                           /is_function
 
   return, 1
 end

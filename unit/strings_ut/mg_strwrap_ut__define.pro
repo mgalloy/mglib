@@ -35,6 +35,17 @@ function mg_strwrap_ut::test_indenting
 end
 
 
+function mg_strwrap_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_strwrap', /is_function
+
+  return, 1
+end
+
+
 pro mg_strwrap_ut__define
   compile_opt strictarr
 

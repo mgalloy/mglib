@@ -162,8 +162,15 @@ function mg_cmp_version, version1, version2, error=error
 
   error = 0L
 
-  version_values_1 = mg_cmp_version_decompose(version1, prerelease_info=pr_info_1)
-  version_values_2 = mg_cmp_version_decompose(version2, prerelease_info=pr_info_2)
+  version_values_1 = mg_cmp_version_decompose(version1, $
+                                              prerelease_info=pr_info_1, $
+                                              error=error_1)
+  version_values_2 = mg_cmp_version_decompose(version2, $
+                                              prerelease_info=pr_info_2, $
+                                              error=error_2)
+
+  error or= error_1 or error_2
+  if (error gt 0L) then return, 0
 
   for i = 0L, 2L do begin
     if (version_values_1[i] gt version_values_2[i]) then return, 1

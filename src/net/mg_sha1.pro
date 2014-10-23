@@ -96,20 +96,17 @@ function mg_sha1, input, string=string, file=file
   if (is_file) then begin
     is_empty = file_test(input, /zero_length)
     is_readable = file_test(input, /read)
-    if (~is_readable) then begin
-      message, 'file unreadable'
-    endif
+    if (~is_readable) then message, 'file unreadable'
 
     msg = is_empty ? byte('') : read_binary(input)
   endif else begin
     msg = byte(input)
   endelse
 
-  mlen = msg[0] eq 0b ? 0ULL : 8ULL*N_ELEMENTS(msg)
-  msg = msg[0] eq 0 ? 128b : [TEMPORARY(msg),128b]
-  while (8*N_ELEMENTS(msg) mod 512) ne 448 do $
-    msg = [TEMPORARY(msg),0b]
-  msg = [TEMPORARY(msg),reverse(byte(mlen,0,8))]
+  mlen = msg[0] eq 0b ? 0ULL : 8ULL * n_elements(msg)
+  msg = msg[0] eq 0 ? 128b : [temporary(msg), 128B]
+  while (8 * n_elements(msg) mod 512) ne 448 do msg = [temporary(msg),0b]
+  msg = [temporary(msg), reverse(byte(mlen, 0, 8))]
   msg = ulong(msg)
 
   h0 = '67452301'xul
@@ -130,7 +127,7 @@ function mg_sha1, input, string=string, file=file
     temp = w
     for i = 16L, 79L do begin
       temp = w[i - 3L] xor w[i - 8L] xor w[i - 14L] xor w[i - 16L]
-      w[i] = (temp * 2UL) OR (temp / 2147483648UL)
+      w[i] = (temp * 2UL) or (temp / 2147483648UL)
     endfor
 
     a = h0
@@ -168,7 +165,7 @@ function mg_sha1, input, string=string, file=file
       b = a
       a = ulong(temp)
     endfor
-    for i=60, 79 do begin
+    for i = 60, 79 do begin
       temp = ((a * 32UL) or (a / 134217728UL)) + mg_sha_helper2(b, c, d) $
                + e + 3395469782ULL + w[i]
       e = d

@@ -20,6 +20,8 @@
 ;-
 
 
+;= property access
+
 ;+
 ; Get properties.
 ;-
@@ -72,6 +74,8 @@ pro mgfffilename::setProperty, extension=extension
 end
 
 
+;= public interface
+
 ;+
 ; Create a filename by specifying its parts. Parts are assumed to be empty if
 ; not specified (unlike `FILEPATH`).
@@ -115,7 +119,7 @@ pro mgfffilename::compose, basename, clock_basename=clockBasename, $
 
   if (keyword_set(clockBasename)) then begin
     t = 1000.D * systime(/seconds)
-    _basename = string(t, format='(%"' + _basename + '")')
+    _basename = string(t, format='(%"' + _basename + '-%d")')
   endif
 
   self.filename = _root + _subdir + _basename
@@ -139,6 +143,8 @@ function mgfffilename::toString, format=format
   return, string(self.filename, format=format)
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources.

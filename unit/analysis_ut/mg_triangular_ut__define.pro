@@ -66,6 +66,17 @@ function mg_triangular_ut::test_lower_strict
 end
 
 
+function mg_triangular_ut::test_error
+  compile_opt strictarr
+  @error_is_pass
+
+  d = findgen(5, 5)
+  result = mg_triangular(d)
+
+  return, 1
+end
+
+
 function mg_triangular_ut::init, _extra=e
   compile_opt strictarr
 

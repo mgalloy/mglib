@@ -57,6 +57,17 @@ function mgfffilename_ut::test_compose_tmp
 end
 
 
+function mgfffilename_ut::test_compose_clock
+  compile_opt strictarr
+
+  f = obj_new('MGffFilename', 'a', subdir=['b', 'c'], /tmp, /clock_basename)
+  filename = f->toString()
+  obj_destroy, f
+  print, filename
+  return, 1
+end
+
+
 function mgfffilename_ut::test_setExtension_replace
   compile_opt strictarr
 

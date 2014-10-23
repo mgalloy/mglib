@@ -64,6 +64,17 @@ function mg_streplace_ut::test_commas
 end
 
 
+function mg_streplace_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_streplace', /is_function
+
+  return, 1
+end
+
+
 pro mg_streplace_ut__define
   compile_opt strictarr
 

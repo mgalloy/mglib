@@ -88,6 +88,20 @@ function mg_subs_ut::test_not_found
 end
 
 
+function mg_subs_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_subs', $
+                            'mg_subs_iter', $
+                            'mg_subs_getvalue'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_subs_ut__define
   compile_opt strictarr
 

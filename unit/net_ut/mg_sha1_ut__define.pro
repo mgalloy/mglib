@@ -49,9 +49,9 @@ function mg_sha1_ut::init, _extra=e
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
 
   self->addTestingRoutine, ['mg_sha1', $
-                            'mg_sha1_helper1', $
-                            'mg_sha1_helper2', $
-                            'mg_sha1_helper3'], $
+                            'mg_sha_helper1', $
+                            'mg_sha_helper2', $
+                            'mg_sha_helper3'], $
                            /is_function
 
   return, 1

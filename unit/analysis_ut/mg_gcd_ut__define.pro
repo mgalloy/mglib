@@ -28,6 +28,16 @@ function mg_gcd_ut::test3
 end
 
 
+function mg_gcd_ut::test_error
+  compile_opt strictarr
+  @error_is_pass
+
+  result = mg_gcd(1.0, 2)
+
+  return, 1
+end
+
+
 function mg_gcd_ut::init, _extra=e
   compile_opt strictarr
 

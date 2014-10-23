@@ -179,6 +179,24 @@ function mgffprefs_ut::test_clear
 end
 
 
+function mgffprefs_ut::test_property
+  compile_opt strictarr
+
+  prefs = obj_new('mgffprefs', author_name=self.author, app_name=self.application)
+
+  prefs->getProperty, app_directory=adir
+  app_dir = file_basename(adir)
+  author_dir = file_basename(file_dirname(adir))
+  assert, app_dir eq self.application, $
+          'application directory not correct: %s', app_dir
+  assert, author_dir eq self.application, $
+          'author directory not correct: %s', author_dir
+  obj_destroy, prefs
+
+  return, 1
+end
+
+
 function mgffprefs_ut::init, _extra=e
   compile_opt strictarr
 

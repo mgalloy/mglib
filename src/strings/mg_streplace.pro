@@ -4,69 +4,69 @@
 ; Handle string replacment with regular expressions.
 ;
 ; :Examples:
-;    The following example demonstrates basic operations of `MG_STREPLACE`,
-;    simply replacing "was" with "was not" in the expression "Mike was here"::
+;   The following example demonstrates basic operations of `MG_STREPLACE`,
+;   simply replacing "was" with "was not" in the expression "Mike was here"::
 ;
-;       IDL> print, mg_streplace('Mike was here', 'was', 'was not')
-;       Mike was not here
+;     IDL> print, mg_streplace('Mike was here', 'was', 'was not')
+;     Mike was not here
 ;
-;    Meta-variables $1, $2, etc. represent matched values in parentheses. This
-;    swaps the first two words in the string::
+;   Meta-variables $1, $2, etc. represent matched values in parentheses. This
+;   swaps the first two words in the string::
 ;
-;       IDL> print, mg_streplace('Mike was here', '([^ ]*) ([^ ]*)', '$2 $1')
-;       was Mike here
+;     IDL> print, mg_streplace('Mike was here', '([^ ]*) ([^ ]*)', '$2 $1')
+;     was Mike here
 ;
-;    Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace
-;    all patching expressions with an evaluated expression::
+;   Capitalize the name following "Mike". Here, EVALUATE and GLOBAL replace
+;   all patching expressions with an evaluated expression::
 ;
-;       IDL> s = 'MikeGeorgeHenryMikeBill'
-;       IDL> re = 'Mike([A-Z][a-z]*)'
-;       IDL> expr = '"Mike" + strupcase($1)'
-;       IDL> print, mg_streplace(s, re, expr, /evaluate, /global)
-;       MikeGEORGEHenryMikeBILL
+;     IDL> s = 'MikeGeorgeHenryMikeBill'
+;     IDL> re = 'Mike([A-Z][a-z]*)'
+;     IDL> expr = '"Mike" + strupcase($1)'
+;     IDL> print, mg_streplace(s, re, expr, /evaluate, /global)
+;     MikeGEORGEHenryMikeBILL
 ;
-;    Another evaluated expression::
+;   Another evaluated expression::
 ;
-;       IDL> re = 'Mike([0-9]+)'
-;       IDL> expr = 'fix($1) * 2'
-;       IDL> help, mg_streplace('Mike5', re, expr, /evaluate)
-;       <Expression>    LONG      =           10
+;     IDL> re = 'Mike([0-9]+)'
+;     IDL> expr = 'fix($1) * 2'
+;     IDL> help, mg_streplace('Mike5', re, expr, /evaluate)
+;     <Expression>    LONG      =           10
 ;
-;    Here's an example to put grouping commas into a long integer value::
+;   Here's an example to put grouping commas into a long integer value::
 ;
-;       IDL> str = '1874382735872851'
-;       IDL> re = '^[+-]?([[:digit:]]+)([[:digit:]]{3})'
-;       IDL> for i = 0, strlen(str) / 3 - 1 do $
-;       IDL>   str = mg_streplace(str, re, '$1,$2', /global)
-;       IDL> print, str
-;       1,874,382,735,872,851
+;     IDL> str = '1874382735872851'
+;     IDL> re = '^[+-]?([[:digit:]]+)([[:digit:]]{3})'
+;     IDL> for i = 0, strlen(str) / 3 - 1 do $
+;     IDL>   str = mg_streplace(str, re, '$1,$2', /global)
+;     IDL> print, str
+;     1,874,382,735,872,851
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    str : in, required, type=string
-;       a string to search for expressions and replace them
-;    pattern : in, required, type=string
-;       a regular expression possibly using subexpressions; see IDL's online
-;       help for STREGEX for help on regular expressions
-;    replacement : in, required, type=string
-;       the string to replace matches of the "pattern"; can use $1, $2, etc.
-;       to refer to subexpressions in "pattern"
+;   str : in, required, type=string
+;     a string to search for expressions and replace them
+;   pattern : in, required, type=string
+;     a regular expression possibly using subexpressions; see IDL's online
+;     help for `STREGEX` for help on regular expressions
+;   replacement : in, required, type=string
+;     the string to replace matches of the "pattern"; can use $1, $2, etc.
+;     to refer to subexpressions in "pattern"
 ;
 ; :Keywords:
-;    evaluate : in, optional, type=boolean
-;       set to evaluate the "replacement" as a IDL expression instead of just
-;       a string.
-;    fold_case : in, optional, type=boolean
-;       set to make a case insensitive match with "pattern"
-;    global : in, optional, type=boolean
-;       set to replace all expressions that match
-;    start : out, optional, type=integral, default=0, private
-;       index into string of where to start looking for the pattern
+;   evaluate : in, optional, type=boolean
+;     set to evaluate the "replacement" as a IDL expression instead of just
+;     a string
+;   fold_case : in, optional, type=boolean
+;     set to make a case insensitive match with "pattern"
+;   global : in, optional, type=boolean
+;     set to replace all expressions that match
+;   start : out, optional, type=integral, default=0, private
+;     index into string of where to start looking for the pattern
 ;
 ; :Author:
-;    Michael Galloy
+;   Michael Galloy
 ;-
 function mg_streplace, str, pattern, replacement, $
                        evaluate=evaluate, $
