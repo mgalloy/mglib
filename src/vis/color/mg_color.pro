@@ -7,52 +7,52 @@
 ; .. image:: mg_colors.png
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       IDL> print, mg_color('black')
-;          0   0   0
-;       IDL> print, mg_color('slateblue')
-;        106  90 205
-;       IDL> c = mg_color('slateblue', /index)
-;       IDL> print, c, c, format='(I, Z)'
-;           13458026      CD5A6A
-;       IDL> print, mg_color(['blue', 'red', 'yellow'])
-;          0 255 255
-;          0   0 255
-;        255   0   0
-;       IDL> print, mg_color(/names)
-;       aliceblue antiquewhite aqua aquamarine azure beige ...
+;     IDL> print, mg_color('black')
+;        0   0   0
+;     IDL> print, mg_color('slateblue')
+;      106  90 205
+;     IDL> c = mg_color('slateblue', /index)
+;     IDL> print, c, c, format='(I, Z)'
+;         13458026      CD5A6A
+;     IDL> print, mg_color(['blue', 'red', 'yellow'])
+;        0 255 255
+;        0   0 255
+;      255   0   0
+;     IDL> print, mg_color(/names)
+;     aliceblue antiquewhite aqua aquamarine azure beige ...
 ;
-;    These commands are in the main-level example program::
+;   These commands are in the main-level example program::
 ;
-;       IDL> .run mg_color
+;     IDL> .run mg_color
 ;
 ; :Uses:
-;    mg_src_root, mg_index2rgb
+;   mg_src_root, mg_index2rgb
 ;
 ; :Returns:
-;    Returns a triple as a bytarr(3) or bytarr(3, n) by default if a single
-;    color name or n color names are given. Returns a decomposed color index
-;    as a long or lonarr(n) if `INDEX` keyword is set.
+;   Returns a triple as a bytarr(3) or bytarr(3, n) by default if a single
+;   color name or n color names are given. Returns a decomposed color index
+;   as a long or lonarr(n) if `INDEX` keyword is set.
 ;
-;    Returns a string array for the names if `NAMES` keyword is set.
+;   Returns a string array for the names if `NAMES` keyword is set.
 ;
 ; :Params:
-;    colorname : in, required, type=string/strarr
-;       case-insensitive name(s) of the color; note that both "grey" and
-;       "gray" are accepted in all names that incorporate them
+;   colorname : in, required, type=string/strarr
+;     case-insensitive name(s) of the color; note that both "grey" and
+;     "gray" are accepted in all names that incorporate them
 ;
 ; :Keywords:
-;    names : in, optional, type=boolean
-;       set to return a string of color names
-;    index : in, optional, type=boolean
-;       set to return a long integer with the RGB decomposed into it
-;    xkcd : in, optional, type=boolean
-;       set to use xkcd color survey color names instead of the HTML color
-;       names (see `xkcd color survey <http://xkcd.com/color/rgb/>`)
-;    crayons : in, optional, type=boolean
-;       set to use crayon color names instead of the HTML color
-;       names
+;   names : in, optional, type=boolean
+;     set to return a string of color names
+;   index : in, optional, type=boolean
+;     set to return a long integer with the RGB decomposed into it
+;   xkcd : in, optional, type=boolean
+;     set to use xkcd color survey color names instead of the HTML color
+;     names (see `xkcd color survey <http://xkcd.com/color/rgb/>`)
+;   crayons : in, optional, type=boolean
+;     set to use crayon color names instead of the HTML color
+;     names
 ;-
 function mg_color, colorname, names=names, index=index, $
                    xkcd=xkcd, crayons=crayons

@@ -24,6 +24,17 @@ function mg_makect_ut::test1
 end
 
 
+function mg_makect_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_makect', /is_function
+
+  return, 1
+end
+
+
 pro mg_makect_ut__define
   compile_opt strictarr
 

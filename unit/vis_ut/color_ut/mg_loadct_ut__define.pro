@@ -24,6 +24,18 @@ function mg_loadct_ut::test1
 end
 
 
+function mg_loadct_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_loadct', 'mg_loadct_showtables']
+  self->addTestingRoutine, 'mg_loadct_termcolumns', /is_function
+
+  return, 1
+end
+
+
 pro mg_loadct_ut__define
   compile_opt strictarr
 

@@ -8,6 +8,17 @@ function mg_index2rgb_ut::test_black
 end
 
 
+function mg_index2rgb_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_index2rgb', /is_function
+
+  return, 1
+end
+
+
 pro mg_index2rgb_ut__define
   compile_opt strictarr
 

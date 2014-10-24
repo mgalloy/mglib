@@ -28,6 +28,17 @@ function mg_rgb2index_ut::test_several_colors
 end
 
 
+function mg_rgb2index_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_rgb2index', /is_function
+
+  return, 1
+end
+
+
 pro mg_rgb2index_ut__define
   compile_opt strictarr
 

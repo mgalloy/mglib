@@ -8,33 +8,33 @@
 ; byte value is unused.
 ;
 ; :Categories:
-;    direct graphics
+;   direct graphics
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       IDL> print, mg_rgb2index([255, 255, 255]), format='(Z06)'   ; white
-;       FFFFFF
-;       IDL> print, mg_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
-;       00FFFF
-;       IDL> print, mg_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
-;       FF0000
+;     IDL> print, mg_rgb2index([255, 255, 255]), format='(Z06)'   ; white
+;     FFFFFF
+;     IDL> print, mg_rgb2index([255, 255, 0]), format='(Z06)'     ; yellow
+;     00FFFF
+;     IDL> print, mg_rgb2index([0, 0, 255]), format='(Z06)'       ; blue
+;     FF0000
 ;
-;    Multiple RGB triplets can also be passed to `MG_RGB2INDEX` in an `n` by
-;    3 byte array::
+;   Multiple RGB triplets can also be passed to `MG_RGB2INDEX` in an `n` by
+;   3 byte array::
 ;
-;       IDL> mg_loadct, 5, /brewer
-;       % LOADCT: Loading table PuBu (Sequential)
-;       IDL> tvlct, rgb, /get
-;       IDL> print, mg_rgb2index(rgb), format='(8Z)'
+;     IDL> mg_loadct, 5, /brewer
+;     % LOADCT: Loading table PuBu (Sequential)
+;     IDL> tvlct, rgb, /get
+;     IDL> print, mg_rgb2index(rgb), format='(8Z)'
 ;
 ; :Returns:
-;    long or lonarr(n)
+;   long or `lonarr(n)`
 ;
 ; :Params:
-;    rgb : in, required, type=bytarr
-;       either `bytarr(3)` or `bytarr(n, 3)` array of RGB coordinates of
-;       colors
+;   rgb : in, required, type=bytarr
+;     either `bytarr(3)` or `bytarr(n, 3)` array of RGB coordinates of
+;     colors
 ;-
 function mg_rgb2index, rgb
   compile_opt strictarr

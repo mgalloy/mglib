@@ -7,35 +7,35 @@
 ; the blue value, and the highest order byte value is unused.
 ;
 ; :Categories:
-;    direct graphics
+;   direct graphics
 ;
 ; :Examples:
-;    For example::
+;   For example::
 ;
-;       IDL> print, mg_index2rgb('ffff00'x)
-;          0 255 255
+;     IDL> print, mg_index2rgb('ffff00'x)
+;        0 255 255
 ;
-;    Multiple colors can be converted at once::
+;   Multiple colors can be converted at once::
 ;
-;       IDL> colors = ['ffff00'x, 'ffffff'x, '0000ff'x, 'ff00ff'x]
-;       IDL> rgbColors = mg_index2rgb(colors)
-;       IDL> print, rgbColors
-;          0 255 255 255
-;        255 255   0   0
-;        255 255   0 255
-;       IDL> tvlct, rgbColors
+;     IDL> colors = ['ffff00'x, 'ffffff'x, '0000ff'x, 'ff00ff'x]
+;     IDL> rgbColors = mg_index2rgb(colors)
+;     IDL> print, rgbColors
+;        0 255 255 255
+;      255 255   0   0
+;      255 255   0 255
+;     IDL> tvlct, rgbColors
 ;
 ; :Returns:
-;    bytarr(3) or bytarr(n, 3); string or strarr(n)
+;   `bytarr(3)` or `bytarr(n, 3)`; string or `strarr(n)`
 ;
 ; :Params:
-;    indices : in, required, type=long or lonarr(n)
-;       indices representing either a color or n colors
+;   indices : in, required, type=long or lonarr(n)
+;     indices representing either a color or n colors
 ;
 ; :Keywords:
-;    hex : in, optional, type=boolean
-;       set to return a string instead of a `bytarr(3)`; string formatted
-;       according to HTML/CSS conventions: `#RRGGBB`
+;   hex : in, optional, type=boolean
+;     set to return a string instead of a `bytarr(3)`; string formatted
+;     according to HTML/CSS conventions: `#RRGGBB`
 ;-
 function mg_index2rgb, indices, hex=hex
   compile_opt strictarr

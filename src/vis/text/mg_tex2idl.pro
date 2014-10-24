@@ -5,24 +5,24 @@
 ; Only handles subscripts, superscripts, and sequences listed below.
 ;
 ; :Todo:
-;    should be able to handle fractions too, use 190 (276 octal) to draw
-;    fraction bars, and !A/!B to go above/below the bar; decide whether to
-;    use \frac{1}{2}
+;   should be able to handle fractions too, use 190 (276 octal) to draw
+;   fraction bars, and !A/!B to go above/below the bar; decide whether to
+;   use \frac{1}{2}
 ;-
 
 ;+
 ; Translate TeX superscript (^) or subscript (_) to proper IDL format codes.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    token : in, required, type=string
-;      either ^ or _, others will return an empty string
+;   token : in, required, type=string
+;     either ^ or _, others will return an empty string
 ;
 ; :Keywords:
-;    level : in, required, type=long
-;       set to subscript/superscript level to get appropriate format code
+;   level : in, required, type=long
+;     set to subscript/superscript level to get appropriate format code
 ;-
 function mg_subsuper, token, level=level
   compile_opt strictarr
@@ -41,11 +41,11 @@ end
 ; matches the first open curly brace, -1L if not found.
 ;
 ; :Returns:
-;    long
+;   long
 ;
 ; :Params:
-;    input : in, required, type=string
-;       input string to search
+;   input : in, required, type=string
+;     input string to search
 ;-
 function mg_matchdelim, input
   compile_opt strictarr
@@ -123,17 +123,17 @@ end
 ; Find the next token in a given string.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    str : in, required, type=string
-;       string to search
-;    tokens : in, required, type=string
-;       tokens
+;   str : in, required, type=string
+;     string to search
+;   tokens : in, required, type=string
+;     tokens
 ;
 ; :Keywords:
-;     position : out, optional, type=long
-;        position in str of next token
+;   position : out, optional, type=long
+;     position in str of next token
 ;-
 function mg_nexttoken, str, tokens, position=position
   on_error, 2
@@ -177,14 +177,14 @@ end
 ; portion of the string after the token.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    str : in, out, required, type=string
-;       input string; the output value of this string is the remaining portion
-;       of the string after the token
-;    token : in, required, type=string
-;       substring to find in the input string
+;   str : in, out, required, type=string
+;     input string; the output value of this string is the remaining portion
+;     of the string after the token
+;   token : in, required, type=string
+;     substring to find in the input string
 ;-
 function mg_token, str, token
   on_error, 2
@@ -208,16 +208,16 @@ end
 ; codes.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    input : in, required, type=string
-;       input string to process
+;   input : in, required, type=string
+;     input string to process
 ;
 ; :Keywords:
-;    level : in, optional, type=long
-;       set to subscript/superscipt level to indicate which format code is
-;       used to format it (and hence !E and !I are used instead of !U and !D)
+;   level : in, optional, type=long
+;     set to subscript/superscipt level to indicate which format code is
+;     used to format it (and hence !E and !I are used instead of !U and !D)
 ;-
 function mg_convert_subsuper, input, level=level
   on_error, 2
@@ -297,15 +297,15 @@ end
 ; Convert TeX fractions in a given string to IDL format codes.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    input : in, required, type=string
-;       input string to process
+;   input : in, required, type=string
+;     input string to process
 ;
 ; :Keywords:
-;    postscript : in, optional, type=boolean
-;       set to use postscript fonts
+;   postscript : in, optional, type=boolean
+;     set to use postscript fonts
 ;-
 function mg_convert_fraction, input, postscript=postscript
   compile_opt strictarr
@@ -328,11 +328,11 @@ end
 ; IDL.
 ;
 ; :Returns:
-;    strarr(2, n)
+;   `strarr(2, n)`
 ;
 ; :Keywords:
-;    postscript : in, optional, type=boolean
-;       set to use postscript fonts
+;   postscript : in, optional, type=boolean
+;     set to use postscript fonts
 ;-
 function mg_textable, postscript=postscript
   on_error, 2
@@ -492,15 +492,15 @@ end
 ; Convert a TeX string to a string with embedded IDL format codes.
 ;
 ; :Returns:
-;    string or strarr
+;   string or `strarr`
 ;
 ; :Params:
-;    input : in, required, type=string/strarr
-;       input TeX string or strarr
+;   input : in, required, type=string/strarr
+;     input TeX string or `strarr`
 ;
 ; :Keywords:
-;    font : in, optional, type=long
-;       set to -1 to translate for vector fonts, 0 for hardware fonts
+;   font : in, optional, type=long
+;     set to -1 to translate for vector fonts, 0 for hardware fonts
 ;-
 function mg_tex2idl, input, font=font
   compile_opt strictarr

@@ -281,6 +281,29 @@ function mgffserialvtk_ut::init, _extra=e
 
   self.view = 0B
 
+  self->addTestingRoutine, ['mgffserialvtk__define', $
+                            'mgffserialvtk::cleanup', $
+                            'mgffserialvtk::getProperty', $
+                            'mgffserialvtk::getData', $
+                            'mgffserialvtk::putBackLine', $
+                            'mgffserialvtk::readHeader', $
+                            'mgffserialvtk::readTopLevelLine', $
+                            'mgffserialvtk::readDataset', $
+                            'mgffserialvtk::readPointData', $
+                            'mgffserialvtk::readCellData', $
+                            'mgffserialvtk::readNormalsAttribute', $
+                            'readScalarsAttribute', $
+                            'mgffserialvtk::readVectorsAttribute', $
+                            'mgffserialvtk::readTextureCoordinatesAttribute', $
+                            'mgffserialvtk::readPolydataDataset']
+  self->addTestingRoutine, ['mgffserialvtk::init', $
+                            'mgffserialvtk::getLine', $
+                            'mgffserialvtk::convertVtkTypeToIdlType', $
+                            'mgffserialvtk::read', $
+                            'mgffserialvtk::readPointsSection', $
+                            'mgffserialvtk::readConnectivityListSection'], $
+                           /is_function
+
   return, 1
 end
 

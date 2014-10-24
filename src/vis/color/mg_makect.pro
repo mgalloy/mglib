@@ -5,35 +5,35 @@
 ; center color) and linearly interpolating.
 ;
 ; :Examples:
-;    See the main-level example program::
+;   See the main-level example program::
 ;
-;       IDL> .run mg_makect
+;     IDL> .run mg_makect
 ;
-;    It produces:
+;   It produces:
 ;
-;    .. image:: colortables.png
+;   .. image:: colortables.png
 ;
 ; :Returns:
-;    bytarr(n, 3)
+;   `bytarr(n, 3)`
 ;
 ; :Params:
-;    c1 : in, required, type="bytarr(3) or bytarr(m, 3)"
-;       starting color or bytarr(m, 3) of colors; must be bytarr(m, 3) if
-;       `PARTITION` keyword is used
-;    c2 : in, optional, type=bytarr(3)
-;       if two parameters are passed in, this is the ending color; if three
-;       parameters are passed in, this is the center color
-;    c3 : in, optional, type=bytarr(3)
-;       ending color
+;   c1 : in, required, type="bytarr(3) or bytarr(m, 3)"
+;     starting color or bytarr(m, 3) of colors; must be bytarr(m, 3) if
+;     `PARTITION` keyword is used
+;   c2 : in, optional, type=bytarr(3)
+;     if two parameters are passed in, this is the ending color; if three
+;     parameters are passed in, this is the center color
+;   c3 : in, optional, type=bytarr(3)
+;     ending color
 ;
 ; :Keywords:
-;    ncolors : in, optional, type=long, default=256
-;       number of colors in the color table to create
-;    partition : in, optional, type=fltarr(m - 1)
-;       set to create a color table by interpreting c1 as a `bytarr(m, 3)`
-;       list of colors and the value of `PARTITION` as a `fltarr(k)` list of
-;       cutoff values between 0.0 and 1.0 (or 0 and 255); there must be one
-;       more color than cutoff value provided
+;   ncolors : in, optional, type=long, default=256
+;     number of colors in the color table to create
+;   partition : in, optional, type=fltarr(m - 1)
+;     set to create a color table by interpreting c1 as a `bytarr(m, 3)`
+;     list of colors and the value of `PARTITION` as a `fltarr(k)` list of
+;     cutoff values between 0.0 and 1.0 (or 0 and 255); there must be one
+;     more color than cutoff value provided
 ;-
 function mg_makect, c1, c2, c3, ncolors=ncolors, partition=partition
   compile_opt strictarr

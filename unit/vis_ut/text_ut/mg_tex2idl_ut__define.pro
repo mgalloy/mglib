@@ -47,6 +47,25 @@ function mg_tex2idl_ut::test4
 end
 
 
+function mg_tex2idl_ut::init
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_tex2idl', $
+                            'mg_textable', $
+                            'mg_convert_fraction', $
+                            'mg_convert_subsuper', $
+                            'mg_token', $
+                            'mg_nexttoken', $
+                            'mg_strcnt', $
+                            'mg_matchdelim', $
+                            'mg_subsuper'], $
+                           /is_function
+
+  return, 1
+end
+
 
 pro mg_tex2idl_ut__define
   compile_opt strictarr

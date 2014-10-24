@@ -93,6 +93,15 @@ pro mgtmnode_table_ut::teardown
 end
 
 
+function mgtmnode_table_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  return, 1
+end
+
+
 pro mgtmnode_table_ut__define
   compile_opt strictarr
 

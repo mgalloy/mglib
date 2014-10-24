@@ -103,6 +103,20 @@ function mg_ticks_ut::test_degrees
 end
 
 
+function mg_ticks_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_ticks', $
+                            'mg_ticks_tickinc', $
+                            'mg_ticks_increments'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_ticks_ut__define
   compile_opt strictarr
 
