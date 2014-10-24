@@ -63,7 +63,7 @@ function mgfffilename_ut::test_compose_clock
   f = obj_new('MGffFilename', 'a', subdir=['b', 'c'], /tmp, /clock_basename)
   filename = f->toString()
   obj_destroy, f
-  print, filename
+
   return, 1
 end
 
