@@ -47,7 +47,7 @@ function mg_tex2idl_ut::test4
 end
 
 
-function mg_tex2idl_ut::init
+function mg_tex2idl_ut::init, _extra=e
   compile_opt strictarr
 
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
