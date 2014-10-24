@@ -102,6 +102,19 @@ function mg_nc_decompose_ut::test_write_var
 end
 
 
+function mg_nc_decompose_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_nc_decompose', $
+                            'mg_nc_varid'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_nc_decompose_ut__define
   compile_opt strictarr
 

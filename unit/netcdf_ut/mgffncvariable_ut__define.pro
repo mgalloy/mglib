@@ -45,6 +45,27 @@ function mgffncvariable_ut::test_group
 end
 
 
+function mgffncvariable_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mgffncvariable__define', $
+                            'mgffncvariable::cleanup', $
+                            'mgffncvariable::getProperty', $
+                            'mgffncvariable::_computeslab']
+  self->addTestingRoutine, ['mgffncvariable::init', $
+                            'mgffncvariable::_overloadBracketsRightSide', $
+                            'mgffncvariable::_overloadPrint', $
+                            'mgffncvariable::dump', $
+                            'mgffncvariable::_overloadHelp', $
+                            'mgffncvariable::_getAttribute'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mgffncvariable_ut__define
   compile_opt strictarr
 

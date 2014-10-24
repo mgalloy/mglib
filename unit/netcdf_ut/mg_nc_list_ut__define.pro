@@ -98,6 +98,17 @@ function mg_nc_list_ut::test_group
 end
 
 
+function mg_nc_list_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_nc_list', /is_function
+
+  return, 1
+end
+
+
 pro mg_nc_list_ut__define
   compile_opt strictarr
 

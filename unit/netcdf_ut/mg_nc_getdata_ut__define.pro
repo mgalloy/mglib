@@ -80,6 +80,24 @@ function mg_nc_getdata_ut::test_group
 end
 
 
+function mg_nc_getdata_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, 'mg_nc_getdata_computeslab'
+  self->addTestingRoutine, ['mg_nc_getdata', $
+                            'mg_nc_getdata_getattribute', $
+                            'mg_nc_getdata_getattributedata', $
+                            'mg_nc_getdata_getvariable', $
+                            'mg_nc_getdata_convertbounds', $
+                            'mg_nc_getdata_convertbounds_1d'], $
+                           /is_function
+
+  return, 1
+end
+
+
 pro mg_nc_getdata_ut__define
   compile_opt strictarr
 

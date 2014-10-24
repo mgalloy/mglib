@@ -227,6 +227,20 @@ function mg_nc_putdata_ut::test_2dvar
 end
 
 
+function mg_nc_putdata_ut::init, _extra=e
+  compile_opt strictarr
+
+  if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
+
+  self->addTestingRoutine, ['mg_nc_putdata', $
+                            'mg_nc_putdata_putattribute', $
+                            'mg_nc_putdata_putvariable']
+  self->addTestingRoutine, 'mg_nc_putdata_checkdimname', /is_function
+
+  return, 1
+end
+
+
 pro mg_nc_putdata_ut__define
   compile_opt strictarr
 
