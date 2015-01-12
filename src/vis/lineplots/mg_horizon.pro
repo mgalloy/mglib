@@ -102,7 +102,10 @@ pro mg_horizon, x, data, titles=titles, $
         y[nextind] = 1.0
       endif
 
-      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[upperband]
+      ind = where(finite(y), count)
+      if (count gt 0L) then begin
+        polyfill, [minx, x[ind], maxx], d + [0, y[ind], 0], color=_colors[upperband]
+      endif
 
       ; display lowerband
 
@@ -120,7 +123,10 @@ pro mg_horizon, x, data, titles=titles, $
         y[nextind] = 1.0
       endif
 
-      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[lowerband]
+      ind = where(finite(y), count)
+      if (count gt 0L) then begin
+        polyfill, [minx, x[ind], maxx], d + [0, y[ind], 0], color=_colors[lowerband]
+      endif
     endfor
 
     ; plot values greater than max
