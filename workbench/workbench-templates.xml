@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Select one statement from multiple choices" enabled="true" id="com.rsi.idldt.proeditor.templates.case" name="case">case (${key}) of
+  ${value}: begin
+      ${cursor}
+    end
+  else: begin
+    end
+endcase
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Insert an error catch block" enabled="true" id="com.rsi.idldt.proeditor.templates.catch" name="catch">catch, error
+if (error ne 0) then begin
+  catch, /cancel 
+
+  ${cursor}
+endif
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="An IDL object class" enabled="true" id="com.rsi.idldt.proeditor.templates.class" name="Class">; docformat = 'rst'
+
+;+
+; :Author:
+;  ${user}
+;-
+
+
+;= Property managment
+
+;+
+; Get properties.
+;-
+pro ${Classname}::getProperty, _ref_extra=e
+  compile_opt strictarr
+
+end
+
+
+;+
+; Set properties.
+;-
+pro ${Classname}::setProperty, _extra=e
+  compile_opt strictarr
+
+end
+
+
+;= Lifecycle methods
+
+;+
+; Cleanup resources.
+;-
+pro ${Classname}::cleanup
+  compile_opt strictarr
+
+end
+
+
+;+
+; Create a ${Classname} object.
+;
+; :Returns:
+;    1 for success, 0 for failure
+;-
+function ${Classname}::init, _extra=extra
+  compile_opt strictarr
+
+  self-&gt;${Classname}::setProperty, _extra=extra
+    
+  return, 1
+end
+
+
+;+
+; Define instance variables
+;-
+pro ${Classname}__define
+  compile_opt idl2
+
+  define = { ${Classname}, $$
+    ${cursor}}
+end
+
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="An IDL object class with a superclass" enabled="true" id="com.rsi.idldt.proeditor.templates.classWithSuper" name="Class with superclass">; docformat = 'rst'
+
+;+
+; :Author:
+;  ${user}
+;-
+
+
+;= Property management
+
+;+
+; Get properties.
+;-
+pro ${Classname}::getProperty, _ref_extra=e
+  compile_opt strictarr
+
+  if (n_elements(e) gt 0L) then self-&gt;${Superclass}::getProperty, _extra=e
+end
+
+
+;+
+; Set properties.
+;-
+pro ${Classname}::setProperty, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(e) gt 0L) then self-&gt;${Superclass}::setProperty, _extra=e
+end
+
+
+;= Lifecycle methods
+
+;+
+; Free resources.
+;-
+pro ${Classname}::cleanup
+  compile_opt strictarr
+  
+  self-&gt;${Superclass}::cleanup
+end
+
+
+;+
+; Create a ${Classname} object.
+;
+; :Returns:
+;    1 for success, 0 for failure
+;-
+function ${Classname}::Init, _extra=e
+  compile_opt strictarr
+
+  if (~self-&gt;${Superclass}::init(_extra=e)) then return, 0
+
+  self-&gt;${Classname}::setProperty, _extra=e
+  
+  return, 1
+end
+
+
+;+
+; Define instance variables.
+;-
+pro ${Classname}__define
+  compile_opt strictarr
+
+  define = { ${Classname}, $$
+             inherits ${Superclass}, $$
+             ${cursor}}
+end
+
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="ENVI Extension code" enabled="true" id="com.rsi.idldt.proeditor.templates.ENVIExtension" name="ENVIExtension">; docformat = 'rst'
+
+
+;+
+; Add the extension to the toolbox; called automatically on ENVI startup.
+;-
+pro ${PROCEDURE_NAME}_extensions_init
+  compile_opt strictarr
+
+  ; get ENVI session
+  e = envi(/current)
+
+  ; add the extension to a subfolder
+  e.addExtension, '${EXTENSION_NAME}', '${PROCEDURE_NAME}', path='${EXTENSION_PATH}'
+end
+
+
++
+; ENVI extension code; called when the toolbox item is chosen.
+;-
+pro ${PROCEDURE_NAME}
+  compile_opt strictarr
+
+  catch, err
+  if (err ne 0) then begin
+    catch, /cancel
+    
+    if obj_valid(e) then e.reportError, 'ERROR: ' + !error_state.msg
+    message, /reset
+    
+    return
+  endif
+
+  ; get ENVI session
+  e = envi(/current)
+
+  ${cursor}
+end
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Iterate over the selected code" enabled="true" id="com.rsi.idldt.proeditor.templates.for" name="for">for ${index} = 0L, ${length} - 1L do begin
+  ${line_selection}${cursor}
+endfor
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Iterate over the selected code" enabled="true" id="com.rsi.idldt.proeditor.templates.foreachNoKey" name="foreach">foreach ${element}, ${variable} do begin
+  ${line_selection}${cursor}
+endforeach
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Iterate over the selected code" enabled="true" id="com.rsi.idldt.proeditor.templates.foreachWithKey" name="foreach with key">foreach ${element}, ${variable}, ${key} do begin
+  ${line_selection}${cursor}
+endforeach
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Embed the selected code within a function" enabled="true" id="com.rsi.idldt.proeditor.templates.function" name="Function">function ${name}
+  compile_opt strictarr
+  
+  ${line_selection}${cursor}
+  return, 1
+end
+</template><template autoinsert="true" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Makes a stub for a function method" enabled="true" id="com.rsi.idldt.proeditor.templates.functionmethod" name="Function method">function ${Classname}::${Method}
+  compile_opt strictarr
+
+  ${cursor}
+  return, 1
+end
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Insert an if/then/else block" enabled="true" id="com.rsi.idldt.proeditor.templates.if" name="if">if (${expression}) then begin
+  ${line_selection}${cursor}
+endif else begin
+endelse
+</template><template autoinsert="true" context="com.rsi.idldt.ui.proeditor.idldoc_context" deleted="false" description="Insert an image into the documentation" enabled="true" id="com.rsi.idldt.proeditor.idldoc.templates.image" name="image::">.. image:: ${image_file_name}</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Embed the selected code within a procedure" enabled="true" id="com.rsi.idldt.proeditor.templates.procedure" name="Procedure">pro ${name}
+  compile_opt strictarr
+  
+  ${line_selection}${cursor}
+end
+</template><template autoinsert="true" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Makes a stub for a procedure method" enabled="true" id="com.rsi.idldt.proeditor.templates.promethod" name="Procedure method">pro ${Classname}::${Method}
+  compile_opt strictarr
+
+  ${cursor}
+end
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Repeat the selected code until an expression is true" enabled="true" id="com.rsi.idldt.proeditor.templates.repeat" name="repeat">repeat begin
+  ${line_selection}${cursor}
+endrep until (${expression})
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="Select one statement from multiple choices, with fall through" enabled="true" id="com.rsi.idldt.proeditor.templates.switch" name="switch">switch (${key}) of
+  ${value}: begin
+      ${cursor}
+      break
+    end
+  else: begin
+    end
+endswitch
+</template><template autoinsert="false" context="com.rsi.idldt.ui.proeditor.context" deleted="false" description="While an expression is true do the selected code" enabled="true" id="com.rsi.idldt.proeditor.templates.while" name="while">while (${expression}) do begin
+  ${line_selection}${cursor}
+endwhile
+</template></templates>
