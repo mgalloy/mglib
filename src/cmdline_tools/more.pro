@@ -3,26 +3,26 @@
 ;+
 ; Page the contents of the filename to the screen.
 ;
-: :Examples:
-;    For example, to print the contents of the `pwd.pro` file to the output
-;    log::
+; :Examples:
+;   For example, to print the contents of the `pwd.pro` file to the output
+;   log::
 ;
-;       IDL> more, file_which('pwd.pro')
-;       ; docformat = 'rst'
+;     IDL> more, file_which('pwd.pro')
+;     ; docformat = 'rst'
 ;
-;       ;+
-;       ; Prints the IDL's current directory to the output log.
-;       ;-
-;       pro pwd
-;         compile_opt strictarr, hidden
+;     ;+
+;     ; Prints the IDL's current directory to the output log.
+;     ;-
+;     pro pwd
+;       compile_opt strictarr, hidden
 ;
-;         cd, current=currentDir
-;         print, currentDir
-;       end
+;       cd, current=currentDir
+;       print, currentDir
+;     end
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename to display
+;   filename : in, required, type=string
+;     filename of file to display
 ;-
 pro more, filename
   compile_opt strictarr
