@@ -1,7 +1,7 @@
 get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 set(DLM_NAME mg_${DIRNAME})
 
-if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
+if (EXISTS ${TRE_INCLUDE_DIR} AND EXISTS ${TRE_LIBRARY})
   include_directories(${TRE_INCLUDE_DIR})
 
   configure_file("${DLM_NAME}.dlm.in" "${DLM_NAME}.dlm")
