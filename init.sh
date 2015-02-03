@@ -1,4 +1,4 @@
 #!/bin/sh
 
 git submodule update --init --recursive
-cd mgcmake; git pull origin master
+cd mgcmake; git checkout master; git pull origin master
