@@ -27,6 +27,8 @@ if (TRE_INCLUDE_DIR AND TRE_LIBRARY)
       LIBRARY DESTINATION lib/${DIRNAME}
     )
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+  else ()
+    message(WARNING "Tre library specified, but does not exist")
   endif ()
 endif ()
 

@@ -31,5 +31,7 @@ if (ZEROMQ_INCLUDE_DIR AND ZEROMQ_LIBRARY_DIR)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm
       DESTINATION lib/${DIRNAME}
     )
+  else ()
+    message(WARNING "ZeroMQ library specified, but does not exist")
   endif ()
 endif ()

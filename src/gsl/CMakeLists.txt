@@ -34,5 +34,7 @@ if (GSL_INCLUDE_DIR AND GSL_LIBRARY_DIR)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm
       DESTINATION lib/${DIRNAME}
     )
+  else ()
+    message(WARNING "GSL library specified, but does not exist")
   endif ()
 endif ()

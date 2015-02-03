@@ -27,6 +27,8 @@ if (MARKDOWN_INCLUDE_DIR AND MARKDOWN_LIBRARY)
       LIBRARY DESTINATION lib/${DIRNAME}
     )
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+  else ()
+    message(WARNING "Markdown library specified, but does not exist")
   endif ()
 endif ()
 
