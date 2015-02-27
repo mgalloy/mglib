@@ -323,14 +323,38 @@ static IDL_VPTR IDL_CDECL IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
   return(IDL_GettmpLong(0));  // needed to not get a compiler warning
 }
 
-void IDL_mg_matrix_vector_multiply(float *a_data, float *b_data, float *result_data, int n, int m) {
-  int row, col;
-  for (row = 0; row < m; row++) {
-    for (col = 0; col < n; col++) {
-      result_data[row] += a_data[row * n + col] * b_data[col];
-    }
-  }
+#define IDL_MG_MATRIX_VECTOR_MULTIPLY(TYPE)                                  \
+void IDL_mg_matrix_vector_multiply_ ## TYPE(TYPE *a_data, TYPE *b_data, TYPE *result_data, int n, int m) { \
+  int row, col;                                                              \
+  for (row = 0; row < m; row++) {                                            \
+    for (col = 0; col < n; col++) {                                          \
+      result_data[row] += a_data[row * n + col] * b_data[col];               \
+    }                                                                        \
+  }                                                                          \
 }
+
+IDL_MG_MATRIX_VECTOR_MULTIPLY(float)
+IDL_MG_MATRIX_VECTOR_MULTIPLY(double)
+
+#define IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(TYPE, IDL_TYPE) \
+IDL_VPTR IDL_mg_batch_matrix_vector_multiply_ ## TYPE(IDL_VPTR a, IDL_VPTR b, int n, int m, int n_multiplies) { \
+  IDL_VPTR result; \
+  int i; \
+  IDL_MEMINT dims[] = { m, n_multiplies }; \
+  TYPE *result_data = (TYPE *) IDL_MakeTempArray(IDL_TYPE, 2, dims, IDL_ARR_INI_ZERO, &result); \
+  TYPE *a_data = (TYPE *)a->value.arr->data; \
+  TYPE *b_data = (TYPE *)b->value.arr->data; \
+  for (i = 0; i < n_multiplies; i++) { \
+    IDL_mg_matrix_vector_multiply_ ## TYPE(a_data + n * m * i, \
+                                           b_data + n * i, \
+                                           result_data + m * i, \
+                                           n, m); \
+  } \
+  return result; \
+}
+
+IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(float, IDL_TYP_FLOAT)
+IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(double, IDL_TYP_DOUBLE)
 
 static IDL_VPTR IDL_mg_batched_matrix_vector_multiply(int argc, IDL_VPTR *argv) {
   IDL_VPTR a = argv[0];
@@ -338,18 +362,17 @@ static IDL_VPTR IDL_mg_batched_matrix_vector_multiply(int argc, IDL_VPTR *argv) 
   IDL_LONG n = IDL_LongScalar(argv[2]);
   IDL_LONG m = IDL_LongScalar(argv[3]);
   IDL_LONG n_multiplies = IDL_LongScalar(argv[4]);
-  int i;
   IDL_VPTR result;
-  IDL_MEMINT dims[] = { m, n_multiplies };
-  float *result_data = (float *) IDL_MakeTempArray(IDL_TYP_FLOAT, 2, dims, IDL_ARR_INI_ZERO, &result);
-  float *a_data = (float *)a->value.arr->data;
-  float *b_data = (float *)b->value.arr->data;
-  for (i = 0; i < n_multiplies; i++) {
-    IDL_mg_matrix_vector_multiply(a_data + n * m * i,
-                                  b_data + n * i,
-                                  result_data + m * i,
-                                  n, m);
+
+  switch (a->type) {
+    case IDL_TYP_FLOAT:
+      result = IDL_mg_batch_matrix_vector_multiply_float(a, b, n, m, n_multiplies);
+      break;
+    case IDL_TYP_DOUBLE:
+      result = IDL_mg_batch_matrix_vector_multiply_double(a, b, n, m, n_multiplies);
+      break;
   }
+  
   return result;
 }
 
