@@ -323,6 +323,36 @@ static IDL_VPTR IDL_CDECL IDL_mg_total(int argc, IDL_VPTR *argv, char *argk) {
   return(IDL_GettmpLong(0));  // needed to not get a compiler warning
 }
 
+void IDL_mg_matrix_vector_multiply(float *a_data, float *b_data, float *result_data, int n, int m) {
+  int row, col;
+  for (row = 0; row < m; row++) {
+    for (col = 0; col < n; col++) {
+      result_data[row] += a_data[row * n + col] * b_data[col];
+    }
+  }
+}
+
+static IDL_VPTR IDL_mg_batched_matrix_vector_multiply(int argc, IDL_VPTR *argv) {
+  IDL_VPTR a = argv[0];
+  IDL_VPTR b = argv[1];
+  IDL_LONG n = IDL_LongScalar(argv[2]);
+  IDL_LONG m = IDL_LongScalar(argv[3]);
+  IDL_LONG n_multiplies = IDL_LongScalar(argv[4]);
+  int i;
+  IDL_VPTR result;
+  IDL_MEMINT dims[] = { m, n_multiplies };
+  float *result_data = (float *) IDL_MakeTempArray(IDL_TYP_FLOAT, 2, dims, IDL_ARR_INI_ZERO, &result);
+  float *a_data = (float *)a->value.arr->data;
+  float *b_data = (float *)b->value.arr->data;
+  for (i = 0; i < n_multiplies; i++) {
+    IDL_mg_matrix_vector_multiply(a_data + n * m * i,
+                                  b_data + n * i,
+                                  result_data + m * i,
+                                  n, m);
+  }
+  return result;
+}
+
 
 int IDL_Load(void) {
   /*
@@ -333,6 +363,8 @@ int IDL_Load(void) {
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_mg_array_equal, "MG_ARRAY_EQUAL", 2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_mg_total,       "MG_TOTAL",       1, 1, 0, 0 },
+    { IDL_mg_batched_matrix_vector_multiply, "MG_BATCHED_MATRIX_VECTOR_MULTIPLY", 5, 5, 0, 0 },
+
   };
 
   /*
