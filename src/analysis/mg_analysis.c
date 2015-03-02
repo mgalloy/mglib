@@ -343,21 +343,21 @@ IDL_MG_MATRIX_VECTOR_MULTIPLY(IDL_ULONG)
 IDL_MG_MATRIX_VECTOR_MULTIPLY(IDL_LONG64)
 IDL_MG_MATRIX_VECTOR_MULTIPLY(IDL_ULONG64)
 
-#define IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(TYPE, IDL_TYPE) \
+#define IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(TYPE, IDL_TYPE)                   \
 IDL_VPTR IDL_mg_batch_matrix_vector_multiply_ ## TYPE(IDL_VPTR a, IDL_VPTR b, int n, int m, int n_multiplies) { \
-  IDL_VPTR result; \
-  int i; \
-  IDL_MEMINT dims[] = { m, n_multiplies }; \
+  IDL_VPTR result;                                                            \
+  int i;                                                                      \
+  IDL_MEMINT dims[] = { m, n_multiplies };                                    \
   TYPE *result_data = (TYPE *) IDL_MakeTempArray(IDL_TYPE, 2, dims, IDL_ARR_INI_ZERO, &result); \
-  TYPE *a_data = (TYPE *)a->value.arr->data; \
-  TYPE *b_data = (TYPE *)b->value.arr->data; \
-  for (i = 0; i < n_multiplies; i++) { \
-    IDL_mg_matrix_vector_multiply_ ## TYPE(a_data + n * m * i, \
-                                           b_data + n * i, \
-                                           result_data + m * i, \
-                                           n, m); \
-  } \
-  return result; \
+  TYPE *a_data = (TYPE *)a->value.arr->data;                                  \
+  TYPE *b_data = (TYPE *)b->value.arr->data;                                  \
+  for (i = 0; i < n_multiplies; i++) {                                        \
+    IDL_mg_matrix_vector_multiply_ ## TYPE(a_data + n * m * i,                \
+                                           b_data + n * i,                    \
+                                           result_data + m * i,               \
+                                           n, m);                             \
+  }                                                                           \
+  return result;                                                              \
 }
 
 IDL_MG_BATCH_MATRIX_VECTOR_MULTIPLY(UCHAR, IDL_TYP_BYTE)
@@ -418,13 +418,15 @@ static IDL_VPTR IDL_mg_batched_matrix_vector_multiply(int argc, IDL_VPTR *argv) 
 int IDL_Load(void) {
   /*
    * These tables contain information on the functions and procedures
-   * that make up the cmdline_tools DLM. The information contained in these
-   * tables must be identical to that contained in mg_introspection.dlm.
+   * that make up the analysis DLM. The information contained in these
+   * tables must be identical to that contained in mg_analysis.dlm.
    */
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_mg_array_equal, "MG_ARRAY_EQUAL", 2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_mg_total,       "MG_TOTAL",       1, 1, 0, 0 },
-    { IDL_mg_batched_matrix_vector_multiply, "MG_BATCHED_MATRIX_VECTOR_MULTIPLY", 5, 5, 0, 0 },
+    { IDL_mg_batched_matrix_vector_multiply,
+                          "MG_BATCHED_MATRIX_VECTOR_MULTIPLY",
+                                            5, 5, 0, 0 },
 
   };
 
