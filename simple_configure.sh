@@ -9,4 +9,4 @@ cmake \
   -DIDLdoc_DIR:PATH=~/projects/idldoc/src \
   -Dmgunit_DIR:PATH=~/projects/mgunit/src \
   -Didlwave_DIR:PATH=~/software/idlwave \
-  .
+  ..
