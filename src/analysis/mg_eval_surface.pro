@@ -6,7 +6,7 @@
 ;
 ; Evaluates the surface:
 ;
-;   $$F(x, y) = \sum_{i=0}^{d_x - 1} \sum_{j=0}^{dy - 1} c_{i, j} x^i y^j$$
+;   $$F(x, y) = \sum_{i=0}^{d_x - 1} \sum_{j=0}^{d_y - 1} c_{i, j} x^i y^j$$
 ;
 ; in a 2-dimensional array for the given `x` and `y` coordinates.
 ;
