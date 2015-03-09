@@ -4,7 +4,7 @@
 ; Function to use coefficients from surf_fit and create polynomial
 ; surface.
 ;
-; Evaluates the surface:
+; Evaluates the polynomail
 ;
 ;   $$F(x, y) = \sum_{i=0}^{d_x - 1} \sum_{j=0}^{d_y - 1} c_{i, j} x^i y^j$$
 ;
@@ -17,11 +17,11 @@
 ;   coeff : in, required, type="fltarr(degree_x, degree_y)"
 ;     coefficients
 ;   coord_x : in, required, type=fltarr(nx)
-;     x-coordinates
+;     x-coordinates to evaluate polynomial
 ;   coord_y : in, required, type=fltarr(ny)
-;     y-coordinates
+;     y-coordinates to evaluate polynomial
 ;-
-function mg_eval_surface, coeff, coord_x, coord_y
+function mg_eval_poly2d, coeff, coord_x, coord_y
   compile_opt strictarr
 
   degrees = size(coeff, /dimensions)
