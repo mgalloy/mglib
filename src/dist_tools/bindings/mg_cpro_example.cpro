@@ -1,0 +1,41 @@
+/// TYPE=1,2,3,4,5,12,13,14,15
+void IDL_mg_matrix_vector_multiply ## TYPE(TYPE *a_data, TYPE *b_data, TYPE *result_data, int n, int m) {
+  int row, col;
+  for (row = 0; row < m; row++) {
+    for (col = 0; col < n; col++) {
+      result_data[row] += a_data[row * n + col] * b_data[col];
+    }
+  }
+}
+
+
+/// TYPE=1,2,3,4,5,12,13,14,15
+IDL_VPTR IDL_mg_batch_matrix_vector_multiply_ ## TYPE(IDL_VPTR a, IDL_VPTR b, int n, int m, int n_multiplies) {
+  IDL_VPTR result;
+  int i;
+  IDL_MEMINT dims[] = { m, n_multiplies };
+  TYPE *result_data = (TYPE *) IDL_MakeTempArray(IDL_TYPE, 2, dims, IDL_ARR_INI_ZERO, &result);
+  TYPE *a_data = (TYPE *)a->value.arr->data;
+  TYPE *b_data = (TYPE *)b->value.arr->data;
+  for (i = 0; i < n_multiplies; i++) {
+    IDL_mg_matrix_vector_multiply_ ## TYPE(a_data + n * m * i,
+                                           b_data + n * i,
+                                           result_data + m * i,
+                                           n, m);
+  }
+  return result;
+}
+
+/// TYPE=1,2,3,4,5,12,13,14,15
+EXPORT IDL_VPTR IDL_mg_batched_matrix_vector_multiply(int argc, IDL_VPTR *argv) {
+  IDL_VPTR a = argv[0];
+  IDL_VPTR b = argv[1];
+  IDL_LONG n = IDL_LongScalar(argv[2]);
+  IDL_LONG m = IDL_LongScalar(argv[3]);
+  IDL_LONG n_multiplies = IDL_LongScalar(argv[4]);
+  IDL_VPTR result;
+
+  MG_CALL_FUNCTION(result, IDL_mg_batch_matrix_vector_multiply, a->type, (a, b, n, m, n_multiplies))
+
+  return result;
+}
