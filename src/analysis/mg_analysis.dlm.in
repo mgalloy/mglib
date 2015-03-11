@@ -40,4 +40,22 @@ FUNCTION MG_ARRAY_EQUAL      2 2 KEYWORDS
 #-
 FUNCTION MG_TOTAL            1 1
 
+#+
+# Does multiple matrix-vector multiplications.
+#
+# :Returns:
+#   matrix-vector products, `arr(m, n_multiples)`
+#
+# :Params:
+#   a : in, required, type="arr(n, m, n_multiples)"
+#     matrices
+#   b : in, required, type="arr(n, n_multiples)"
+#     vectors
+#   n : in, required, type=long
+#     number of columns in one matrix of `a`
+#   m : in, required, type=long
+#     number of rows in one matrix of `a`
+#   n_multiples : in, required, type=long
+#     number of matrix-vector products to compute
+#-
 FUNCTION MG_BATCHED_MATRIX_VECTOR_MULTIPLY 5 5
