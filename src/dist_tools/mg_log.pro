@@ -79,6 +79,18 @@
 ;       optional argument to be substituted into `msg` format string
 ;    arg6 : in, optional, type=string
 ;       optional argument to be substituted into `msg` format string
+;    arg7 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg8 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg9 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg10 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg11 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
+;    arg12 : in, optional, type=string
+;       optional argument to be substituted into `msg` format string
 ;
 ; :Keywords:
 ;    name : in, optional, type=string
@@ -104,7 +116,10 @@
 ;    _extra : in, optional, type=keywords
 ;       keywords to `MGffLogger::setProperty` to configure the logger
 ;-
-pro mg_log, msg, arg1, arg2, arg3, arg4, arg5, arg6, name=name, $
+pro mg_log, msg, $
+            arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, $
+            arg11, arg12, $
+            name=name, $
             debug=debug, informational=informational, $
             warning=warning, error=error, critical=critical, $
             last_error=lastError, $
@@ -122,6 +137,12 @@ pro mg_log, msg, arg1, arg2, arg3, arg4, arg5, arg6, name=name, $
     5: _msg = string(arg1, arg2, arg3, arg4, format='(%"' + msg + '")')
     6: _msg = string(arg1, arg2, arg3, arg4, arg5, format='(%"' + msg + '")')
     7: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, format='(%"' + msg + '")')
+    8: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, format='(%"' + msg + '")')
+    9: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, format='(%"' + msg + '")')
+    10: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, format='(%"' + msg + '")')
+    11: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + msg + '")')
+    12: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + msg + '")')
+    13: _msg = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + msg + '")')
   endcase
 
   ; create the top-level logger if it doesn't already exist in the
