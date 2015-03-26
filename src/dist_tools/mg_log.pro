@@ -126,6 +126,7 @@ pro mg_log, msg, $
             logger=logger, quit=quit, _extra=e
   compile_opt strictarr
   on_error, 2
+  on_ioerror, format_error
   @mg_log_common
 
   case n_params() of
@@ -175,6 +176,10 @@ pro mg_log, msg, $
   ; do last so that a quitting message can be logged at the same time that the
   ; logger is shutdown
   if (keyword_set(quit)) then obj_destroy, logger
+
+  return
+  format_error:
+  message, 'format error'
 end
 
 
