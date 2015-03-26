@@ -2,37 +2,37 @@
 
 ;+
 ; Finds the routines (normal functions and procedures) needed for the code
-; inside a file i.e. the routines it calls, the routines those routines call,
+; inside a file, i.e., the routines it calls, the routines those routines call,
 ; etc.
 ;
 ; :Bugs:
-;    Because `RESOLVE_ALL` is called to compile all the routines called from
-;    within the given routine, `RESOLVE_ALL` is always present in the resolved
-;    routines. It and its helper `UNIQ` are removed from the output (but may
-;    actually be present).
+;   Because `RESOLVE_ALL` is called to compile all the routines called from
+;   within the given routine, `RESOLVE_ALL` is always present in the resolved
+;   routines. It and its helper `UNIQ` are removed from the output (but may
+;   actually be present).
 ;
 ; :Returns:
-;    string array of routine names
+;   string array of routine names
 ;
 ; :Params:
-;    file : in, required, type=string
-;       file basename without the `.pro` extension to resolve for called
-;       routines
+;   file : in, required, type=string
+;     file basename without the `.pro` extension to resolve for called
+;     routines
 ;
 ; :Keywords:
-;    count : out, optional, type=long
-;       number of called routines found
-;
-;    bridge : in, out, optional, type=object
-;       IDL_IDLBridge object used to resolve routines; if a bridge is not
-;       passed in, one is created; if a named variable is passed, the bridge
-;       object will be passed back to the caller, otherwise the bridge is
-;       destroyed
+;   count : out, optional, type=long
+;     number of called routines found
+;   bridge : in, out, optional, type=object
+;     IDL_IDLBridge object used to resolve routines; if a bridge is not
+;     passed in, one is created; if a named variable is passed, the bridge
+;     object will be passed back to the caller, otherwise the bridge is
+;     destroyed
 ;-
 function mg_called_routines, file, count=count, bridge=bridge
   compile_opt strictarr
 
-  ignores = ['RESOLVE_ALL', 'RESOLVE_ALL_BODY', 'RESOLVE_ALL_CLASS', '$MAIN$', 'UNIQ']
+  ignores = ['RESOLVE_ALL', 'RESOLVE_ALL_BODY', 'RESOLVE_ALL_CLASS', $
+             '$MAIN$', 'UNIQ']
   filename = file + '.pro'
 
   bridge = obj_valid(bridge) ? bridge : obj_new('IDL_IDLBridge')
