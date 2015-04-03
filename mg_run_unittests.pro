@@ -18,6 +18,7 @@ pro mg_run_unittests, filename, tests=tests
 
   mgunit, _tests, filename=filename, html=n_elements(filename) gt 0L, $
           ntest=ntest, npass=npass, nfail=nfail, nskip=nskip
+
   if (n_elements(filename) gt 0L) then begin
     print, ntest, npass, nfail, nskip, $
            format='(%"%d tests: %d passed, %d failed, %d skipped")'
