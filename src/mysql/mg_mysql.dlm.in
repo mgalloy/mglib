@@ -7,3 +7,10 @@ BUILD_DATE    ${mglib_BUILD_DATE}
 
 FUNCTION   MG_MYSQL_GET_CLIENT_INFO         0    0
 FUNCTION   MG_MYSQL_GET_CLIENT_VERSION      0    0
+
+FUNCTION   MG_MYSQL_INIT                    0    0
+PROCEDURE  MG_MYSQL_CLOSE                   1    1
+
+FUNCTION   MG_MYSQL_REAL_CONNECT            8    8
+FUNCTION   MG_MYSQL_QUERY                   2    2
+FUNCTION   MG_MYSQL_ERROR                   1    1
