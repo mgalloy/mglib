@@ -60,7 +60,9 @@ function mgutlibtestcase::init, _extra=e
 
   if (~self->MGutTestCase::init(_extra=e)) then return, 0
 
-  self.idl_major_version = long(strmid(!version.release, 0, strpos(!version.release, '.')))
+  self.idl_major_version = long(strmid(!version.release, $
+                                       0, $
+                                       strpos(!version.release, '.')))
 
   if (self.idl_major_version ge 8) then begin
     ; save current state of refcounting

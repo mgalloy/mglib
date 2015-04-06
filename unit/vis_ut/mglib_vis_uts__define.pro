@@ -15,7 +15,7 @@ function mglib_vis_uts::init, _extra=e
 
   if (~self->mguttestsuite::init(_strict_extra=e)) then return, 0
 
-  self->add, /all
+  self->add, /all, _extra=e
 
   return, 1
 end
