@@ -1,0 +1,9 @@
+MODULE        mg_mysql
+DESCRIPTION   MySQL bindings
+VERSION       ${VERSION}
+SOURCE        mgalloy
+BUILD_DATE    ${mglib_BUILD_DATE}
+
+
+FUNCTION   MG_MYSQL_GET_CLIENT_INFO         0    0
+FUNCTION   MG_MYSQL_GET_CLIENT_VERSION      0    0
