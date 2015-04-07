@@ -201,6 +201,16 @@ static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
 }
 
 
+// int STDCALL mysql_next_result(MYSQL *mysql);
+// 0 successful and there are more results
+// -1 successful and there are no more results
+// >0 not successful
+static IDL_VPTR IDL_mg_mysql_next_result(int argc, IDL_VPTR *argv) {
+  int status = mysql_next_result((MYSQL *)argv[0]->value.ptrint);
+  return IDL_GettmpLong(status);
+}
+
+
 int IDL_Load(void) {
   IDL_StructDefPtr mg_mysql_field_sdef;
 
@@ -222,6 +232,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_get_field,          "MG_MYSQL_GET_FIELD",          2, 2, 0, 0 },
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        1, 1, 0, 0 },
+    { IDL_mg_mysql_next_result,        "MG_MYSQL_NEXT_RESULT",        1, 1, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
