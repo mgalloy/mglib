@@ -104,6 +104,13 @@ static void IDL_mg_mysql_free_result(int argc, IDL_VPTR *argv) {
 }
 
 
+// my_ulonglong STDCALL mysql_insert_id(MYSQL *mysql);
+static IDL_VPTR IDL_mg_mysql_insert_id(int argc, IDL_VPTR *argv) {
+  my_ulonglong id = mysql_insert_id((MYSQL *)argv[0]->value.ptrint);
+  return IDL_GettmpULong64(id);
+}
+
+
 int IDL_Load(void) {
   /*
      These tables contain information on the functions and procedures
@@ -121,6 +128,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_row,          "MG_MYSQL_FETCH_ROW",          1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        2, 2, 0, 0 },
+    { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {

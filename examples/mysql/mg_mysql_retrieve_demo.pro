@@ -4,6 +4,18 @@
 ; Simple demo to show inserting some values into a database table.
 ; `MG_MYSQL_INSERT_DEMO` must be run before this demo.
 ;
+; The output of the program is::
+;
+;   IDL> mg_mysql_retrieve_demo
+;     1 Audi              52642
+;     2 Mercedes          57127
+;     3 Skoda              9000
+;     4 Volvo             29000
+;     5 Bentley          350000
+;     6 Citroen           21000
+;     7 Hummer            41400
+;     8 Volkswagen        21600
+;
 ; Results can be verified from the `mysql` command line::
 ;
 ;   mysql> use testdb;
