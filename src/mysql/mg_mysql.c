@@ -41,13 +41,13 @@ static void IDL_mg_mysql_close(int argc, IDL_VPTR *argv) {
 //                                    unsigned long clientflag);
 static IDL_VPTR IDL_mg_mysql_real_connect(int argc, IDL_VPTR *argv) {
   MYSQL *mysql = mysql_real_connect((MYSQL *) argv[0]->value.ptrint,
-				    IDL_VarGetString(argv[1]),
-				    IDL_VarGetString(argv[2]),
-				    IDL_VarGetString(argv[3]),
-				    IDL_VarGetString(argv[4]),
-				    argv[5]->value.ul,
-				    IDL_VarGetString(argv[6]),
-				    argv[7]->value.ul64);
+                                    IDL_VarGetString(argv[1]),
+                                    IDL_VarGetString(argv[2]),
+                                    IDL_VarGetString(argv[3]),
+                                    argv[4]->value.str.slen == 0 ? NULL : IDL_VarGetString(argv[4]),
+                                    argv[5]->value.ul,
+                                    argv[6]->value.str.slen == 0 ? NULL : IDL_VarGetString(argv[6]),
+                                    argv[7]->value.ul64);
   return IDL_GettmpMEMINT((IDL_MEMINT) mysql);
 }
 
@@ -55,7 +55,7 @@ static IDL_VPTR IDL_mg_mysql_real_connect(int argc, IDL_VPTR *argv) {
 // int STDCALL mysql_query(MYSQL *mysql, const char *q);
 static IDL_VPTR IDL_mg_mysql_query(int argc, IDL_VPTR *argv) {
   int status = mysql_query((MYSQL *) argv[0]->value.ptrint,
-			   IDL_VarGetString(argv[1]));
+                           IDL_VarGetString(argv[1]));
   return IDL_GettmpLong(status);
 }
 
