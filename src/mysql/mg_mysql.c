@@ -211,6 +211,29 @@ static IDL_VPTR IDL_mg_mysql_next_result(int argc, IDL_VPTR *argv) {
 }
 
 
+// unsigned long STDCALL mysql_real_escape_string(MYSQL *mysql,
+//                                                char *to, const char *from,
+//                                                unsigned long length);
+static IDL_VPTR IDL_mg_mysql_real_escape_string(int argc, IDL_VPTR *argv) {
+  unsigned long length = mysql_real_escape_string((MYSQL *)argv[0]->value.ptrint,
+                                                  IDL_VarGetString(argv[1]),
+                                                  IDL_VarGetString(argv[2]),
+                                                  IDL_ULong64Scalar(argv[3]));
+  return IDL_GettmpULong64(length);
+}
+
+
+
+// int STDCALL mysql_real_query(MYSQL *mysql, const char *q,
+//                              unsigned long length);
+static IDL_VPTR IDL_mg_mysql_real_query(int argc, IDL_VPTR *argv) {
+  int status = mysql_real_query((MYSQL *)argv[0]->value.ptrint,
+                                IDL_VarGetString(argv[1]),
+                                IDL_ULong64Scalar(argv[2]));
+  return IDL_GettmpLong(status);
+}
+
+
 int IDL_Load(void) {
   IDL_StructDefPtr mg_mysql_field_sdef;
 
@@ -233,6 +256,8 @@ int IDL_Load(void) {
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        1, 1, 0, 0 },
     { IDL_mg_mysql_next_result,        "MG_MYSQL_NEXT_RESULT",        1, 1, 0, 0 },
+    { IDL_mg_mysql_real_escape_string, "MG_MYSQL_REAL_ESCAPE_STRING", 4, 4, 0, 0 },
+    { IDL_mg_mysql_real_query,         "MG_MYSQL_REAL_QUERY",         3, 3, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
