@@ -3,6 +3,18 @@
 ;+
 ; Simple example to create a MySQL database called "testdb".
 ;
+; Results can be verified from the `mysql` command line::
+;
+;   mysql> show databases;
+;   +--------------------+
+;   | Database           |
+;   +--------------------+
+;   | information_schema |
+;   | mysql              |
+;   | testdb             |
+;   +--------------------+
+;   3 rows in set (0.00 sec)
+;
 ; :Keywords:
 ;   host : in, optional, type=string, default=localhost
 ;     host to connect to
@@ -26,12 +38,16 @@ pro mg_mysql_createdb_demo, host=host, user=user, password=password
 
   con = mg_mysql_real_connect(con, _host, _user, _password, '', 0UL, '', 0ULL)
   if (con eq 0) then begin
-    message, 'CONNECT: ' + mg_mysql_error(con)
+    error_msg = mg_mysql_error(con)
+    mg_mysql_close, con
+    message, 'CONNECT: ' + error_msg
   endif
 
   status = mg_mysql_query(con, 'CREATE DATABASE testdb')
   if (status ne 0) then begin
-    message, 'QUERY: ' + mg_mysql_error(con)
+    error_msg = mg_mysql_error(con)
+    mg_mysql_close, con
+    message, 'QUERY: ' + error_msg
   endif
 
   mg_mysql_close, con
