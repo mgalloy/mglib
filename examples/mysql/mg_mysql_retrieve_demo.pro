@@ -89,11 +89,17 @@ pro mg_mysql_retrieve_demo, host=host, user=user, password=password
 
   n_fields = mg_mysql_num_fields(result)
 
+  fields = replicate({ mg_mysql_field }, n_fields)
+  for f = 0L, n_fields - 1L do begin
+    fields[f] = mg_mysql_fetch_field(result)
+  endfor
+  print, fields.name, format='(%"%-3s %-15s %-7s")'
+
   row = mg_mysql_fetch_row(result)
   row_str = strarr(3)
   while (row ne 0) do begin
     for i = 0, n_fields - 1 do begin
-      row_str[i] = mg_mysql_fetch_field(row, i)
+      row_str[i] = mg_mysql_get_field(row, i)
     endfor
     print, row_str, format='(%"%3s %-15s %7s")'
     row = mg_mysql_fetch_row(result)

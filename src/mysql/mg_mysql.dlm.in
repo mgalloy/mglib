@@ -1,23 +1,26 @@
-MODULE        mg_mysql
-DESCRIPTION   MySQL bindings
-VERSION       ${VERSION}
-SOURCE        mgalloy
-BUILD_DATE    ${mglib_BUILD_DATE}
+module        mg_mysql
+description   MySQL bindings
+version       ${VERSION}
+source        mgalloy
+build_date    ${mglib_BUILD_DATE}
 
 
-FUNCTION   MG_MYSQL_GET_CLIENT_INFO         0    0
-FUNCTION   MG_MYSQL_GET_CLIENT_VERSION      0    0
+function   mg_mysql_get_client_info         0    0
+function   mg_mysql_get_client_version      0    0
 
-FUNCTION   MG_MYSQL_INIT                    0    0
-PROCEDURE  MG_MYSQL_CLOSE                   1    1
+function   mg_mysql_init                    0    0
+procedure  mg_mysql_close                   1    1
 
-FUNCTION   MG_MYSQL_REAL_CONNECT            8    8
-FUNCTION   MG_MYSQL_QUERY                   2    2
-FUNCTION   MG_MYSQL_ERROR                   1    1
+function   mg_mysql_real_connect            8    8
+function   mg_mysql_query                   2    2
+function   mg_mysql_error                   1    1
 
-FUNCTION   MG_MYSQL_STORE_RESULT            1     1
-FUNCTION   MG_MYSQL_NUM_FIELDS              1     1
-FUNCTION   MG_MYSQL_FETCH_ROW               1     1
-FUNCTION   MG_MYSQL_FETCH_FIELD             2     2
-PROCEDURE  MG_MYSQL_FREE_RESULT             1     1
-FUNCTION   MG_MYSQL_INSERT_ID               1     1
+function   mg_mysql_store_result            1     1
+function   mg_mysql_num_fields              1     1
+function   mg_mysql_fetch_row               1     1
+function   mg_mysql_get_field               2     2
+procedure  mg_mysql_free_result             1     1
+function   mg_mysql_insert_id               1     1
+
+structure  mg_mysql_field
+function   mg_mysql_fetch_field             1     1

@@ -6,6 +6,30 @@
 
 #include "mg_idl_export.h"
 
+static IDL_STRUCT_TAG_DEF mg_mysql_field[] = {
+  { "NAME",             0,    (void *) IDL_TYP_STRING,  0 },
+  { "ORG_NAME",         0,    (void *) IDL_TYP_STRING,  0 },
+  { "TABLE",            0,    (void *) IDL_TYP_STRING,  0 },
+  { "ORG_TABLE",        0,    (void *) IDL_TYP_STRING,  0 },
+  { "DB",               0,    (void *) IDL_TYP_STRING,  0 },
+  { "CATALOG",          0,    (void *) IDL_TYP_STRING,  0 },
+  { "DEF",              0,    (void *) IDL_TYP_STRING,  0 },
+  { "LENGTH",           0,    (void *) IDL_TYP_ULONG64, 0 },
+  { "MAX_LENGTH",       0,    (void *) IDL_TYP_ULONG64, 0 },
+  { "NAME_LENGTH",      0,    (void *) IDL_TYP_ULONG,   0 },
+  { "ORG_NAME_LENGTH",  0,    (void *) IDL_TYP_ULONG,   0 },
+  { "TABLE_LENGTH",     0,    (void *) IDL_TYP_ULONG,   0 },
+  { "ORG_TABLE_LENGTH", 0,    (void *) IDL_TYP_ULONG,   0 },
+  { "DB_LENGTH",        0,    (void *) IDL_TYP_ULONG,   0 },
+  { "CATALOG_LENGTH",   0,    (void *) IDL_TYP_ULONG,   0 },
+  { "DEF_LENGTH",       0,    (void *) IDL_TYP_ULONG,   0 },
+  { "FLAGS",            0,    (void *) IDL_TYP_ULONG,   0 },
+  { "DECIMALS",         0,    (void *) IDL_TYP_ULONG,   0 },
+  { "CHARSETNR",        0,    (void *) IDL_TYP_ULONG,   0 },
+  { "TYPE",             0,    (void *) IDL_TYP_ULONG,   0 },
+  { "EXTENSION",        0,    (void *) IDL_TYP_PTRINT,  0 },
+  { 0 }
+};
 
 // const char * STDCALL mysql_get_client_info(void);
 static IDL_VPTR IDL_mg_mysql_get_client_info(int argc, IDL_VPTR *argv) {
@@ -90,7 +114,7 @@ static IDL_VPTR IDL_mg_mysql_fetch_row(int argc, IDL_VPTR *argv) {
 
 // not part of mysql.h, but needed to access the C fields
 // typedef char **MYSQL_ROW;
-static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
+static IDL_VPTR IDL_mg_mysql_get_field(int argc, IDL_VPTR *argv) {
   MYSQL_ROW row = (MYSQL_ROW) argv[0]->value.ptrint;
   IDL_ULONG i = IDL_ULongScalar(argv[1]);
   char *field = row[i];
@@ -111,7 +135,75 @@ static IDL_VPTR IDL_mg_mysql_insert_id(int argc, IDL_VPTR *argv) {
 }
 
 
+// MYSQL_FIELD * STDCALL mysql_fetch_fields(MYSQL_RES *res);
+static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
+  static IDL_MEMINT nfields = 1;
+  MYSQL_FIELD *field = mysql_fetch_field((MYSQL_RES *)argv[0]->value.ptrint);
+  typedef struct field {
+    IDL_STRING name;
+    IDL_STRING org_name;
+    IDL_STRING table;
+    IDL_STRING org_table;
+    IDL_STRING db;
+    IDL_STRING catalog;
+    IDL_STRING def;
+    IDL_ULONG64 length;
+    IDL_ULONG64 max_length;
+    IDL_ULONG name_length;
+    IDL_ULONG org_name_length;
+    IDL_ULONG table_length;
+    IDL_ULONG org_table_length;
+    IDL_ULONG db_length;
+    IDL_ULONG catalog_length;
+    IDL_ULONG def_length;
+    IDL_ULONG flags;
+    IDL_ULONG decimals;
+    IDL_ULONG charsetnr;
+    IDL_ULONG type;
+    IDL_PTRINT extension;
+  } MG_Field;
+  MG_Field *mg_field_data = (MG_Field *) calloc(nfields, sizeof(MG_Field));
+  void *idl_field_data;
+
+  IDL_StrStore(&mg_field_data->name, field->name);
+  IDL_StrStore(&mg_field_data->org_name, field->org_name);
+  IDL_StrStore(&mg_field_data->table, field->table);
+  IDL_StrStore(&mg_field_data->org_table, field->org_table);
+  IDL_StrStore(&mg_field_data->db, field->db);
+  IDL_StrStore(&mg_field_data->catalog, field->catalog);
+  IDL_StrStore(&mg_field_data->def, field->def);
+
+  mg_field_data->length = field->length;
+  mg_field_data->max_length = field->max_length;
+
+  mg_field_data->name_length = field->name_length;
+  mg_field_data->org_name_length = field->org_name_length;
+  mg_field_data->table_length = field->table_length;
+  mg_field_data->org_table_length = field->org_table_length;
+  mg_field_data->db_length = field->db_length;
+  mg_field_data->catalog_length = field->catalog_length;
+  mg_field_data->def_length = field->def_length;
+  mg_field_data->flags = field->flags;
+  mg_field_data->decimals = field->decimals;
+  mg_field_data->charsetnr = field->charsetnr;
+  mg_field_data->type = field->type;
+
+  mg_field_data->extension = (IDL_PTRINT)field->extension;
+
+  idl_field_data = IDL_MakeStruct(0, mg_mysql_field);
+  IDL_VPTR result = IDL_ImportArray(1,
+                                    &nfields,
+                                    IDL_TYP_STRUCT,
+                                    (UCHAR *) mg_field_data,
+                                    0,
+                                    idl_field_data);
+  return result;
+}
+
+
 int IDL_Load(void) {
+  IDL_StructDefPtr mg_mysql_field_sdef;
+
   /*
      These tables contain information on the functions and procedures
      that make up the cmdline_tools DLM. The information contained in these
@@ -127,14 +219,17 @@ int IDL_Load(void) {
     { IDL_mg_mysql_store_result,       "MG_MYSQL_STORE_RESULT",       1, 1, 0, 0 },
     { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_row,          "MG_MYSQL_FETCH_ROW",          1, 1, 0, 0 },
-    { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        2, 2, 0, 0 },
+    { IDL_mg_mysql_get_field,          "MG_MYSQL_GET_FIELD",          2, 2, 0, 0 },
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
+    { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        1, 1, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC) IDL_mg_mysql_close,       "MG_MYSQL_CLOSE",        1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC) IDL_mg_mysql_free_result, "MG_MYSQL_FREE_RESULT",  1, 1, 0, 0 },
   };
+
+  mg_mysql_field_sdef = IDL_MakeStruct("MG_MYSQL_FIELD", mg_mysql_field);
 
   /*
      Register our routines. The routines must be specified exactly the same
