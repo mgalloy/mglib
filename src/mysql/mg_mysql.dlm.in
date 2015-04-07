@@ -14,3 +14,9 @@ PROCEDURE  MG_MYSQL_CLOSE                   1    1
 FUNCTION   MG_MYSQL_REAL_CONNECT            8    8
 FUNCTION   MG_MYSQL_QUERY                   2    2
 FUNCTION   MG_MYSQL_ERROR                   1    1
+
+FUNCTION   MG_MYSQL_STORE_RESULT            1     1
+FUNCTION   MG_MYSQL_NUM_FIELDS              1     1
+FUNCTION   MG_MYSQL_FETCH_ROW               1     1
+FUNCTION   MG_MYSQL_FETCH_FIELD             2     2
+PROCEDURE  MG_MYSQL_FREE_RESULT             1     1

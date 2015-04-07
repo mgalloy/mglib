@@ -45,9 +45,9 @@ static IDL_VPTR IDL_mg_mysql_real_connect(int argc, IDL_VPTR *argv) {
                                     IDL_VarGetString(argv[2]),
                                     IDL_VarGetString(argv[3]),
                                     argv[4]->value.str.slen == 0 ? NULL : IDL_VarGetString(argv[4]),
-                                    argv[5]->value.ul,
+                                    IDL_ULongScalar(argv[5]),
                                     argv[6]->value.str.slen == 0 ? NULL : IDL_VarGetString(argv[6]),
-                                    argv[7]->value.ul64);
+                                    IDL_ULong64Scalar(argv[7]));
   return IDL_GettmpMEMINT((IDL_MEMINT) mysql);
 }
 
@@ -67,6 +67,43 @@ static IDL_VPTR IDL_mg_mysql_error(int argc, IDL_VPTR *argv) {
 }
 
 
+// MYSQL_RES * STDCALL mysql_store_result(MYSQL *mysql);
+static IDL_VPTR IDL_mg_mysql_store_result(int argc, IDL_VPTR *argv) {
+  MYSQL_RES *result = mysql_store_result((MYSQL *)argv[0]->value.ptrint);
+  return IDL_GettmpMEMINT((IDL_MEMINT) result);
+}
+
+
+// unsigned int STDCALL mysql_num_fields(MYSQL_RES *res);
+static IDL_VPTR IDL_mg_mysql_num_fields(int argc, IDL_VPTR *argv) {
+  unsigned int num_fields = mysql_num_fields((MYSQL_RES *)argv[0]->value.ptrint);
+  return IDL_GettmpULong(num_fields);
+}
+
+
+// MYSQL_ROW STDCALL mysql_fetch_row(MYSQL_RES *result);
+static IDL_VPTR IDL_mg_mysql_fetch_row(int argc, IDL_VPTR *argv) {
+  MYSQL_ROW row = mysql_fetch_row((MYSQL_RES *)argv[0]->value.ptrint);
+  return IDL_GettmpMEMINT((IDL_MEMINT) row);
+}
+
+
+// not part of mysql.h, but needed to access the C fields
+// typedef char **MYSQL_ROW;
+static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
+  MYSQL_ROW row = (MYSQL_ROW) argv[0]->value.ptrint;
+  IDL_ULONG i = IDL_ULongScalar(argv[1]);
+  char *field = row[i];
+  return IDL_StrToSTRING(field);
+}
+
+
+// void STDCALL mysql_free_result(MYSQL_RES *result);
+static void IDL_mg_mysql_free_result(int argc, IDL_VPTR *argv) {
+  mysql_free_result((MYSQL_RES *)argv[0]->value.ptrint);
+}
+
+
 int IDL_Load(void) {
   /*
      These tables contain information on the functions and procedures
@@ -80,10 +117,15 @@ int IDL_Load(void) {
     { IDL_mg_mysql_real_connect,       "MG_MYSQL_REAL_CONNECT",       8, 8, 0, 0 },
     { IDL_mg_mysql_query,              "MG_MYSQL_QUERY",              2, 2, 0, 0 },
     { IDL_mg_mysql_error,              "MG_MYSQL_ERROR",              1, 1, 0, 0 },
+    { IDL_mg_mysql_store_result,       "MG_MYSQL_STORE_RESULT",       1, 1, 0, 0 },
+    { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
+    { IDL_mg_mysql_fetch_row,          "MG_MYSQL_FETCH_ROW",          1, 1, 0, 0 },
+    { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
-    { (IDL_SYSRTN_GENERIC) IDL_mg_mysql_close, "MG_MYSQL_CLOSE",  1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_mysql_close,       "MG_MYSQL_CLOSE",        1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_mg_mysql_free_result, "MG_MYSQL_FREE_RESULT",  1, 1, 0, 0 },
   };
 
   /*

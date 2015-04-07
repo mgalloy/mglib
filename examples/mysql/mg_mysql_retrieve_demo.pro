@@ -2,7 +2,7 @@
 
 ;+
 ; Simple demo to show inserting some values into a database table.
-; `MG_MYSQL_CREATEDB_DEMO` must be run before this demo.
+; `MG_MYSQL_INSERT_DEMO` must be run before this demo.
 ;
 ; Results can be verified from the `mysql` command line::
 ;
@@ -41,7 +41,7 @@
 ;   password : in, optional, type=string, default=passwd
 ;     password for user
 ;-
-pro mg_mysql_insert_demo, host=host, user=user, password=password
+pro mg_mysql_retrieve_demo, host=host, user=user, password=password
   compile_opt strictarr
   on_error, 2
 
@@ -62,24 +62,31 @@ pro mg_mysql_insert_demo, host=host, user=user, password=password
     message, 'CONNECT: ' + error_msg
   endif
 
-  cmds = ['DROP TABLE IF EXISTS Cars', $
-          'CREATE TABLE Cars(Id INT, Name TEXT, Price INT)', $
-          'INSERT INTO Cars VALUES(1,''Audi'',52642)', $
-          'INSERT INTO Cars VALUES(2,''Mercedes'',57127)', $
-          'INSERT INTO Cars VALUES(3,''Skoda'',9000)', $
-          'INSERT INTO Cars VALUES(4,''Volvo'',29000)', $
-          'INSERT INTO Cars VALUES(5,''Bentley'',350000)', $
-          'INSERT INTO Cars VALUES(6,''Citroen'',21000)', $
-          'INSERT INTO Cars VALUES(7,''Hummer'',41400)', $
-          'INSERT INTO Cars VALUES(8,''Volkswagen'',21600)']
+  if (mg_mysql_query(con, 'select * from Cars') ne 0) then begin
+    error_msg = mg_mysql_error(con)
+    mg_mysql_close, con
+    message, 'SELECT: ' + error_msg
+  endif
 
-  for c = 0L, n_elements(cmds) - 1L do begin
-    if (mg_mysql_query(con, cmds[c]) ne 0) then begin
-      error_msg = mg_mysql_error(con)
-      mg_mysql_close, con
-      message, 'CMD ' + cmds[c] + ': ' + error_msg
-    endif
-  endfor
+  result = mg_mysql_store_result(con)
+  if (result eq 0) then begin
+    error_msg = mg_mysql_error(con)
+    mg_mysql_close, con
+    message, 'STORE: ' + error_msg
+  endif
 
+  n_fields = mg_mysql_num_fields(result)
+
+  row = mg_mysql_fetch_row(result)
+  row_str = strarr(3)
+  while (row ne 0) do begin
+    for i = 0, n_fields - 1 do begin
+      row_str[i] = mg_mysql_fetch_field(row, i)
+    endfor
+    print, row_str, format='(%"%3s %-15s %7s")'
+    row = mg_mysql_fetch_row(result)
+  endwhile
+
+  mg_mysql_free_result, result
   mg_mysql_close, con
 end
