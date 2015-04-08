@@ -17,8 +17,10 @@ function   mg_mysql_error                   1    1
 
 function   mg_mysql_store_result            1     1
 function   mg_mysql_num_fields              1     1
+function   mg_mysql_num_rows                1     1
 function   mg_mysql_fetch_row               1     1
 function   mg_mysql_get_field               2     2
+function   mg_mysql_get_blobfield           3     3
 procedure  mg_mysql_free_result             1     1
 function   mg_mysql_insert_id               1     1
 function   mg_mysql_next_result             1     1

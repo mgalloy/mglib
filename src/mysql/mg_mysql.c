@@ -105,6 +105,13 @@ static IDL_VPTR IDL_mg_mysql_num_fields(int argc, IDL_VPTR *argv) {
 }
 
 
+// my_ulonglong mysql_num_rows(MYSQL_RES *result);
+static IDL_VPTR IDL_mg_mysql_num_rows(int argc, IDL_VPTR *argv) {
+  unsigned long long num_rows = mysql_num_rows((MYSQL_RES *)argv[0]->value.ptrint);
+  return IDL_GettmpULong64(num_rows);
+}
+
+
 // MYSQL_ROW STDCALL mysql_fetch_row(MYSQL_RES *result);
 static IDL_VPTR IDL_mg_mysql_fetch_row(int argc, IDL_VPTR *argv) {
   MYSQL_ROW row = mysql_fetch_row((MYSQL_RES *)argv[0]->value.ptrint);
@@ -116,9 +123,37 @@ static IDL_VPTR IDL_mg_mysql_fetch_row(int argc, IDL_VPTR *argv) {
 // typedef char **MYSQL_ROW;
 static IDL_VPTR IDL_mg_mysql_get_field(int argc, IDL_VPTR *argv) {
   MYSQL_ROW row = (MYSQL_ROW) argv[0]->value.ptrint;
-  IDL_ULONG i = IDL_ULongScalar(argv[1]);
-  char *field = row[i];
+  IDL_ULONG field_index = IDL_ULongScalar(argv[1]);
+  char *field = row[field_index];
   return IDL_StrToSTRING(field);
+}
+
+
+// not part of mysql.h, but needed to access the C fields
+// typedef char **MYSQL_ROW;
+static IDL_VPTR IDL_mg_mysql_get_blobfield(int argc, IDL_VPTR *argv) {
+  MYSQL_ROW row = (MYSQL_ROW) argv[0]->value.ptrint;
+  IDL_ULONG field_index = IDL_ULongScalar(argv[1]);
+  unsigned long length = IDL_ULong64Scalar(argv[2]);
+
+  char *field = row[field_index];
+
+  IDL_ARRAY_DIM dims;
+  IDL_VPTR blob;
+  char *blob_data;
+  int i;
+
+  dims[0] = length;
+  blob_data = (char *) IDL_MakeTempArray(IDL_TYP_BYTE,
+                                         1,
+                                         dims,
+                                         IDL_ARR_INI_NOP,
+                                         &blob);
+
+  for (i = 0; i < length; i++) {
+    blob_data[i] = field[i];
+  }
+  return blob;
 }
 
 
@@ -278,8 +313,10 @@ int IDL_Load(void) {
     { IDL_mg_mysql_error,              "MG_MYSQL_ERROR",              1, 1, 0, 0 },
     { IDL_mg_mysql_store_result,       "MG_MYSQL_STORE_RESULT",       1, 1, 0, 0 },
     { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
+    { IDL_mg_mysql_num_rows,           "MG_MYSQL_NUM_ROWS",           1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_row,          "MG_MYSQL_FETCH_ROW",          1, 1, 0, 0 },
     { IDL_mg_mysql_get_field,          "MG_MYSQL_GET_FIELD",          2, 2, 0, 0 },
+    { IDL_mg_mysql_get_blobfield,      "MG_MYSQL_GET_BLOBFIELD",      3, 3, 0, 0 },
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_lengths,      "MG_MYSQL_FETCH_LENGTHS",      1, 1, 0, 0 },
