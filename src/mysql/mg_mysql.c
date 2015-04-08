@@ -237,13 +237,37 @@ static IDL_VPTR IDL_mg_mysql_real_query(int argc, IDL_VPTR *argv) {
 }
 
 
+// unsigned long * STDCALL mysql_fetch_lengths(MYSQL_RES *result);
+static IDL_VPTR IDL_mg_mysql_fetch_lengths(int argc, IDL_VPTR *argv) {
+  MYSQL_RES *result = (MYSQL_RES *)argv[0]->value.ptrint;
+  unsigned int num_fields = mysql_num_fields(result);
+  unsigned long *lengths = mysql_fetch_lengths(result);
+  IDL_ARRAY_DIM dims;
+  IDL_VPTR vptr_lengths;
+  unsigned long *lengths_data;
+  int i;
+
+  dims[0] = num_fields;
+
+  lengths_data = (unsigned long *) IDL_MakeTempArray(IDL_TYP_ULONG64,
+                                                     1,
+                                                     dims,
+                                                     IDL_ARR_INI_NOP,
+                                                     &vptr_lengths);
+  for (i = 0; i < num_fields; i++) {
+    lengths_data[i] = lengths[i];
+  }
+  return vptr_lengths;
+}
+
+
 int IDL_Load(void) {
   IDL_StructDefPtr mg_mysql_field_sdef;
 
   /*
      These tables contain information on the functions and procedures
-     that make up the cmdline_tools DLM. The information contained in these
-     tables must be identical to that contained in cmdline_tools.dlm.
+     that make up the MySQL DLM. The information contained in these
+     tables must be identical to that contained in mg_mysql.dlm.
   */
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_mg_mysql_get_client_info,    "MG_MYSQL_GET_CLIENT_INFO",    0, 0, 0, 0 },
@@ -258,6 +282,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_get_field,          "MG_MYSQL_GET_FIELD",          2, 2, 0, 0 },
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_field,        "MG_MYSQL_FETCH_FIELD",        1, 1, 0, 0 },
+    { IDL_mg_mysql_fetch_lengths,      "MG_MYSQL_FETCH_LENGTHS",      1, 1, 0, 0 },
     { IDL_mg_mysql_next_result,        "MG_MYSQL_NEXT_RESULT",        1, 1, 0, 0 },
     { IDL_mg_mysql_real_escape_string, "MG_MYSQL_REAL_ESCAPE_STRING", 4, 4, 0, 0 },
     { IDL_mg_mysql_real_query,         "MG_MYSQL_REAL_QUERY",         3, 3, 0, 0 },

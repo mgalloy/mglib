@@ -25,6 +25,7 @@ function   mg_mysql_next_result             1     1
 
 structure  mg_mysql_field
 function   mg_mysql_fetch_field             1     1
+function   mg_mysql_fetch_lengths           1     1
 
 function   mg_mysql_real_escape_string      4     4
 function   mg_mysql_real_query              3     3
