@@ -215,10 +215,13 @@ static IDL_VPTR IDL_mg_mysql_next_result(int argc, IDL_VPTR *argv) {
 //                                                char *to, const char *from,
 //                                                unsigned long length);
 static IDL_VPTR IDL_mg_mysql_real_escape_string(int argc, IDL_VPTR *argv) {
-  unsigned long length = mysql_real_escape_string((MYSQL *)argv[0]->value.ptrint,
-                                                  IDL_VarGetString(argv[1]),
-                                                  IDL_VarGetString(argv[2]),
-                                                  IDL_ULong64Scalar(argv[3]));
+  unsigned long length;
+  IDL_ENSURE_ARRAY(argv[1])
+  IDL_ENSURE_ARRAY(argv[2])
+  length = mysql_real_escape_string((MYSQL *)argv[0]->value.ptrint,
+                                    (char *) argv[1]->value.arr->data,
+                                    (char *) argv[2]->value.arr->data,
+                                    IDL_ULong64Scalar(argv[3]));
   return IDL_GettmpULong64(length);
 }
 
