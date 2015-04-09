@@ -315,8 +315,8 @@ function mgfflogger::init, parent=parent, name=name, _extra=e
   self.name = n_elements(name) eq 0L ? '' : name
   self.children = obj_new('IDL_Container')
 
-  self.time_format = 'C(CYI4.4, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSF06.3)'
-  self.format = '%(time)s %(levelname)s: %(routine)s: %(message)s'
+  self.time_format = 'C(CYI4.4, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2)'
+  self.format = '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 
   self.level = 0L
   self.levelNames = ['Critical', 'Error', 'Warning',  'Informational', 'Debug']
