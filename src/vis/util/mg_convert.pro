@@ -154,7 +154,7 @@ pro mg_convert, basename, $
   endcase
 
   _density = n_elements(density) eq 0L ? (keyword_set(retina) ? 600L : 300L) : density
-  if (n_elements(maxDimensions) gt 0L) then begin
+  if (keyword_set(retina) && n_elements(maxDimensions) gt 0L) then begin
     _maxDimensions = 2L * maxDimensions
   endif
 
