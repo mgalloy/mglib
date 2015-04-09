@@ -1,5 +1,21 @@
 ; docformat = 'rst'
 
+;+
+; Wrapper for direct MySQL bindings.
+;
+; :Properties:
+;   quiet
+;     indicates whether error messages should be printed
+;   client_info : type=string
+;     version string
+;   client_version : type=ulong64
+;     version
+;-
+
+
+;+
+; Set properties.
+;-
 pro mgdbmysql::setProperty, quiet=quiet
   compile_opt strictarr
 
@@ -7,6 +23,9 @@ pro mgdbmysql::setProperty, quiet=quiet
 end
 
 
+;+
+; Retrieve properties.
+;-
 pro mgdbmysql::getProperty, client_info=client_info, $
                             client_version=client_version
   compile_opt strictarr
@@ -16,6 +35,9 @@ pro mgdbmysql::getProperty, client_info=client_info, $
 end
 
 
+;+
+; :Private:
+;-
 function mgdbmysql::lookup, code
   compile_opt strictarr
 
@@ -58,9 +80,16 @@ end
 
 
 ;+
-; if type is 3 -> long
-; if charsetnr is 33 and type is 252 -> string
-; otherwise binary
+; Return the correct variable type to hold data for a given field.
+;
+; :Private:
+;
+; :Returns:
+;   variable of given type
+;
+; :Params:
+;   field : in, required, type=structure
+;     structure describing the field
 ;-
 function mgdbmysql::_get_type, field
   compile_opt strictarr
@@ -80,13 +109,50 @@ function mgdbmysql::_get_type, field
 end
 
 
+;+
+; Perform a query and retrieve the results.
+;
+; :Returns:
+;   array of structures
+;
+; :Params:
+;   sql_query : in, required, type=string
+;     query string, may be C format string with `arg1`-`arg12` substituted into
+;     it
+;
+; :Keywords:
+;   fields : out, optional, type=array of structures
+;     array of structures defining each field of the return value
+;   error_message : out, optional, type=string
+;     MySQL error message
+;-
 function mgdbmysql::query, sql_query, $
+                           arg1, arg2, arg3, arg4, arg5, $
+                           arg6, arg7, arg8, arg9, arg10, $
+                           arg11, arg12, $
                            fields=fields, $
                            error_message=error_message
   compile_opt strictarr
   on_error, 2
 
-  if (mg_mysql_query(self.connection, sql_query) ne 0) then begin
+  case n_params() of
+     0: _sql_query = ''
+     1: _sql_query = sql_query
+     2: _sql_query = string(arg1, format='(%"' + sql_query + '")')
+     3: _sql_query = string(arg1, arg2, format='(%"' + sql_query + '")')
+     4: _sql_query = string(arg1, arg2, arg3, format='(%"' + sql_query + '")')
+     5: _sql_query = string(arg1, arg2, arg3, arg4, format='(%"' + sql_query + '")')
+     6: _sql_query = string(arg1, arg2, arg3, arg4, arg5, format='(%"' + sql_query + '")')
+     7: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, format='(%"' + sql_query + '")')
+     8: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, format='(%"' + sql_query + '")')
+     9: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, format='(%"' + sql_query + '")')
+    10: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, format='(%"' + sql_query + '")')
+    11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + sql_query + '")')
+    12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + sql_query + '")')
+    13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + sql_query + '")')
+  endcase
+
+  if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
     error_message = mg_mysql_error(self.connection)
     if (self.quiet || arg_present(error_message)) then begin
       return, !null
@@ -139,6 +205,57 @@ end
 
 
 ;+
+; Perform an SQL command that does not retrieve a result.
+;
+; :Returns:
+;   array of structures
+;
+; :Params:
+;   sql_query : in, required, type=string
+;     query string, may be C format string with `arg1`-`arg12` substituted into
+;     it
+;
+; :Keywords:
+;   error_message : out, optional, type=string
+;     MySQL error message
+;-
+pro mgdbmysql::execute, sql_query, $
+                        arg1, arg2, arg3, arg4, arg5, $
+                        arg6, arg7, arg8, arg9, arg10, $
+                        arg11, arg12, $
+                        error_message=error_message
+  compile_opt strictarr
+  on_error, 2
+
+  case n_params() of
+     0: _sql_query = ''
+     1: _sql_query = sql_query
+     2: _sql_query = string(arg1, format='(%"' + sql_query + '")')
+     3: _sql_query = string(arg1, arg2, format='(%"' + sql_query + '")')
+     4: _sql_query = string(arg1, arg2, arg3, format='(%"' + sql_query + '")')
+     5: _sql_query = string(arg1, arg2, arg3, arg4, format='(%"' + sql_query + '")')
+     6: _sql_query = string(arg1, arg2, arg3, arg4, arg5, format='(%"' + sql_query + '")')
+     7: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, format='(%"' + sql_query + '")')
+     8: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, format='(%"' + sql_query + '")')
+     9: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, format='(%"' + sql_query + '")')
+    10: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, format='(%"' + sql_query + '")')
+    11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + sql_query + '")')
+    12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + sql_query + '")')
+    13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + sql_query + '")')
+  endcase
+
+  if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
+    error_message = mg_mysql_error(self.connection)
+    if (self.quiet || arg_present(error_message)) then begin
+      return
+    endif else begin
+      message, error_message
+    endelse
+  endif
+end
+
+
+;+
 ; Connect to a database.
 ;
 ; :Keywords:
@@ -154,6 +271,8 @@ end
 ;     port to use
 ;   socket : in, optional, type=string
 ;     socket or named pipe to use
+;   error_message : out, optional, type=string
+;     MySQL error message
 ;-
 pro mgdbmysql::connect, host=host, $
                         user=user, $
@@ -196,6 +315,9 @@ pro mgdbmysql::connect, host=host, $
 end
 
 
+;+
+; Free resources, including closing database connection.
+;-
 pro mg_dbmysql::cleanup
   compile_opt strictarr
 
@@ -206,6 +328,16 @@ pro mg_dbmysql::cleanup
 end
 
 
+;+
+; Create database connection.
+;
+; :Returns:
+;   1 for success, 0 otherwise
+;
+; :Keywords:
+;   _extra : in, optional, type=keywords
+;     keywords to `setProperty`
+;-
 function mgdbmysql::init, _extra=e
   compile_opt strictarr
 
@@ -215,6 +347,17 @@ function mgdbmysql::init, _extra=e
 end
 
 
+;+
+; Define MySQL database class.
+;
+; :Fields:
+;   connection
+;     connection pointer
+;   quiet
+;     boolean whether to print error messages
+;   enum_field_types
+;     hash of codes to constant names
+;-
 pro mgdbmysql__define
   compile_opt strictarr
 
