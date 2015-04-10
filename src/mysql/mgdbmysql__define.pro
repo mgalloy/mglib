@@ -318,7 +318,7 @@ end
 ;+
 ; Free resources, including closing database connection.
 ;-
-pro mg_dbmysql::cleanup
+pro mgdbmysql::cleanup
   compile_opt strictarr
 
   if (self.connection ne 0) then begin
