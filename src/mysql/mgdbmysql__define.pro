@@ -74,15 +74,19 @@ function mgdbmysql::_get_type, field
   on_error, 2
 
   case field.type of
-    3: return, 0L
-    252: begin
+    3: return, 0L     ; MYSQL_TYPE_LONG
+    8: return, 0ULL   ; MYSQL_TYPE_LONGLONG
+    10: return, ''    ; MYSQL_TYPE_DATE
+    12: return, ''    ; MYSQL_TYPE_DATETIME
+    252: begin        ; MYSQL_TYPE_BLOB
         if (field.charsetnr eq 33) then begin
           return, ''
         endif else begin
           return, ptr_new(/allocate_heap)
         endelse
       end
-    253: return, ''
+    253: return, ''   ; MYSQL_TYPE_VARSTRING
+    254: return, ''   ; MYSQL_TYPE_STRING
     else: message, 'unsupported type'
   endcase
 end
@@ -132,12 +136,14 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
     for f = 0L, n_fields - 1L do begin
       case size(row_result.(f), /type) of
         3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
+        5: query_result[r].(f) = double(mg_mysql_get_field(row, f))
         7: query_result[r].(f) = mg_mysql_get_field(row, f)
         10: *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
+        15: query_result[r].(f) = ulong64(mg_mysql_get_field(row, f))
       endcase
     endfor
   endfor
-  
+
   return, query_result
 end
 
@@ -363,16 +369,6 @@ pro mgdbmysql::connect, host=host, $
 
   flags = 0ULL
 
-  self.connection = mg_mysql_init()
-  if (self.connection eq 0) then begin
-    error_message = self->last_error_message()
-    if (self.quiet || arg_present(error_message)) then begin
-      return
-    endif else begin
-      message, error_message
-    endelse
-  endif
-
   self.connection = mg_mysql_real_connect(self.connection, $
                                           self.host, user, password, $
                                           self.database, $
@@ -419,10 +415,19 @@ end
 ;+
 ; Set properties.
 ;-
-pro mgdbmysql::setProperty, quiet=quiet
+pro mgdbmysql::setProperty, quiet=quiet, $
+                            mysql_secure_auth=mysql_secure_auth, $
+                            mysql_opt_protocol=mysql_opt_protocol
   compile_opt strictarr
 
   if (n_elements(quiet)) then self.quiet = quiet
+
+  if (n_elements(mysql_opt_protocol) gt 0) then begin
+    status = mg_mysql_options(self.connection, 9UL, ulong(mysql_opt_protocol[0]))
+  endif
+  if (n_elements(mysql_secure_auth) gt 0) then begin
+    status = mg_mysql_options(self.connection, 18UL, byte(mysql_secure_auth[0]))
+  endif
 end
 
 
@@ -467,6 +472,17 @@ end
 ;-
 function mgdbmysql::init, _extra=e
   compile_opt strictarr
+  on_error, 2
+
+  self.connection = mg_mysql_init()
+  if (self.connection eq 0) then begin
+    error_message = self->last_error_message()
+    if (self.quiet || arg_present(error_message)) then begin
+      return, 0
+    endif else begin
+      message, error_message
+    endelse
+  endif
 
   self->setProperty, _extra=e
 
