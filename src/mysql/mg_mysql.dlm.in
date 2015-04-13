@@ -14,6 +14,7 @@ procedure  mg_mysql_close                   1    1
 
 function   mg_mysql_real_connect            8    8
 function   mg_mysql_list_tables             1    2
+function   mg_mysql_list_dbs                1    2
 function   mg_mysql_query                   2    2
 function   mg_mysql_error                   1    1
 function   mg_mysql_errno                   1    1

@@ -87,6 +87,20 @@ static IDL_VPTR IDL_mg_mysql_list_tables(int argc, IDL_VPTR *argv) {
 }
 
 
+// MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild)
+static IDL_VPTR IDL_mg_mysql_list_dbs(int argc, IDL_VPTR *argv) {
+  char *wildcard = NULL;
+  if (argc > 1) {
+    if (argv[1]->type == IDL_TYP_STRING) {
+      wildcard = IDL_VarGetString(argv[1]);
+    }
+  }
+  MYSQL_RES *result = mysql_list_dbs((MYSQL *)argv[0]->value.ptrint,
+                                     wildcard);
+  return IDL_GettmpMEMINT((IDL_MEMINT) result);
+}
+
+
 // void STDCALL mysql_close(MYSQL *sock);
 static void IDL_mg_mysql_close(int argc, IDL_VPTR *argv) {
   mysql_close((MYSQL *)argv[0]->value.ptrint);
@@ -352,6 +366,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_init,               "MG_MYSQL_INIT",               0, 0, 0, 0 },
     { IDL_mg_mysql_options,            "MG_MYSQL_OPTIONS",            3, 3, 0, 0 },
     { IDL_mg_mysql_list_tables,        "MG_MYSQL_LIST_TABLES",        1, 2, 0, 0 },
+    { IDL_mg_mysql_list_dbs,           "MG_MYSQL_LIST_DBS",           1, 2, 0, 0 },
     { IDL_mg_mysql_real_connect,       "MG_MYSQL_REAL_CONNECT",       8, 8, 0, 0 },
     { IDL_mg_mysql_query,              "MG_MYSQL_QUERY",              2, 2, 0, 0 },
     { IDL_mg_mysql_error,              "MG_MYSQL_ERROR",              1, 1, 0, 0 },

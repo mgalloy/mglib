@@ -304,6 +304,30 @@ end
 
 
 ;+
+; Return a list of databases available.
+;
+; :Returns:
+;   array of structures or `[]` if no matching tables
+;
+; :Params:
+;   wildcard : in, optional, type=string, default=%
+;     wildcard matched against databases, containing `%` and/or `_`
+;
+; :Keywords:
+;   n_databases : out, optional, type=long
+;     set to a named variable to retrieve the number of matching databases
+;-
+function mgdbmysql::list_dbs, wildcard, n_databases=n_databases
+  compile_opt strictarr
+
+  result = mg_mysql_list_dbs(self.connection, wildcard)
+  query_result = self->_get_results(result, n_rows=n_databases)
+  mg_mysql_free_result, result
+  return, n_databases eq 0 ? [] : query_result.(0)
+end
+
+
+;+
 ; Connect to a database.
 ;
 ; :Keywords:
@@ -478,6 +502,11 @@ end
 
 db = MGdbMySQL()
 db->connect, user='mgalloy', password='passwd', database='testdb'
+
+database_query = '%'
+databases = db->list_dbs(database_query, n_databases=n_databases)
+print, database_query, n_databases eq 0 ? '' : strjoin(databases, ', '), $
+       format='(%"Databases matching ''%s'': %s\n")'
 
 table_query = 'C%'
 tables = db->list_tables(table_query, n_tables=n_tables)
