@@ -9,11 +9,13 @@ function   mg_mysql_get_client_info         0    0
 function   mg_mysql_get_client_version      0    0
 
 function   mg_mysql_init                    0    0
+function   mg_mysql_options                 3    3
 procedure  mg_mysql_close                   1    1
 
 function   mg_mysql_real_connect            8    8
 function   mg_mysql_query                   2    2
 function   mg_mysql_error                   1    1
+function   mg_mysql_errno                   1    1
 
 function   mg_mysql_store_result            1     1
 function   mg_mysql_num_fields              1     1

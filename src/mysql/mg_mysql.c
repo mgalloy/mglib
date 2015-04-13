@@ -52,6 +52,24 @@ static IDL_VPTR IDL_mg_mysql_init(int argc, IDL_VPTR *argv) {
 }
 
 
+// int mysql_options(MYSQL *mysql, enum mysql_option option, const char *arg)
+static IDL_VPTR IDL_mg_mysql_options(int argc, IDL_VPTR *argv) {
+  char *value;
+  switch (argv[2]->type) {
+    case IDL_TYP_BYTE:
+      value = (char *) &argv[2]->value.c;
+      break;
+    case IDL_TYP_STRING:
+      value = IDL_VarGetString(argv[2]);
+      break;
+  }
+  int status = mysql_options((MYSQL *)argv[0]->value.ptrint,
+                             IDL_ULongScalar(argv[1]),
+                             value);
+  return IDL_GettmpLong(status);
+}
+
+
 // void STDCALL mysql_close(MYSQL *sock);
 static void IDL_mg_mysql_close(int argc, IDL_VPTR *argv) {
   mysql_close((MYSQL *)argv[0]->value.ptrint);
@@ -88,6 +106,13 @@ static IDL_VPTR IDL_mg_mysql_query(int argc, IDL_VPTR *argv) {
 static IDL_VPTR IDL_mg_mysql_error(int argc, IDL_VPTR *argv) {
   const char *msg = mysql_error((MYSQL *)argv[0]->value.ptrint);
   return IDL_StrToSTRING(msg);
+}
+
+
+// unsigned int mysql_errno(MYSQL *mysql)
+static IDL_VPTR IDL_mg_mysql_errno(int argc, IDL_VPTR *argv) {
+  unsigned int err = mysql_errno((MYSQL *)argv[0]->value.ptrint);
+  return IDL_GettmpULong(err);
 }
 
 
@@ -308,9 +333,11 @@ int IDL_Load(void) {
     { IDL_mg_mysql_get_client_info,    "MG_MYSQL_GET_CLIENT_INFO",    0, 0, 0, 0 },
     { IDL_mg_mysql_get_client_version, "MG_MYSQL_GET_CLIENT_VERSION", 0, 0, 0, 0 },
     { IDL_mg_mysql_init,               "MG_MYSQL_INIT",               0, 0, 0, 0 },
+    { IDL_mg_mysql_options,            "MG_MYSQL_OPTIONS",            3, 3, 0, 0 },
     { IDL_mg_mysql_real_connect,       "MG_MYSQL_REAL_CONNECT",       8, 8, 0, 0 },
     { IDL_mg_mysql_query,              "MG_MYSQL_QUERY",              2, 2, 0, 0 },
     { IDL_mg_mysql_error,              "MG_MYSQL_ERROR",              1, 1, 0, 0 },
+    { IDL_mg_mysql_errno,              "MG_MYSQL_ERRNO",              1, 1, 0, 0 },
     { IDL_mg_mysql_store_result,       "MG_MYSQL_STORE_RESULT",       1, 1, 0, 0 },
     { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
     { IDL_mg_mysql_num_rows,           "MG_MYSQL_NUM_ROWS",           1, 1, 0, 0 },
