@@ -14,28 +14,6 @@
 
 
 ;+
-; Set properties.
-;-
-pro mgdbmysql::setProperty, quiet=quiet
-  compile_opt strictarr
-
-  if (n_elements(quiet)) then self.quiet = quiet
-end
-
-
-;+
-; Retrieve properties.
-;-
-pro mgdbmysql::getProperty, client_info=client_info, $
-                            client_version=client_version
-  compile_opt strictarr
-
-  if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
-  if (arg_present(client_version)) then version = mg_mysql_get_client_version()
-end
-
-
-;+
 ; :Private:
 ;-
 function mgdbmysql::lookup, code
@@ -109,6 +87,21 @@ function mgdbmysql::_get_type, field
 end
 
 
+;= API
+
+;+
+; Returns the error message for the last failed MySQL API routine.
+;
+; :Returns:
+;   string of error message
+;-
+function mgdbmysql::last_error_message
+  compile_opt strictarr
+
+  error_message = mg_mysql_error(self.connection)
+  return, error_message eq '' ? 'unknown error' : error_message
+end
+
 ;+
 ; Perform a query and retrieve the results.
 ;
@@ -153,7 +146,7 @@ function mgdbmysql::query, sql_query, $
   endcase
 
   if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
-    error_message = mg_mysql_error(self.connection)
+    error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return, !null
     endif else begin
@@ -163,7 +156,7 @@ function mgdbmysql::query, sql_query, $
 
   result = mg_mysql_store_result(self.connection)
   if (result eq 0) then begin
-    error_message = mg_mysql_error(self.connection)
+    error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return, !null
     endif else begin
@@ -245,7 +238,7 @@ pro mgdbmysql::execute, sql_query, $
   endcase
 
   if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
-    error_message = mg_mysql_error(self.connection)
+    error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return
     endif else begin
@@ -284,15 +277,16 @@ pro mgdbmysql::connect, host=host, $
   compile_opt strictarr
   on_error, 2
 
-  _host = n_elements(host) eq 0 ? 'localhost' : host
+  self.host = n_elements(host) eq 0 ? 'localhost' : host
   _port = n_elements(port) eq 0 ? 0UL : port
   _socket = n_elements(socket) eq 0 ? '' : socket
+  self.database = database
 
   flags = 0ULL
 
   self.connection = mg_mysql_init()
   if (self.connection eq 0) then begin
-    error_message = mg_mysql_error(self.connection)
+    error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return
     endif else begin
@@ -301,10 +295,11 @@ pro mgdbmysql::connect, host=host, $
   endif
 
   self.connection = mg_mysql_real_connect(self.connection, $
-                                          _host, user, password, database, $
+                                          self.host, user, password, $
+                                          self.database, $
                                           _port, _socket, flags)
   if (self.connection eq 0) then begin
-    error_message = mg_mysql_error(self.connection)
+    error_message = self->last_error_message()
     mg_mysql_close, self.connection
     if (self.quiet || arg_present(error_message)) then begin
       return
@@ -314,6 +309,47 @@ pro mgdbmysql::connect, host=host, $
   endif
 end
 
+
+;= overloaded operators
+
+function mgdbmysql::_overloadHelp, varname
+  compile_opt strictarr
+
+  if (self.connection ne 0L) then begin
+    return, string(varname, self.host, self.database, format='(%"%-16s%s:%s")')
+  endif else begin
+    return, string(varname, format='(%"%-16snot connected")')
+  endelse
+end
+
+
+;= property access
+
+;+
+; Set properties.
+;-
+pro mgdbmysql::setProperty, quiet=quiet
+  compile_opt strictarr
+
+  if (n_elements(quiet)) then self.quiet = quiet
+end
+
+
+;+
+; Retrieve properties.
+;-
+pro mgdbmysql::getProperty, client_info=client_info, $
+                            client_version=client_version, $
+                            connected=connected
+  compile_opt strictarr
+
+  if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
+  if (arg_present(client_version)) then version = mg_mysql_get_client_version()
+  connected = self.connection ne 0ULL
+end
+
+
+;= lifecycle methods
 
 ;+
 ; Free resources, including closing database connection.
@@ -361,8 +397,10 @@ end
 pro mgdbmysql__define
   compile_opt strictarr
 
-  define = { MGdbMySQL, $
+  define = { MGdbMySQL, inherits IDL_Object, $
              connection: 0ULL, $
+             host: '', $
+             database: '', $
              quiet: 0B, $
              enum_field_types: obj_new() $
            }
