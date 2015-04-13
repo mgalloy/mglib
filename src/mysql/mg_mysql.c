@@ -59,6 +59,9 @@ static IDL_VPTR IDL_mg_mysql_options(int argc, IDL_VPTR *argv) {
     case IDL_TYP_BYTE:
       value = (char *) &argv[2]->value.c;
       break;
+    case IDL_TYP_ULONG:
+      value = (char *) &argv[2]->value.ul;
+      break;
     case IDL_TYP_STRING:
       value = IDL_VarGetString(argv[2]);
       break;
