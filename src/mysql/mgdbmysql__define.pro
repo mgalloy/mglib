@@ -82,8 +82,63 @@ function mgdbmysql::_get_type, field
           return, ptr_new(/allocate_heap)
         endelse
       end
+    253: return, ''
     else: message, 'unsupported type'
   endcase
+end
+
+
+
+;+
+; Helper method to return a result set.
+;
+; :Private:
+;
+; :Params:
+;   result : in, required, type=ulong64
+;     result set
+;
+; :Keywords:
+;   fields : out, optional, type=array of structures
+;     set to a named variable to retrieve an array of structures describing
+;     describing the fields of the results
+;   n_rows : out, optional, type=integer
+;     set to a named variable to retrieve the number of rows in the result
+;-
+function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
+  compile_opt strictarr
+
+  n_fields = mg_mysql_num_fields(result)
+  n_rows = mg_mysql_num_rows(result)
+
+  if (n_rows eq 0) then return, {}
+
+  fields = replicate({ mg_mysql_field }, n_fields)
+  for f = 0L, n_fields - 1L do begin
+    fields[f] = mg_mysql_fetch_field(result)
+  endfor
+
+  row_result = create_struct(idl_validname(fields[0].name, /convert_all), $
+                             self->_get_type(fields[0]))
+  for f = 1L, n_fields - 1L do begin
+    row_result = create_struct(row_result, $
+                               fields[f].name, self->_get_type(fields[f]))
+  endfor
+
+  query_result = replicate(row_result, n_rows)
+  for r = 0L, n_rows - 1L do begin
+    row = mg_mysql_fetch_row(result)
+    lengths = mg_mysql_fetch_lengths(result)
+    for f = 0L, n_fields - 1L do begin
+      case size(row_result.(f), /type) of
+        3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
+        7: query_result[r].(f) = mg_mysql_get_field(row, f)
+        10: *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
+      endcase
+    endfor
+  endfor
+  
+  return, query_result
 end
 
 
@@ -101,6 +156,7 @@ function mgdbmysql::last_error_message
   error_message = mg_mysql_error(self.connection)
   return, error_message eq '' ? 'unknown error' : error_message
 end
+
 
 ;+
 ; Perform a query and retrieve the results.
@@ -164,32 +220,7 @@ function mgdbmysql::query, sql_query, $
     endelse
   endif
 
-  n_fields = mg_mysql_num_fields(result)
-  n_rows = mg_mysql_num_rows(result)
-
-  fields = replicate({ mg_mysql_field }, n_fields)
-  for f = 0L, n_fields - 1L do begin
-    fields[f] = mg_mysql_fetch_field(result)
-  endfor
-
-  row_result = create_struct(fields[0].name, self->_get_type(fields[0]))
-  for f = 1L, n_fields - 1L do begin
-    row_result = create_struct(row_result, $
-                               fields[f].name, self->_get_type(fields[f]))
-  endfor
-
-  query_result = replicate(row_result, n_rows)
-  for r = 0L, n_rows - 1L do begin
-    row = mg_mysql_fetch_row(result)
-    lengths = mg_mysql_fetch_lengths(result)
-    for f = 0L, n_fields - 1L do begin
-      case size(row_result.(f), /type) of
-        3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
-        7: query_result[r].(f) = mg_mysql_get_field(row, f)
-        10: *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
-      endcase
-    endfor
-  endfor
+  query_result = self->_get_results(result, fields=fields)
 
   mg_mysql_free_result, result
 
@@ -245,6 +276,30 @@ pro mgdbmysql::execute, sql_query, $
       message, error_message
     endelse
   endif
+end
+
+
+;+
+; Return a list of tables available.
+;
+; :Returns:
+;   array of structures or `[]` if no matching tables
+;
+; :Params:
+;   wildcard : in, optional, type=string, default=%
+;     wildcard matched against table names, containing `%` and/or `_`
+;
+; :Keywords:
+;   n_tables : out, optional, type=long
+;     set to a named variable to retrieve the number of matching tables
+;-
+function mgdbmysql::list_tables, wildcard, n_tables=n_tables
+  compile_opt strictarr
+
+  result = mg_mysql_list_tables(self.connection, wildcard)
+  query_result = self->_get_results(result, n_rows=n_tables)
+  mg_mysql_free_result, result
+  return, n_tables eq 0 ? [] : query_result.(0)
 end
 
 
@@ -312,6 +367,18 @@ end
 
 ;= overloaded operators
 
+;+
+; Returns a string describing the database.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     variable name
+;-
 function mgdbmysql::_overloadHelp, varname
   compile_opt strictarr
 
@@ -411,6 +478,11 @@ end
 
 db = MGdbMySQL()
 db->connect, user='mgalloy', password='passwd', database='testdb'
+
+table_query = 'C%'
+tables = db->list_tables(table_query, n_tables=n_tables)
+print, table_query, n_tables eq 0 ? '' : strjoin(tables, ', '), $
+       format='(%"Tables matching ''%s'': %s\n")'
 
 car_results = db->query('select * from Cars', fields=fields)
 print, fields.name, format='(%"%-3s %-10s %-6s")'
