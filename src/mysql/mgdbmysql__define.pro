@@ -436,12 +436,20 @@ end
 ;-
 pro mgdbmysql::getProperty, client_info=client_info, $
                             client_version=client_version, $
-                            connected=connected
+                            connected=connected, $
+                            proto_info=proto_info, $
+                            host_info=host_info, $
+                            server_info=server_info, $
+                            server_version=server_version
   compile_opt strictarr
 
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
   if (arg_present(client_version)) then version = mg_mysql_get_client_version()
   connected = self.connection ne 0ULL
+  if (arg_present(proto_info)) then proto_info = mg_mysql_get_proto_info(self.connection)
+  if (arg_present(host_info)) then host_info = mg_mysql_get_host_info(self.connection)
+  if (arg_present(server_info)) then server_info = mg_mysql_get_server_info(self.connection)
+  if (arg_present(server_version)) then server_version = mg_mysql_get_server_version(self.connection)
 end
 
 
@@ -518,6 +526,11 @@ end
 
 db = MGdbMySQL()
 db->connect, user='mgalloy', password='passwd', database='testdb'
+db->getProperty, proto_info=proto_info, $
+                 host_info=host_info, $
+                 server_info=server_info, $
+                 server_version=server_version
+help, proto_info, host_info, server_info, server_version
 
 database_query = '%'
 databases = db->list_dbs(database_query, n_databases=n_databases)

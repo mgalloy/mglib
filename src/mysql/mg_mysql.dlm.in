@@ -7,6 +7,10 @@ build_date    ${mglib_BUILD_DATE}
 
 function   mg_mysql_get_client_info         0    0
 function   mg_mysql_get_client_version      0    0
+function   mg_mysql_get_proto_info          1    1
+function   mg_mysql_get_host_info           1    1
+function   mg_mysql_get_server_info         1    1
+function   mg_mysql_get_server_version      1    1
 
 function   mg_mysql_init                    0    0
 function   mg_mysql_options                 3    3
