@@ -440,7 +440,8 @@ pro mgdbmysql::getProperty, client_info=client_info, $
                             proto_info=proto_info, $
                             host_info=host_info, $
                             server_info=server_info, $
-                            server_version=server_version
+                            server_version=server_version, $
+                            last_command_info=last_command_info
   compile_opt strictarr
 
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
@@ -450,6 +451,7 @@ pro mgdbmysql::getProperty, client_info=client_info, $
   if (arg_present(host_info)) then host_info = mg_mysql_get_host_info(self.connection)
   if (arg_present(server_info)) then server_info = mg_mysql_get_server_info(self.connection)
   if (arg_present(server_version)) then server_version = mg_mysql_get_server_version(self.connection)
+  if (arg_present(last_command_info)) then last_command_info = mg_mysql_info(self.connection)
 end
 
 

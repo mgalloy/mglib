@@ -73,6 +73,13 @@ static IDL_VPTR IDL_mg_mysql_get_server_version(int argc, IDL_VPTR *argv) {
 }
 
 
+// const char *mysql_info(MYSQL *mysql)
+static IDL_VPTR IDL_mg_mysql_info(int argc, IDL_VPTR *argv) {
+  const char *info = mysql_info((MYSQL *)argv[0]->value.ptrint);
+  return IDL_StrToSTRING(info);
+}
+
+
 // MYSQL * STDCALL mysql_init(MYSQL *mysql);
 static IDL_VPTR IDL_mg_mysql_init(int argc, IDL_VPTR *argv) {
   MYSQL *mysql = mysql_init(NULL);
@@ -402,6 +409,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_get_host_info,      "MG_MYSQL_GET_HOST_INFO",      1, 1, 0, 0 },
     { IDL_mg_mysql_get_server_info,    "MG_MYSQL_GET_SERVER_INFO",    1, 1, 0, 0 },
     { IDL_mg_mysql_get_server_version, "MG_MYSQL_GET_SERVER_VERSION", 1, 1, 0, 0 },
+    { IDL_mg_mysql_info,               "MG_MYSQL_INFO",               1, 1, 0, 0 },
     { IDL_mg_mysql_init,               "MG_MYSQL_INIT",               0, 0, 0, 0 },
     { IDL_mg_mysql_options,            "MG_MYSQL_OPTIONS",            3, 3, 0, 0 },
     { IDL_mg_mysql_list_tables,        "MG_MYSQL_LIST_TABLES",        1, 2, 0, 0 },
