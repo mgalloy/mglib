@@ -203,6 +203,13 @@ static IDL_VPTR IDL_mg_mysql_fetch_row(int argc, IDL_VPTR *argv) {
 }
 
 
+// unsigned int mysql_field_count(MYSQL *mysql)
+static IDL_VPTR IDL_mg_mysql_field_count(int argc, IDL_VPTR *argv) {
+  unsigned int count = mysql_field_count((MYSQL *)argv[0]->value.ptrint);
+  return IDL_GettmpULong(count);
+}
+
+
 // not part of mysql.h, but needed to access the C fields
 // typedef char **MYSQL_ROW;
 static IDL_VPTR IDL_mg_mysql_get_field(int argc, IDL_VPTR *argv) {
@@ -407,6 +414,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_num_fields,         "MG_MYSQL_NUM_FIELDS",         1, 1, 0, 0 },
     { IDL_mg_mysql_num_rows,           "MG_MYSQL_NUM_ROWS",           1, 1, 0, 0 },
     { IDL_mg_mysql_fetch_row,          "MG_MYSQL_FETCH_ROW",          1, 1, 0, 0 },
+    { IDL_mg_mysql_field_count,        "MG_MYSQL_FIELD_COUNT",        1, 1, 0, 0 },
     { IDL_mg_mysql_get_field,          "MG_MYSQL_GET_FIELD",          2, 2, 0, 0 },
     { IDL_mg_mysql_get_blobfield,      "MG_MYSQL_GET_BLOBFIELD",      3, 3, 0, 0 },
     { IDL_mg_mysql_insert_id,          "MG_MYSQL_INSERT_ID",          1, 1, 0, 0 },

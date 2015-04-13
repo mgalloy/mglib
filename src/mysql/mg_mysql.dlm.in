@@ -34,6 +34,7 @@ function   mg_mysql_insert_id               1     1
 function   mg_mysql_next_result             1     1
 
 structure  mg_mysql_field
+function   mg_mysql_field_count             1     1
 function   mg_mysql_fetch_field             1     1
 function   mg_mysql_fetch_lengths           1     1
 
