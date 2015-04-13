@@ -417,7 +417,8 @@ end
 ;-
 pro mgdbmysql::setProperty, quiet=quiet, $
                             mysql_secure_auth=mysql_secure_auth, $
-                            mysql_opt_protocol=mysql_opt_protocol
+                            mysql_opt_protocol=mysql_opt_protocol, $
+                            database=database
   compile_opt strictarr
 
   if (n_elements(quiet)) then self.quiet = quiet
@@ -427,6 +428,10 @@ pro mgdbmysql::setProperty, quiet=quiet, $
   endif
   if (n_elements(mysql_secure_auth) gt 0) then begin
     status = mg_mysql_options(self.connection, 18UL, byte(mysql_secure_auth[0]))
+  endif
+  if (n_elements(database) gt 0) then begin
+    self.database = database
+    status = mg_mysql_select_db(self.connection, self.database)
   endif
 end
 
@@ -441,7 +446,8 @@ pro mgdbmysql::getProperty, client_info=client_info, $
                             host_info=host_info, $
                             server_info=server_info, $
                             server_version=server_version, $
-                            last_command_info=last_command_info
+                            last_command_info=last_command_info, $
+                            database=database
   compile_opt strictarr
 
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
@@ -452,6 +458,7 @@ pro mgdbmysql::getProperty, client_info=client_info, $
   if (arg_present(server_info)) then server_info = mg_mysql_get_server_info(self.connection)
   if (arg_present(server_version)) then server_version = mg_mysql_get_server_version(self.connection)
   if (arg_present(last_command_info)) then last_command_info = mg_mysql_info(self.connection)
+  database = self.database
 end
 
 

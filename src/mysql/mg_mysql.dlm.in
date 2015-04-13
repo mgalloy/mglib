@@ -16,6 +16,7 @@ function   mg_mysql_info                    1    1
 function   mg_mysql_init                    0    0
 function   mg_mysql_options                 3    3
 procedure  mg_mysql_close                   1    1
+function   mg_mysql_select_db               2    2
 
 function   mg_mysql_real_connect            8    8
 function   mg_mysql_list_tables             1    2

@@ -160,6 +160,14 @@ static IDL_VPTR IDL_mg_mysql_real_connect(int argc, IDL_VPTR *argv) {
 }
 
 
+// int mysql_select_db(MYSQL *mysql, const char *db)
+static IDL_VPTR IDL_mg_mysql_select_db(int argc, IDL_VPTR *argv) {
+  int status = mysql_select_db((MYSQL *) argv[0]->value.ptrint,
+                               IDL_VarGetString(argv[1]));
+  return IDL_GettmpLong(status);
+}
+
+
 // int STDCALL mysql_query(MYSQL *mysql, const char *q);
 static IDL_VPTR IDL_mg_mysql_query(int argc, IDL_VPTR *argv) {
   int status = mysql_query((MYSQL *) argv[0]->value.ptrint,
@@ -415,6 +423,7 @@ int IDL_Load(void) {
     { IDL_mg_mysql_list_tables,        "MG_MYSQL_LIST_TABLES",        1, 2, 0, 0 },
     { IDL_mg_mysql_list_dbs,           "MG_MYSQL_LIST_DBS",           1, 2, 0, 0 },
     { IDL_mg_mysql_real_connect,       "MG_MYSQL_REAL_CONNECT",       8, 8, 0, 0 },
+    { IDL_mg_mysql_select_db,          "MG_MYSQL_SELECT_DB",          2, 2, 0, 0 },
     { IDL_mg_mysql_query,              "MG_MYSQL_QUERY",              2, 2, 0, 0 },
     { IDL_mg_mysql_error,              "MG_MYSQL_ERROR",              1, 1, 0, 0 },
     { IDL_mg_mysql_errno,              "MG_MYSQL_ERRNO",              1, 1, 0, 0 },
