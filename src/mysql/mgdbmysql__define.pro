@@ -568,6 +568,8 @@ pro mgdbmysql::connect, host=host, $
       message, error_message
     endelse
   endif
+
+  self.connected = 1B
 end
 
 
@@ -640,7 +642,7 @@ pro mgdbmysql::getProperty, quiet=quiet, $
   quiet = self.quiet
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
   if (arg_present(client_version)) then version = mg_mysql_get_client_version()
-  connected = self.connection ne 0ULL
+  connected = self.connected
   if (arg_present(proto_info)) then proto_info = mg_mysql_get_proto_info(self.connection)
   if (arg_present(host_info)) then host_info = mg_mysql_get_host_info(self.connection)
   if (arg_present(server_info)) then server_info = mg_mysql_get_server_info(self.connection)
@@ -661,6 +663,7 @@ pro mgdbmysql::cleanup
   if (self.connection ne 0) then begin
     mg_mysql_close, self.connection
     self.connection = 0UL
+    self.connected = 0B
   endif
 end
 
@@ -680,6 +683,8 @@ end
 function mgdbmysql::init, error_message=error_message, _extra=e
   compile_opt strictarr
   on_error, 2
+
+  self.connected = 0B
 
   status = self->_init()
   if (status ne 1) then begin
@@ -721,6 +726,7 @@ pro mgdbmysql__define
 
   define = { MGdbMySQL, inherits IDL_Object, $
              connection: 0ULL, $
+             connected: 0B, $
              host: '', $
              database: '', $
              quiet: 0B, $
