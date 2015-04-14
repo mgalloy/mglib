@@ -1,7 +1,72 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper for direct MySQL bindings.
+; Higher-level wrapper for direct MySQL bindings.
+;
+; :Examples:
+;   An example MySQL database would need to first create the database object::
+;
+;     db = MGdbMySQL()
+;
+;   Before connecting, it might be needed to set some options on the
+;   connections, for example to change the authentication method::
+;
+;     db->setProperty, mysql_secure_auth=0
+;
+;   Next, we connect to the database::
+;
+;     db->connect, user='mgalloy', password='passwd', database='testdb'
+;
+;   At this point, it is possible to query properties of the connection::
+;
+;     db->getProperty, proto_info=proto_info, $
+;                      host_info=host_info, $
+;                      server_info=server_info, $
+;                      server_version=server_version
+;     help, proto_info, host_info, server_info, server_version
+;
+;   We can list the databases available::
+;
+;     database_query = '%'
+;     databases = db->list_dbs(database_query, n_databases=n_databases)
+;     print, database_query, n_databases eq 0 ? '' : strjoin(databases, ', '), $
+;            format='(%"Databases matching ''%s'': %s\n")'
+;
+;   As well as the tables available in the current database::
+;
+;     table_query = 'C%'
+;     tables = db->list_tables(table_query, n_tables=n_tables)
+;     print, table_query, n_tables eq 0 ? '' : strjoin(tables, ', '), $
+;            format='(%"Tables matching ''%s'': %s\n")'
+;
+;   The `::query` method returns an array of structures containing the data::
+;
+;     car_results = db->query('select * from Cars', fields=fields)
+;     print, fields.name, format='(%"%-3s %-10s %-6s")'
+;     print, car_results, format='(%"%3d %10s %6d")'
+;
+;   Blobs are returned as pointers to a byte data array (which will have to be
+;   `REFORM`-ed to the correct size and converted to the correct data type)::
+;
+;     image_results = db->query('select * from Images', fields=fields)
+;     mg_image, reform(*image_results[0].data, 288, 216), /new_window
+;
+;   Cleanup the array of structures containing a pointer and the database
+;   object::
+;
+;     heap_free, image_results
+;     obj_destroy, db
+;
+;   Note: it is often necessary to restore a byte vector to another data type.
+;   Here is an example of doing the conversion both ways::
+;
+;     IDL> d = dist(5)
+;     IDL> b = byte(d, 0, 25 * 4)
+;     IDL> f = reform(float(b, 0, 25), 5, 5)
+;     IDL> print, array_equal(d, f, /no_typeconv)
+;        1
+;     IDL> print, array_equal(size(d, /dimensions), size(f, /dimensions))
+;        1
 ;
 ; :Properties:
 ;   quiet
@@ -10,11 +75,36 @@
 ;     version string
 ;   client_version : type=ulong64
 ;     version
+;   database : type=string
+;     current database name
+;   connected : type=byte
+;     whether the database is connected
+;   mysql_secure_auth : type=byte
+;     whether to use secure authentication, must be set before connecting
+;   mysql_opt_protocol : type=int
+;     which protocol to use, must be set before connecting
+;   proto_info : type=string
+;     protocol information, must be retrieved after conecting
+;   host_info : type=string
+;     host infomration, must be retrieved after conecting
+;   server_info : type=string
+;     server information, must be retrieved after conecting
+;   server_version : type=ulong64
+;     server version, must be retrieved after conecting
+;   last_command_info : type=string
+;     information about the last SQL command issued
 ;-
 
 
+;= helper methods
 
 ;+
+; Does the `mysql_init` call, returning whether the the MySQL API is found.
+;
+; :Private:
+;
+; :Returns:
+;   1 for success, 0 for failure
 ;-
 function mgdbmysql::_init
   compile_opt strictarr
@@ -30,9 +120,18 @@ function mgdbmysql::_init
 end
 
 ;+
+; Gives the name of an `enum_field_type` value.
+;
 ; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   code : in, required, type=integer
+;     `enum_field_type`
 ;-
-function mgdbmysql::lookup, code
+function mgdbmysql::_lookup_field_type, code
   compile_opt strictarr
 
   if (~obj_valid(self.enum_field_types)) then begin
@@ -114,6 +213,9 @@ end
 ;
 ; :Private:
 ;
+; :Returns:
+;   array of structures
+;
 ; :Params:
 ;   result : in, required, type=ulong64
 ;     result set
@@ -190,6 +292,8 @@ end
 ;   sql_query : in, required, type=string
 ;     query string, may be C format string with `arg1`-`arg12` substituted into
 ;     it
+;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 : in, optional, type=any
+;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
 ;   fields : out, optional, type=array of structures
@@ -260,6 +364,8 @@ end
 ;   sql_query : in, required, type=string
 ;     query string, may be C format string with `arg1`-`arg12` substituted into
 ;     it
+;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 : in, optional, type=any
+;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
 ;   error_message : out, optional, type=string
@@ -455,7 +561,8 @@ end
 ;+
 ; Retrieve properties.
 ;-
-pro mgdbmysql::getProperty, client_info=client_info, $
+pro mgdbmysql::getProperty, quiet=quiet, $
+                            client_info=client_info, $
                             client_version=client_version, $
                             connected=connected, $
                             proto_info=proto_info, $
@@ -466,6 +573,7 @@ pro mgdbmysql::getProperty, client_info=client_info, $
                             database=database
   compile_opt strictarr
 
+  quiet = self.quiet
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
   if (arg_present(client_version)) then version = mg_mysql_get_client_version()
   connected = self.connection ne 0ULL
@@ -582,11 +690,9 @@ print, fields.name, format='(%"%-3s %-10s %-6s")'
 print, car_results, format='(%"%3d %10s %6d")'
 
 image_results = db->query('select * from Images', fields=fields)
-
 mg_image, reform(*image_results[0].data, 288, 216), /new_window
 
-ptr_free, image_results[0].data
-
+heap_free, image_results
 obj_destroy, db
 
 end
