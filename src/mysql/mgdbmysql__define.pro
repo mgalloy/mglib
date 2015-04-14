@@ -13,6 +13,22 @@
 ;-
 
 
+
+;+
+;-
+function mgdbmysql::_init
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0) then begin
+    catch, /cancel
+    return, 0
+  endif
+
+  self.connection = mg_mysql_init()
+  return, 1
+end
+
 ;+
 ; :Private:
 ;-
@@ -484,14 +500,24 @@ end
 ;   1 for success, 0 otherwise
 ;
 ; :Keywords:
+;   error_message : out, optional, type=string
+;     MySQL error message
 ;   _extra : in, optional, type=keywords
 ;     keywords to `setProperty`
 ;-
-function mgdbmysql::init, _extra=e
+function mgdbmysql::init, error_message=error_message, _extra=e
   compile_opt strictarr
   on_error, 2
 
-  self.connection = mg_mysql_init()
+  status = self->_init()
+  if (status ne 1) then begin
+    if (self.quiet || arg_present(error_message)) then begin
+      return, 0
+    endif else begin
+      message, !error_state.msg
+    endelse
+  endif
+
   if (self.connection eq 0) then begin
     error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
