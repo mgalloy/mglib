@@ -83,7 +83,7 @@
 ;     whether to use secure authentication, must be set before connecting
 ;   mysql_opt_protocol : type=int
 ;     which protocol to use, must be set before connecting
-;   proto_info : type=string
+;   proto_info : type=ulong
 ;     protocol information, must be retrieved after conecting
 ;   host_info : type=string
 ;     host infomration, must be retrieved after conecting
@@ -230,8 +230,13 @@ end
 function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
   compile_opt strictarr
 
-  n_fields = mg_mysql_num_fields(result)
+  field = {}
+  n_rows = 0ULL
+
+  if (result eq 0) then return, {}
+
   n_rows = mg_mysql_num_rows(result)
+  n_fields = mg_mysql_num_fields(result)
 
   if (n_rows eq 0) then return, {}
 
@@ -425,8 +430,18 @@ function mgdbmysql::list_tables, wildcard, n_tables=n_tables
   compile_opt strictarr
 
   result = mg_mysql_list_tables(self.connection, wildcard)
+  if (result eq 0) then begin
+    error_message = self->last_error_message()
+    if (self.quiet || arg_present(error_message)) then begin
+      return, !null
+    endif else begin
+      message, error_message
+    endelse
+  endif
+
   query_result = self->_get_results(result, n_rows=n_tables)
   mg_mysql_free_result, result
+
   return, n_tables eq 0 ? [] : query_result.(0)
 end
 
@@ -449,6 +464,15 @@ function mgdbmysql::list_dbs, wildcard, n_databases=n_databases
   compile_opt strictarr
 
   result = mg_mysql_list_dbs(self.connection, wildcard)
+  if (result eq 0) then begin
+    error_message = self->last_error_message()
+    if (self.quiet || arg_present(error_message)) then begin
+      return, !null
+    endif else begin
+      message, error_message
+    endelse
+  endif
+
   query_result = self->_get_results(result, n_rows=n_databases)
   mg_mysql_free_result, result
   return, n_databases eq 0 ? [] : query_result.(0)
@@ -465,12 +489,19 @@ end
 ;     user to connect as
 ;   password : in, required, type=string
 ;     password for user
-;   database : in, required, type=string
+;   database : in, optional, type=string
 ;     database to connect to
 ;   port : in, optional, type=ulong, default=0UL
 ;     port to use
 ;   socket : in, optional, type=string
 ;     socket or named pipe to use
+;   config_filename : in, optional, type=string
+;     filename of configuration file that contains connection information;
+;     keywords to this routine override the values in the configuration file
+;   config_section : in, optional, type=string, default=''
+;     name of section in `config_filename` containing connection information;
+;     this section must contain `user` and `password` with optional values
+;     for `host`, `database`, `port`, and `socket`
 ;   error_message : out, optional, type=string
 ;     MySQL error message
 ;-
@@ -480,19 +511,52 @@ pro mgdbmysql::connect, host=host, $
                         database=database, $
                         port=port, $
                         socket=socket, $
+                        config_filename=config_filename, $
+                        config_section=config_section, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
 
-  self.host = n_elements(host) eq 0 ? 'localhost' : host
-  _port = n_elements(port) eq 0 ? 0UL : port
-  _socket = n_elements(socket) eq 0 ? '' : socket
-  self.database = database
+  if (n_elements(config_filename) gt 0) then begin
+    c = mg_read_config(config_filename)
+
+    self.host = n_elements(host) eq 0 $
+                  ? c->get('host', section=config_section, default='localhost') $
+                  : host
+    _port = n_elements(port) eq 0 $
+              ? ulong(c->get('port', section=config_section, default=0)) $
+              : port
+    _socket = n_elements(socket) eq 0 $
+                ? c->get('socket', section=config_section, default='') $
+                : socket
+    self.database = n_elements(database) eq 0 $
+                      ? c->get('database', section=config_section, default='') $
+                      : database
+
+    _user = c->get('user', section=config_section, found=user_found)
+    _user = n_elements(user) gt 0 ? user : _user
+    if (~user_found && n_elements(user) eq 0) then begin
+      message, 'USER required'
+    endif
+
+    _password = c->get('password', section=config_section, found=password_found)
+    _password = n_elements(password) gt 0 ? password : _password
+    if (~password_found && n_elements(password) eq 0) then begin
+      message, 'PASSWORD required'
+    endif
+  endif else begin
+    self.host = n_elements(host) eq 0 ? 'localhost' : host
+    _port = n_elements(port) eq 0 ? 0UL : port
+    _socket = n_elements(socket) eq 0 ? '' : socket
+    self.database = n_elements(database) eq 0 ? '' : database
+    _user = user
+    _password = password
+  endelse
 
   flags = 0ULL
 
   self.connection = mg_mysql_real_connect(self.connection, $
-                                          self.host, user, password, $
+                                          self.host, _user, _password, $
                                           self.database, $
                                           _port, _socket, flags)
   if (self.connection eq 0) then begin
@@ -673,7 +737,12 @@ db->getProperty, proto_info=proto_info, $
                  host_info=host_info, $
                  server_info=server_info, $
                  server_version=server_version
-help, proto_info, host_info, server_info, server_version
+print, proto_info, format='(%"Proto info: %d")'
+print, host_info, format='(%"Host info: %s")'
+print, server_info, format='(%"Server info: %s")'
+print, server_version, format='(%"Server version: %d")'
+
+print
 
 database_query = '%'
 databases = db->list_dbs(database_query, n_databases=n_databases)
