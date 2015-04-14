@@ -145,7 +145,7 @@ function mg_read_config, filename, $
             h->put, name, value, section=section_name
           endif
 
-          section_tokens = stregex(line, '^\[[[:space:]]*([[:alnum:]:._$ ]+)', $
+          section_tokens = stregex(line, '^\[[[:space:]]*([^]\]+)', $
                                    /extract, /subexpr)
           section_name = strtrim(section_tokens[1], 2)
         end
