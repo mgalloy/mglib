@@ -22,17 +22,16 @@ if (MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
         PREFIX ""
     )
   endif ()
+
+  target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY} ${MYSQL_LIBRARY})
+
+  install(TARGETS ${DLM_NAME}
+    RUNTIME DESTINATION lib/${DIRNAME}
+    LIBRARY DESTINATION lib/${DIRNAME}
+  )
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+
+  file(GLOB PRO_FILES "*.pro")
+  install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
+  install(FILES .idldoc DESTINATION lib/${DIRNAME})
 endif ()
-
-target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY} ${MYSQL_LIBRARY})
-
-install(TARGETS ${DLM_NAME}
-  RUNTIME DESTINATION lib/${DIRNAME}
-  LIBRARY DESTINATION lib/${DIRNAME}
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
-
-file(GLOB PRO_FILES "*.pro")
-install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
-install(FILES .idldoc DESTINATION lib/${DIRNAME})
-
