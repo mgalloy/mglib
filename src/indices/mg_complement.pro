@@ -24,9 +24,10 @@
 ;     complement
 ;-
 function mg_complement, indices, n, count=ncomplement
-  compile_opt strictarr
+  compile_opt strictarr, strictarrsubs
 
   all = bytarr(n)
-  if (indices[0] ne -1L) then all[indices] = 1B
+  valid_indices = where(indices gt 0 and indices lt n, n_valid)
+  if (n_valid gt 0L) then all[indices[valid_indices]] = 1B
   return, where(all eq 0B, ncomplement)
 end
