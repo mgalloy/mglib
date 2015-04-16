@@ -222,20 +222,28 @@ pro mgfflogger::insertLastError, back_levels=back_levels
   if (n_elements(helpOutput) eq 1L && helpOutput[0] eq '') then return
 
   self->print, 'Stack trace for error', level=1, back_levels=_back_levels + 1L
+  self->print, transpose(helpOutput), level=1, /no_header
+end
 
-  if (self.filename eq '') then begin
-    lun = -2L
-  endif else begin
-    if (file_test(self.filename)) then begin
-      openu, lun, self.filename, /get_lun, /append
-    endif else begin
-      openw, lun, self.filename, /get_lun
-    endelse
-  endelse
 
-  printf, lun, transpose(helpOutput)
+;+
+; Insert stack trace into log.
+;
+; :Keywords:
+;   level : in, optional, type=long
+;     level of message
+;   back_levels : in, optional, private, type=boolean
+;     number of levels to go back in the stack trace beyond the normal ones;
+;     should be set to 1 if calling this routine from `MG_LOG` for
+;     example
+;-
+pro mgfflogger::insert_execution_info, level=level, back_levels=back_levels
+  compile_opt strictarr
 
-  if (lun ge 0L) then free_lun, lun
+  _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
+  s = scope_traceback(/system)
+  s = s[0:n_elements(s) - 2L - back_levels]
+  self->print, transpose(s), level=level, /no_header
 end
 
 
@@ -243,17 +251,21 @@ end
 ; Log message to given level.
 ;
 ; :Params:
-;    msg : in, required, type=string
-;       message to print
+;   msg : in, required, type=string
+;     message to print
 ;
 ; :Keywords:
-;    level : in, optional, type=long
-;       level of message
-;    back_levels : in, optional, private, type=boolean
-;       number of levels to go back in the stack trace beyond the normal ones;
-;       should be set to 1 if calling this routine from `MG_LOG` for example
+;   level : in, optional, type=long
+;     level of message
+;   back_levels : in, optional, private, type=boolean
+;     number of levels to go back in the stack trace beyond the normal ones;
+;     should be set to 1 if calling this routine from `MG_LOG` for
+;     example
+;   no_header : in, optional, type=boolean
+;     set to not print header information
 ;-
-pro mgfflogger::print, msg, level=level, back_levels=back_levels
+pro mgfflogger::print, msg, level=level, back_levels=back_levels, $
+                       no_header=no_header
   compile_opt strictarr
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
@@ -269,18 +281,24 @@ pro mgfflogger::print, msg, level=level, back_levels=back_levels
   endelse
 
   if (level le self->_getLevel()) then begin
-    stack = scope_traceback(/structure, /system)
-    self->getProperty, fullname=fullname
-    vars = { time: string(systime(/julian), format='(' + self.time_format + ')'), $
-             levelname: strupcase(self.levelNames[level - 1L]), $
-             levelshortname: strupcase(self.levelShortNames[level - 1L]), $
-             routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
-             stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, '->'), $
-             name: self.name, $
-             fullname: fullname, $
-             message: msg $
-           }
-    s = mg_subs(self.format, vars)
+    if (keyword_set(no_header)) then begin
+      s = msg
+    endif else begin
+      stack = scope_traceback(/structure, /system)
+      self->getProperty, fullname=fullname
+      vars = { time: string(systime(/julian), $
+                            format='(' + self.time_format + ')'), $
+               levelname: strupcase(self.levelNames[level - 1L]), $
+               levelshortname: strupcase(self.levelShortNames[level - 1L]), $
+               routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
+               stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
+                                   '->'), $
+               name: self.name, $
+               fullname: fullname, $
+               message: msg $
+             }
+      s = mg_subs(self.format, vars)
+    endelse
     printf, lun, s
   endif
 

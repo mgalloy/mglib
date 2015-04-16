@@ -108,6 +108,9 @@
 ;    last_error : in, optional, type=boolean
 ;       set to place a stack trace for the last error in the log; placed after
 ;       the logging of any normal message in this call
+;    execution_info : in, optional, type=boolean
+;       set to place a stack trace in the log; placed after the
+;       logging of any normal message in this call
 ;    logger : out, optional, type=object
 ;       `MGffLogger` object
 ;    quit : in, optional, type=boolean
@@ -123,6 +126,7 @@ pro mg_log, msg, $
             debug=debug, informational=informational, $
             warning=warning, error=error, critical=critical, $
             last_error=lastError, $
+            execution_info=execution_info, $
             logger=logger, quit=quit, _extra=e
   compile_opt strictarr
   on_error, 2
@@ -155,18 +159,24 @@ pro mg_log, msg, $
   logger = n_elements(name) eq 0L ? mgLogger : mgLogger->getByName(name)
 
   ; pass on keywords to the logger
-  logger->setProperty, _extra=e
+  logger->setProperty, _strict_extra=e
+
+  levels = [keyword_set(critical), $
+            keyword_set(error), $
+            keyword_set(warning), $
+            keyword_set(informational), $
+            keyword_set(debug)]
+  _level = max(levels * (lindgen(5) + 1L))
+  if (_level eq 0L) then _level = 5L  ; default level is DEBUG
 
   ; log messages
   if (n_params() gt 0L && obj_valid(logger)) then begin
-    levels = [keyword_set(critical), $
-              keyword_set(error), $
-              keyword_set(warning), $
-              keyword_set(informational), $
-              keyword_set(debug)]
-    level = max(levels * (lindgen(5) + 1L))
-    if (level eq 0L) then level = 5L  ; default level is DEBUG
-    logger->print, _msg, level=level, back_levels=1
+    logger->print, _msg, level=_level, back_levels=1
+  endif
+
+  ; insert execution info at same level if requested
+  if (keyword_set(execution_info)) then begin
+    logger->insert_execution_info, level=_level, back_levels=1
   endif
 
   ; do after regular messages so that a regular message and the stack trace
