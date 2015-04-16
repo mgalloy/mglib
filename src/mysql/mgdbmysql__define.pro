@@ -75,6 +75,8 @@
 ;     version string
 ;   client_version : type=ulong64
 ;     version
+;   host_name : type=string
+;     host, must be retrieved after connecting
 ;   database : type=string
 ;     current database name
 ;   connected : type=byte
@@ -519,6 +521,12 @@ pro mgdbmysql::connect, host=host, $
 
   if (n_elements(config_filename) gt 0) then begin
     c = mg_read_config(config_filename)
+    if (n_elements(config_section) gt 0 && config_section ne '') then begin
+      if (~c->has_section(config_section)) then begin
+        message, string(config_section, $
+                        format='(%"CONFIG_SECTION %s not found")')
+      endif
+    endif
 
     self.host = n_elements(host) eq 0 $
                   ? c->get('host', section=config_section, default='localhost') $
@@ -598,6 +606,28 @@ function mgdbmysql::_overloadHelp, varname
 end
 
 
+;+
+; Returns a string array giving either the available databases or tables,
+; depending on whether the database is currently set.
+;
+; :Returns:
+;   string
+;-
+function mgdbmysql::_overloadPrint
+  compile_opt strictarr
+
+  if (self.database eq '') then begin
+    databases = transpose(['Available databases:', '  ' + self->list_dbs()])
+    return, databases
+  endif else begin
+    tables = transpose([string(self.database, $
+                               format='(%"Available tables for %s:")'), $
+                        '  ' + self->list_tables()])
+    return, tables
+  endelse
+end
+
+
 ;= property access
 
 ;+
@@ -636,7 +666,8 @@ pro mgdbmysql::getProperty, quiet=quiet, $
                             server_info=server_info, $
                             server_version=server_version, $
                             last_command_info=last_command_info, $
-                            database=database
+                            database=database, $
+                            host_name=host_name
   compile_opt strictarr
 
   quiet = self.quiet
@@ -649,6 +680,7 @@ pro mgdbmysql::getProperty, quiet=quiet, $
   if (arg_present(server_version)) then server_version = mg_mysql_get_server_version(self.connection)
   if (arg_present(last_command_info)) then last_command_info = mg_mysql_info(self.connection)
   database = self.database
+  host_name = self.host
 end
 
 
