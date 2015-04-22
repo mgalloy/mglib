@@ -10,8 +10,8 @@ pro mg_map::launch, pool
   pool->getProperty, n_processes=n_processes
   for p = 0L, n_processes - 1L do begin
     process = pool->get_process(p)
-    process->setProperty, callback_object=self, $
-                          callback_method='next'
+    process->setProperty, cb_object=self, $
+                          cb_method='next'
     self->launch_process, process
   endfor
 end
@@ -21,6 +21,7 @@ pro mg_map::launch_process, process
   compile_opt strictarr
 
   process->setProperty, userdata=self.i
+  process->getProperty, name=process_name
   process->setVar, 'x', (*self.iterable)[self.i]
   process->execute, self.statement, /nowait
   ++self.i
@@ -30,7 +31,8 @@ end
 function mg_map::is_done
   compile_opt strictarr
 
-  return, self.i ge self.count
+  self.pool->getProperty, n_processes=n_processes
+  return, self.n_done ge n_processes
 end
 
 
@@ -48,14 +50,16 @@ pro mg_map::next, process, status, error
   compile_opt strictarr
 
   ; store result
-  process->getProperty, userdata=i
+  process->getProperty, userdata=i, name=process_name
+
   self.result[i] = process->getVar('result')
 
   if (self.i lt self.count) then begin
     self->launch_process, process
   endif else begin
-    process->setProperty, callback_object=obj_new(), $
-                          callback_method=''
+    process->setProperty, cb_object=obj_new(), $
+                          cb_method=''
+    ++self.n_done
   endelse
 end
 
@@ -68,9 +72,10 @@ pro mg_map::cleanup
 end
 
 
-function mg_map::init, func=func, iterable=iterable
+function mg_map::init, pool=pool, func=func, iterable=iterable
   compile_opt strictarr
 
+  self.pool = pool
   self.result = hash()
 
   self.statement = string(func, format='(%"result = %s(x)")')
@@ -86,10 +91,12 @@ pro mg_map__define
   compile_opt strictarr
 
   define = { MG_Map, $
+             pool: obj_new(), $
              statement: '', $
              iterable: ptr_new(), $
              count: 0L, $
              i: 0L, $
+             n_done: 0L, $
              result: obj_new() $
            }
 end
@@ -100,11 +107,16 @@ end
 function mg_pool::map, f, iterable
   compile_opt strictarr
 
-  map = obj_new('MG_Map', func=f, iterable=iterable)
+  map = obj_new('MG_Map', pool=self, func=f, iterable=iterable)
   map->launch, self
-  while (~map->is_done()) do wait, 0.5
+
+  while (~map->is_done()) do begin
+    wait, 0.5
+  endwhile
+
   result = map->get_result()
   obj_destroy, map
+
   return, result
 end
 
@@ -154,15 +166,17 @@ end
 ; :Keywords:
 ;   n_processes : in, optional, type=long, default=!cpu.hw_ncpu
 ;     number of processes; default is the number of CPUs (cores) on the system
+;   _extra : in, optional, type=keywords
+;     keywords to 'MG_Process::init'
 ;-
-function mg_pool::init, n_processes=n_processes
+function mg_pool::init, n_processes=n_processes, _extra=e
   compile_opt strictarr
 
   self.n_processes = n_elements(n_processes) eq 0L ? !cpu.hw_ncpu : n_processes
 
   self.processes = ptr_new(objarr(self.n_processes))
   for p = 0L, self.n_processes - 1L do begin
-    (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2))
+    (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2), _extra=e)
   endfor
 
   self.result = hash()

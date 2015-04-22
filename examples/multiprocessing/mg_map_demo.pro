@@ -1,14 +1,10 @@
 ; docformat = 'rst'
 
-function mg_map_demo_func, x
-  compile_opt strictarr
 
-  r = randomu(seed, 1)
-  wait, 10. * r[0]
-  return, x^2
-end
-
-
+;+
+; Demo of using `MG_Pool::map` method to map a function over an array of
+; values.
+;-
 pro mg_map_demo
   compile_opt strictarr
 
@@ -19,7 +15,7 @@ pro mg_map_demo
   x_squared = pool->map('mg_map_demo_func', x)
 
   help, x_squared
-  print, x_squared
+  print, x_squared, format='(10(F8.1))'
 
   obj_destroy, pool
 end
