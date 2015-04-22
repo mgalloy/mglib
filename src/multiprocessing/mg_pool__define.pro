@@ -1,15 +1,30 @@
 ; docformat = 'rst'
 
+;+
+; Class representing a pool of processes.
+;
+; :Properties:
+;   n_processes : type=long
+;     number of processes; default is the number of CPUs (cores) on the system
+;   polling_cycle : type=float
+;     time, in seconds, to wait before checking again to see if work is
+;     completed
+;-
 
 ;= helper methods
 
-pro mg_map::launch, pool
+;+
+; Start a pool working on a map.
+;
+; :Private:
+;-
+pro mg_map::launch
   compile_opt strictarr
 
   ; setup processes to callback to map helper method
-  pool->getProperty, n_processes=n_processes
+  self.pool->getProperty, n_processes=n_processes
   for p = 0L, n_processes - 1L do begin
-    process = pool->get_process(p)
+    process = self.pool->get_process(p)
     process->setProperty, cb_object=self, $
                           cb_method='next'
     self->launch_process, process
@@ -17,6 +32,11 @@ pro mg_map::launch, pool
 end
 
 
+;+
+; Launch a process on the next available work item.
+;
+; :Private:
+;-
 pro mg_map::launch_process, process
   compile_opt strictarr
 
@@ -28,6 +48,11 @@ pro mg_map::launch_process, process
 end
 
 
+;+
+; Returns whether the map is completed.
+;
+; :Private:
+;-
 function mg_map::is_done
   compile_opt strictarr
 
@@ -36,6 +61,11 @@ function mg_map::is_done
 end
 
 
+;+
+; Retrieve final result.
+;
+; :Private:
+;-
 function mg_map::get_result
   compile_opt strictarr
 
@@ -46,6 +76,11 @@ function mg_map::get_result
 end
 
 
+;+
+; Hand off the next work item to the finishing process.
+;
+; :Private:
+;-
 pro mg_map::next, process, status, error
   compile_opt strictarr
 
@@ -64,6 +99,11 @@ pro mg_map::next, process, status, error
 end
 
 
+;+
+; Free resources.
+;
+; :Private:
+;-
 pro mg_map::cleanup
   compile_opt strictarr
 
@@ -72,6 +112,11 @@ pro mg_map::cleanup
 end
 
 
+;+
+; Create a `MG_Map` class.
+;
+; :Private:
+;-
 function mg_map::init, pool=pool, func=func, iterable=iterable
   compile_opt strictarr
 
@@ -87,6 +132,11 @@ function mg_map::init, pool=pool, func=func, iterable=iterable
 end
 
 
+;+
+; Define `MG_Map` class.
+;
+; :Private:
+;-
 pro mg_map__define
   compile_opt strictarr
 
@@ -104,14 +154,32 @@ end
 
 ;= API
 
+;+
+; :Todo:
+;   this should be able to handle multiple arguments
+;
+; :Examples:
+;   For example, suppose we want to execute a simple function on an array of
+;   items and return the result. The function we wish to execute on each
+;   element is::
+;
+;     function mg_map_demo_func, x
+;       return, x^2
+;     end
+;
+;   Then the function can be done with::
+;
+;     pool = obj_new('MG_Pool')
+;     x_squared = pool->map('mg_map_demo_func', findgen(100))
+;-
 function mg_pool::map, f, iterable
   compile_opt strictarr
 
   map = obj_new('MG_Map', pool=self, func=f, iterable=iterable)
-  map->launch, self
+  map->launch
 
   while (~map->is_done()) do begin
-    wait, 0.5
+    wait, self.polling_cycle
   endwhile
 
   result = map->get_result()
@@ -121,6 +189,16 @@ function mg_pool::map, f, iterable
 end
 
 
+;+
+; Retrieve a process from the pool by index.
+;
+; :Returns:
+;   `MG_Process` object
+;
+; :Params:
+;   i : in, required, type=integer
+;     index of process, 0...n_processes - 1
+;-
 function mg_pool::get_process, i
   compile_opt strictarr
 
@@ -130,16 +208,24 @@ end
 
 ;= property access
 
-pro mg_pool::setProperty
+;+
+; Set properties.
+;-
+pro mg_pool::setProperty, polling_cycle=polling_cycle
   compile_opt strictarr
 
+  if (n_elements(polling_cycle) gt 0L) then self.polling_cycle = polling_cycle
 end
 
 
-pro mg_pool::getProperty, n_processes=n_processes
+;+
+; Retrieve properties.
+;-
+pro mg_pool::getProperty, n_processes=n_processes, polling_cycle=polling_cycle
   compile_opt strictarr
 
   if (arg_present(n_processes)) then n_processes = self.n_processes
+  if (arg_present(polling_cycle)) then polling_cycle = self.polling_cycle
 end
 
 
@@ -166,10 +252,15 @@ end
 ; :Keywords:
 ;   n_processes : in, optional, type=long, default=!cpu.hw_ncpu
 ;     number of processes; default is the number of CPUs (cores) on the system
+;   polling_cycle : in, optional, type=float, default=0.5
+;     time, in seconds, to wait before checking again to see if work is
+;     completed
 ;   _extra : in, optional, type=keywords
 ;     keywords to 'MG_Process::init'
 ;-
-function mg_pool::init, n_processes=n_processes, _extra=e
+function mg_pool::init, n_processes=n_processes, $
+                        polling_cycle=polling_cycle, $
+                        _extra=e
   compile_opt strictarr
 
   self.n_processes = n_elements(n_processes) eq 0L ? !cpu.hw_ncpu : n_processes
@@ -179,18 +270,23 @@ function mg_pool::init, n_processes=n_processes, _extra=e
     (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2), _extra=e)
   endfor
 
-  self.result = hash()
+  self.polling_cycle = n_elements(polling_cycle) eq 0 ? 0.5 : polling_cycle
 
   return, 1
 end
 
 
 ;+
-; Class representing a process.
+; Define `MG_Pool` class.
 ;
 ; :Fields:
 ;   n_processes
 ;     number of processes
+;   processes
+;     pointer to `objarr` of processes
+;   polling_cycle
+;     amount of time, in seconds, to wait before checking to see if result is
+;     completed
 ;-
 pro mg_pool__define
   compile_opt strictarr
@@ -198,6 +294,6 @@ pro mg_pool__define
   define = { MG_Pool, $
              n_processes: 0L, $
              processes: ptr_new(), $
-             result: obj_new() $
+             polling_cycle: 0.0 $
            }
 end

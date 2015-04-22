@@ -1,30 +1,81 @@
 ; docformat = 'rst'
 
+;+
+; Wrapper class for `IDL_IDLBridge` which provides some hooks for the other
+; multiprocessing classes such as `MG_Pool` and `MG_Queue`.
+;
+; :Properties:
+;   name : type=string
+;     name for the process
+;   cb_object : type=object
+;     object whose method specified by `cb_method` should be called on task
+;     completion
+;   cb_method : type=string
+;     method of `cb_object` that should be called on task completion
+;   _extra : type=keywords
+;     keywords to `IDL_IDLBridge`
+;-
+
+
 ;= helper routines/methods
 
+;+
+; Default callback routine for `CALLBACK` property of `MG_Process`. A callback
+; must be set to make sure `MG_Process::onCallback` is called, but this default
+; routine does not do anything.
+;
+; :Private:
+;
+; :Params:
+;   status : in, required, type=integer
+;     status -- 2 for completion, 3 for error, 4 for aborted
+;   error : in, required, type=string
+;     error message if status is 3
+;   process : in, required, type=object
+;     `MG_Process` object
+;   userdata : in, required, type=any
+;     value of `USERDATA` property of `MG_Process`
+;-
 pro mg_process_callback, status, error, process, userdata
   compile_opt strictarr
 
-  ; need to have a callback to make sure ::onCallback gets called, but there
-  ; is nothing to do here since it is all done in ::onCallback
+  ; pass
 end
 
 
+;+
+; Method which calls callback routine and/or method.
+;
+; :Private:
+;
+; :Params:
+;   status : in, required, type=integer
+;     status -- 2 for completion, 3 for error, 4 for aborted
+;   error : in, required, type=string
+;     error message if status is 3
+;-
 pro mg_process::onCallback, status, error
   compile_opt strictarr
 
+  ; call CALLBACK routine, if set
   self->IDL_IDLBridge::onCallback, status, error
 
-  if (obj_valid(self.cb_object)) then begin
-    call_method, self.cb_method, self.cb_object, $
-                 self, status, error
+  ; call cb_object::cb_method if set
+  if (obj_valid(self.cb_object) && self.cb_method ne '') then begin
+    call_method, self.cb_method, self.cb_object, self, status, error
   endif
 end
 
 
 ;= API
 
-
+;+
+; Execute a statement inside the process.
+;
+; :Keywords:
+;   nowait : in, optional, type=boolean
+;     set for asynchronous execution
+;-
 pro mg_process::execute, cmd, nowait=nowait
   compile_opt strictarr
 
@@ -34,6 +85,9 @@ end
 
 ;= property access
 
+;+
+; Set properties.
+;-
 pro mg_process::setProperty, name=name, $
                              cb_object=callback_object, $
                              cb_method=callback_method, $
@@ -54,6 +108,9 @@ pro mg_process::setProperty, name=name, $
 end
 
 
+;+
+; Retrieve properties.
+;-
 pro mg_process::getProperty, name=name, $
                              cb_object=callback_object, $
                              cb_method=callback_method, $
@@ -91,6 +148,11 @@ end
 ; :Keywords:
 ;   name : in, optional, type=string
 ;     name for the process
+;   cb_object : in, optional, type=object
+;     object whose method specified by `cb_method` should be called on task
+;     completion
+;   cb_method : in, optional, type=string
+;     method of `cb_object` that should be called on task completion
 ;   _extra : in, optional, type=keywords
 ;     keywords to `IDL_IDLBridge`
 ;-
@@ -117,6 +179,11 @@ end
 ; :Fields:
 ;   name
 ;     name of the process
+;   cb_object
+;     object whose method specified by `cb_method` should be called on task
+;     completion
+;   cb_method
+;     method of `cb_object` that should be called on task completion
 ;-
 pro mg_process__define
   compile_opt strictarr
