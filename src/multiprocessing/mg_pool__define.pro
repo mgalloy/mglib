@@ -155,6 +155,8 @@ end
 ;= API
 
 ;+
+; Execute a function on each item of an array.
+;
 ; :Todo:
 ;   this should be able to handle multiple arguments
 ;

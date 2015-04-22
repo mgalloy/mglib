@@ -39,6 +39,8 @@ IDL library of Michael Galloy.
     file input/output routines
   googlevoice/
     class for connecting to Google Voice
+  grib/
+    GRIB handling routines
   gsl/
     generated wrappers for GNU Scientific Library (GSL) routines
   hdf/
