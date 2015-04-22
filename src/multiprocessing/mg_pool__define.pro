@@ -75,7 +75,7 @@ function mg_map::init, func=func, iterable=iterable
 
   self.statement = string(func, format='(%"result = %s(x)")')
 
-  self.iterable = ptr_free(iterable)
+  self.iterable = ptr_new(iterable)
   self.count = n_elements(iterable)
 
   return, 1
