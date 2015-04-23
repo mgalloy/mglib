@@ -103,7 +103,7 @@ pro mg_process::join, status=status, error=error
   compile_opt strictarr
   
   status = self->status(error=error)
-  while (status ne 1) do begin
+  while (status eq 1) do begin
     wait, self.polling_cycle
     status = self->status(error=error)
   endwhile
