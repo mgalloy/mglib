@@ -1,6 +1,12 @@
 ; docformat = 'rst'
 
 ;+
+; Example of creating a process to do some work while the main process
+; performs a shorter task and then waits to join up with the subprocess.
+;-
+
+
+;+
 ; Example task which takes about 10.0 seconds to complete.
 ;-
 pro mg_join_demo
