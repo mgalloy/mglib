@@ -162,7 +162,7 @@ pro mg_convert, basename, $
               ? (n_elements(scale) eq 0 $
                    ? '' $
                    : ' -resize ' + strtrim(scale, 2) + '%') $
-              : ' -resize ' + strjoin(strtrim(_maxDimensions, 2), 'x')
+              : ' -resize ' + strjoin(strtrim(maxDimensions, 2), 'x')
 
   defsysv, '!convert_location', exists=locationExists
   if (n_elements(convertLocation) gt 0L) then begin
