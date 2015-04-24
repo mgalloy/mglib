@@ -9,7 +9,7 @@
 ;    parent : private
 ;       parent logger
 ;    level : type=long
-;       current level of logging: 0 (none), 1 (critial), 2 (error),
+;       current level of logging: 0 (not set), 1 (critical), 2 (error),
 ;       3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
 ;       which will be cascaded up to the parents of the logger with the
 ;       logger taking the last level and passing the previous ones up to its
