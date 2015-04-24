@@ -65,8 +65,11 @@ t0 = systime(/seconds)
 x_squared = pool->map('mg_pool_map_demo', x, multiplier=multiplier)
 t1 = systime(/seconds)
 
+expected = multiplier * 0.5 * ceil(float(n) / n_processes)
 mg_log, '%0.1f sec to find result (approx %0.1f sec of work)', $
-        t1 - t0, multiplier * 0.5 * ceil(float(n) / n_processes)
+        t1 - t0, expected
+
+mg_log, '%0.1f%% overhead', (t1 - t0 - expected) / (t1 - t0) * 100.
 
 help, x_squared
 print, x_squared, format='(10(F8.1))'
