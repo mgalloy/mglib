@@ -39,7 +39,7 @@
 ;   x : in, required, type=numeric
 ;     input value to be squared
 ;-
-function mg_map_demo, x
+function mg_pool_map_demo, x
   compile_opt strictarr
 
   r = randomu(seed, 1)
@@ -55,7 +55,7 @@ pool = obj_new('MG_Pool')
 
 n = 100L
 x = findgen(n)
-x_squared = pool->map('mg_map_demo', x)
+x_squared = pool->map('mg_pool_map_demo', x)
 
 help, x_squared
 print, x_squared, format='(10(F8.1))'

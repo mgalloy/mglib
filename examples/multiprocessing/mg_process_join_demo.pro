@@ -9,7 +9,7 @@
 ;+
 ; Example task which takes about 10.0 seconds to complete.
 ;-
-pro mg_join_demo
+pro mg_process_join_demo
   compile_opt strictarr
 
   t0 = systime(/seconds)
@@ -24,10 +24,10 @@ end
 
 ; main-level example program
 
-p = mg_process(name='demo process', output='')
+p = mg_process(name='subprocess', output='')
 
 t0 = systime(/seconds)
-p->execute, 'mg_join_demo', /nowait
+p->execute, 'mg_process_join_demo', /nowait
 
 main_t0 = systime(/seconds)
 mg_log, 'main process starting'
