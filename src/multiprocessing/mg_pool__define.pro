@@ -44,6 +44,12 @@ pro mg_map::launch_process, process
 
   process->setProperty, userdata=self.i
   process->setVar, 'x', (*self.iterable)[self.i]
+  if (n_elements(*self.keywords) gt 0L) then begin
+    tnames = tag_names(*self.keywords)
+    for k = 0L, n_tags(*self.keywords) - 1L do begin
+      process->setVar, tnames[k], (*self.keywords).(k)
+    endfor
+  endif
   process->execute, self.statement, /nowait
   ++self.i
 end
@@ -79,9 +85,16 @@ function mg_map::get_result
   if (self.is_procedure) then message, 'no result for procedure map'
 
   indices = (self.result->keys())->toArray()
-  values = (self.result->values())->toArray()
 
-  return, values[sort(indices)]
+  if (size(*self.iterable, /type) eq 11 $
+        && obj_isa(*self.iterable, 'IDL_Object')) then begin
+    values = self.result->values()
+    return, values[sort(indices)]
+  endif else begin
+    values = (self.result->values())->toArray()
+    return, values[sort(indices)]
+  endelse
+
 end
 
 
@@ -121,6 +134,7 @@ pro mg_map::cleanup
 
   if (~self.is_procedure) then obj_destroy, self.result
   ptr_free, self.iterable
+  ptr_free, self.keywords
 end
 
 
@@ -130,20 +144,28 @@ end
 ; :Private:
 ;-
 function mg_map::init, pool=pool, func=func, iterable=iterable, $
-                       is_procedure=is_procedure
+                       is_procedure=is_procedure, _extra=e
   compile_opt strictarr
 
   self.pool = pool
 
   self.is_procedure = keyword_set(is_procedure)
+  if (n_elements(e) eq 0L) then begin
+    kw = ''
+  endif else begin
+    tnames = tag_names(e)
+    kw = ', ' + strjoin(tnames + '=' + tnames, ', ')
+  endelse
+
   if (self.is_procedure) then begin
-    self.statement = string(func, format='(%"%s, x")')
+    self.statement = string(func, kw, format='(%"%s, x%s")')
   endif else begin
     self.result = hash()
-    self.statement = string(func, format='(%"result = %s(x)")')
+    self.statement = string(func, kw, format='(%"result = %s(x%s)")')
   endelse
 
   self.iterable = ptr_new(iterable)
+  self.keywords = ptr_new(e)
   self.count = n_elements(iterable)
 
   return, 1
@@ -163,6 +185,7 @@ pro mg_map__define
              is_procedure: 0B, $
              statement: '', $
              iterable: ptr_new(), $
+             keywords: ptr_new(), $
              count: 0L, $
              i: 0L, $
              n_done: 0L, $
@@ -181,8 +204,10 @@ end
 ;   this should be able to handle multiple arguments
 ;
 ; :Returns:
-;   the result of appling the function to each element of the array,
-;   or `!null` if a procedure
+;   the result of appling the function to each element of the iterable as an
+;   array if `iterable` as an array or as a `list` if `iterable` was a `list`
+;   (or some other appropriate subclass of `IDL_Object`), or `!null` if
+;   `is_procedure` is set
 ;
 ; :Examples:
 ;   For example, suppose we want to execute a simple function on an array of
@@ -203,19 +228,22 @@ end
 ;     function to call on each item of `iterable`, unless
 ;     `is_procedure` is set, in which case it is considered a procedure
 ;   iterable : in, required, type=iterable type
-;     array or `IDL_Object` subclass which implements the `_overloadSize`
-;     and `_overloadBracketsRightSide` methods where the items are
-;     given by `iterable[i]` with `i=0,1,...n-1`
+;     array or list (technically any `IDL_Object` subclass which implements
+;     the `_overloadSize` and `_overloadBracketsRightSide` methods where the
+;     items are given by `iterable[i]` with `i=0,1,...n-1`)
 ;
 ; :Keywords:
 ;   is_procedure : in, optional, type=boolean
 ;     set to indicate `f` is procedure, otherwise it is assumed to be
-;     a function     
+;     a function
+;   _extra : in, optional, type=numeric/string
+;     keywords to pass to `f`; keywords are not iterated through, they are
+;     passed as a whole to `f` in each call
 ;-
-function mg_pool::map, f, iterable, is_procedure=is_procedure
+function mg_pool::map, f, iterable, is_procedure=is_procedure, _extra=e
   compile_opt strictarr
 
-  map = obj_new('MG_Map', pool=self, func=f, iterable=iterable)
+  map = obj_new('MG_Map', pool=self, func=f, iterable=iterable, _extra=e)
   map->launch
 
   while (~map->is_done()) do begin

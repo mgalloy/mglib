@@ -8,7 +8,6 @@
 ;   To run this demo::
 ;
 ;     IDL> .run mg_map_demo
-;     IDL> .run mg_map_demo
 ;     X_SQUARED       FLOAT     = Array[100]
 ;          0.0     1.0     4.0     9.0    16.0    25.0    36.0    49.0
 ;         64.0    81.0   100.0   121.0   144.0   169.0   196.0   225.0
@@ -39,11 +38,12 @@
 ;   x : in, required, type=numeric
 ;     input value to be squared
 ;-
-function mg_pool_map_demo, x
+function mg_pool_map_demo, x, multiplier=multiplier
   compile_opt strictarr
 
+  _multiplier = n_elements(multiplier) eq 0L ? 5. : multiplier
   r = randomu(seed, 1)
-  wait, 5. * r[0]
+  wait, _multiplier * r[0]
 
   return, x^2
 end
@@ -51,11 +51,22 @@ end
 
 ; main-level example program
 
+t0 = systime(/seconds)
 pool = obj_new('MG_Pool')
+t1 = systime(/seconds)
+
+pool->getProperty, n_processes=n_processes
+mg_log, '%0.1f sec to create pool with %d processs', t1 - t0, n_processes
 
 n = 100L
+multiplier = 2.5
 x = findgen(n)
-x_squared = pool->map('mg_pool_map_demo', x)
+t0 = systime(/seconds)
+x_squared = pool->map('mg_pool_map_demo', x, multiplier=multiplier)
+t1 = systime(/seconds)
+
+mg_log, '%0.1f sec to find result (approx %0.1f sec of work)', $
+        t1 - t0, multiplier * 0.5 * ceil(float(n) / n_processes)
 
 help, x_squared
 print, x_squared, format='(10(F8.1))'
