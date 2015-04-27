@@ -11,9 +11,9 @@
 ;    level : type=long
 ;       current level of logging: 0 (not set), 1 (critical), 2 (error),
 ;       3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
-;       which will be cascaded up to the parents of the logger with the
-;       logger taking the last level and passing the previous ones up to its
-;       parent; only messages with levels lower or equal to than the logger
+;       which will be cascaded up to the parents of the logger with the logger
+;       taking the last level and passing the previous ones up to its parent;
+;       only messages with levels greater than or equal to than the logger
 ;       level will be logged
 ;    time_format : type=string
 ;       Fortran style format code to specify the format of the time in the
@@ -22,13 +22,13 @@
 ;    format : type=string
 ;       format string for messages, default value for format is::
 ;
-;         '%(time)s %(levelname)s: %(routine)s: %(message)s'
+;         '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 ;
 ;       where the possible names to include are: "time", "levelname",
 ;       "levelshortname", "routine", "stacktrace", "name", "fullname" and
 ;       "message".
 ;
-;       Note that the time argument will first be formatted using the
+;       Note that the "time" argument will first be formatted using the
 ;       `TIME_FORMAT` specification
 ;    filename : type=string
 ;       filename to send append output to; set to empty string to send output
@@ -43,7 +43,8 @@
 
 
 ;+
-; Get the minimum level value of this logger and all its parents.
+; Get the maximum level value of this logger and all its parents. Level 0 is
+; not set and is not used in the calculation.
 ;
 ; :Private:
 ;
@@ -54,7 +55,9 @@ function mgfflogger::_getLevel
   compile_opt strictarr
 
   return, obj_valid(self.parent) $
-            ? (self.parent->_getLevel() < self.level) $
+            ? (self.level eq 0 $
+              ? (self.parent->_getLevel()) $
+              : (self.parent->_getLevel() > self.level)) $
             : self.level
 end
 

@@ -43,12 +43,12 @@
 ;
 ; This type of hierarchy is useful for applications with subsystems with
 ; independent level values. The effective log level for log messages sent to a
-; sublogger is the most restrictive log level from all the parent loggers. For
+; sublogger is the least restrictive log level from all the parent loggers. For
 ; example, if the level of `gui_logger` was set to "Informational" with::
 ;
 ;    gui_logger->setProperty, level=4
 ;
-; Then informational log messages would not be logged because the parent
+; Then informational log messages would be logged even though the parent
 ; logger, "mg_example", has a level of 3, i.e., "Warning".
 ;
 ; :Examples:
@@ -152,7 +152,7 @@ pro mg_log, msg, $
 
   ; create the top-level logger if it doesn't already exist in the
   ; mg_log_common common block
-  if (~obj_valid(mgLogger)) then mgLogger = obj_new('MGffLogger', level=5)
+  if (~obj_valid(mgLogger)) then mgLogger = obj_new('MGffLogger', level=0)
 
   ; use (optional) name to lookup actual logger or use the top-level logger
   ; if not named
@@ -161,6 +161,7 @@ pro mg_log, msg, $
   ; pass on keywords to the logger
   logger->setProperty, _strict_extra=e
 
+  ; set the level of the message
   levels = [keyword_set(critical), $
             keyword_set(error), $
             keyword_set(warning), $
