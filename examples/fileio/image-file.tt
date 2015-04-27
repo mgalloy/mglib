@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>info structure from QUERY_IMAGE</title>
+    <style type="text/css">
+      body { font-family: Verdana; }
+      table { padding: 3px; background: #DDDDDD; border: 1px dashed #AAAAAA; }
+      tr, td { margin: 0; }
+      td { padding-right: 3em; font-size: 10pt; }
+    </style>
+  </head>
+
+  <body>
+
+    <table>
+      <tr>
+	<td>Number of bands</td> 
+	<td>[% channels %]</td>
+      </tr>
+
+      <tr>
+	<td>Dimensions</td> 
+	<td>[% strjoin(strtrim(dimensions, 2), ', ') %]</td>
+      </tr>
+
+      <tr>
+	<td>Has a palette?</td> 
+	<td>[% (['no', 'yes'])[has_palette] %]</td>
+      </tr>
+
+      <tr>
+	<td>Image index</td> 
+	<td>[% image_index + 1 %] / [% num_images %]</td>
+      </tr>
+
+      <tr>
+	<td>Pixel type</td> 
+	<td>[% (['undefined', 'byte', 'int', 'long', 'float', 'double', 'complex', 'string', 'struct', 'decomplex', 'pointer', 'object', 'uint', 'ulong', 'long64', 'ulong64'])[pixel_type] %]</td>
+      </tr>
+
+      <tr>
+	<td>Type</td> 
+	<td>[% strlowcase(type) %]</td>
+      </tr>
+    </table>
+
+  </body>
+</html> 

@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Report of images in [% dir %]</title>
+    <style type="text/css">
+      body { font-family: Verdana; }
+      h1 { font-size: 12pt; font-weight: normal; }
+      .date { font-size: 10pt; margin-bottom: 1em; }
+      h2 { font-size: 10pt; font-weight: normal; margin-top: 2em; }
+      table { padding: 3px; background: #DDDDDD; border: 1px dashed #AAAAAA; margin-left: 2em; }
+      tr, td { margin: 0; }
+      td { padding-right: 3em; font-size: 10pt; }
+      .footer { margin-top: 3em; padding-top: 3px; font-size: 9pt; border-top: 1px dotted #AAA; }
+      .png { background: #FFDDDD; }
+      .jpeg { background: #DDFFDD; }
+      .dicom { background: #DDDDFF; }
+      .tiff { background: #FFFFDD; }
+    </style>
+  </head>
+
+  <body>
+    [% INCLUDE_TEMPLATE header %]
+
+    [% FOREACH f IN files %]<h2>[% f.filename %]</h2>
+    <table class="[% f.type %]">
+      <tr>
+	<td>Number of bands</td> 
+	<td>[% f.channels %]</td>
+      </tr>
+
+      <tr>
+	<td>Dimensions</td> 
+	<td>[% strjoin(strtrim(f.dimensions, 2), ', ') %]</td>
+      </tr>
+
+      <tr>
+	<td>Has a palette?</td> 
+	<td>[% (['no', 'yes'])[f.has_palette] %]</td>
+      </tr>
+
+      <tr>
+	<td>Image index</td> 
+	<td>[% f.image_index + 1 %] / [% f.num_images %]</td>
+      </tr>
+
+      <tr>
+	<td>Pixel type</td> 
+	<td>[% (['undefined', 'byte', 'int', 'long', 'float', 'double', 'complex', 'string', 'struct', 'decomplex', 'pointer', 'object', 'uint', 'ulong', 'long64', 'ulong64'])[f.pixel_type] %]</td>
+      </tr>
+
+      <tr>
+	<td>Type</td> 
+	<td>[% strlowcase(f.type) %]</td>
+      </tr>
+    </table>
+    [% END %]
+
+    [% INCLUDE footer %]
+  </body>
+</html>
+
