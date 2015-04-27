@@ -25,7 +25,7 @@ pro mg_map::launch
 
   ; setup processes to callback to map helper method
   self.pool->getProperty, n_processes=n_processes
-  for p = 0L, n_processes - 1L do begin
+  for p = 0L, (n_processes < self.count) - 1L do begin
     process = self.pool->get_process(p)
     process->setProperty, cb_object=self, $
                           cb_method='next'
@@ -44,17 +44,21 @@ pro mg_map::launch_process, process
 
   process->setProperty, userdata=self.i
 
+  ; setup arguments
   for i = 0L, n_elements(self.iterable) - 1L do begin
     process->setVar, 'x' + strtrim(i, 2), (self.iterable[i])[self.i]
   endfor
 
+  ; setup keywords
   if (n_elements(*self.keywords) gt 0L) then begin
     tnames = tag_names(*self.keywords)
     for k = 0L, n_tags(*self.keywords) - 1L do begin
       process->setVar, tnames[k], (*self.keywords).(k)
     endfor
   endif
+
   process->execute, self.statement, /nowait
+
   ++self.i
 end
 
@@ -73,7 +77,7 @@ function mg_map::is_done
   ; that it needs to call the callback routine
   status = self.pool->status(error=error)
 
-  return, self.n_done ge n_processes
+  return, self.n_done ge (n_processes < self.count)
 end
 
 
@@ -162,12 +166,13 @@ function mg_map::init, pool=pool, func=func, iterable=iterable, $
 
   self.iterable = iterable
   self.keywords = ptr_new(e)
+  self.i = 0L
 
   ; find max number of elements in all iterables
   self.count = (self.iterable->map('n_elements'))->reduce(lambda(x, y: x > y))
 
   ; determine if any iterable is a list
-  self.is_list = (self.iterable->map(lambda(x: isa(x, 'list'))))->reduce(lambda(x, y: x > y))
+  self.is_list = (self.iterable->map(lambda(x: isa(x, 'IDL_Object'))))->reduce(lambda(x, y: x > y))
 
   args = strjoin('x' + strtrim(indgen(n_elements(self.iterable)), 2), ', ')
 
