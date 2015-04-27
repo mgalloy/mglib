@@ -36,16 +36,18 @@
 ;
 ; :Params:
 ;   x : in, required, type=numeric
-;     input value to be squared
+;     first input value
+;   y : in, required, type=numeric
+;     second input value
 ;-
-function mg_pool_map_demo, x, multiplier=multiplier
+function mg_pool_map_demo, x, y, multiplier=multiplier
   compile_opt strictarr
 
   _multiplier = n_elements(multiplier) eq 0L ? 5. : multiplier
   r = randomu(seed, 1)
   wait, _multiplier * r[0]
 
-  return, x^2
+  return, x^2 + y^3
 end
 
 
@@ -61,8 +63,9 @@ mg_log, '%0.1f sec to create pool with %d processs', t1 - t0, n_processes
 n = 100L
 multiplier = 2.5
 x = findgen(n)
+y = 0.5 * findgen(n)
 t0 = systime(/seconds)
-x_squared = pool->map('mg_pool_map_demo', x, multiplier=multiplier)
+x_squared = pool->map('mg_pool_map_demo', x, y, multiplier=multiplier)
 t1 = systime(/seconds)
 
 expected = multiplier * 0.5 * ceil(float(n) / n_processes)
@@ -72,7 +75,7 @@ mg_log, '%0.1f sec to find result (approx %0.1f sec of work)', $
 mg_log, '%0.1f%% overhead', (t1 - t0 - expected) / (t1 - t0) * 100.
 
 help, x_squared
-print, x_squared, format='(10(F8.1))'
+print, x_squared, format='(8(F10.2))'
 
 obj_destroy, pool
 

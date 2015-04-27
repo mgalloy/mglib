@@ -43,7 +43,11 @@ pro mg_map::launch_process, process
   compile_opt strictarr
 
   process->setProperty, userdata=self.i
-  process->setVar, 'x', (*self.iterable)[self.i]
+
+  for i = 0L, n_elements(self.iterable) - 1L do begin
+    process->setVar, 'x' + strtrim(i, 2), (self.iterable[i])[self.i]
+  endfor
+
   if (n_elements(*self.keywords) gt 0L) then begin
     tnames = tag_names(*self.keywords)
     for k = 0L, n_tags(*self.keywords) - 1L do begin
@@ -86,8 +90,7 @@ function mg_map::get_result
 
   indices = (self.result->keys())->toArray()
 
-  if (size(*self.iterable, /type) eq 11 $
-        && obj_isa(*self.iterable, 'IDL_Object')) then begin
+  if (self.is_list) then begin
     values = self.result->values()
     return, values[sort(indices)]
   endif else begin
@@ -133,7 +136,7 @@ pro mg_map::cleanup
   compile_opt strictarr
 
   if (~self.is_procedure) then obj_destroy, self.result
-  ptr_free, self.iterable
+  obj_destroy, self.iterable
   ptr_free, self.keywords
 end
 
@@ -157,16 +160,23 @@ function mg_map::init, pool=pool, func=func, iterable=iterable, $
     kw = ', ' + strjoin(tnames + '=' + tnames, ', ')
   endelse
 
+  self.iterable = iterable
+  self.keywords = ptr_new(e)
+
+  ; find max number of elements in all iterables
+  self.count = (self.iterable->map('n_elements'))->reduce(lambda(x, y: x > y))
+
+  ; determine if any iterable is a list
+  self.is_list = (self.iterable->map(lambda(x: isa(x, 'list'))))->reduce(lambda(x, y: x > y))
+
+  args = strjoin('x' + strtrim(indgen(n_elements(self.iterable)), 2), ', ')
+
   if (self.is_procedure) then begin
-    self.statement = string(func, kw, format='(%"%s, x%s")')
+    self.statement = string(func, args, kw, format='(%"%s, %s%s")')
   endif else begin
     self.result = hash()
-    self.statement = string(func, kw, format='(%"result = %s(x%s)")')
+    self.statement = string(func, args, kw, format='(%"result = %s(%s%s)")')
   endelse
-
-  self.iterable = ptr_new(iterable)
-  self.keywords = ptr_new(e)
-  self.count = n_elements(iterable)
 
   return, 1
 end
@@ -184,9 +194,10 @@ pro mg_map__define
              pool: obj_new(), $
              is_procedure: 0B, $
              statement: '', $
-             iterable: ptr_new(), $
-             keywords: ptr_new(), $
+             iterable: obj_new(), $
+             is_list: 0B, $
              count: 0L, $
+             keywords: ptr_new(), $
              i: 0L, $
              n_done: 0L, $
              result: obj_new() $
@@ -205,7 +216,7 @@ end
 ;
 ; :Returns:
 ;   the result of appling the function to each element of the iterable as an
-;   array if `iterable` as an array or as a `list` if `iterable` was a `list`
+;   array if `iterable1` as an array or as a `list` if `iterable1` was a `list`
 ;   (or some other appropriate subclass of `IDL_Object`), or `!null` if
 ;   `is_procedure` is set
 ;
@@ -225,9 +236,9 @@ end
 ;
 ; :Params:
 ;   f : in, required, type=string
-;     function to call on each item of `iterable`, unless
+;     function to call on each item of the iterable arguments, unless
 ;     `is_procedure` is set, in which case it is considered a procedure
-;   iterable : in, required, type=iterable type
+;   iterable1, iterable2, iterable3 , iterable4 : in, required, type=iterable type
 ;     array or list (technically any `IDL_Object` subclass which implements
 ;     the `_overloadSize` and `_overloadBracketsRightSide` methods where the
 ;     items are given by `iterable[i]` with `i=0,1,...n-1`)
@@ -240,10 +251,29 @@ end
 ;     keywords to pass to `f`; keywords are not iterated through, they are
 ;     passed as a whole to `f` in each call
 ;-
-function mg_pool::map, f, iterable, is_procedure=is_procedure, _extra=e
+function mg_pool::map, f, iterable1, iterable2, iterable3, iterable4, $
+                       is_procedure=is_procedure, _extra=e
   compile_opt strictarr
+  on_error, 2
 
-  map = obj_new('MG_Map', pool=self, func=f, iterable=iterable, _extra=e)
+  iterable = list()
+  switch n_params() of
+    5: iterable->add, iterable4, 0
+    4: iterable->add, iterable3, 0
+    3: iterable->add, iterable2, 0
+    2: begin
+        iterable->add, iterable1, 0
+        break
+      end
+    1: message, 'at least one iterable argument required'
+    0: message, 'function name argument required'
+  endswitch
+
+  map = obj_new('MG_Map', $
+                pool=self, $
+                func=f, $
+                iterable=iterable, $
+                _extra=e)
   map->launch
 
   while (~map->is_done()) do begin
@@ -287,7 +317,7 @@ end
 ;
 ;   code  description             error message
 ;   ----  ----------------------  -------------
-;      0  idl                     empty string
+;      0  idle                    empty string
 ;      1  executing command       empty string
 ;      2  completed               empty string
 ;      3  error halted execution  error message
