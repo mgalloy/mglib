@@ -17,7 +17,7 @@ function mg_match_ut::test_basic
           n_matches, standard_n_matches
 
   for m = 0L, n_matches - 1L do begin
-    assert, a[a_matches[m]] eq b[b_matches[m]];, $
+    assert, a[a_matches[m]] eq b[b_matches[m]], $
             'match %d not equal, a[%d] = %d, but b[%d] = %d', $
             m, a_matches[m], a[a_matches[m]], b_matches[m], b[b_matches[m]]
   endfor
