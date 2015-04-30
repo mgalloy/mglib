@@ -267,7 +267,7 @@ end
 ;   no_header : in, optional, type=boolean
 ;     set to not print header information
 ;-
-pro mgfflogger::print, msg, level=level, back_levels=back_levels, $
+pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
                        no_header=no_header
   compile_opt strictarr
 
@@ -283,7 +283,8 @@ pro mgfflogger::print, msg, level=level, back_levels=back_levels, $
     endelse
   endelse
 
-  if (level le self->_getLevel()) then begin
+  logger_level = self->_getLevel()
+  if ((logger_level eq 0L) or (msg_level le logger_level)) then begin
     if (keyword_set(no_header)) then begin
       s = msg
     endif else begin
@@ -291,8 +292,8 @@ pro mgfflogger::print, msg, level=level, back_levels=back_levels, $
       self->getProperty, fullname=fullname
       vars = { time: string(systime(/julian), $
                             format='(' + self.time_format + ')'), $
-               levelname: strupcase(self.levelNames[level - 1L]), $
-               levelshortname: strupcase(self.levelShortNames[level - 1L]), $
+               levelname: strupcase(self.levelNames[msg_level - 1L]), $
+               levelshortname: strupcase(self.levelShortNames[msg_level - 1L]), $
                routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
                stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
                                    '->'), $
