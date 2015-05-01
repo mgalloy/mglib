@@ -8,9 +8,9 @@ function mg_match_ut::test_basic
 
   standard_n_matches = 3L
 
-  a_matches = mg_match(a, b, $
-                       b_matches=b_matches, $
-                       n_matches=n_matches)
+  n_matches = mg_match(a, b, $
+                       a_matches=a_matches, $
+                       b_matches=b_matches)
 
   assert, n_matches eq standard_n_matches, $
           'incorrect number of matches %d (correct is %d)', $
@@ -34,9 +34,9 @@ function mg_match_ut::test_single
 
   standard_n_matches = 1L
 
-  a_matches = mg_match(a, b, $
-                       b_matches=b_matches, $
-                       n_matches=n_matches)
+  n_matches = mg_match(a, b, $
+                       a_matches=a_matches, $
+                       b_matches=b_matches)
 
   assert, n_matches eq standard_n_matches, $
           'incorrect number of matches %d (correct is %d)', $
@@ -60,9 +60,9 @@ function mg_match_ut::test_nomatches
 
   standard_n_matches = 0L
 
-  a_matches = mg_match(a, b, $
-                       b_matches=b_matches, $
-                       n_matches=n_matches)
+  n_matches = mg_match(a, b, $
+                       a_matches=a_matches, $
+                       b_matches=b_matches)
 
   assert, n_matches eq standard_n_matches, $
           'incorrect number of matches %d (correct is %d)', $
@@ -86,9 +86,9 @@ function mg_match_ut::test_strings
 
   standard_n_matches = 1L
 
-  a_matches = mg_match(a, b, $
-                       b_matches=b_matches, $
-                       n_matches=n_matches)
+  n_matches = mg_match(a, b, $
+                       a_matches=a_matches, $
+                       b_matches=b_matches)
 
   assert, n_matches eq standard_n_matches, $
           'incorrect number of matches %d (correct is %d)', $

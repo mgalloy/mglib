@@ -4,17 +4,19 @@
 ;	Routine to match values between two arrays.
 ;
 ; :Returns:
-;   `lonarr` of indices of `a` which match elements of `b` or `!null` if no
-;    matches found
+;   long, number of matches found
 ;
 ; :Params:
 ;   a, b : in, required, type=array
 ;     arrays to match
 ;
 ; :Keywords:
+;   a_matches : out, optional, type=`lonarr`
+;     set to a named variable to retrieve the indices of `a` which match
+;     elements of `b` or `!null` if no matches found
 ;   b_matches : out, optional, type=`lonarr`
 ;     set to a named variable to retrieve the indices of `b` which match
-;     elements of `a` or `!null` if no matches found; the return value and
+;     elements of `a` or `!null` if no matches found; the `a_matches` and
 ;     `b_matches` are given in the same order, so for any
 ;     `i = 0...n_matches - 1` then::
 ;
@@ -23,7 +25,7 @@
 ;   n_matches : out, optional, type=long
 ;     number of matches found
 ;-
-function mg_match, a, b, b_matches=b_matches, n_matches=n_matches
+function mg_match, a, b, a_matches=a_matches, b_matches=b_matches
   compile_opt strictarr
 
   na = n_elements(a)
@@ -44,8 +46,9 @@ function mg_match, a, b, b_matches=b_matches, n_matches=n_matches
                   n_matches)
 
   if (n_matches eq 0L) then begin
+    a_matches = !null
     b_matches = !null
-    return, !null
+    return, 0L
   endif
 
   matches = transpose([[matches], [matches + 1L]])
@@ -58,7 +61,7 @@ function mg_match, a, b, b_matches=b_matches, n_matches=n_matches
   b_where = where(flag eq 1L)
   b_matches = ind[b_where]   ; b subscripts
 
-  return, a_matches
+  return, n_matches
 end
 
 
