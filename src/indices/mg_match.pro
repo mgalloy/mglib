@@ -21,9 +21,6 @@
 ;     `i = 0...n_matches - 1` then::
 ;
 ;       a[a_matches[i]] eq b[b_matches[i]]
-;
-;   n_matches : out, optional, type=long
-;     number of matches found
 ;-
 function mg_match, a, b, a_matches=a_matches, b_matches=b_matches
   compile_opt strictarr

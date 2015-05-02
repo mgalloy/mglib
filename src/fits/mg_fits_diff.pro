@@ -43,6 +43,26 @@ function mg_fits_diff_getkeywords, header, ignore_keywords=ignore_keywords, $
 end
 
 
+;+
+; Helper routine to check the keywords in a FITS header for differences.
+;
+; :Private:
+;
+; :Returns:
+;   `0B` if no difference found, `1B` if a difference was found
+;
+; :Params:
+;   header1, header2 : in, required, type=strarr
+;     headers of a FITS file, as returned via `FITS_READ`
+;   filename1, filename2 : in, required, type=string
+;     filenames of FITS files, used for logging
+;
+; :Keywords:
+;   ignore_keywords : in, optional, type=strarr
+;     keywords to ignore, may contain wildcards `*` and `?`
+;   logname : in, optional, type=string
+;     name of `MG_LOG` logger to send details about differences to
+;-
 function mg_fits_diff_checkkeywords, header1, filename1, $
                                      header2, filename2, $
                                      ignore_keywords=ignore_keywords, $
@@ -105,6 +125,24 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
 end
 
 
+;+
+; Helper routine to check the data in a FITS header for differences.
+;
+; :Private:
+;
+; :Returns:
+;   `0B` if no difference found, `1B` if a difference was found
+;
+; :Params:
+;   data1, data2 : in, required, type=strarr
+;     data of a FITS file, as returned via `FITS_READ`
+;   filename1, filename2 : in, required, type=string
+;     filenames of FITS files, used for logging
+;
+; :Keywords:
+;   logname : in, optional, type=string
+;     name of `MG_LOG` logger to send details about differences to
+;-
 function mg_fits_diff_checkdata, data1, filename1,$
                                  data2, filename2, $
                                  logname=logname
@@ -166,26 +204,66 @@ function mg_fits_diff, filename1, filename2, $
   compile_opt strictarr
 
   fits_open, filename1, fcb1
-  fits_read, fcb1, data1, header1
-  fits_close, fcb1
-
   fits_open, filename2, fcb2
+
+  fits_read, fcb1, data1, header1
   fits_read, fcb2, data2, header2
-  fits_close, fcb2
 
   keywords_diff = mg_fits_diff_checkkeywords(header1, filename1, $
                                              header2, filename2, $
                                              ignore_keywords=ignore_keywords, $
                                              logname=logname)
-  if (keywords_diff) then return, keywords_diff
+  if (keywords_diff) then begin
+    fits_close, fcb1
+    fits_close, fcb2
+    return, keywords_diff
+  endif
 
   ; check data
   data_diff = mg_fits_diff_checkdata(data1, filename1, $
                                      data2, filename2, $
                                      logname=logname)
-  if (data_diff) then return, data_diff
+  if (data_diff) then begin
+    fits_close, fcb1
+    fits_close, fcb2
+    return, data_diff
+  endif
 
-  ; TODO: check extensions
+  extend_diff = fcb1.nextend ne fcb1.nextend
+  if (extend_diff gt 0L) then begin
+    if (n_elements(logname) gt 0L) then begin
+      mg_log, 'number of extensions in %s not the same as in %s', $
+              filename1, filename2, $
+              name=logname, /warn
+    endif
+  endif
+
+  for e = 0L, fcb1.nextend - 1L do begin
+    fits_read, fcb1, data1, header1, exten_no=e
+    fits_read, fcb2, data2, header2, exten_no=e
+
+    keywords_diff = mg_fits_diff_checkkeywords(header1, filename1, $
+                                               header2, filename2, $
+                                               ignore_keywords=ignore_keywords, $
+                                               logname=logname)
+    if (keywords_diff) then begin
+      fits_close, fcb1
+      fits_close, fcb2
+      return, keywords_diff
+    endif
+
+    data_diff = mg_fits_diff_checkdata(data1, filename1, $
+                                       data2, filename2, $
+                                       logname=logname)
+    if (data_diff) then begin
+      fits_close, fcb1
+      fits_close, fcb2
+      return, data_diff
+    endif
+  endfor
+
+  fits_close, fcb1
+  fits_close, fcb2
 
   return, 0B
 end
