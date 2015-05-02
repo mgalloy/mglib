@@ -1,5 +1,20 @@
 ; docformat = 'rst'
 
+
+function mg_fits_diff_ut::test_differentdata
+  compile_opt strictarr
+
+  filename1 = filepath('20150428_223017_kcor.fts', root=self.fits_data_root)
+  filename2 = filepath('20150428_223017_kcor_changeddata.fts', $
+                       root=self.fits_data_root)
+
+  diff = mg_fits_diff(filename1, filename2)
+  assert, diff eq 1, 'difference not found'
+
+  return, 1
+end
+
+
 function mg_fits_diff_ut::test_differentkeywords
   compile_opt strictarr
 

@@ -19,8 +19,8 @@
 ;     set to a named variable to retrieve the number of keywords found in the
 ;     header
 ;-
-function mg_fits_diff_keywords, header, ignore_keywords=ignore_keywords, $
-                                n_keywords=n_keywords
+function mg_fits_diff_getkeywords, header, ignore_keywords=ignore_keywords, $
+                                   n_keywords=n_keywords
   compile_opt strictarr
 
   keywords = (stregex(header, '(.{8})=', /subexpr, /extract))[1, *]
@@ -43,51 +43,16 @@ function mg_fits_diff_keywords, header, ignore_keywords=ignore_keywords, $
 end
 
 
-;+
-; Determine if two FITS files are equivalent (given some conditions on what to
-; check and a numeric tolerance).
-;
-; Uses `FITS_OPEN`, `FITS_READ`, and `FITS_CLOSE` from SolarSoft library.
-;
-; :Uses:
-;   fits_open, fits_read, fits_close
-;
-; :Returns:
-;   `0B` if no differences found, `1B` if not
-;
-; :Params:
-;   filename1, filename2 : in, required, type=string
-;     filenames of two files to compare
-;
-; :Keywords:
-;   ignore_keywords : in, optional, type=strarr
-;     keywords to ignore, may contain wildcards `*` and `?`
-;   ignore_whitespace : in, optional, type=boolean
-;     set to ignore trailing whitespace in header values
-;   tolerance : in, optional, type=float, default=0.0
-;     tolerance to use when comparing data elements
-;   logname : in, optional, type=string
-;     name of `MG_LOG` logger to send details about differences to
-;-
-function mg_fits_diff, filename1, filename2, $
-                       ignore_keywords=ignore_keywords, $
-                       ignore_whitespace=ignore_whitespace, $
-                       tolerance=tolerance, $
-                       logname=logname
+function mg_fits_diff_checkkeywords, header1, filename1, $
+                                     header2, filename2, $
+                                     ignore_keywords=ignore_keywords, $
+                                     logname=logname
   compile_opt strictarr
 
-  fits_open, filename1, fcb1
-  fits_read, fcb1, data1, header1, /header_only
-  fits_close, fcb1
-
-  fits_open, filename2, fcb2
-  fits_read, fcb2, data2, header2, /header_only
-  fits_close, fcb2
-
-  keywords1 = mg_fits_diff_keywords(header1, ignore_keywords=ignore_keywords, $
-                                    n_keywords=n_keywords1)
-  keywords2 = mg_fits_diff_keywords(header2, ignore_keywords=ignore_keywords, $
-                                    n_keywords=n_keywords2)
+  keywords1 = mg_fits_diff_getkeywords(header1, ignore_keywords=ignore_keywords, $
+                                       n_keywords=n_keywords1)
+  keywords2 = mg_fits_diff_getkeywords(header2, ignore_keywords=ignore_keywords, $
+                                       n_keywords=n_keywords2)
 
   n_matches = mg_match(keywords1, keywords2, $
                        a_matches=matches1, b_matches=matches2)
@@ -136,9 +101,90 @@ function mg_fits_diff, filename1, filename2, $
     endif
   endfor
 
+  return, keywords_diff
+end
+
+
+function mg_fits_diff_checkdata, data1, filename1,$
+                                 data2, filename2, $
+                                 logname=logname
+  compile_opt strictarr
+
+  data_diff = array_equal(size(data1), size(data2)) eq 0
+  if (data_diff gt 0L) then begin
+    if (n_elements(logname) gt 0L) then begin
+      mg_log, 'data in %s not the same size/type as in %s', $
+              filename1, filename2, $
+              name=logname, /warn
+    endif
+  endif
+
+  data_diff = array_equal(data1, data2) eq 0
+  if (data_diff gt 0L) then begin
+    if (n_elements(logname) gt 0L) then begin
+      mg_log, 'data in %s not the same as in %s', $
+              filename1, filename2, $
+              name=logname, /warn
+    endif
+  endif
+
+  return, data_diff
+end
+
+
+;+
+; Determine if two FITS files are equivalent (given some conditions on what to
+; check and a numeric tolerance).
+;
+; Uses `FITS_OPEN`, `FITS_READ`, and `FITS_CLOSE` from SolarSoft library.
+;
+; :Uses:
+;   fits_open, fits_read, fits_close
+;
+; :Returns:
+;   `0B` if no differences found, `1B` if not
+;
+; :Params:
+;   filename1, filename2 : in, required, type=string
+;     filenames of two files to compare
+;
+; :Keywords:
+;   ignore_keywords : in, optional, type=strarr
+;     keywords to ignore, may contain wildcards `*` and `?`
+;   ignore_whitespace : in, optional, type=boolean
+;     set to ignore trailing whitespace in header values
+;   tolerance : in, optional, type=float, default=0.0
+;     tolerance to use when comparing data elements
+;   logname : in, optional, type=string
+;     name of `MG_LOG` logger to send details about differences to
+;-
+function mg_fits_diff, filename1, filename2, $
+                       ignore_keywords=ignore_keywords, $
+                       ignore_whitespace=ignore_whitespace, $
+                       tolerance=tolerance, $
+                       logname=logname
+  compile_opt strictarr
+
+  fits_open, filename1, fcb1
+  fits_read, fcb1, data1, header1
+  fits_close, fcb1
+
+  fits_open, filename2, fcb2
+  fits_read, fcb2, data2, header2
+  fits_close, fcb2
+
+  keywords_diff = mg_fits_diff_checkkeywords(header1, filename1, $
+                                             header2, filename2, $
+                                             ignore_keywords=ignore_keywords, $
+                                             logname=logname)
   if (keywords_diff) then return, keywords_diff
 
-  ; TODO: check data
+  ; check data
+  data_diff = mg_fits_diff_checkdata(data1, filename1, $
+                                     data2, filename2, $
+                                     logname=logname)
+  if (data_diff) then return, data_diff
+
   ; TODO: check extensions
 
   return, 0B
