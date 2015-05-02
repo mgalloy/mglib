@@ -27,7 +27,17 @@ function mg_fits_diff_keywords, header, ignore_keywords=ignore_keywords, $
   keywords_ind = where(keywords ne '', n_keywords)
   if (n_keywords gt 0L) then begin
     keywords = strtrim(keywords[keywords_ind], 2)
-  endif else keywords = !null
+  endif else return, !null
+
+  ignore = bytarr(n_keywords)
+  for ik = 0L, n_elements(ignore_keywords) - 1L do begin
+    ignore or= strmatch(keywords, ignore_keywords[ik])
+  endfor
+
+  keep_ind = where(ignore eq 0L, n_keywords)
+  if (n_keywords gt 0L) then begin
+    keywords = keywords[keep_ind]
+  endif
 
   return, keywords
 end
@@ -43,7 +53,7 @@ end
 ;   fits_open, fits_read, fits_close
 ;
 ; :Returns:
-;   `1B` if equivalent, `0B` if not
+;   `0B` if no differences found, `1B` if not
 ;
 ; :Params:
 ;   filename1, filename2 : in, required, type=string
@@ -82,11 +92,11 @@ function mg_fits_diff, filename1, filename2, $
   n_matches = mg_match(keywords1, keywords2, $
                        a_matches=matches1, b_matches=matches2)
 
-  notfound_ind1 = mg_complement(matches1, n_keywords1, count=n_notfound_keywords1)
-  notfound_ind2 = mg_complement(matches2, n_keywords2, count=n_notfound_keywords2)
-
   keywords_diff = 0B
 
+  ; make sure all keywords in filename1 are also in filename2
+  notfound_ind1 = mg_complement(matches1, n_keywords1, $
+                                count=n_notfound_keywords1)
   if (n_notfound_keywords1 gt 0L) then begin
     if (n_elements(logname) gt 0L) then begin
       mg_log, 'keywords in %s not found in %s: %s', $
@@ -96,6 +106,9 @@ function mg_fits_diff, filename1, filename2, $
     keywords_diff = 1B
   endif
 
+  ; make sure all keywords in filename2 are also in filename1
+  notfound_ind2 = mg_complement(matches2, n_keywords2, $
+                                count=n_notfound_keywords2)
   if (n_notfound_keywords2 gt 0L) then begin
     if (n_elements(logname) gt 0L) then begin
       mg_log, 'keywords in %s not found in %s: %s', $
@@ -107,7 +120,28 @@ function mg_fits_diff, filename1, filename2, $
 
   if (keywords_diff) then return, keywords_diff
 
-  return, 1B
+  ; compare values of keywords
+  for k = 0L, n_keywords1 - 1L do begin
+    key = keywords1[k]
+    v1 = sxpar(header1, key)
+    v2 = sxpar(header2, key)
+    if (v1 ne v2) then begin
+      if (n_elements(logname) gt 0L) then begin
+        mg_log, 'value for keyword %s not the same, %s ne %s', $
+                key, strtrim(v1, 2), strtrim(v2, 2), $
+                name=logname, /warn
+      endif
+      keywords_diff = 1B
+      break
+    endif
+  endfor
+
+  if (keywords_diff) then return, keywords_diff
+
+  ; TODO: check data
+  ; TODO: check extensions
+
+  return, 0B
 end
 
 
