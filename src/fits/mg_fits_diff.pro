@@ -144,21 +144,31 @@ end
 ;     filenames of FITS files, used for logging
 ;
 ; :Keywords:
+;   tolerance : in, optional, type=float, default=0.0
+;     tolerance to use when comparing data elements
 ;   differences : in, optional, type=list
 ;     list of difference messages that can be added to
 ;-
 function mg_fits_diff_checkdata, data1, filename1,$
                                  data2, filename2, $
+                                 tolerance=tolerance, $
                                  differences=differences
   compile_opt strictarr
 
   data_diff = array_equal(size(data1), size(data2)) eq 0
+
   if (data_diff gt 0L && obj_valid(differences)) then begin
     fmt = '(%"data in %s not the same size/type as in %s")'
     differences->add, string(filename1, filename2, format=fmt)
   endif
 
-  data_diff = array_equal(data1, data2) eq 0
+  if (n_elements(tolerence) gt 0L) then begin
+    ind = where(abs(data1 - data2) gt tolerance, count)
+    data_diff = count gt 0L
+  endif else begin
+    data_diff = array_equal(data1, data2) eq 0
+  endelse
+
   if (data_diff gt 0L && obj_valid(differences)) then begin
     fmt = '(%"data in %s not the same as in %s")'
     differences->add, string(filename1, filename2, format=fmt)
@@ -172,7 +182,7 @@ end
 ; Determine if two FITS files are equivalent (given some conditions on what to
 ; check and a numeric tolerance).
 ;
-; Uses `FITS_OPEN`, `FITS_READ`, `FITS_CLOSE`, `SXPAR` from IDL Astronomy
+; Uses `FITS_OPEN`, `FITS_READ`, `FITS_CLOSE`, and `SXPAR` from IDL Astronomy
 ; User's library.
 ;
 ; :Uses:
@@ -228,6 +238,7 @@ function mg_fits_diff, filename1, filename2, $
   ; check data
   data_diff = mg_fits_diff_checkdata(data1, filename1, $
                                      data2, filename2, $
+                                     tolerance=tolerance, $
                                      differences=_differences)
   if (data_diff) then begin
     fits_close, fcb1
@@ -267,6 +278,7 @@ function mg_fits_diff, filename1, filename2, $
 
     data_diff = mg_fits_diff_checkdata(data1, filename1, $
                                        data2, filename2, $
+                                       tolerance=tolerance, $
                                        differences=_differences)
     if (data_diff) then begin
       fits_close, fcb1
