@@ -29,6 +29,20 @@ function mg_fits_diff_ut::test_differentkeywords
 end
 
 
+function mg_fits_diff_ut::test_differentkeywords_ignored
+  compile_opt strictarr
+
+  filename1 = filepath('20150428_223017_kcor.fts', root=self.fits_data_root)
+  filename2 = filepath('20150428_223017_kcor_changedkeywords.fts', $
+                       root=self.fits_data_root)
+
+  diff = mg_fits_diff(filename1, filename2, ignore_keywords=['DATE*'])
+  assert, diff eq 0, 'found a difference where there was not one'
+
+  return, 1
+end
+
+
 function mg_fits_diff_ut::test_differentkeywordvalues
   compile_opt strictarr
 
