@@ -192,6 +192,9 @@ end
 ;     set to ignore trailing whitespace in header values
 ;   tolerance : in, optional, type=float, default=0.0
 ;     tolerance to use when comparing data elements
+;   differences : out, optional, type=strarr
+;     set to a named variable to retrieve a an array of difference messages,
+;     `!null` if no differences found
 ;-
 function mg_fits_diff, filename1, filename2, $
                        ignore_keywords=ignore_keywords, $
