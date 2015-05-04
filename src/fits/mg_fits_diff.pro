@@ -109,7 +109,10 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
 
   ; compare values of keywords
   for k = 0L, n_keywords1 - 1L do begin
-    if (matches1[k] lt 0L) then continue
+    ; determine if keywords1[k] is in the matching indices
+    ind = where(matches1 eq k, count)
+    if (count eq 0L) then continue
+
     key = keywords1[k]
     v1 = sxpar(header1, key)
     v2 = sxpar(header2, key)

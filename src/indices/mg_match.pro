@@ -67,7 +67,7 @@ end
 a = [0, 1, 3, 4, 5]
 b = [3, 5, 6, 7, 0, 2]
 
-a_matches = mg_match(a, b, b_matches=b_matches, n_matches=n_matches)
+n_matches = mg_match(a, b, a_matches=a_matches, b_matches=b_matches)
 
 print, strjoin(strtrim(a_matches, 2), ', '), format='(%"a matches: %s")'
 print, strjoin(strtrim(b_matches, 2), ', '), format='(%"b matches: %s")'
