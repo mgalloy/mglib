@@ -120,7 +120,6 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
                                  format=fmt)
       endif
       keywords_diff = 1B
-      break
     endif
   endfor
 
