@@ -107,10 +107,9 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
     keywords_diff = 1B
   endif
 
-  if (keywords_diff) then return, keywords_diff
-
   ; compare values of keywords
   for k = 0L, n_keywords1 - 1L do begin
+    if (matches1[k] lt 0L) then continue
     key = keywords1[k]
     v1 = sxpar(header1, key)
     v2 = sxpar(header2, key)
