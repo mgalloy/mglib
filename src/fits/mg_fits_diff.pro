@@ -211,72 +211,38 @@ function mg_fits_diff, filename1, filename2, $
 
   if (arg_present(differences)) then _differences = list()
 
-  keywords_diff = mg_fits_diff_checkkeywords(header1, filename1, $
-                                             header2, filename2, $
-                                             ignore_keywords=ignore_keywords, $
-                                             differences=_differences)
-  if (keywords_diff) then begin
-    fits_close, fcb1
-    fits_close, fcb2
-    if (arg_present(differences)) then begin
-      differences = _differences->toarray()
-      obj_destroy, _differences
-    endif
-    return, keywords_diff
-  endif
+  diff = 0B
+  diff or= mg_fits_diff_checkkeywords(header1, filename1, $
+                                      header2, filename2, $
+                                      ignore_keywords=ignore_keywords, $
+                                      differences=_differences)
 
   ; check data
-  data_diff = mg_fits_diff_checkdata(data1, filename1, $
-                                     data2, filename2, $
-                                     differences=_differences)
-  if (data_diff) then begin
-    fits_close, fcb1
-    fits_close, fcb2
-    if (arg_present(differences)) then begin
-      differences = _differences->toarray()
-      obj_destroy, _differences
-    endif
-    return, data_diff
-  endif
+  diff or= mg_fits_diff_checkdata(data1, filename1, $
+                                  data2, filename2, $
+                                  differences=_differences)
 
   extend_diff = fcb1.nextend ne fcb1.nextend
-  if (extend_diff gt 0L) then begin
+  if (extend_diff gt 0) then begin
     if (arg_present(differences)) then begin
       fmt = '(%"number of extensions in %s not the same as in %s")'
       _differences->add, string(filename1, filename2, format=fmt)
     endif
   endif
+  diff or= extend_diff
 
   for e = 0L, fcb1.nextend - 1L do begin
     fits_read, fcb1, data1, header1, exten_no=e
     fits_read, fcb2, data2, header2, exten_no=e
 
-    keywords_diff = mg_fits_diff_checkkeywords(header1, filename1, $
-                                               header2, filename2, $
-                                               ignore_keywords=ignore_keywords, $
-                                               differences=_differences)
-    if (keywords_diff) then begin
-      fits_close, fcb1
-      fits_close, fcb2
-      if (arg_present(differences)) then begin
-        differences = _differences->toarray()
-        obj_destroy, _differences
-      endif
-      return, keywords_diff
-    endif
+    diff or= mg_fits_diff_checkkeywords(header1, filename1, $
+                                        header2, filename2, $
+                                        ignore_keywords=ignore_keywords, $
+                                        differences=_differences)
 
-    data_diff = mg_fits_diff_checkdata(data1, filename1, $
-                                       data2, filename2, $
-                                       differences=_differences)
-    if (data_diff) then begin
-      fits_close, fcb1
-      fits_close, fcb2
-      if (arg_present(differences)) then begin
-        differences = _differences->toarray()
-        obj_destroy, _differences
-      endif
-      return, data_diff
-    endif
+    diff or= mg_fits_diff_checkdata(data1, filename1, $
+                                    data2, filename2, $
+                                    differences=_differences)
   endfor
 
   fits_close, fcb1
@@ -287,7 +253,7 @@ function mg_fits_diff, filename1, filename2, $
     obj_destroy, _differences
   endif
 
-  return, 0B
+  return, diff
 end
 
 
