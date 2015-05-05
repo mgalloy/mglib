@@ -244,7 +244,7 @@ function mgffoptions::_overloadPrint
     if (s eq '') then continue
     if (~first_line) then output_list->add, '' else first_line = 0B
 
-    output_list->add, string(s, format='(%"[ %s ]")')
+    output_list->add, string(s, format='(%"[%s]")')
     foreach option, sec, o do begin
       output_list->add, string(o + ':', option, format=format)
     endforeach
