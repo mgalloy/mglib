@@ -75,11 +75,11 @@ end
 ;     IDL> config['Mark', 'City'] = 'Madison'
 ;     IDL> config['Mark', 'State'] = 'Wisconsin'
 ;     IDL> print, config
-;     [ Mark ]
+;     [Mark]
 ;     City:   Madison
 ;     State:  Wisconsin
 ;
-;     [ Mike ]
+;     [Mike]
 ;     City:   Boulder
 ;     State:  Colorado
 ;
@@ -206,11 +206,11 @@ end
 ;   For example::
 ;
 ;     IDL> print, config
-;     [ Mark ]
+;     [Mark]
 ;     City:   Madison
 ;     State:  Wisconsin
 ;
-;     [ Mike ]
+;     [Mike]
 ;     City:   Boulder
 ;     State:  Colorado
 ;
