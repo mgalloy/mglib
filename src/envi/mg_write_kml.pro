@@ -61,16 +61,18 @@ pro mg_write_kml, event
 
   outputKMLFile = dialog_pickfile(title='Select output KML filename', $
                                   default_extension='kml', /write)
-  if (strlowcase(strmid(outputKMLFile, 3, 4, /reverse_offset)) ne '.kml') then $
-      outputKMLFile = outputKMLFile + '.kml'
+  extension = strlowcase(strmid(outputKMLFile, 3, 4, /reverse_offset))
+  if (extension ne '.kml') then begin
+    outputKMLFile = outputKMLFile + '.kml'
+  endif
   openw, kml_lun, outputKMLFile, /get_lun
 
   ; header info
   printf, kml_lun, '<?xml version="1.0" encoding="UTF-8"?>'
-  printf, kml_lun, '<kml xmlns="http://earth.google.com/kml/2.0">'
+  printf, kml_lun, '<kml xmlns="http://www.opengis.net/kml/2.2">'
   printf, kml_lun, '  <GroundOverlay>'
-  printf, kml_lun, '    <description>' + descrip + '</description>'
   printf, kml_lun, '    <name>' + file_basename(outputKMLFile, '.kml') + '</name>'
+  printf, kml_lun, '    <description>' + descrip + '</description>'
 
   ; choose a filename to write output file
   outputOverlayFile = file_dirname(outputKMLFile, /mark_directory) $
@@ -82,12 +84,13 @@ pro mg_write_kml, event
              i_max=255, i_min=0, range_by=1, method=1, $
              out_dt=1, out_max=255, out_min=0, /in_memory, r_fid=sfid
 
-  ; write an output file that Google Earth understands (TIFF, JPG, PNG, or GIF)
+  ; write an output file that Google Earth understands: (BMP, GIF, TIFF, TGA,
+  ; and PNG)
   envi_output_to_external_format, fid=sfid, dims=dims, pos=lindgen(nb), $
-                                  out_name=outputOverlayFile, /TIFF
+                                  out_name=outputOverlayFile, /tiff
 
   ;envi_output_to_external_format, fid=fid, dims=dims, pos=pos, $
-  ;                                out_name=outputOverlayFile, /TIFF
+  ;                                out_name=outputOverlayFile, /tiff
 
   ; get the edges
   ;north_lat = (map_info.mc)[3]
@@ -95,21 +98,13 @@ pro mg_write_kml, event
   ;east_lon = (map_info.mc)[2] + (map_info.ps)[0] * geo_nl
   ;west_lon = (map_info.mc)[2]
 
-  ; Write the LookAt info, for example:
-  ;  <LookAt id="khLookAt555">
-  ;    <longitude>-122.2222480773926</longitude>
-  ;    <latitude>37.4064826965332</latitude>
-  ;    <range>3622.087524184783</range>
-  ;    <tilt>-1.071539217492538e-011</tilt>
-  ;    <heading>-1.802287630081704e-014</heading>
-  ;  </LookAt>
-  printf, kml_lun, '    <LookAt>'
-  printf, kml_lun, '      <longitude>' + strtrim(total(lon) / 4.0, 2) + '</longitude>'
-  printf, kml_lun, '      <latitude>' + strtrim(total(lat) / 4.0, 2) + '</latitude>'
-  printf, kml_lun, '      <range>18934</range>'
-  printf, kml_lun, '      <tilt>0.0</tilt>'
-  printf, kml_lun, '      <heading>0.0</heading>'
-  printf, kml_lun, '    </LookAt>'
+  ; printf, kml_lun, '    <LookAt>'
+  ; printf, kml_lun, '      <longitude>' + strtrim(total(lon) / 4.0, 2) + '</longitude>'
+  ; printf, kml_lun, '      <latitude>' + strtrim(total(lat) / 4.0, 2) + '</latitude>'
+  ; printf, kml_lun, '      <range>18934</range>'
+  ; printf, kml_lun, '      <tilt>0.0</tilt>'
+  ; printf, kml_lun, '      <heading>0.0</heading>'
+  ; printf, kml_lun, '    </LookAt>'
 
   ; Add the icon tag (the actual image), for example:
   ;  <Icon>
@@ -119,11 +114,9 @@ pro mg_write_kml, event
   printf, kml_lun, '      <href>' + outputOverlayFile + '</href>'
   printf, kml_lun, '    </Icon>'
 
-  ; Not sure what this does. Make it red for now (AABBGGRR format)
-  printf, kml_lun, '    <color>ffffffff</color>
-
   ; Add the corners to the kml file
-  ;  <LatLonBox id="khLatLonBox557">
+
+  ;  <LatLonBox>
   ;    <north>37.41778844370899</north>
   ;    <south>37.39517166922765</south>
   ;    <east>-122.2075616019248</east>
@@ -134,7 +127,7 @@ pro mg_write_kml, event
   angle = (atan((lat[1] - lat[0]) / (lon[1] - lon[0])) $
            + atan((lat[2] - lat[3]) / (lon[2] - lon[3]))) / 1.4 * !radeg
 
-  printf, kml_lun, '    <LatLonBox id="khLatLonBox565">'
+  printf, kml_lun, '    <LatLonBox>'
   printf, kml_lun, '      <north>' + strtrim((lat[0] + lat[1]) /2.0, 2) + '</north>'
   printf, kml_lun, '      <south>' + strtrim((lat[3] + lat[2]) /2.0, 2) + '</south>'
   printf, kml_lun, '      <east>'  + strtrim((lon[2] + lon[1]) / 2.0, 2)  + '</east>'
