@@ -156,8 +156,46 @@ pro mg_fits_browser::handleEvents, event
   case uname of
     'open': self->_openFiles
     'tlb':
-    'import':
+    'export_data':
+    'export_header':
+    'cmdline': begin
+        if (self.currently_selected eq 0L) then return
+
+        current_uname = widget_info(self.currently_selected, /uname)
+        case current_uname of
+          'fits:file': begin
+              widget_control, self.currently_selected, get_uvalue=f
+              exten_no = 0
+            end
+          'fits:extension': begin
+              widget_control, self.currently_selected, get_uvalue=exten_no
+              parent_id = widget_info(self.currently_selected, /parent)
+              widget_control, parent_id, get_uvalue=f
+            end
+          else: begin
+              ; this should never happen, but this message will make debugging easier
+              ok = dialog_message(string(current_uname, format='(%"unknown uname: %s")'), $
+                                  dialog_parent=self.tlb)
+              return
+            end
+        endcase
+
+        fits_open, f, fcb
+        fits_read, fcb, data, header, exten_no=exten_no
+        fits_close, fcb
+
+        ; TODO: need to know if data or header and name for variable
+        export_data_id = widget_info(self.tlb, find_by_uname='export_data')
+        data_set = widget_info(export_data_id, /button_set)
+        if (data_set eq 1) then begin
+          (scope_varfetch('data', /enter, level=1)) = data
+        endif else begin
+          (scope_varfetch('header', /enter, level=1)) = header
+        endelse
+      end
     'fits:file': begin
+        self.currently_selected = event.id
+
         widget_control, event.id, get_uvalue=f
 
         fits_open, f, fcb
@@ -170,10 +208,12 @@ pro mg_fits_browser::handleEvents, event
         widget_control, header_widget, set_value=header
       end
     'fits:extension': begin
+        self.currently_selected = event.id
+
         widget_control, event.id, get_uvalue=e
         parent_id = widget_info(event.id, /parent)
-
         widget_control, parent_id, get_uvalue=f
+
         fits_open, f, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
@@ -219,10 +259,24 @@ pro mg_fits_browser::_createWidgets
                               tooltip='Open FITS file', $
                               value=filepath('open.bmp', subdir=bitmapdir))
 
-  vis_toolbar = widget_base(toolbar, /toolbar, /nonexclusive, /row)
-  display_button = widget_button(vis_toolbar, /bitmap, uname='display', $
-                                 tooltip='Display FITS file', $
-                                 value=filepath('image.bmp', subdir=bitmapdir))
+  export_toolbar = widget_base(toolbar, /toolbar, /row)
+  cmdline_button = widget_button(export_toolbar, /bitmap, uname='cmdline', $
+                                 tooltip='Export to command line', $
+                                 value=filepath('commandline.bmp', $
+                                                subdir=bitmapdir))
+
+  exporttype_toolbar = widget_base(export_toolbar, /toolbar, /exclusive, /row, $
+                                   xpad=0, ypad=0)
+  data_button = widget_button(exporttype_toolbar, /bitmap, $
+                              uname='export_data', $
+                              tooltip='Set export type to data', $
+                              value=filepath('binary.bmp', subdir=bitmapdir))
+  header_button = widget_button(exporttype_toolbar, /bitmap, $
+                                uname='export_header', $
+                                tooltip='Set export type to header', $
+                                value=filepath('lft.bmp', subdir=bitmapdir))
+  widget_control, data_button, set_button=1
+  widget_control, header_button, set_button=0
 
   ; content row
   content_base = widget_base(self.tlb, /row)
@@ -248,7 +302,9 @@ pro mg_fits_browser::_createWidgets
 
   ; variable name for import
 
-  ; import, done buttons
+  ; status basr
+  status_bar = widget_label(self.tlb, scr_xsize=300 + 2 * scr_ysize, $
+                            /sunken_frame)
 end
 
 
@@ -327,7 +383,8 @@ pro mg_fits_browser__define
              tree: 0L, $
              filename: '', $
              title: '', $
-             nfiles: 0L $
+             nfiles: 0L, $
+             currently_selected: 0L $
            }
 end
 
@@ -364,7 +421,7 @@ end
 
 
 dir = '/Users/mgalloy/Desktop/IRIS-4/data analysis/iris/20131226_171752_3840007146'
-file = filepath('iris_l2_20131226_171752_3840007146_SJI_1330_t000.fits', root=dir)
-b = mg_fits_browser(file)
+files = file_search(dir, '*.fits')
+b = mg_fits_browser(files)
 
 end
