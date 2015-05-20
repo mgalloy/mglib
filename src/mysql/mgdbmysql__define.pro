@@ -263,7 +263,11 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
         3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
         5: query_result[r].(f) = double(mg_mysql_get_field(row, f))
         7: query_result[r].(f) = mg_mysql_get_field(row, f)
-        10: *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
+        10: begin
+            if (lengths[f] gt 0) then begin
+              *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
+            endif
+          end
         15: query_result[r].(f) = ulong64(mg_mysql_get_field(row, f))
       endcase
     endfor
