@@ -9,6 +9,8 @@
 ;-
 
 
+;= helper routines
+
 ;+
 ; Thin procedural wrapper to call `::handleEvents` event handler.
 ;
@@ -39,6 +41,8 @@ pro mg_fits_browser_cleanup, tlb
 end
 
 
+;= API
+
 ;+
 ; Set the window title based on the current filename. Set the filename to the
 ; empty string if there is no title to display.
@@ -59,6 +63,21 @@ end
 
 
 ;+
+; Set the text in the status bar.
+;
+; :Params:
+;   msg : in, optional, type=string
+;     message to display in the status bar
+;-
+pro mg_fits_browser::setStatus, msg, clear=clear
+  compile_opt strictarr
+
+  _msg = keyword_set(clear) || n_elements(msg) eq 0L ? '' : msg
+  widget_control, self.statusbar, set_value=_msg
+end
+
+
+;+
 ; Load FITS files corresponding to filenames.
 ;
 ; :Params:
@@ -75,6 +94,10 @@ pro mg_fits_browser::loadFiles, filenames
   ncbmp = read_bmp(filepath('image.bmp', subdir=['resource', 'bitmaps']), r, g, b)
   ncbmp = [[[r[ncbmp]]], [[g[ncbmp]]], [[b[ncbmp]]]]
 
+  self->setStatus, string(self.nfiles, self.nfiles eq 1 ? '' : 's', $
+                          format='(%"Loading %d FITS file%s...")')
+
+  widget_control, self.tree, update=0
   foreach f, filenames do begin
     file_node = widget_tree(self.tree, /folder, $
                             value=file_basename(f), $
@@ -89,6 +112,9 @@ pro mg_fits_browser::loadFiles, filenames
     endfor
     fits_close, fcb
   endforeach
+  widget_control, self.tree, update=1
+
+  self->setStatus, /clear
 end
 
 
@@ -142,6 +168,8 @@ pro mg_fits_browser::_openFiles
 end
 
 
+;= event handling
+
 ;+
 ; Handle all events from the widget program.
 ;
@@ -158,6 +186,7 @@ pro mg_fits_browser::handleEvents, event
     'tlb':
     'export_data':
     'export_header':
+    'tabs':
     'cmdline': begin
         if (self.currently_selected eq 0L) then return
 
@@ -232,6 +261,8 @@ pro mg_fits_browser::handleEvents, event
 end
 
 
+;= widget lifecycle methods
+
 ;+
 ; Handle cleanup when the widget program is destroyed.
 ;-
@@ -281,30 +312,34 @@ pro mg_fits_browser::_createWidgets
   ; content row
   content_base = widget_base(self.tlb, /row)
 
+  tree_xsize = 300
   scr_ysize = 512
 
   ; tree
   self.tree = widget_tree(content_base, uname='browser', $
-                          scr_xsize=300, scr_ysize=scr_ysize)
+                          scr_xsize=tree_xsize, scr_ysize=scr_ysize)
+
+  tabs = widget_tab(content_base, uname='tabs')
 
   ; visualization
-  image_display = widget_draw(content_base, xsize=scr_ysize, ysize=scr_ysize, $
-                              uname='draw')
+  image_base = widget_base(tabs, xpad=0, ypad=0, title='Data', /column)
+  image_draw = widget_draw(image_base, xsize=scr_ysize, ysize=scr_ysize, $
+                           uname='draw')
 
   ; details column
-  details = widget_base(content_base, /column)
+  details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column)
 
   ; metadata
-  header = widget_text(details, value='', $
-                       xsize=80, scr_ysize=scr_ysize, $
-                       /scroll, $
-                       uname='fits_header')
+  header_text = widget_text(details_base, value='', $
+                            xsize=80, scr_ysize=scr_ysize, $
+                            /scroll, $
+                            uname='fits_header')
 
   ; variable name for import
 
   ; status basr
-  status_bar = widget_label(self.tlb, scr_xsize=300 + 2 * scr_ysize, $
-                            /sunken_frame)
+  self.statusbar = widget_label(self.tlb, scr_xsize=tree_xsize + scr_ysize, $
+                                /align_left, /sunken_frame)
 end
 
 
@@ -329,6 +364,8 @@ pro mg_fits_browser::_startXManager
             cleanup='mg_fits_browser_cleanup'
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources
@@ -381,6 +418,7 @@ pro mg_fits_browser__define
   define = { mg_fits_browser, $
              tlb: 0L, $
              tree: 0L, $
+             statusbar: 0L, $
              filename: '', $
              title: '', $
              nfiles: 0L, $
@@ -420,8 +458,8 @@ function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb
 end
 
 
-dir = '/Users/mgalloy/Desktop/IRIS-4/data analysis/iris/20131226_171752_3840007146'
-files = file_search(dir, '*.fits')
-b = mg_fits_browser(files)
+dir = '/Users/mgalloy/data/CoMP/raw/20150226'
+files = file_search(dir, '*.FTS')
+b = mg_fits_browser(files[0:4])
 
 end
