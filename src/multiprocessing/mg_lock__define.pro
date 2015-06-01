@@ -34,6 +34,9 @@
 pro mg_lock::acquire, no_block=no_block, acquired=acquired
   compile_opt strictarr
 
+  acquired = self.acquired
+  if (self.acquired) then return
+
   self.acquired = sem_lock(self.name)
   acquired = self.acquired
   if (keyword_set(no_block)) then return
