@@ -1,6 +1,37 @@
 ; docformat = 'rst'
 
-function mg_semaphore::acquire
+;+
+; A semaphore is a counter representing some shared and limited resource. For
+; example, the number of computational cores or network connections are
+; resources that can be shared by multiple processes, but degrade if over
+; subscribed.
+;
+; :Properties:
+;   name : type=string
+;     name of the semaphore; other processes must use the same name in order
+;     to share the count
+;   value : type=long
+;     value of the counter
+;   max_value : type=long
+;     maximum allowed value of the counter; releases beyond the maximum value
+;     will have no effect
+;   polling_cycle : type=float
+;     time between polling events, in seconds
+;-
+
+
+;= API
+
+;+
+; Acquire a resource limited by the semaphore. Acquiring decrements the
+; counter.
+;
+; :Keywords:
+;   acquired : out, optional, type=boolean
+;     set to a named variable to retrieve whether the semaphore was acquired;
+;     semaphores are always acquired (but may block briefly before returning)
+;-
+pro mg_semaphore::acquire, acquired=acquired
   compile_opt strictarr
 
   acquired = self.lock->acquire()
@@ -11,11 +42,13 @@ function mg_semaphore::acquire
   endwhile
   --(*self.counter)[0]
   self.lock->release
-
-  return, 1
 end
 
 
+;+
+; Release a resource limited by the semaphore. Releasing increments the
+; counter.
+;-
 pro mg_semaphore::release
   compile_opt strictarr
 
@@ -29,7 +62,50 @@ pro mg_semaphore::release
 end
 
 
-pro mg_semaphore::getProperty, name=name, value=value, max_value=max_value
+;= overloaded operators
+
+;+
+; Get output for use with `PRINT`.
+;
+; :Returns:
+;   string
+;-
+function mg_semaphore::_overloadPrint
+  compile_opt strictarr
+
+  return, string(self.name, (*self.counter)[0], self.max_value, $
+                 format='(%"%s [%d/%d]")')
+end
+
+
+;+
+; Overload routine used by `HELP`.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of variable to provide `HELP` for
+;-
+function mg_semaphore::_overloadHelp, varname
+  compile_opt strictarr
+
+  type = 'MG_SEMAPHORE'
+  specs = string(self.name, (*self.counter)[0], self.max_value, $
+                 format='(%"<NAME=%s  COUNTER=%d  MAX_VALUE=%d>")')
+
+  return, string(varname, type, specs, format='(%"%-16s %-13s = %s")')
+end
+
+
+;= property access
+
+;+
+; Get properties.
+;-
+pro mg_semaphore::getProperty, name=name, value=value, max_value=max_value, $
+                               polling_cycle=polling_cycle
   compile_opt strictarr
 
   if (arg_present(name)) then name = self.name
@@ -44,6 +120,9 @@ pro mg_semaphore::getProperty, name=name, value=value, max_value=max_value
 end
 
 
+;+
+; Set properties.
+;-
 pro mg_semaphore::setProperty, polling_cycle=polling_cycle, max_value=max_value
   compile_opt strictarr
 
@@ -52,6 +131,12 @@ pro mg_semaphore::setProperty, polling_cycle=polling_cycle, max_value=max_value
 end
 
 
+;= lifecycle methods
+
+;+
+; Free the resources of the semaphore object. When all the semaphore objects
+; are freed, the semaphore itself will be freed.
+;-
 pro mg_semaphore::cleanup
   compile_opt strictarr
 
@@ -59,6 +144,26 @@ pro mg_semaphore::cleanup
 end
 
 
+;+
+; Create a semaphore object.
+;
+; :Returns:
+;   1 for success, 0 for failure
+;
+; :Params:
+;   counter : in, optional, type=long
+;     starting value for counter
+;
+; :Keywords:
+;   name : in, required, type=string
+;     name to use for the semaphore; the same name must be used in other
+;     processes to refer to the same semaphore
+;   polling_cycle : in, optional, type=float, default=0.5
+;     time to wait between polling events, in seconds
+;   max_value : in, optional, type=long
+;     if set, `MAX_VALUE` provides a maximum value for the counter; `::release`
+;     calls beyond the `MAX_VALUE` do not increase the counter
+;-
 function mg_semaphore::init, counter, name=name, polling_cycle=polling_cycle, $
                              max_value=max_value
   compile_opt strictarr
@@ -87,6 +192,9 @@ function mg_semaphore::init, counter, name=name, polling_cycle=polling_cycle, $
 end
 
 
+;+
+; Define `MG_Semaphore` class.
+;-
 pro mg_semaphore__define
   compile_opt strictarr
 
