@@ -288,8 +288,7 @@ end
 function mgdbmysql::last_error_message
   compile_opt strictarr
 
-  error_message = mg_mysql_error(self.connection)
-  return, error_message eq '' ? 'unknown error' : error_message
+  return, mg_mysql_error(self.connection)
 end
 
 
@@ -312,8 +311,11 @@ end
 ;     set to a named variable to retrieve the statement that was used
 ;   fields : out, optional, type=array of structures
 ;     array of structures defining each field of the return value
+;   status : out, optional, type=long
+;     set to a named variable to retrieve the status code from the
+;     query, 0 for success
 ;   error_message : out, optional, type=string
-;     MySQL error message
+;     MySQL error message; "Success" if not error
 ;-
 function mgdbmysql::query, sql_query, $
                            arg1, arg2, arg3, arg4, arg5, $
@@ -322,6 +324,7 @@ function mgdbmysql::query, sql_query, $
                            arg16, arg17, arg18, arg19, arg20, $
                            sql_statement=_sql_query, $
                            fields=fields, $
+                           status=status, $
                            error_message=error_message
   compile_opt strictarr
   on_error, 2
@@ -351,14 +354,15 @@ function mgdbmysql::query, sql_query, $
     21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
   endcase
 
-  if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
+  status = mg_mysql_query(self.connection, _sql_query)
+  if (status ne 0) then begin
     error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return, !null
     endif else begin
       message, error_message
     endelse
-  endif
+  endif else error_message = 'Success'
 
   result = mg_mysql_store_result(self.connection)
   if (result eq 0) then begin
@@ -395,8 +399,11 @@ end
 ; :Keywords:
 ;   sql_statement : out, optional, type=string
 ;     set to a named variable to retrieve the statement that was used
+;   status : out, optional, type=long
+;     set to a named variable to retrieve the status code from the
+;     query, 0 for success
 ;   error_message : out, optional, type=string
-;     MySQL error message
+;     MySQL error message; "Success" if not error
 ;-
 pro mgdbmysql::execute, sql_query, $
                         arg1, arg2, arg3, arg4, arg5, $
@@ -404,6 +411,7 @@ pro mgdbmysql::execute, sql_query, $
                         arg11, arg12, arg13, arg14, arg15, $
                         arg16, arg17, arg18, arg19, arg20, $
                         sql_statement=_sql_query, $
+                        status=status, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
@@ -433,14 +441,15 @@ pro mgdbmysql::execute, sql_query, $
     21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
   endcase
 
-  if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
+  status = mg_mysql_query(self.connection, _sql_query)
+  if (status ne 0) then begin
     error_message = self->last_error_message()
     if (self.quiet || arg_present(error_message)) then begin
       return
     endif else begin
       message, error_message
     endelse
-  endif
+  endif else error_message = 'Success'
 end
 
 
