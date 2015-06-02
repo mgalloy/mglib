@@ -303,7 +303,8 @@ end
 ;   sql_query : in, required, type=string
 ;     query string, may be C format string with `arg1`-`arg12` substituted into
 ;     it
-;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 : in, optional, type=any
+;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10,
+;   arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20 : in, optional, type=any
 ;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
@@ -384,7 +385,8 @@ end
 ;   sql_query : in, required, type=string
 ;     query string, may be C format string with `arg1`-`arg12` substituted into
 ;     it
-;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 : in, optional, type=any
+;   arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10,
+;   arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20 : in, optional, type=any
 ;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
