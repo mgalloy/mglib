@@ -315,7 +315,8 @@ end
 function mgdbmysql::query, sql_query, $
                            arg1, arg2, arg3, arg4, arg5, $
                            arg6, arg7, arg8, arg9, arg10, $
-                           arg11, arg12, $
+                           arg11, arg12, arg13, arg14, arg15, $
+                           arg16, arg17, arg18, arg19, arg20, $
                            fields=fields, $
                            error_message=error_message
   compile_opt strictarr
@@ -336,6 +337,14 @@ function mgdbmysql::query, sql_query, $
     11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + sql_query + '")')
     12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + sql_query + '")')
     13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + sql_query + '")')
+    14: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, format='(%"' + sql_query + '")')
+    15: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, format='(%"' + sql_query + '")')
+    16: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, format='(%"' + sql_query + '")')
+    17: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, format='(%"' + sql_query + '")')
+    18: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, format='(%"' + sql_query + '")')
+    19: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, format='(%"' + sql_query + '")')
+    20: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, format='(%"' + sql_query + '")')
+    21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
   endcase
 
   if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
@@ -385,7 +394,8 @@ end
 pro mgdbmysql::execute, sql_query, $
                         arg1, arg2, arg3, arg4, arg5, $
                         arg6, arg7, arg8, arg9, arg10, $
-                        arg11, arg12, $
+                        arg11, arg12, arg13, arg14, arg15, $
+                        arg16, arg17, arg18, arg19, arg20, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
@@ -405,6 +415,14 @@ pro mgdbmysql::execute, sql_query, $
     11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + sql_query + '")')
     12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + sql_query + '")')
     13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + sql_query + '")')
+    14: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, format='(%"' + sql_query + '")')
+    15: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, format='(%"' + sql_query + '")')
+    16: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, format='(%"' + sql_query + '")')
+    17: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, format='(%"' + sql_query + '")')
+    18: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, format='(%"' + sql_query + '")')
+    19: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, format='(%"' + sql_query + '")')
+    20: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, format='(%"' + sql_query + '")')
+    21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
   endcase
 
   if (mg_mysql_query(self.connection, _sql_query) ne 0) then begin
