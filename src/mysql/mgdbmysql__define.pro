@@ -308,6 +308,8 @@ end
 ;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
+;   statement : out, optional, type=string
+;     set to a named variable to retrieve the statement that was used
 ;   fields : out, optional, type=array of structures
 ;     array of structures defining each field of the return value
 ;   error_message : out, optional, type=string
@@ -318,6 +320,7 @@ function mgdbmysql::query, sql_query, $
                            arg6, arg7, arg8, arg9, arg10, $
                            arg11, arg12, arg13, arg14, arg15, $
                            arg16, arg17, arg18, arg19, arg20, $
+                           statement=_sql_query, $
                            fields=fields, $
                            error_message=error_message
   compile_opt strictarr
@@ -390,6 +393,8 @@ end
 ;     arguments to be substituted into `sql_query`
 ;
 ; :Keywords:
+;   statement : out, optional, type=string
+;     set to a named variable to retrieve the statement that was used
 ;   error_message : out, optional, type=string
 ;     MySQL error message
 ;-
@@ -398,6 +403,7 @@ pro mgdbmysql::execute, sql_query, $
                         arg6, arg7, arg8, arg9, arg10, $
                         arg11, arg12, arg13, arg14, arg15, $
                         arg16, arg17, arg18, arg19, arg20, $
+                        statement=_sql_query, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
