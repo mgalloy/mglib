@@ -112,13 +112,24 @@ end
 ;-
 pro mg_map::next, process, status, error
   compile_opt strictarr
+  on_error, 2
 
   ; store result
   process->getProperty, userdata=i, name=process_name
 
+  status = process->status(error=error)
+  if (status eq 3 || status eq 4) then begin
+    message, 'error completing pool command: ' + error
+  endif
+
   if (~self.is_procedure) then begin
-    ; need the parentheses around self.result on UNIX
-    (self.result)[i] = process->getVar('result')
+    result = process->getVar('result', error=error)
+    if (error eq 0L) then begin
+      ; need the parentheses around self.result on UNIX
+      (self.result)[i] = result
+    endif else begin
+      message, string(i, format='(%"result not calculated for process %d")')
+    endelse
   endif
 
   if (self.i lt self.count) then begin

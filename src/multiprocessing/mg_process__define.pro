@@ -110,6 +110,35 @@ pro mg_process::join, status=status, error=error
 end
 
 
+;+
+; Get a variable from the process.
+;
+; :Returns:
+;   any variable
+;
+; :Params:
+;   varname : in, required, type=string
+;     name of the variable to retrieve
+;
+; :Keywords
+;   error : out, optional, type=long
+;     set to a named variable to retrieve the error status of getting the
+;     variable, will be 0 if no errors
+;-
+function mg_process::getvar, varname, error=error
+  compile_opt strictarr
+
+   catch, error
+   if (error ne 0L) then begin
+     catch, /cancel
+     return, !null
+   endif
+
+   var = self->IDL_IDLBridge::getvar(varname)
+   return, var
+end
+
+
 ;= overloaded operators
 
 ;+
