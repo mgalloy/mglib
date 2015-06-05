@@ -120,7 +120,7 @@ end
 ;   varname : in, required, type=string
 ;     name of the variable to retrieve
 ;
-; :Keywords
+; :Keywords:
 ;   error : out, optional, type=long
 ;     set to a named variable to retrieve the error status of getting the
 ;     variable, will be 0 if no errors
