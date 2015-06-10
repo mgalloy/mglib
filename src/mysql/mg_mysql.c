@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <mysql_version.h>
 #include <my_global.h>
 #include <mysql.h>
 
@@ -27,7 +28,9 @@ static IDL_STRUCT_TAG_DEF mg_mysql_field[] = {
   { "DECIMALS",         0,    (void *) IDL_TYP_ULONG,   0 },
   { "CHARSETNR",        0,    (void *) IDL_TYP_ULONG,   0 },
   { "TYPE",             0,    (void *) IDL_TYP_ULONG,   0 },
+#if MYSQL_VERSION_ID >= 50100
   { "EXTENSION",        0,    (void *) IDL_TYP_PTRINT,  0 },
+#endif
   { 0 }
 };
 
@@ -301,7 +304,9 @@ static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
     IDL_ULONG decimals;
     IDL_ULONG charsetnr;
     IDL_ULONG type;
+#if MYSQL_VERSION_ID >= 50100
     IDL_PTRINT extension;
+#endif
   } MG_Field;
   MG_Field *mg_field_data = (MG_Field *) calloc(nfields, sizeof(MG_Field));
   void *idl_field_data;
@@ -329,7 +334,9 @@ static IDL_VPTR IDL_mg_mysql_fetch_field(int argc, IDL_VPTR *argv) {
   mg_field_data->charsetnr = field->charsetnr;
   mg_field_data->type = field->type;
 
+#if MYSQL_VERSION_ID >= 50100
   mg_field_data->extension = (IDL_PTRINT)field->extension;
+#endif
 
   idl_field_data = IDL_MakeStruct(0, mg_mysql_field);
   IDL_VPTR result = IDL_ImportArray(1,
