@@ -270,6 +270,7 @@ end
 pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
                        no_header=no_header
   compile_opt strictarr
+  on_error, 2
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
 
