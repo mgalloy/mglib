@@ -128,16 +128,30 @@ end
 pro mg_fits_browser::_display_image, data
   compile_opt strictarr
 
+help, data
   ndims = size(data, /n_dimensions)
   if (ndims ne 2) then begin
+    old_win_id = !d.window
+    wset, self.draw_id
     erase
+    wset, old_win_id
     return
   endif
 
   dims = size(data, /dimensions)
 
-  draw_id = widget_info(self.tlb, find_by_uname='draw')
-  widget_control, draw_id, get_value=win_id
+  data_aspect_ratio = float(dims[1]) / float(dims[0])
+  draw_aspect_ratio = float(geo_info.draw_ysize) / float(geo_info.draw_xsize)
+
+  if (data_aspect_ratio gt draw_aspect_ratio) then begin
+    ; use y as limiting factor for new dimensions
+    dims *= geo_info.draw_ysize / float(dims[1])
+  endif else begin
+    ; use x as limiting factor for new dimensions
+    dims *= geo_info.draw_xsize / float(dims[0])
+  endelse
+
+  data = congrid(date, dims[0], dims[1])
 
   geo_info = widget_info(draw_id, /geometry)
   if (dims[0] gt geo_info.draw_xsize || dims[1] gt geo_info.draw_ysize) then begin
@@ -149,7 +163,7 @@ pro mg_fits_browser::_display_image, data
   endelse
 
   old_win_id = !d.window
-  wset, win_id
+  wset, self.draw_id
   tvscl, data, xoffset, yoffset
   wset, old_win_id
 end
@@ -162,7 +176,7 @@ pro mg_fits_browser::_openFiles
   compile_opt strictarr
 
   filenames = dialog_pickfile(group=self.tlb, /read, /multiple_files, $
-                              filter='*.fits', $
+                              filter=['*.fits', '*.fts', '*.FTS'], $
                               title='Select FITS files to open')
   if (filenames[0] ne '') then self->loadFiles, filenames
 end
@@ -350,6 +364,9 @@ pro mg_fits_browser::_realizeWidgets
   compile_opt strictarr
 
   widget_control, self.tlb, /realize
+  image_draw = widget_info(self.tlb, find_by_uname='draw')
+  widget_control, image_draw, get_value=draw_id
+  self.draw_id = draw_id
 end
 
 
@@ -418,6 +435,7 @@ pro mg_fits_browser__define
   define = { mg_fits_browser, $
              tlb: 0L, $
              tree: 0L, $
+             draw_id: 0L, $
              statusbar: 0L, $
              filename: '', $
              title: '', $
@@ -458,8 +476,13 @@ function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb
 end
 
 
-dir = '/Users/mgalloy/data/CoMP/raw/20150226'
-files = file_search(dir, '*.FTS')
-b = mg_fits_browser(files[0:4])
+;dir = '/Users/mgalloy/data/CoMP/raw/20150226'
+;files = file_search(dir, '*.FTS')
+;b = mg_fits_browser(files[0:4])
+
+f = filepath('20150428_223017_kcor.fts', $
+             subdir=['..', '..', 'unit', 'fits_ut'], $
+             root=mg_src_root())
+b = mg_fits_browser(f)
 
 end
