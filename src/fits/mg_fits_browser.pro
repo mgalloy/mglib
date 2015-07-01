@@ -206,10 +206,14 @@ end
 pro mg_fits_browser::open_files
   compile_opt strictarr
 
-  filenames = dialog_pickfile(group=self.tlb, /read, /multiple_files, $
+  filenames = dialog_pickfile(path=self.path, $
+                              group=self.tlb, /read, /multiple_files, $
                               filter=self->file_extensions(), $
                               title='Select FITS files to open')
-  if (filenames[0] ne '') then self->load_files, filenames
+  if (filenames[0] ne '') then begin
+    self.path = file_dirname(filenames[0])
+    self->load_files, filenames
+  endif
 end
 
 
@@ -431,6 +435,7 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb
   compile_opt strictarr
 
   self.title = 'FITS Browser'
+  self.path = ''
 
   self->create_widgets
   self->realize_widgets
@@ -461,6 +466,7 @@ pro mg_fits_browser__define
              statusbar: 0L, $
              filename: '', $
              title: '', $
+             path: '', $
              nfiles: 0L, $
              currently_selected: 0L $
            }
