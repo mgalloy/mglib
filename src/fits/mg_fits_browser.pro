@@ -44,6 +44,19 @@ end
 ;= data specific
 
 ;+
+; Returns valid file extensions.
+;
+; :Returns:
+;   strarr
+;-
+function mg_fits_browser::file_extensions
+  compile_opt strictarr
+
+  return, ['*.fits', '*.fts', '*.FTS']
+end
+
+
+;+
 ; Display the given data as an image.
 ;
 ; :Params:
@@ -61,6 +74,9 @@ pro mg_fits_browser::display_image, data, header
     return
   endif
 
+  draw_wid = widget_info(self.tlb, find_by_uname='draw')
+  geo_info = widget_info(draw_wid, /geometry)
+
   dims = size(data, /dimensions)
 
   data_aspect_ratio = float(dims[1]) / float(dims[0])
@@ -74,9 +90,8 @@ pro mg_fits_browser::display_image, data, header
     dims *= geo_info.draw_xsize / float(dims[0])
   endelse
 
-  data = congrid(date, dims[0], dims[1])
+  data = congrid(data, dims[0], dims[1])
 
-  geo_info = widget_info(draw_id, /geometry)
   if (dims[0] gt geo_info.draw_xsize || dims[1] gt geo_info.draw_ysize) then begin
     xoffset = 0
     yoffset = 0
@@ -191,7 +206,7 @@ pro mg_fits_browser::open_files
   compile_opt strictarr
 
   filenames = dialog_pickfile(group=self.tlb, /read, /multiple_files, $
-                              filter=['*.fits', '*.fts', '*.FTS'], $
+                              filter=self->file_extensions(), $
                               title='Select FITS files to open')
   if (filenames[0] ne '') then self->load_files, filenames
 end
@@ -216,6 +231,7 @@ pro mg_fits_browser::handle_events, event
     'export_data':
     'export_header':
     'tabs':
+    'browser':
     'cmdline': begin
         if (self.currently_selected eq 0L) then return
 
