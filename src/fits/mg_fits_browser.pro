@@ -258,14 +258,17 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=exten_no
         fits_close, fcb
 
-        ; TODO: need to know if data or header and name for variable
-        export_data_id = widget_info(self.tlb, find_by_uname='export_data')
-        data_set = widget_info(export_data_id, /button_set)
-        if (data_set eq 1) then begin
-          (scope_varfetch('data', /enter, level=1)) = data
-        endif else begin
-          (scope_varfetch('header', /enter, level=1)) = header
-        endelse
+        tabs = widget_info(self.tlb, find_by_uname='tabs')
+        tab_index = widget_info(tabs, /tab_current)
+        case tab_index of
+          0: (scope_varfetch('data', /enter, level=1)) = data
+          1: (scope_varfetch('header', /enter, level=1)) = header
+          else: begin
+            ; this should never happen, but this message will make debugging easier
+            ok = dialog_message(string(tab_index, format='(%"unknown tab: %d")'), $
+                                dialog_parent=self.tlb)
+          end
+        endcase
       end
     'fits:file': begin
         self.currently_selected = event.id
@@ -340,19 +343,6 @@ pro mg_fits_browser::create_widgets
                                  tooltip='Export to command line', $
                                  value=filepath('commandline.bmp', $
                                                 subdir=bitmapdir))
-
-  exporttype_toolbar = widget_base(export_toolbar, /toolbar, /exclusive, /row, $
-                                   xpad=0, ypad=0)
-  data_button = widget_button(exporttype_toolbar, /bitmap, $
-                              uname='export_data', $
-                              tooltip='Set export type to data', $
-                              value=filepath('binary.bmp', subdir=bitmapdir))
-  header_button = widget_button(exporttype_toolbar, /bitmap, $
-                                uname='export_header', $
-                                tooltip='Set export type to header', $
-                                value=filepath('lft.bmp', subdir=bitmapdir))
-  widget_control, data_button, set_button=1
-  widget_control, header_button, set_button=0
 
   ; content row
   content_base = widget_base(self.tlb, /row)
