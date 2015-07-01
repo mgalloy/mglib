@@ -12,7 +12,7 @@
 ;= helper routines
 
 ;+
-; Thin procedural wrapper to call `::handleEvents` event handler.
+; Thin procedural wrapper to call `::handle_events` event handler.
 ;
 ; :Params:
 ;    event : in, required, type=structure
@@ -22,12 +22,12 @@ pro mg_fits_browser_handleevents, event
   compile_opt strictarr
 
   widget_control, event.top, get_uvalue=browser
-  browser->handleEvents, event
+  browser->handle_events, event
 end
 
 
 ;+
-; Thin procedural wrapper to call `::_cleanupWidgets` cleanup routine.
+; Thin procedural wrapper to call `::cleanup_widgets` cleanup routine.
 ;
 ; :Params:
 ;    tlb : in, required, type=long
@@ -37,86 +37,11 @@ pro mg_fits_browser_cleanup, tlb
   compile_opt strictarr
 
   widget_control, tlb, get_uvalue=browser
-  browser->_cleanupWidgets
+  browser->cleanup_widgets
 end
 
 
-;= API
-
-;+
-; Set the window title based on the current filename. Set the filename to the
-; empty string if there is no title to display.
-;
-; :Params:
-;    filename : in, required, type=string
-;       filename to display in title
-;-
-pro mg_fits_browser::setTitle, filename
-  compile_opt strictarr
-
-  title = string(self.title, $
-                 filename eq '' ? '' : ' - ', $
-                 filename, $
-                 format='(%"%s%s%s")')
-  widget_control, self.tlb, base_set_title=title
-end
-
-
-;+
-; Set the text in the status bar.
-;
-; :Params:
-;   msg : in, optional, type=string
-;     message to display in the status bar
-;-
-pro mg_fits_browser::setStatus, msg, clear=clear
-  compile_opt strictarr
-
-  _msg = keyword_set(clear) || n_elements(msg) eq 0L ? '' : msg
-  widget_control, self.statusbar, set_value=_msg
-end
-
-
-;+
-; Load FITS files corresponding to filenames.
-;
-; :Params:
-;   filenames : in, optional, type=string/strarr
-;     filenames of files to load
-;-
-pro mg_fits_browser::loadFiles, filenames
-  compile_opt strictarr
-
-  self.nfiles += n_elements(filenames)
-
-  self->setTitle, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
-
-  ncbmp = read_bmp(filepath('image.bmp', subdir=['resource', 'bitmaps']), r, g, b)
-  ncbmp = [[[r[ncbmp]]], [[g[ncbmp]]], [[b[ncbmp]]]]
-
-  self->setStatus, string(self.nfiles, self.nfiles eq 1 ? '' : 's', $
-                          format='(%"Loading %d FITS file%s...")')
-
-  widget_control, self.tree, update=0
-  foreach f, filenames do begin
-    file_node = widget_tree(self.tree, /folder, $
-                            value=file_basename(f), $
-                            bitmap=ncbmp, $
-                            uname='fits:file', uvalue=f)
-    fits_open, f, fcb
-    fits_read, fcb, data, header
-    for i = 0L, fcb.nextend - 1L do begin
-      ext_node = widget_tree(file_node, $
-                             value='extension ' + strtrim(i, 2), $
-                             uname='fits:extension', uvalue=i)
-    endfor
-    fits_close, fcb
-  endforeach
-  widget_control, self.tree, update=1
-
-  self->setStatus, /clear
-end
-
+;= data specific
 
 ;+
 ; Display the given data as an image.
@@ -124,17 +49,15 @@ end
 ; :Params:
 ;   data : in, required, type=2D array
 ;     data to display
+;   header : in, required, type=strarr
+;     FITS header
 ;-
-pro mg_fits_browser::_display_image, data
+pro mg_fits_browser::display_image, data, header
   compile_opt strictarr
 
-help, data
   ndims = size(data, /n_dimensions)
   if (ndims ne 2) then begin
-    old_win_id = !d.window
-    wset, self.draw_id
-    erase
-    wset, old_win_id
+    self->erase
     return
   endif
 
@@ -169,16 +92,108 @@ help, data
 end
 
 
+;= API
+
+;+
+; Erase the draw window.
+;-
+pro mg_fits_browser::erase
+  compile_opt strictarr
+
+  old_win_id = !d.window
+  wset, self.draw_id
+  erase
+  wset, old_win_id
+end
+
+
+;+
+; Set the window title based on the current filename. Set the filename to the
+; empty string if there is no title to display.
+;
+; :Params:
+;    filename : in, required, type=string
+;       filename to display in title
+;-
+pro mg_fits_browser::set_title, filename
+  compile_opt strictarr
+
+  title = string(self.title, $
+                 filename eq '' ? '' : ' - ', $
+                 filename, $
+                 format='(%"%s%s%s")')
+  widget_control, self.tlb, base_set_title=title
+end
+
+
+;+
+; Set the text in the status bar.
+;
+; :Params:
+;   msg : in, optional, type=string
+;     message to display in the status bar
+;-
+pro mg_fits_browser::set_status, msg, clear=clear
+  compile_opt strictarr
+
+  _msg = keyword_set(clear) || n_elements(msg) eq 0L ? '' : msg
+  widget_control, self.statusbar, set_value=_msg
+end
+
+
+;+
+; Load FITS files corresponding to filenames.
+;
+; :Params:
+;   filenames : in, optional, type=string/strarr
+;     filenames of files to load
+;-
+pro mg_fits_browser::load_files, filenames
+  compile_opt strictarr
+
+  self.nfiles += n_elements(filenames)
+
+  self->set_title, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
+
+  ncbmp = read_bmp(filepath('image.bmp', subdir=['resource', 'bitmaps']), r, g, b)
+  ncbmp = [[[r[ncbmp]]], [[g[ncbmp]]], [[b[ncbmp]]]]
+
+  self->set_status, string(self.nfiles, self.nfiles eq 1 ? '' : 's', $
+                           format='(%"Loading %d FITS file%s...")')
+
+  widget_control, self.tree, update=0
+  foreach f, filenames do begin
+    file_node = widget_tree(self.tree, /folder, $
+                            value=file_basename(f), $
+                            bitmap=ncbmp, $
+                            uname='fits:file', uvalue=f)
+    fits_open, f, fcb
+    fits_read, fcb, data, header
+    for i = 0L, fcb.nextend - 1L do begin
+      ext_node = widget_tree(file_node, $
+                             value='extension ' + strtrim(i, 2), $
+                             uname='fits:extension', uvalue=i)
+    endfor
+    fits_close, fcb
+  endforeach
+  widget_control, self.tree, update=1
+
+  self->set_status, /clear
+end
+
+
 ;+
 ; Bring up pick file dialog to choose a file and load it.
+;
+; :Private:
 ;-
-pro mg_fits_browser::_openFiles
+pro mg_fits_browser::open_files
   compile_opt strictarr
 
   filenames = dialog_pickfile(group=self.tlb, /read, /multiple_files, $
                               filter=['*.fits', '*.fts', '*.FTS'], $
                               title='Select FITS files to open')
-  if (filenames[0] ne '') then self->loadFiles, filenames
+  if (filenames[0] ne '') then self->load_files, filenames
 end
 
 
@@ -191,12 +206,12 @@ end
 ;    event : in, required, type=structure
 ;       event structure for event handler to handle
 ;-
-pro mg_fits_browser::handleEvents, event
+pro mg_fits_browser::handle_events, event
   compile_opt strictarr
 
   uname = widget_info(event.id, /uname)
   case uname of
-    'open': self->_openFiles
+    'open': self->open_files
     'tlb':
     'export_data':
     'export_header':
@@ -245,7 +260,7 @@ pro mg_fits_browser::handleEvents, event
         fits_read, fcb, data, header
         fits_close, fcb
 
-        self->_display_image, data
+        self->display_image, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -261,7 +276,7 @@ pro mg_fits_browser::handleEvents, event
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
 
-        self->_display_image, data
+        self->display_image, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -280,7 +295,7 @@ end
 ;+
 ; Handle cleanup when the widget program is destroyed.
 ;-
-pro mg_fits_browser::_cleanupWidgets
+pro mg_fits_browser::cleanup_widgets
   compile_opt strictarr
 
   obj_destroy, self
@@ -290,7 +305,7 @@ end
 ;+
 ; Create the widget hierarchy.
 ;-
-pro mg_fits_browser::_createWidgets
+pro mg_fits_browser::create_widgets
   compile_opt strictarr
 
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb')
@@ -360,7 +375,7 @@ end
 ;+
 ; Draw the widget hierarchy.
 ;-
-pro mg_fits_browser::_realizeWidgets
+pro mg_fits_browser::realize_widgets
   compile_opt strictarr
 
   widget_control, self.tlb, /realize
@@ -373,7 +388,7 @@ end
 ;+
 ; Start `XMANAGER`.
 ;-
-pro mg_fits_browser::_startXManager
+pro mg_fits_browser::start_xmanager
   compile_opt strictarr
 
   xmanager, 'mg_fits_browser', self.tlb, /no_block, $
@@ -410,13 +425,13 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb
 
   self.title = 'FITS Browser'
 
-  self->_createWidgets
-  self->_realizeWidgets
-  self->_startXManager
+  self->create_widgets
+  self->realize_widgets
+  self->start_xmanager
 
   tlb = self.tlb
 
-  if (n_elements(filenames) gt 0L) then self->loadFiles, filenames
+  if (n_elements(filenames) gt 0L) then self->load_files, filenames
 
   return, 1
 end
@@ -461,8 +476,11 @@ end
 ;   tlb : out, optional, type=long
 ;     set to a named variable to retrieve the top-level base widget identifier
 ;     of the FITS browser
+;   classname : in, optional, type=string, default='mg_fits_browser'
+;     classname of subclass of `mg_fits_browser` class
 ;-
-function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb
+function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb, $
+                          classname=classname
   compile_opt strictarr
 
   ; parameter filename takes precedence (it clobbers keyword filename, if
@@ -470,7 +488,8 @@ function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb
   if (n_elements(kfilenames) gt 0L) then _filenames = kfilenames
   if (n_elements(pfilenames) gt 0L) then _filenames = pfilenames
 
-  b = obj_new('mg_fits_browser', filenames=_filenames, tlb=tlb)
+  _classname = n_elements(classname) eq 0L ? 'mg_fits_browser' : classname
+  b = obj_new(_classname, filenames=_filenames, tlb=tlb)
 
   return, b
 end
