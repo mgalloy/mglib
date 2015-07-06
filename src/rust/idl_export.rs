@@ -938,6 +938,7 @@ impl ::std::clone::Clone for Struct_Unnamed32 {
 impl ::std::default::Default for Struct_Unnamed32 {
     fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
+pub type Enum_Unnamed34 = ::libc::c_uint;
 pub type IDL_ROI_STATE = Struct_Unnamed32;
 #[repr(C)]
 #[derive(Copy)]
@@ -2216,6 +2217,22 @@ pub type wctrans_t = __darwin_wctrans_t;
 pub type IDL_TIMER_CB = ::std::option::Option<extern "C" fn() -> ()>;
 pub type IDL_TIMER_CONTEXT = IDL_TIMER_CB;
 pub type IDL_TIMER_CONTEXT_PTR = *mut IDL_TIMER_CONTEXT;
+pub type __builtin_va_list = [__va_list_tag; 1usize];
+pub type __va_list_tag = Struct___va_list_tag;
+#[repr(C)]
+#[derive(Copy)]
+pub struct Struct___va_list_tag {
+    pub gp_offset: ::libc::c_uint,
+    pub fp_offset: ::libc::c_uint,
+    pub overflow_arg_area: *mut ::libc::c_void,
+    pub reg_save_area: *mut ::libc::c_void,
+}
+impl ::std::clone::Clone for Struct___va_list_tag {
+    fn clone(&self) -> Self { *self }
+}
+impl ::std::default::Default for Struct___va_list_tag {
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
+}
 extern "C" {
     pub static mut __stdinp: *mut FILE;
     pub static mut __stdoutp: *mut FILE;
@@ -3167,8 +3184,6 @@ extern "C" {
                               msg_action: ::libc::c_int) -> ::libc::c_int;
     pub fn IDL_FilePathExpandW(wcharPath: *mut wchar_t,
                                msg_action: ::libc::c_int) -> ::libc::c_int;
-    pub fn IDL_FilePathSearch(argc: ::libc::c_int, argv: *mut IDL_VPTR,
-                              argk: *mut ::libc::c_char) -> IDL_VPTR;
     pub fn IDL_FilePathSearch(argc: ::libc::c_int, argv: *mut IDL_VPTR,
                               argk: *mut ::libc::c_char) -> IDL_VPTR;
     pub fn IDL_TerminalRaw(to_from: ::libc::c_int, fnin: ::libc::c_int) -> ();

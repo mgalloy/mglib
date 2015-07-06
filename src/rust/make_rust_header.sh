@@ -18,4 +18,4 @@ cat $IDL_DIR/external/include/idl_export.h >> idl_export.h
 DYLD_LIB_PATH=/Library/Developer/CommandLineTools/usr/lib
 
 # generate the bindings
-DYLD_LIBRARY_PATH=$DYLD_LIB_PATH $BINDGEN idl_export.h -o idl.rs
+DYLD_LIBRARY_PATH=$DYLD_LIB_PATH $BINDGEN -builtins idl_export.h -o idl_export.rs
