@@ -9,36 +9,36 @@
 ;   needed and then a template string can selectively access the desired
 ;   values. For example, create a hash of a couple values::
 ;
-;      IDL> h = hash('name', 'Mike', 'height', 72)
+;     IDL> h = hash('name', 'Mike', 'height', 72)
 ;
 ;   If desired, the `name` key can be used to access just one of the keys in
 ;   the hash::
 ;
-;      IDL> print, mg_subs('Name: %(name)s', h)
-;      Name: Mike
+;     IDL> print, mg_subs('Name: %(name)s', h)
+;     Name: Mike
 ;
-;    But the other (or all of the other) attributes can also be accessed::
+;   But the other (or all of the other) attributes can also be accessed::
 ;
-;      IDL> print, mg_subs('Height: %(height)d inches', h)
-;      Height: 72 inches
+;     IDL> print, mg_subs('Height: %(height)d inches', h)
+;     Height: 72 inches
 ;
-;    The main-level program at the end of this file also contains examples.
-;    Run them with::
+;   The main-level program at the end of this file also contains examples.
+;   Run them with::
 ;
-;       IDL> .run mg_subs
+;     IDL> .run mg_subs
 ;
-;    This does the following examples::
+;   This does the following examples::
 ;
-;       IDL> print, mg_subs('%(name)s is located in zip code %(zipcode)05d.', $
-;       IDL>                { name: 'Exelis VIS', zipcode: 80301 })
-;       Exelis VIS is located in zip code 80301.
-;       IDL> h = hash('loc', 'Boulder, CO', 'temp', 80, 'units', 'degrees F')
-;       IDL> print, mg_subs('It is %(temp)d %(units)s in %(loc)s today!', h)
-;       It is 80 degrees F in Boulder, CO today!
-;       IDL> obj_destroy, h
+;     IDL> print, mg_subs('%(name)s is located in zip code %(zipcode)05d.', $
+;     IDL>                { name: 'Exelis VIS', zipcode: 80301 })
+;     Exelis VIS is located in zip code 80301.
+;     IDL> h = hash('loc', 'Boulder, CO', 'temp', 80, 'units', 'degrees F')
+;     IDL> print, mg_subs('It is %(temp)d %(units)s in %(loc)s today!', h)
+;     It is 80 degrees F in Boulder, CO today!
+;     IDL> obj_destroy, h
 ;
 ; :Requires:
-;    IDL 8.0
+;   IDL 8.0
 ;-
 
 
@@ -48,32 +48,44 @@
 ; :Private:
 ;
 ; :Returns:
-;    value of the key/field
+;   value of the key/field
 ;
 ; :Params:
-;    hash : in, required, type=hash/structure
-;       hash or structure to lookup key in; if structure, then key lookup is
-;       done case-insensitively; if hash object, the hash mush have a `hasKey`
-;       method and allow hash lookup using overloaded `[]`s
-;    name : in, required, type=string
-;       name of key/field to lookup
+;   hash : in, required, type=hash/structure
+;     hash or structure to lookup key in; if structure, then key lookup is
+;     done case-insensitively; if hash object, the hash mush have a `hasKey`
+;     method and allow hash lookup using overloaded `[]`s
+;   name : in, required, type=string
+;     name of key/field to lookup
 ;
 ; :Keywords:
-;    found : out, optional, type=boolean
-;       set to a named variable to get whether the `name` was found in the
-;       `hash`
+;   found : out, optional, type=boolean
+;     set to a named variable to get whether the `name` was found in the `hash`
+;   use_environment : in, optional, type=boolean
+;     set to use environment variables if value is not found in hash
 ;-
-function mg_subs_getvalue, hash, name, found=found
+function mg_subs_getvalue, hash, name, found=found, $
+                           use_environment=use_environment
   compile_opt strictarr
   on_error, 2
 
   case size(hash, /type) of
      8: begin
         ind = where(tag_names(hash) eq strupcase(name), found)
+        if (~found && keyword_set(use_environment)) then begin
+          value = getenv(name)
+          found = value ne ''
+          return, found ? value : -1L
+        endif
         return, found ? hash.(ind[0]) : -1L
       end
     11: begin
         found = hash->hasKey(name)
+        if (~found && keyword_set(use_environment)) then begin
+          value = getenv(name)
+          found = value ne ''
+          return, found ? value : -1L
+        endif
         return, found ? hash[name] : -1L
       end
     else: message, 'unknown hash type'
@@ -88,21 +100,24 @@ end
 ; :Private:
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    template : in, optional, type=string
-;       string to substitute into
-;    hash : in, required, type=hash/structure
-;       hash table or structure with key-value pairs to subsitute into the
-;       template
+;   template : in, optional, type=string
+;     string to substitute into
+;   hash : in, required, type=hash/structure
+;     hash table or structure with key-value pairs to subsitute into the
+;     template
 ;
 ; :Keywords:
 ;   unresolved_keys : out, optional, type=long
 ;     set to a named variable to retrieve the number of keys that were not
 ;     found in the hash; if passed, no error message is output
+;   use_environment : in, optional, type=boolean
+;     set to use environment variables if value is not found in hash
 ;-
-function mg_subs_iter, template, hash, unresolved_keys=unresolved_keys
+function mg_subs_iter, template, hash, unresolved_keys=unresolved_keys, $
+                       use_environment=use_environment
   compile_opt strictarr
   on_error, 2
 
@@ -125,7 +140,8 @@ function mg_subs_iter, template, hash, unresolved_keys=unresolved_keys
     ; lookup key and substitute it
     if (pos[0] lt strlen(template)) then begin
       name = strmid(template, pos[1], len[1])
-      value = mg_subs_getvalue(hash, name, found=found)
+      value = mg_subs_getvalue(hash, name, found=found, $
+                               use_environment=use_environment)
 
       if (~found) then begin
         if (arg_present(unresolved_keys)) then begin
@@ -154,30 +170,36 @@ end
 ; using the correspondences found in the provided hash or structure.
 ;
 ; :Returns:
-;    string
+;   string
 ;
 ; :Params:
-;    template : in, optional, type=string
-;       string to substitute into
-;    hash : in, required, type=hash/structure
-;       hash table or structure with key-value pairs to subsitute into the
-;       template
+;   template : in, optional, type=string
+;     string to substitute into
+;   hash : in, required, type=hash/structure
+;     hash table or structure with key-value pairs to subsitute into the
+;     template
 ;
 ; :Keywords:
 ;   unresolved_keys : out, optional, type=long
 ;     set to a named variable to retrieve the number of keys that were not
 ;     found in the hash; if passed, no error message is output
+;   use_environment : in, optional, type=boolean
+;     set to use environment variables if value is not found in hash
 ;-
-function mg_subs, template, hash, unresolved_keys=unresolved_keys
+function mg_subs, template, hash, unresolved_keys=unresolved_keys, $
+                  use_environment=use_environment
   compile_opt strictarr
   on_error, 2
 
   result = template
-  new_result = mg_subs_iter(result, hash, unresolved_keys=unresolved_keys)
+  new_result = mg_subs_iter(result, hash, unresolved_keys=unresolved_keys, $
+                            use_environment=use_environment)
 
   repeat begin
     tmp = new_result
-    new_result = mg_subs_iter(new_result, hash, unresolved_keys=unresolved_keys)
+    new_result = mg_subs_iter(new_result, hash, $
+                              unresolved_keys=unresolved_keys, $
+                              use_environment=use_environment)
     result = tmp
   endrep until (result eq new_result)
 

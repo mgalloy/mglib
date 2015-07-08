@@ -8,7 +8,10 @@
 ;
 ; :Properties:
 ;   fold_case
-;     set for case-insensitive matching for section and option names.
+;     set for case-insensitive matching for section and option names
+;   use_environment
+;     set to use environment variables for values in substitution not found in
+;     file
 ;   sections
 ;     array of section names
 ;
@@ -451,9 +454,12 @@ function mgffoptions::get, option, $
   endif else begin
     value = mg_subs(((self.sections)[_section])[_option], $
                     (self.sections)[_section], $
-                    unresolved_keys=unresolved_keys)
+                    unresolved_keys=unresolved_keys, $
+                    use_environment=self.use_environment)
     if (_section ne '' && self.sections->hasKey('')) then begin
-      value = mg_subs(value, (self.sections)[''], unresolved_keys=unresolved_keys)
+      value = mg_subs(value, (self.sections)[''], $
+                      unresolved_keys=unresolved_keys, $
+                      use_environment=self.use_environment)
     endif
   endelse
 
@@ -493,11 +499,11 @@ end
 ; :Returns:
 ;   1 for success, 0 for failure
 ;-
-function mgffoptions::init, fold_case=fold_case
+function mgffoptions::init, fold_case=fold_case, use_environment=use_environment
   compile_opt strictarr
 
-
   self.fold_case = keyword_set(fold_case)
+  self.use_environment = keyword_set(use_environment)
   self.sections = hash()
 
   return, 1
@@ -518,6 +524,7 @@ pro mgffoptions__define
   
   dummy = { MGffOptions, inherits IDL_Object, $
             fold_case: 0B, $
+            use_environment: 0B, $
             sections: obj_new() $
           }
 end
