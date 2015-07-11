@@ -121,7 +121,7 @@ function mg_routinebinding::output, preamble=preamble
                        (p.array && ~p.device) ? 'ARRAY' : 'SCALAR', $
                        i, $
                        format='(%"%s  IDL_ENSURE_%s(argv[%d])")')
-      if (p.device || p.pointer) then begin
+      if (p.device) then begin
         output += string(mg_newline(), $
                          i, $
                          'IDL_TYP_PTRINT', $
