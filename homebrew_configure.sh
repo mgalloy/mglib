@@ -20,5 +20,7 @@ cmake \
   -DIDLdoc_DIR:PATH=~/projects/idldoc/src \
   -Dmgunit_DIR:PATH=~/projects/mgunit/src \
   -Didlwave_DIR:PATH=~/software/idlwave \
+  -DPLASMA_INCLUDE_DIR:PATH=~/software/plasma/include \
+  -DPLASMA_LIBRARY_DIR:PATH=~/software/plasma/lib \
   ..
 
