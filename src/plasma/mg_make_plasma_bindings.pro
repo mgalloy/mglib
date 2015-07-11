@@ -24,7 +24,7 @@ pro mg_make_plasma_bindings, header_directory=header_directory, $
                      : lib_directory
   dlm = mg_dlm(basename='mg_plasma', $
                prefix='MG_', $
-               name='mg_gsl', $
+               name='mg_plasma', $
                description='IDL bindings for Plasma', $
                version='1.0', $
                source='Michael Galloy')
