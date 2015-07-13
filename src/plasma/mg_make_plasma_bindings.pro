@@ -29,13 +29,28 @@ pro mg_make_plasma_bindings, header_directory=header_directory, $
                version='1.0', $
                source='Michael Galloy')
 
-  dlm->addInclude, ['plasma.h'], $
+  dlm->addInclude, ['plasma.h', $
+                    'plasma_s.h', $
+                    'plasma_d.h', $
+                    'plasma_ds.h', $
+                    'plasma_c.h', $
+                    'plasma_z.h', $
+                    'plasma_zc.h'], $
                    header_directory=_header_directory
   dlm->addLibrary, 'libplasma.a', $
                    lib_directory=_lib_directory, $
                    /static
+  dlm->addLibrary, 'libquark.a', $
+                   lib_directory=_lib_directory, $
+                   /static
+  dlm->addLibrary, 'hwloc', $
+                   lib_directory='/usr/local/lib'
+
   dlm->addRoutinesFromHeaderFile, filepath('mg_plasma_bindings.h', $
                                            root=mg_src_root())
+
+  dlm->addVariableAccessor, 'PLASMA_SCHEDULING_MODE', type=3L
+  dlm->addVariableAccessor, 'PLASMA_DYNAMIC_SCHEDULING', type=3L
 
   dlm->write
   dlm->build, show_all_output=keyword_set(show_all_output)
