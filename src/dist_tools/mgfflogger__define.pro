@@ -266,11 +266,15 @@ end
 ;     example
 ;   no_header : in, optional, type=boolean
 ;     set to not print header information
+;   was_logged : out, optional, type=boolean
+;     set to a named variable to retrieve whether the message was logged
 ;-
 pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
-                       no_header=no_header
+                       no_header=no_header, was_logged=was_logged
   compile_opt strictarr
   on_error, 2
+
+  was_logged = 0B
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
 
@@ -305,6 +309,7 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
       s = mg_subs(self.format, vars)
     endelse
     printf, lun, s
+    was_logged = 1B
   endif
 
   if (lun ge 0L) then free_lun, lun
