@@ -44,6 +44,27 @@ end
 ;= data specific
 
 ;+
+; Return title to display for extension.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   ext_number : in, required, type=long
+;     extension number
+;   ext_name : in, required, type=long
+;     extension name
+;   ext_header : in, required, type=strarr
+;     header for extension
+;-
+function mg_fits_browser::extension_title, ext_number, ext_name, ext_header
+  compile_opt strictarr
+
+  return, ext_name eq '' ? ('extension ' + strtrim(ext_number, 2)) : ext_name
+end
+
+
+;+
 ; Returns valid file extensions.
 ;
 ; :Returns:
@@ -186,8 +207,9 @@ pro mg_fits_browser::load_files, filenames
     fits_open, f, fcb
     fits_read, fcb, data, header
     for i = 0L, fcb.nextend - 1L do begin
+      fits_read, fcb, ext_data, ext_header, exten_no=i
       ext_node = widget_tree(file_node, $
-                             value='extension ' + strtrim(i, 2), $
+                             value=self->extension_title(i, fcb.extname[i], ext_header), $
                              uname='fits:extension', uvalue=i)
     endfor
     fits_close, fcb
