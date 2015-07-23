@@ -258,13 +258,13 @@ pro mg_fits_browser::load_files, filenames
   widget_control, self.tree, update=0
   foreach f, filenames do begin
     fits_open, f, fcb
-    fits_read, fcb, data, header
+    fits_read, fcb, data, header, exten_no=0
 
     file_node = widget_tree(self.tree, /folder, $
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
                             uname='fits:file', uvalue=f)
-    for i = 0L, fcb.nextend - 1L do begin
+    for i = 1L, fcb.nextend - 1L do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i
       ext_node = widget_tree(file_node, $
                              bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header), $
@@ -362,7 +362,7 @@ pro mg_fits_browser::handle_events, event
         widget_control, event.id, get_uvalue=f
 
         fits_open, f, fcb
-        fits_read, fcb, data, header
+        fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
 
         self->display_image, data, header
