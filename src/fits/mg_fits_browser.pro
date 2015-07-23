@@ -41,7 +41,46 @@ pro mg_fits_browser_cleanup, tlb
 end
 
 
-;= data specific
+;= data specific to be overridden by subclass
+
+
+;+
+; Return title to display for extension.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename of FITS file
+;   header : in, required, type=strarr
+;     primary header of FITS file
+;-
+function mg_fits_browser::file_title, filename, header
+  compile_opt strictarr
+
+  return, file_basename(filename)
+end
+
+
+;+
+; Return bitmap of icon to display next to the file.
+;
+; :Returns:
+;   `bytarr(m, n, 3)` or `bytarr(m, n, 4)` or `0` if default is to be used
+;
+; :Params:
+;   filename : in, required, type=string
+;     filename of FITS file
+;   header : in, required, type=strarr
+;     primary header of FITS file
+;-
+function mg_fits_browser::file_bitmap, filename, header
+  compile_opt strictarr
+
+  return, 0
+end
+
 
 ;+
 ; Return title to display for extension.
@@ -61,6 +100,27 @@ function mg_fits_browser::extension_title, ext_number, ext_name, ext_header
   compile_opt strictarr
 
   return, ext_name eq '' ? ('extension ' + strtrim(ext_number, 2)) : ext_name
+end
+
+
+;+
+; Return bitmap of icon to display next to the extension.
+;
+; :Returns:
+;   `bytarr(m, n, 3)` or `bytarr(m, n, 4)` or `0` if default is to be used
+;
+; :Params:
+;   ext_number : in, required, type=long
+;     extension number
+;   ext_name : in, required, type=long
+;     extension name
+;   ext_header : in, required, type=strarr
+;     header for extension
+;-
+function mg_fits_browser::extension_bitmap, ext_number, ext_name, ext_header
+  compile_opt strictarr
+
+  return, 0
 end
 
 
@@ -192,23 +252,22 @@ pro mg_fits_browser::load_files, filenames
 
   self->set_title, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
 
-  ncbmp = read_bmp(filepath('image.bmp', subdir=['resource', 'bitmaps']), r, g, b)
-  ncbmp = [[[r[ncbmp]]], [[g[ncbmp]]], [[b[ncbmp]]]]
-
   self->set_status, string(self.nfiles, self.nfiles eq 1 ? '' : 's', $
                            format='(%"Loading %d FITS file%s...")')
 
   widget_control, self.tree, update=0
   foreach f, filenames do begin
-    file_node = widget_tree(self.tree, /folder, $
-                            value=file_basename(f), $
-                            bitmap=ncbmp, $
-                            uname='fits:file', uvalue=f)
     fits_open, f, fcb
     fits_read, fcb, data, header
+
+    file_node = widget_tree(self.tree, /folder, $
+                            value=self->file_title(f, header), $
+                            bitmap=self->file_bitmap(f, header), $
+                            uname='fits:file', uvalue=f)
     for i = 0L, fcb.nextend - 1L do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i
       ext_node = widget_tree(file_node, $
+                             bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header), $
                              value=self->extension_title(i, fcb.extname[i], ext_header), $
                              uname='fits:extension', uvalue=i)
     endfor
