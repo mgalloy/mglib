@@ -79,7 +79,9 @@ pro mg_horizon, x, data, titles=titles, $
     ; flip values below center point
     center = (_maximum + _minimum) / 2.
     range = _maximum - _minimum
-    dataset =  center + abs(center - dataset)
+    dataset = center + abs(center - dataset)
+    dataset_minimum = center + abs(center - _minimum)
+    dataset_maximum = center + abs(center - _maximum)
 
     bandorder = [reverse(lindgen(_nbands / 2L)), lindgen(_nbands / 2L)]
 
@@ -130,19 +132,19 @@ pro mg_horizon, x, data, titles=titles, $
     endfor
 
     ; plot values greater than max
-    ind = where(dataset gt _maximum, count)
+    ind = where(data[d, *] gt _maximum, count)
     if (count gt 0L) then begin
       y = reform(dataset * 0.0)
       y[ind] = 1.0
-      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[upperband - 1L]
+      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[-1] ;_colors[upperband - 1L]
     endif
 
     ; plot values less than min
-    ind = where(dataset lt _minimum, count)
+    ind = where(data[d, *] lt _minimum, count)
     if (count gt 0L) then begin
       y = reform(dataset * 0.0)
       y[ind] = 1.0
-      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[lowerband + 1L]
+      polyfill, [minx, x, maxx], d + [0, y, 0], color=_colors[0] ;_colors[lowerband + 1L]
     endif
   endfor
 
