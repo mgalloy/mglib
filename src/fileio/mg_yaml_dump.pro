@@ -20,6 +20,18 @@ function mg_yaml_dump_ishash, h
 end
 
 
+;+
+; Get the "keys" of a hash or structure.
+;
+; :Private:
+;
+; :Returns:
+;   `strarr` or `lindgen(n)`
+;
+; :Params:
+;   h : in, required, type=hash or structure
+;     hash or structure to find keys for
+;-
 function mg_yaml_dump_hashkeys, h
   compile_opt strictarr
 
@@ -31,6 +43,21 @@ function mg_yaml_dump_hashkeys, h
 end
 
 
+;+
+; Get the real key for a hash or structure, i.e., convert an index into a tag
+; name in the case of a structure.
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   h : in, required, type=hash or structure
+;     hash or structure to find key for
+;   key : in, required, type=string or long
+;     "key" into the hash/structure
+;-
 function mg_yaml_dump_hashkey, h, key
   compile_opt strictarr
 
@@ -42,6 +69,20 @@ function mg_yaml_dump_hashkey, h, key
 end
 
 
+;+
+; Use a "key" to access an element of a hash.
+;
+; :Private:
+;
+; :Returns:
+;   any
+;
+; :Params:
+;   h : in, required, type=hash or structure
+;     hash or structure to find value in
+;   key : in, required, type=string or long
+;     "key" into the hash/structure
+;-
 function mg_yaml_dump_hashelement, h, key
   compile_opt strictarr
 
@@ -53,6 +94,18 @@ function mg_yaml_dump_hashelement, h, key
 end
 
 
+;+
+; Convert an the last two characters of an indent to "- ".
+;
+; :Private:
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   indent : in, required, type=string
+;     current indent
+;-
 function mg_yaml_dump_firstindent, indent
   compile_opt strictarr
 
@@ -62,18 +115,6 @@ function mg_yaml_dump_firstindent, indent
     len eq 2: return, '- '
     else: return, string(bytarr(len - 2) + (byte(' '))[0]) + '- '
   endcase
-end
-
-
-function mg_yaml_dump_convertindent, indent
-  compile_opt strictarr
-
-  len = strlen(indent)
-  if (len eq 0) then begin
-    return, ''
-  endif else begin
-    return, string(bytarr(len) + (byte(' '))[0]) + '- '
-  endelse
 end
 
 
@@ -97,9 +138,25 @@ function mg_yaml_dump_islist, o
 end
 
 
+;+
+; Handle the output for the current level of indentation.
+;
+; :Private:
+;
+; :Params:
+;   o : in, required, type=combination of list/array and hash/structure
+;     variable to dump
+;
+; :Keywords:
+;   from_list : in, optional, type=boolean
+;     set to indicate that the current variable is from a list and its first
+;     item should have a "- " at the end of its indent
+;   result : in, required, type=list
+;     list of strings which are output
+;-
 pro mg_yaml_dump_level, o, indent=indent, from_list=from_list, result=result
   compile_opt strictarr
-  ;on_error, 2
+  on_error, 2
 
   _indent = n_elements(indent) eq 0L ? '' : indent
   if (keyword_set(from_list)) then begin
@@ -150,6 +207,17 @@ end
 ; Write a combination of lists/arrays and hashes/structures to a YAML-formatted
 ; string.
 ;
+; :Examples:
+;   For example, try:
+;
+;     IDL> print, mg_yaml_dump(list({a: [1, 2], b: 2 }, 'c', 'd'))
+;     - A:
+;         - 1
+;         - 2
+;       B: 2
+;     - c
+;     - d
+;
 ; :Returns:
 ;   string
 ;
@@ -159,7 +227,7 @@ end
 ;
 ; :Keywords:
 ;   filename : in, optional, type=string
-;     if present, write the string to this file also
+;     if present, write the string to a file with this filename also
 ;-
 function mg_yaml_dump, o, filename=filename
   compile_opt strictarr
