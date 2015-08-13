@@ -114,7 +114,14 @@ function mg_read_ascii, filename, $
                : n_elements(columnTypes)
 
   if (nColumns eq 0L) then begin
-    message, 'one of COLUMN_NAMES, COLUMN_TYPES, or GROUPS must be defined'
+    nlines = file_lines(filename)
+    if (nlines eq 0L) then return, []
+
+    lines = strarr(nlines)
+    openr, lun, filename, /get_lun
+    readf, lun, lines
+    free_lun, lun
+    return, lines
   endif
 
   ; pad column names with the correct number of zeros
