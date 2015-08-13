@@ -154,16 +154,11 @@ end
 ;   result : in, required, type=list
 ;     list of strings which are output
 ;-
-pro mg_yaml_dump_level, o, indent=indent, from_list=from_list, result=result
+pro mg_yaml_dump_level, o, indent=indent, tack_on=tack_on, result=result
   compile_opt strictarr
   on_error, 2
 
   _indent = n_elements(indent) eq 0L ? '' : indent
-  if (keyword_set(from_list)) then begin
-    _first_indent = mg_yaml_dump_firstindent(_indent)
-  endif else begin
-    _first_indent = _indent
-  endelse
 
   case 1 of
     mg_yaml_dump_ishash(o): begin
@@ -171,34 +166,43 @@ pro mg_yaml_dump_level, o, indent=indent, from_list=from_list, result=result
         foreach k, keys, i do begin
           el = mg_yaml_dump_hashelement(o, k)
           if (mg_yaml_dump_ishash(el) || mg_yaml_dump_islist(el)) then begin
-            result->add, string(i eq 0 ? _first_indent : _indent, $
-                                strtrim(mg_yaml_dump_hashkey(o, k), 2), $
-                                format='(%"%s%s:")')
+            val = string(strtrim(mg_yaml_dump_hashkey(o, k), 2), $
+                         format='(%"%s:")')
+            if (keyword_set(tack_on) && i eq 0) then begin
+              result[-1] += val
+            endif else begin
+              result->add, _indent + val
+            endelse
             mg_yaml_dump_level, el, indent=_indent + '  ', result=result
           endif else begin
-            result->add, string(i eq 0 ? _first_indent : _indent, $
-                                strtrim(mg_yaml_dump_hashkey(o, k), 2), $
-                                strtrim(el, 2), $
-                                format='(%"%s%s: %s")')
+            val = string(strtrim(mg_yaml_dump_hashkey(o, k), 2), $
+                         strtrim(el, 2), $
+                         format='(%"%s: %s")')
+            if (keyword_set(tack_on) && i eq 0) then begin
+              result[-1] += val
+            endif else begin
+              result->add, _indent + val
+            endelse
           endelse
         endforeach
       end
     mg_yaml_dump_islist(o): begin
         foreach el, o, i do begin
-          case 1 of
-            mg_yaml_dump_ishash(el): begin
-                mg_yaml_dump_level, el, indent=_indent + '  ', /from_list, result=result
-              end
-            mg_yaml_dump_islist(el): begin
-                mg_yaml_dump_level, el, indent=_indent + '  ', /from_list, result=result
-              end
-            else: result->add, string(i eq 0 ? _first_indent : _indent, $
-                                      strtrim(el, 2), $
-                                      format='(%"%s- %s")')
-          endcase
+          if (keyword_set(tack_on) && i eq 0) then begin
+            result[-1] += '- '
+          endif else begin
+            result->add, string(_indent, format='(%"%s- ")')
+          endelse
+          mg_yaml_dump_level, el, indent=_indent + '  ', result=result, /tack_on
         endforeach
       end
-    else: message, 'unknown type'
+    else: begin
+        if (keyword_set(tack_on)) then begin
+          result[-1] += strtrim(o, 2)
+        endif else begin
+          result->add, strtrim(o, 2)
+        endelse
+      end
   endcase
 end
 
@@ -259,6 +263,8 @@ print, '---'
 print, mg_yaml_dump(list({a: [1, 2], b: 2 }, 'c', 'd'))
 print, '---'
 print, mg_yaml_dump(list({a: {e: [1, 2], f: 2}, b: 2 }, 'c', 'd'))
+print, '---'
+print, mg_yaml_dump(list(list(list(1, 2), 3), 4))
 print, '---'
 
 end
