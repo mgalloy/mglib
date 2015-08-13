@@ -174,5 +174,9 @@ adata = mg_read_ascii(file_which('ascii.dat'), data_start=3, $
                       groups=lonarr(4), missing_value=-999.)
 print, adata.col0
 
+text = mg_read_ascii(file_which('ascii.txt'))
+help, text
+print, transpose(text)
+
 end
 
