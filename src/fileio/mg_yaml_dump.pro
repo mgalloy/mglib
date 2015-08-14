@@ -169,7 +169,7 @@ pro mg_yaml_dump_level, o, indent=indent, tack_on=tack_on, result=result
             val = string(strtrim(mg_yaml_dump_hashkey(o, k), 2), $
                          format='(%"%s:")')
             if (keyword_set(tack_on) && i eq 0) then begin
-              result[-1] += val
+              result->add, result->remove() + val
             endif else begin
               result->add, _indent + val
             endelse
@@ -179,17 +179,18 @@ pro mg_yaml_dump_level, o, indent=indent, tack_on=tack_on, result=result
                          strtrim(el, 2), $
                          format='(%"%s: %s")')
             if (keyword_set(tack_on) && i eq 0) then begin
-              result[-1] += val
+              result->add, result->remove() + val
             endif else begin
               result->add, _indent + val
             endelse
           endelse
         endforeach
+        if (size(keys, /type) eq 11) then obj_destroy, keys
       end
     mg_yaml_dump_islist(o): begin
         foreach el, o, i do begin
           if (keyword_set(tack_on) && i eq 0) then begin
-            result[-1] += '- '
+            result->add, result->remove() + '- '
           endif else begin
             result->add, string(_indent, format='(%"%s- ")')
           endelse
@@ -198,7 +199,7 @@ pro mg_yaml_dump_level, o, indent=indent, tack_on=tack_on, result=result
       end
     else: begin
         if (keyword_set(tack_on)) then begin
-          result[-1] += strtrim(o, 2)
+          result->add, result->remove() + strtrim(o, 2)
         endif else begin
           result->add, strtrim(o, 2)
         endelse
