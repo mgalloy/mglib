@@ -1,87 +1,88 @@
 ; docformat = 'rst'
 
 ;+
-; Wrapper to READ_ASCII and ASCII_TEMPLATE.
+; Wrapper to `READ_ASCII` and `ASCII_TEMPLATE`.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_read_ascii
+;     IDL> .run mg_read_ascii
 ;
-;    It does::
+;   It does::
 ;
-;       IDL> col_names = ['lon', 'lat', 'elev', 'temp', 'dewpt', 'wind_speed', 'wind_dir']
-;       IDL> wdata = mg_read_ascii(file_which('ascii.txt'), data_start=5, $
-;       IDL>                       column_types=[4, 4, 3, 3, 3, 3, 3], $
-;       IDL>                       column_names=col_names, $
-;       IDL>                       groups=lindgen(7))
-;       IDL> help, wdata
-;       ** Structure <2851608>, 7 tags, length=420, data length=420, refs=1:
-;          LON             FLOAT     Array[15]
-;          LAT             FLOAT     Array[15]
-;          ELEV            LONG      Array[15]
-;          TEMP            LONG      Array[15]
-;          DEWPT           LONG      Array[15]
-;          WIND_SPEED      LONG      Array[15]
-;          WIND_DIR        LONG      Array[15]
+;     IDL> col_names = ['lon', 'lat', 'elev', 'temp', 'dewpt', 'wind_speed', 'wind_dir']
+;     IDL> wdata = mg_read_ascii(file_which('ascii.txt'), data_start=5, $
+;     IDL>                       column_types=[4, 4, 3, 3, 3, 3, 3], $
+;     IDL>                       column_names=col_names, $
+;     IDL>                       groups=lindgen(7))
+;     IDL> help, wdata
+;     ** Structure <2851608>, 7 tags, length=420, data length=420, refs=1:
+;        LON             FLOAT     Array[15]
+;        LAT             FLOAT     Array[15]
+;        ELEV            LONG      Array[15]
+;        TEMP            LONG      Array[15]
+;        DEWPT           LONG      Array[15]
+;        WIND_SPEED      LONG      Array[15]
+;        WIND_DIR        LONG      Array[15]
 ;
-;       IDL> adata = mg_read_ascii(file_which('ascii.dat'), data_start=3, $
-;       IDL>                       delimiter=string(9B), comment_symbol='%', $
-;       IDL>                       groups=lonarr(4), missing_value=-999.)
-;       IDL> print, adata.col0
-;             55.3000      22.1000      19.3000      40.0000
-;             19.1000     -999.000      15.1000      33.4000
-;             100.300      79.0000      22.1000      3.30000
+;     IDL> adata = mg_read_ascii(file_which('ascii.dat'), data_start=3, $
+;     IDL>                       delimiter=string(9B), comment_symbol='%', $
+;     IDL>                       groups=lonarr(4), missing_value=-999.)
+;     IDL> print, adata.col0
+;           55.3000      22.1000      19.3000      40.0000
+;           19.1000     -999.000      15.1000      33.4000
+;           100.300      79.0000      22.1000      3.30000
 ;
 ; :Returns:
-;    structure with field names given by `COLUMN_NAMES` keyword, or, if
-;    `COLUMN_NAMES` is not present, "col0", "col1", etc.
+;   structure with field names given by `COLUMN_NAMES` keyword, or, if
+;   `COLUMN_NAMES` is not present, "col0", "col1", etc., or, a `strarr` if
+;   the columns are not specified in any manner
 ;
 ; :Params:
-;    filename : in, required, type=string
-;       filename of file to read
+;   filename : in, required, type=string
+;     filename of file to read
 ;
 ; :Keywords:
-;    column_names : in, optional, type=strarr
-;       names for the columns in the data; if there are groups specified,
-;       the column names should be repeated for each column in the group, so
-;       that the number of column names is always equal to the number of
-;       columns
-;    column_types : in, optional, type=lonarr
-;       SIZE type codes for the columns in the data; if there are groups
-;       specified, the column types should be repeated for each column in the
-;       group, so that the number of column types is always equal to the
-;       number of columns
-;    comment_symbol : in, optional, type=string
-;       specifies a comment character for the lines in the file
-;    data_start : in, optional, type=long, default=0L
-;       number of lines to skip at the beginning of the file
-;    delimiter : in, optional, type=string
-;       delimiter between columns of data
-;    groups : in, optional, type=lonarr
-;       indices of groups for each column, i.e.::
+;   column_names : in, optional, type=strarr
+;     names for the columns in the data; if there are groups specified,
+;     the column names should be repeated for each column in the group, so
+;     that the number of column names is always equal to the number of
+;     columns
+;   column_types : in, optional, type=lonarr
+;     `SIZE` type codes for the columns in the data; if there are groups
+;     specified, the column types should be repeated for each column in the
+;     group, so that the number of column types is always equal to the
+;     number of columns
+;   comment_symbol : in, optional, type=string
+;     specifies a comment character for the lines in the file
+;   data_start : in, optional, type=long, default=0L
+;     number of lines to skip at the beginning of the file
+;   delimiter : in, optional, type=string
+;     delimiter between columns of data
+;   groups : in, optional, type=lonarr
+;     indices of groups for each column, i.e.::
 ;
-;          [0, 0, 0, 0, 0, 0, 0]
+;       [0, 0, 0, 0, 0, 0, 0]
 ;
-;       indicates all seven columns are in a single group, where::
+;     indicates all seven columns are in a single group, where::
 ;
-;          [0, 1, 2, 3, 4, 5, 6]
+;       [0, 1, 2, 3, 4, 5, 6]
 ;
-;       would put each column in a new group
-;    missing_value : in, optional, type=scalar
-;       value to use for missing items in the data
-;    count : out, optional, type=long
-;       set to a named variable to get the number of records read
-;    header : out, optional, type=strarr
-;       set to a named variable to get the header information skipped by
-;       `DATA_START`
-;    num_records : in, optional, type=long
-;       number of records to read; default is to read all available records
-;    record_start : in, optional, type=long, default=0
-;       set to index of first record to read (after `DATA_START` is taken into
-;       account)
-;    verbose : in, optional, type=boolean
-;       set to print runtime messages
+;     would put each column in a new group
+;   missing_value : in, optional, type=scalar
+;     value to use for missing items in the data
+;   count : out, optional, type=long
+;     set to a named variable to get the number of records read
+;   header : out, optional, type=strarr
+;     set to a named variable to get the header information skipped by
+;     `DATA_START`
+;   num_records : in, optional, type=long
+;     number of records to read; default is to read all available records
+;   record_start : in, optional, type=long, default=0
+;     set to index of first record to read (after `DATA_START` is taken into
+;     account)
+;   verbose : in, optional, type=boolean
+;     set to print runtime messages
 ;-
 function mg_read_ascii, filename, $
                         column_names=columnNames, $
