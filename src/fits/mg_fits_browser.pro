@@ -458,7 +458,7 @@ pro mg_fits_browser::create_widgets
 
   ; variable name for import
 
-  ; status basr
+  ; status bar
   self.statusbar = widget_label(self.tlb, scr_xsize=tree_xsize + scr_ysize, $
                                 /align_left, /sunken_frame)
 end
