@@ -37,7 +37,7 @@ pro mg_fits_browser_cleanup, tlb
   compile_opt strictarr
 
   widget_control, tlb, get_uvalue=browser
-  browser->cleanup_widgets
+  if (obj_valid(browser)) then browser->cleanup_widgets
 end
 
 
