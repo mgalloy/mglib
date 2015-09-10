@@ -1,3 +1,12 @@
+Obtaining
+---------
+
+mglib is available from `GitHub <https://github.com/mgalloy/mglib>`_, either
+through git or as downloading a zip file. The mgcmake submodule must also be
+retrieved as well, run the `init.sh` script in the mglib root directory to get
+it.
+
+
 Building
 --------
 
@@ -11,7 +20,9 @@ There are more complete example configuration commands in
 *homebrew_configure.sh* (for OS X builds using homebrew to get dependencies),
 *unix_configure.sh* (for basic unix configuration), and *simmple_configure.sh*
 (which doesn't build any DLMs with dependencies) which specifies some optional
-libraries that cause DLMs that depend on them to be built. These example configuration scripts build out-of-source, so change to the *build* directory before building::
+libraries that cause DLMs that depend on them to be built. These example
+configuration scripts build out-of-source, so change to the *build* directory
+before building::
 
   cd build
 
