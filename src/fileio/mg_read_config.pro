@@ -195,5 +195,7 @@ end
 config = mg_read_config(filepath('config.ini', root=mg_src_root()))
 print, config->has_option('foodir', section='My Section')
 print, config->get('foodir', section='My Section')
+print, config->get('value1', section='My Section', /boolean)
+print, config->get('value2', section='My Section', /boolean)
 
 end
