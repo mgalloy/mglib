@@ -407,7 +407,7 @@ function mgffoptions::_convertBoolean, value
 
   if (size(value, /n_dimensions) gt 0L) then begin
     n = n_elements(value)
-    result = strarr(n)
+    result = bytarr(n)
     for i = 0L, n - 1L do result[i] = self->_convertBoolean(value[i])
     return, result
   endif

@@ -258,6 +258,7 @@ function mg_read_config_ut::test_boolean1
   v3 = config->get('bool_value3', section='My Section', /boolean, default=1B)
   v4 = config->get('bool_value4', section='My Section', /boolean, default=0B)
   v5 = config->get('bool_value5', section='My Section', /boolean, default=1B)
+  v6 = config->get('bool_value6', section='My Section', /boolean, /extract)
 
   assert, size(v1, /type) eq 1, $
           'incorrect type for bool_value1: %d', size(v1, /type)
@@ -269,12 +270,19 @@ function mg_read_config_ut::test_boolean1
           'incorrect type for bool_value4: %d', size(v4, /type)
   assert, size(v5, /type) eq 1, $
           'incorrect type for bool_value5: %d', size(v5, /type)
+  assert, size(v6, /type) eq 1, $
+          'incorrect type for bool_value6: %d', size(v6, /type)
+
+  assert, n_elements(v6) eq 5, $
+          'incorrect number of values for bool_value6: %d', n_elements(v6)
 
   assert, v1 eq 1, 'incorrect value for bool_value1: %d', v1
   assert, v2 eq 1, 'incorrect value for bool_value2: %d', v2
   assert, v3 eq 1, 'incorrect value for bool_value3: %d', v3
   assert, v4 eq 0, 'incorrect value for bool_value4: %d', v3
   assert, v5 eq 0, 'incorrect value for bool_value5: %d', v3
+  assert, array_equal(v6, [1, 1, 0, 0, 1]), $
+          'incorrect value for bool_value6: %s', strjoin(strtrim(v6, 2), ', ')
 
   obj_destroy, config
 
