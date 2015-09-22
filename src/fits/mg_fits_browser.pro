@@ -221,6 +221,23 @@ end
 
 
 ;+
+; Display the image and its annotations (if desired).
+;
+; :Params:
+;   data : in, required, type=2D array
+;     data to display
+;   header : in, required, type=strarr
+;     FITS header
+;-
+pro mg_fits_browser::display, data, header
+  compile_opt strictarr
+
+  self->display_image, data, header
+  if (self.annotate) then self->annotate_image, data, header
+end
+
+
+;+
 ; Set the window title based on the current filename. Set the filename to the
 ; empty string if there is no title to display.
 ;
@@ -383,6 +400,28 @@ pro mg_fits_browser::handle_events, event
                                                        subdir=['resource', 'bitmaps']), $
                                     /bitmap
         endelse
+
+        uname = widget_info(self.currently_selected, /uname)
+        case uname of
+          'fits:file': begin
+              widget_control, self.currently_selected, get_uvalue=f
+
+              fits_open, f, fcb
+              fits_read, fcb, data, header, exten_no=0
+              fits_close, fcb
+            end
+        'fits:extension': begin
+            widget_control, self.currently_selected, get_uvalue=e
+            parent_id = widget_info(self.currently_selected, /parent)
+            widget_control, parent_id, get_uvalue=f
+
+            fits_open, f, fcb
+            fits_read, fcb, data, header, exten_no=e
+            fits_close, fcb
+          end
+          else:
+        endcase
+        self->display, data, header
       end
     'fits:file': begin
         self.currently_selected = event.id
@@ -393,8 +432,7 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
 
-        self->display_image, data, header
-        if (self.annotate) then self->annotate_image, data, header
+        self->display, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -410,7 +448,7 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
 
-        self->display_image, data, header
+        self->display, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
