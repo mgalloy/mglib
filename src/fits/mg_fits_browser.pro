@@ -172,7 +172,7 @@ pro mg_fits_browser::display_image, data, header
     dims *= geo_info.draw_xsize / float(dims[0])
   endelse
 
-  data = congrid(data, dims[0], dims[1])
+  _data = congrid(data, dims[0], dims[1])
 
   if (dims[0] gt geo_info.draw_xsize || dims[1] gt geo_info.draw_ysize) then begin
     xoffset = 0
@@ -184,7 +184,7 @@ pro mg_fits_browser::display_image, data, header
 
   old_win_id = !d.window
   wset, self.draw_id
-  tvscl, data, xoffset, yoffset
+  tvscl, _data, xoffset, yoffset
   wset, old_win_id
 end
 
