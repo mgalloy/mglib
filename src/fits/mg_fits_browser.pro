@@ -401,6 +401,7 @@ pro mg_fits_browser::handle_events, event
                                     /bitmap
         endelse
 
+        if (self.currently_selected le 0L) then return
         uname = widget_info(self.currently_selected, /uname)
         case uname of
           'fits:file': begin
