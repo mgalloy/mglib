@@ -31,7 +31,7 @@ function mg_n_categories, n, brewer_ct=brewer_ct
   _n = n < ct_colors[_brewer_ct - 27L]
 
   tvlct, orig_rgb, /get
-  mg_loadct, 27, /brewer
+  mg_loadct, _brewer_ct, /brewer
   tvlct, rgb, /get
 
   colors = mg_rgb2index(rgb[0:_n - 1L, *])
