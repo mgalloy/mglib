@@ -13,5 +13,5 @@
 function mg_rms, data
   compile_opt strictarr
 
-  return, sqrt(total(data) / n_elements(data))
+  return, sqrt((total(data))^2 / n_elements(data))
 end
