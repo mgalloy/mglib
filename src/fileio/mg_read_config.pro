@@ -197,5 +197,6 @@ print, config->has_option('foodir', section='My Section')
 print, config->get('foodir', section='My Section')
 print, config->get('value1', section='My Section', /boolean)
 print, config->get('value2', section='My Section', /boolean)
+print, config->get('value3', section='My Section', /boolean, default=1B)
 
 end

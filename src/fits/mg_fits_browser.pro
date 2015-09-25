@@ -172,7 +172,7 @@ pro mg_fits_browser::display_image, data, header
     dims *= geo_info.draw_xsize / float(dims[0])
   endelse
 
-  data = congrid(data, dims[0], dims[1])
+  _data = congrid(data, dims[0], dims[1])
 
   if (dims[0] gt geo_info.draw_xsize || dims[1] gt geo_info.draw_ysize) then begin
     xoffset = 0
@@ -184,8 +184,24 @@ pro mg_fits_browser::display_image, data, header
 
   old_win_id = !d.window
   wset, self.draw_id
-  tvscl, data, xoffset, yoffset
+  tvscl, _data, xoffset, yoffset
   wset, old_win_id
+end
+
+
+;+
+; Overlay information on the image.
+;
+; :Params:
+;   data : in, required, type=2D array
+;     data to display
+;   header : in, required, type=strarr
+;     FITS header
+;-
+pro mg_fits_browser::annotate_image, data, header
+  compile_opt strictarr
+
+  ; by default nothing is done
 end
 
 
@@ -201,6 +217,23 @@ pro mg_fits_browser::erase
   wset, self.draw_id
   erase
   wset, old_win_id
+end
+
+
+;+
+; Display the image and its annotations (if desired).
+;
+; :Params:
+;   data : in, required, type=2D array
+;     data to display
+;   header : in, required, type=strarr
+;     FITS header
+;-
+pro mg_fits_browser::display, data, header
+  compile_opt strictarr
+
+  self->display_image, data, header
+  if (self.annotate) then self->annotate_image, data, header
 end
 
 
@@ -356,6 +389,41 @@ pro mg_fits_browser::handle_events, event
           end
         endcase
       end
+    'annotate': begin
+        self.annotate = event.select
+        if (event.select) then begin
+          widget_control, event.id, set_value=filepath('ellipse_active.bmp', $
+                                                       subdir=['resource', 'bitmaps']), $
+                                    /bitmap
+        endif else begin
+          widget_control, event.id, set_value=filepath('ellipse.bmp', $
+                                                       subdir=['resource', 'bitmaps']), $
+                                    /bitmap
+        endelse
+
+        if (self.currently_selected le 0L) then return
+        uname = widget_info(self.currently_selected, /uname)
+        case uname of
+          'fits:file': begin
+              widget_control, self.currently_selected, get_uvalue=f
+
+              fits_open, f, fcb
+              fits_read, fcb, data, header, exten_no=0
+              fits_close, fcb
+            end
+        'fits:extension': begin
+            widget_control, self.currently_selected, get_uvalue=e
+            parent_id = widget_info(self.currently_selected, /parent)
+            widget_control, parent_id, get_uvalue=f
+
+            fits_open, f, fcb
+            fits_read, fcb, data, header, exten_no=e
+            fits_close, fcb
+          end
+          else:
+        endcase
+        self->display, data, header
+      end
     'fits:file': begin
         self.currently_selected = event.id
 
@@ -365,7 +433,7 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
 
-        self->display_image, data, header
+        self->display, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -381,7 +449,7 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
 
-        self->display_image, data, header
+        self->display, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -429,6 +497,12 @@ pro mg_fits_browser::create_widgets
                                  tooltip='Export to command line', $
                                  value=filepath('commandline.bmp', $
                                                 subdir=bitmapdir))
+
+  toggle_toolbar = widget_base(toolbar, /row, /nonexclusive)
+  annotate_button = widget_button(toggle_toolbar, /bitmap, uname='annotate', $
+                                  tooltip='Annotate image', $
+                                  value=filepath('ellipse.bmp', $
+                                                 subdir=bitmapdir))
 
   ; content row
   content_base = widget_base(self.tlb, /row)
@@ -524,6 +598,8 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb
 
   tlb = self.tlb
 
+  self.annotate = 0B
+
   if (n_elements(filenames) gt 0L) then self->load_files, filenames
 
   return, 1
@@ -549,7 +625,8 @@ pro mg_fits_browser__define
              title: '', $
              path: '', $
              nfiles: 0L, $
-             currently_selected: 0L $
+             currently_selected: 0L, $
+             annotate: 0B $
            }
 end
 
