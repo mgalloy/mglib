@@ -394,6 +394,28 @@ end
 
 
 ;+
+; Return an array of the section names.
+;
+; :Returns:
+;   `strarr`, or `!null` if no sections present
+;
+; :Keywords:
+;   count : out, optional, type=long
+;     set to a named variable to retrieve the number of sections returned
+;-
+function mgffoptions::sections, count=count
+  compile_opt strictarr
+
+  count = self.sections->count()
+  sections = self.sections->keys()
+  sections_array = sections->toArray()
+  obj_destroy, sections
+
+  return, sections_array
+end
+
+
+;+
 ; Convert value to boolean.
 ;
 ; :Private:
