@@ -297,7 +297,7 @@ pro mg_fits_browser::load_files, filenames
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
                             uname='fits:file', uvalue=f)
-    for i = 1L, fcb.nextend - 1L do begin
+    for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i
       ext_node = widget_tree(file_node, $
                              bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header), $
