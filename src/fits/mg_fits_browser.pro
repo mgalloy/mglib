@@ -327,7 +327,7 @@ pro mg_fits_browser::load_files, filenames
     file_node = widget_tree(self.tree, /folder, $
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
-                            uname='fits:file', uvalue=f)
+                            uname='fits:file', uvalue=file_expand_path(f))
     for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i
       ext_node = widget_tree(file_node, $
@@ -439,6 +439,7 @@ pro mg_fits_browser::handle_events, event
         self.currently_selected = event.id
 
         widget_control, event.id, get_uvalue=f
+        self->set_status, f
 
         fits_open, f, fcb
         fits_read, fcb, data, header, exten_no=0
@@ -453,6 +454,8 @@ pro mg_fits_browser::handle_events, event
         self.currently_selected = event.id
 
         widget_control, event.id, get_uvalue=e
+        self->set_status, string(e, format='(%"Extension: %d")')
+
         parent_id = widget_info(event.id, /parent)
         widget_control, parent_id, get_uvalue=f
 
