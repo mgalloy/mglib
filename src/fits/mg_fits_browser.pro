@@ -510,7 +510,7 @@ pro mg_fits_browser::create_widgets, _extra=e
                                                  subdir=bitmapdir))
 
   ; content row
-  content_base = widget_base(self.tlb, /row)
+  content_base = widget_base(self.tlb, /row, uname='content_base')
 
   tree_xsize = 300
   scr_ysize = 512
