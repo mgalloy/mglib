@@ -477,6 +477,10 @@ end
 
 ;+
 ; Create the widget hierarchy.
+;
+; :Params:
+;   _extra : in, optional, type=keywords
+;     keywords to `WIDGET_BASE`
 ;-
 pro mg_fits_browser::create_widgets, _extra=e
   compile_opt strictarr
@@ -586,14 +590,16 @@ end
 ;     filenames of FITS files to view
 ;   tlb : out, optional, type=long
 ;     widget identifier for the top-level base
+;   _extra : in, optional, type=keywords
+;     keywords to `::create_widgets`
 ;-
-function mg_fits_browser::init, filenames=filenames, tlb=tlb
+function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   compile_opt strictarr
 
   self.title = 'FITS Browser'
   self.path = ''
 
-  self->create_widgets
+  self->create_widgets, _extra=e
   self->realize_widgets
   self->start_xmanager
 
