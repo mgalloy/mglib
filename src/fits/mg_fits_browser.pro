@@ -478,10 +478,11 @@ end
 ;+
 ; Create the widget hierarchy.
 ;-
-pro mg_fits_browser::create_widgets
+pro mg_fits_browser::create_widgets, _extra=e
   compile_opt strictarr
 
-  self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb')
+  self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
+                         _extra=e)
 
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
