@@ -338,6 +338,10 @@ pro mg_fits_browser::load_files, filenames
 
   widget_control, self.tree, update=0
   foreach f, filenames do begin
+    if (~file_test(f)) then begin
+      message, 'file not found ' + f, /informational
+      continue
+    endif
     fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0
 
@@ -562,7 +566,7 @@ pro mg_fits_browser::create_widgets, _extra=e
   ; visualization
   image_base = widget_base(tabs, xpad=0, ypad=0, title='Data', /column)
   image_draw = widget_draw(image_base, xsize=scr_ysize, ysize=scr_ysize, $
-                           uname='draw')
+                           uname='draw', retain=2)
 
   ; details column
   details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column)
