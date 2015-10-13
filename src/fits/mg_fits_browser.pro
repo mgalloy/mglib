@@ -329,11 +329,12 @@ end
 pro mg_fits_browser::load_files, filenames
   compile_opt strictarr
 
+  n_files = n_elements(filenames)
   self.nfiles += n_elements(filenames)
 
   self->set_title, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
 
-  self->set_status, string(self.nfiles, self.nfiles eq 1 ? '' : 's', $
+  self->set_status, string(n_files, n_files eq 1 ? '' : 's', $
                            format='(%"Loading %d FITS file%s...")')
 
   widget_control, self.tree, update=0
