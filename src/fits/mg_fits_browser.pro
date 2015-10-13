@@ -205,6 +205,23 @@ pro mg_fits_browser::annotate_image, data, header
 end
 
 
+;+
+; Determine if annotation is avalable for a given image.
+;
+; :Params:
+;   data : in, required, type=2D array
+;     data to display
+;   header : in, required, type=strarr
+;     FITS header
+;-
+function mg_fits_browser::annotate_available, data, header
+  compile_opt strictarr
+
+  return, 0B
+end
+
+
+
 ;= API
 
 ;+
@@ -445,6 +462,9 @@ pro mg_fits_browser::handle_events, event
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
 
+        annotate_button = widget_info(self.tlb, find_by_uname='annotate')
+        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
+
         self->display, data, header
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
@@ -462,6 +482,9 @@ pro mg_fits_browser::handle_events, event
         fits_open, f, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
+
+        annotate_button = widget_info(self.tlb, find_by_uname='annotate')
+        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
 
         self->display, data, header
 
@@ -521,7 +544,8 @@ pro mg_fits_browser::create_widgets, _extra=e
   annotate_button = widget_button(toggle_toolbar, /bitmap, uname='annotate', $
                                   tooltip='Annotate image', $
                                   value=filepath('ellipse.bmp', $
-                                                 subdir=bitmapdir))
+                                                 subdir=bitmapdir), $
+                                  sensitive=0)
 
   ; content row
   content_base = widget_base(self.tlb, /row, uname='content_base')
