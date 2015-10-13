@@ -321,6 +321,10 @@ pro mg_fits_browser::load_files, filenames
 
   widget_control, self.tree, update=0
   foreach f, filenames do begin
+    if (~file_test(f)) then begin
+      message, 'file not found ' + f, /informational
+      continue
+    endif
     fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0
 
