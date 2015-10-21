@@ -339,8 +339,8 @@ pro mg_fits_browser::load_files, filenames
 
   widget_control, self.tree, update=0
   foreach f, filenames do begin
-    if (~file_test(f)) then begin
-      message, 'file not found ' + f, /informational
+    if (~file_test(f, /regular)) then begin
+      message, 'file not found or not regular: ' + f, /informational
       continue
     endif
     fits_open, f, fcb
