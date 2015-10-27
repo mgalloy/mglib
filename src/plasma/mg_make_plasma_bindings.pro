@@ -43,8 +43,6 @@ pro mg_make_plasma_bindings, header_directory=header_directory, $
   dlm->addLibrary, 'libquark.a', $
                    lib_directory=_lib_directory, $
                    /static
-  dlm->addLibrary, 'hwloc', $
-                   lib_directory='/usr/local/lib'
 
   dlm->addRoutinesFromHeaderFile, filepath('mg_plasma_bindings.h', $
                                            root=mg_src_root())
