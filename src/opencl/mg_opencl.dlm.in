@@ -1,0 +1,22 @@
+module       MG_OPENCL
+description  IDL bindings for OpenCL
+version      ${VERSION}
+source       mgalloy
+build_date   ${mglib_BUILD_DATE}
+
+
+#= query
+
+function   mg_cl_platforms                    0   0   keywords
+function   mg_cl_devices                      0   0   keywords
+procedure  mg_cl_help                         0   1   keywords
+
+
+#= initialization
+
+procedure  mg_cl_init                         0   0   keywords
+
+
+#= memory
+
+procedure  mg_cl_free                         1   1   keywords
