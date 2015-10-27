@@ -5,7 +5,7 @@ set(VERSION_PATCH "0")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 # required version of CMake
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1.3)
 cmake_policy(SET CMP0017 NEW)
 if (POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
