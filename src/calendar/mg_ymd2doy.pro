@@ -22,5 +22,5 @@ function mg_ymd2doy, year, month, day
   is_leapyear = (year mod 4 eq 0) and (year mod 100 ne 0) or (year mod 400 eq 0)
   is_leapyear and= month ge 3
 
-  return, d + idays[month - 1] + is_leapyear
+  return, day + idays[month - 1] + is_leapyear
 end
