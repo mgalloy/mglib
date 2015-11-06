@@ -22,5 +22,6 @@ cmake \
   -Didlwave_DIR:PATH=~/software/idlwave \
   -DPLASMA_INCLUDE_DIR:PATH=~/software/plasma/include \
   -DPLASMA_LIBRARY_DIR:PATH=~/software/plasma/lib \
+  -DIDL_ROOT_DIR=/Applications/exelis/idl84 \
   ..
 
