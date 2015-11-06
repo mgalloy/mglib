@@ -520,7 +520,7 @@ end
 ;+
 ; Create the widget hierarchy.
 ;
-; :Params:
+; :Keywords:
 ;   _extra : in, optional, type=keywords
 ;     keywords to `WIDGET_BASE`
 ;-

@@ -10,7 +10,7 @@
 ;   0B or 1B
 ;
 ; :Params:
-;   o : in, required, type=any
+;   h : in, required, type=any
 ;     variable to check
 ;-
 function mg_yaml_dump_ishash, h
@@ -148,7 +148,7 @@ end
 ;     variable to dump
 ;
 ; :Keywords:
-;   from_list : in, optional, type=boolean
+;   tack_on : in, optional, type=boolean
 ;     set to indicate that the current variable is from a list and its first
 ;     item should have a "- " at the end of its indent
 ;   result : in, required, type=list

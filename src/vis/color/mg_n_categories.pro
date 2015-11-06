@@ -8,7 +8,7 @@
 ;   `lonarr`
 ;
 ; :Params:
-;   n : in, requird, type=integer
+;   n : in, required, type=integer
 ;     number of colors required
 ;
 ; :Keywords:
