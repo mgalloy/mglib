@@ -191,7 +191,10 @@ function mgdbmysql::_get_type, field
   on_error, 2
 
   case field.type of
+    1: return, 0B     ; MYSQL_TYPE_TINY1
+    2: return, 0S     ; MYSQL_TYPE_SHORT
     3: return, 0L     ; MYSQL_TYPE_LONG
+    4: return, 0.0    ; MYSQL_TYPE_FLOAT
     8: return, 0ULL   ; MYSQL_TYPE_LONGLONG
     10: return, ''    ; MYSQL_TYPE_DATE
     12: return, ''    ; MYSQL_TYPE_DATETIME
@@ -204,7 +207,7 @@ function mgdbmysql::_get_type, field
       end
     253: return, ''   ; MYSQL_TYPE_VARSTRING
     254: return, ''   ; MYSQL_TYPE_STRING
-    else: message, 'unsupported type'
+    else: message, 'unsupported type: ' + strtrim(field.type, 2)
   endcase
 end
 
@@ -260,7 +263,10 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
     lengths = mg_mysql_fetch_lengths(result)
     for f = 0L, n_fields - 1L do begin
       case size(row_result.(f), /type) of
+        1: query_result[r].(f) = byte(mg_mysql_get_field(row, f))
+        2: query_result[r].(f) = fix(mg_mysql_get_field(row, f))
         3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
+        4: query_result[r].(f) = float(mg_mysql_get_field(row, f))
         5: query_result[r].(f) = double(mg_mysql_get_field(row, f))
         7: query_result[r].(f) = mg_mysql_get_field(row, f)
         10: begin
