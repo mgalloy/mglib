@@ -262,19 +262,20 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
     row = mg_mysql_fetch_row(result)
     lengths = mg_mysql_fetch_lengths(result)
     for f = 0L, n_fields - 1L do begin
+      _result = mg_mysql_get_field(row, f)
       case size(row_result.(f), /type) of
-        1: query_result[r].(f) = byte(mg_mysql_get_field(row, f))
-        2: query_result[r].(f) = fix(mg_mysql_get_field(row, f))
-        3: query_result[r].(f) = long(mg_mysql_get_field(row, f))
-        4: query_result[r].(f) = float(mg_mysql_get_field(row, f))
-        5: query_result[r].(f) = double(mg_mysql_get_field(row, f))
-        7: query_result[r].(f) = mg_mysql_get_field(row, f)
+        1: query_result[r].(f) = byte(fix(_result))
+        2: query_result[r].(f) = fix(_result)
+        3: query_result[r].(f) = long(_result)
+        4: query_result[r].(f) = float(_result)
+        5: query_result[r].(f) = double(_result)
+        7: query_result[r].(f) = _result
         10: begin
             if (lengths[f] gt 0) then begin
               *query_result[r].(f) = mg_mysql_get_blobfield(row, f, lengths[f])
             endif
           end
-        15: query_result[r].(f) = ulong64(mg_mysql_get_field(row, f))
+        15: query_result[r].(f) = ulong64(_result)
       endcase
     endfor
   endfor
