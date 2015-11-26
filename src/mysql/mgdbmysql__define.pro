@@ -565,6 +565,8 @@ pro mgdbmysql::connect, host=host, $
   compile_opt strictarr
   on_error, 2
 
+  self.connected = 0B
+
   if (n_elements(config_filename) gt 0) then begin
     c = mg_read_config(config_filename)
     if (n_elements(config_section) gt 0 && config_section ne '') then begin
@@ -609,13 +611,15 @@ pro mgdbmysql::connect, host=host, $
 
   flags = 0ULL
 
-  self.connection = mg_mysql_real_connect(self.connection, $
-                                          self.host, _user, _password, $
-                                          self.database, $
-                                          _port, _socket, flags)
-  if (self.connection eq 0) then begin
+  tmp = mg_mysql_real_connect(self.connection, $
+                              self.host, _user, _password, $
+                              self.database, $
+                              _port, _socket, flags)
+  if (tmp eq 0UL) then begin
     error_message = self->last_error_message()
     mg_mysql_close, self.connection
+    self.connection = 0UL
+
     if (self.quiet || arg_present(error_message)) then begin
       return
     endif else begin
@@ -738,7 +742,7 @@ end
 pro mgdbmysql::cleanup
   compile_opt strictarr
 
-  if (self.connection ne 0) then begin
+  if (self.connection ne 0UL) then begin
     mg_mysql_close, self.connection
     self.connection = 0UL
     self.connected = 0B
