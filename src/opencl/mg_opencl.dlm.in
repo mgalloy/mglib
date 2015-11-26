@@ -19,4 +19,6 @@ procedure  mg_cl_init                         0   0   keywords
 
 #= memory
 
+function   mg_cl_putvar                       1   1   keywords
+function   mg_cl_getvar                       1   1   keywords
 procedure  mg_cl_free                         1   1   keywords

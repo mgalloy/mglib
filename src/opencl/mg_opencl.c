@@ -13,6 +13,9 @@
 
 #include "mg_hashtable.h"
 
+
+#pragma mark --- header definitions ---
+
 // CL_INIT macro needs to know IDL_cl_init definition
 static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk);
 
@@ -65,6 +68,8 @@ static IDL_MSG_DEF msg_arr[] = {
 };
 
 
+// ===
+
 void mg_cl_release_kernel(void *k) {
   cl_kernel kernel = (cl_kernel) k;
   cl_program program;
@@ -83,6 +88,8 @@ void mg_cl_release_kernel(void *k) {
 }
 
 
+// ===
+
 #pragma mark --- helper macros ---
 
 #define STRINGIFY(text) #text
@@ -98,6 +105,8 @@ void mg_cl_release_kernel(void *k) {
     kw.error->value.l = err;                   \
   }
 
+
+// ===
 
 #pragma mark --- query routines ---
 
@@ -588,6 +597,8 @@ static void IDL_cl_help(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
+// ===
+
 #pragma mark --- initialization ---
 
 static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk) {
@@ -748,7 +759,138 @@ static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
+// ===
+
 #pragma mark --- memory ---
+
+static IDL_VPTR IDL_cl_putvar(int argc, IDL_VPTR *argv, char *argk) {
+  int nargs;
+  cl_int err = 0;
+  cl_mem buffer;
+  IDL_VPTR result;
+  CL_VPTR cl_var;
+
+  IDL_ENSURE_ARRAY(argv[0]);
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  // initialize OpenCL, if needed
+  CL_INIT;
+
+  buffer = clCreateBuffer(current_context,
+                          CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                          IDL_TypeSize[argv[0]->type] * argv[0]->value.arr->n_elts,
+                          argv[0]->value.arr->data,
+                          &err);
+  if (err < 0) {
+    CL_SET_ERROR(err);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(err);
+  }
+
+  cl_var = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
+  cl_var->type = argv[0]->type;
+  cl_var->flags = argv[0]->flags;
+  cl_var->n_elts = argv[0]->value.arr->n_elts;
+  cl_var->n_dim = argv[0]->value.arr->n_dim;
+  memcpy(cl_var->dim, argv[0]->value.arr->dim, sizeof(IDL_ARRAY_DIM));
+  cl_var->buffer = buffer;
+
+  result = IDL_Gettmp();
+  result->type = IDL_TYP_PTRINT;
+  result->value.ptrint = (IDL_PTRINT) cl_var;
+
+  IDL_KW_FREE;
+
+  return result;
+}
+
+static IDL_VPTR IDL_cl_getvar(int argc, IDL_VPTR *argv, char *argk) {
+  int nargs;
+  cl_int err = 0;
+
+  CL_VPTR cl_var = (CL_VPTR) argv[0]->value.ptrint;
+  cl_mem buffer = cl_var->buffer;
+  IDL_LONG type = cl_var->type;
+  size_t n_bytes = cl_var->n_elts * IDL_TypeSize[type];
+  IDL_VPTR result;
+  IDL_ARRAY_DIM dims;
+  UCHAR *data;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  CL_INIT;
+
+  memcpy(dims, cl_var->dim, sizeof(IDL_ARRAY_DIM));
+  data = malloc(n_bytes);
+
+  err = clEnqueueReadBuffer(current_queue,
+                            buffer,
+                            CL_TRUE,         // blocking read?
+                            0,               // offset
+                            n_bytes,
+                            data,
+                            0,               // num_events_in_wait_list
+                            NULL,            // event_wait_list
+                            NULL);           // event
+  if (err < 0) {
+    CL_SET_ERROR(err);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(err);
+  }
+
+  err = clFinish(current_queue);
+  if (err < 0) {
+    CL_SET_ERROR(err);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(err);
+  }
+
+  result = IDL_ImportArray(cl_var->n_dim,
+                           dims,
+                           type,
+                           data,
+                           NULL,
+                           NULL);
+
+  IDL_KW_FREE;
+
+  return result;
+}
 
 static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
   int nargs;
@@ -811,6 +953,8 @@ static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
+// ===
+
 #pragma mark --- Lifecycle ---
 
 
@@ -827,6 +971,8 @@ int IDL_Load(void) {
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { IDL_cl_platforms, "MG_CL_PLATFORMS", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_devices,   "MG_CL_DEVICES",   0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_putvar,    "MG_CL_PUTVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_getvar,    "MG_CL_GETVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
