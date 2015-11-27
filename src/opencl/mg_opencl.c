@@ -596,6 +596,110 @@ static void IDL_cl_help(int argc, IDL_VPTR *argv, char *argk) {
   IDL_KW_FREE;
 }
 
+static IDL_VPTR IDL_cl_size(int argc, IDL_VPTR *argv, char *argk) {
+  int nargs, r;
+  cl_int err = 0;
+  IDL_LONG *result;
+  IDL_MEMINT result_dims;
+  IDL_VPTR result_vptr;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_LONG dimensions;
+    IDL_VPTR error;
+    int error_present;
+    IDL_LONG n_dimensions;
+    IDL_LONG n_elements;
+    IDL_LONG tname;
+    IDL_LONG type;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "DIMENSIONS", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(dimensions) },
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { "N_DIMENSIONS", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(n_dimensions) },
+    { "N_ELEMENTS", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(n_elements) },
+    { "TNAME", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(tname) },
+    { "TYPE", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(type) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  CL_INIT;
+
+  CL_VPTR cl_var = (CL_VPTR) argv[0]->value.ptrint;
+
+  if (kw.dimensions) {
+    IDL_KW_FREE;
+
+    result = (IDL_LONG *) malloc(sizeof(IDL_LONG) * (cl_var->n_dim));
+    for (r = 0; r < cl_var->n_dim; r++) result[r] = cl_var->dim[r];
+    result_dims = cl_var->n_dim;
+    result_vptr = IDL_ImportArray(1,
+                                  &result_dims,
+                                  IDL_TYP_LONG,
+                                  (UCHAR *) result,
+                                  NULL,
+                                  NULL);
+    return result_vptr;
+  }
+
+  if (kw.n_dimensions) {
+    IDL_KW_FREE;
+
+    return IDL_GettmpLong(cl_var->n_dim);
+  }
+
+  if (kw.n_elements) {
+    IDL_KW_FREE;
+
+    return IDL_GettmpLong(cl_var->n_elts);
+  }
+
+  if (kw.tname) {
+    IDL_KW_FREE;
+
+    return IDL_StrToSTRING(IDL_TypeName[cl_var->type]);
+  }
+
+  if (kw.type) {
+    IDL_KW_FREE;
+
+    return IDL_GettmpLong(cl_var->type);
+  }
+
+  IDL_KW_FREE;
+
+  // full result is [n_dimensions, dimensions, type, n_elements]
+
+  result = (IDL_LONG *) malloc(sizeof(IDL_LONG) * (cl_var->n_dim + 3));
+  result[0] = cl_var->n_dim;
+  for (r = 0; r < cl_var->n_dim; r++) result[r + 1] = cl_var->dim[r];
+  result[cl_var->n_dim + 1] = cl_var->type;
+  result[cl_var->n_dim + 2] = cl_var->n_elts;
+  result_dims = cl_var->n_dim + 3;
+  result_vptr = IDL_ImportArray(1,
+                                &result_dims,
+                                IDL_TYP_LONG,
+                                (UCHAR *) result,
+                                NULL,
+                                NULL);
+
+  return result_vptr;
+}
+
 
 // ===
 
@@ -973,6 +1077,7 @@ int IDL_Load(void) {
     { IDL_cl_devices,   "MG_CL_DEVICES",   0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_putvar,    "MG_CL_PUTVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_getvar,    "MG_CL_GETVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_size,      "MG_CL_SIZE",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
