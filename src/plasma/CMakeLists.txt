@@ -9,7 +9,7 @@ else ()
   set(SEP_CHAR ":")
 endif ()
 
-if (PLASMA_FOUND)
+if (PLASMA_FOUND AND IDL_LICENSED)
   if (EXISTS ${PLASMA_INCLUDE_DIR} AND EXISTS ${PLASMA_LIBRARY_DIR})
     add_custom_command(
       OUTPUT mg_plasma.${IDL_PLATFORM_EXT}.${IDL_DLL_EXT}
