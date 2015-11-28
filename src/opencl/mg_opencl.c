@@ -12,14 +12,14 @@
 #endif
 
 #include "mg_hashtable.h"
+#include "mg_cl_kernels.h"
 
 
 #pragma mark --- header definitions ---
 
-char *kernel_location;
 
 // CL_INIT macro needs to know IDL_cl_init definition
-static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk);
+static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk);
 
 
 char *CL_TypeNames[] = { "",
@@ -141,37 +141,10 @@ void mg_cl_release_kernel(void *k) {
 }
 
 
-static void mg_cl_set_kernel_location(char *kernel_loc) {
-  kernel_location = (char *) malloc(strlen(kernel_loc) + 1);
-  sprintf(kernel_location, "%s", kernel_loc);
-  kernel_location[strlen(kernel_loc)] = '\0';
-}
-
-
-static char *mg_cl_kernel_filename(char *basename) {
-  int len = strlen(basename) + 1;
-  char *filename;
-
-  if (kernel_location) {
-    len += strlen(kernel_location) + 1;
-    filename = (char *) malloc(len);
-    sprintf(filename, "%s/%s", kernel_location, basename);
-  } else {
-    filename = (char *) malloc(len);
-    sprintf(filename, "%s", basename);
-  }
-
-  filename[len - 1] = '\0';
-  return(filename);
-}
-
-
-static char *mg_cl_read_program(char *basename, size_t *program_size) {
+static char *mg_cl_read_program(char *filename, size_t *program_size) {
   FILE *program_handle;
   char *program_buffer;
   int err = 0;
-
-  char *filename = mg_cl_kernel_filename(basename);
 
   if ((program_handle = fopen(filename, "r"))) {
     err = fseek(program_handle, 0, SEEK_END);
@@ -201,7 +174,7 @@ static char *mg_cl_read_program(char *basename, size_t *program_size) {
 
 #define CL_INIT                   \
   if (!current_context) {         \
-    IDL_cl_initialize(0, NULL, NULL);   \
+    IDL_cl_init(0, NULL, NULL);   \
   }
 
 #define CL_CHECK_BUILD                                                       \
@@ -821,7 +794,7 @@ static IDL_VPTR IDL_cl_size(int argc, IDL_VPTR *argv, char *argk) {
 
 #pragma mark --- initialization ---
 
-static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk) {
+static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk) {
   int nargs;
   cl_int err = 0;
 
@@ -853,8 +826,6 @@ static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk) {
       IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
     { "GPU", IDL_TYP_LONG, 1, IDL_KW_ZERO,
       0, IDL_KW_OFFSETOF(gpu) },
-    { "KERNEL_LOCATION", IDL_TYP_STRING, 1, IDL_KW_VIN,
-      IDL_KW_OFFSETOF(kernel_loc_present), IDL_KW_OFFSETOF(kernel_loc) },
     { "PLATFORM", IDL_TYP_UNDEF, 1, IDL_KW_VIN,
       IDL_KW_OFFSETOF(platform_present), IDL_KW_OFFSETOF(platform) },
     { NULL }
@@ -866,9 +837,6 @@ static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk) {
   // initialize error
   CL_SET_ERROR(err);
 
-  if (kw.kernel_loc_present) {
-    mg_cl_set_kernel_location(IDL_VarGetString(kw.kernel_loc));
-  }
   if (kw.platform_present) {
     platform_index = kw.platform->value.l;
   } else {
@@ -1263,12 +1231,7 @@ static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR ty
     kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
 
     if (!kernel) {
-      program_buffer = mg_cl_read_program("array_init.cl", &program_size);
-      if (!program_buffer) {
-        CL_SET_ERROR(-100);
-        IDL_KW_FREE;
-        return IDL_GettmpLong(0);
-      }
+      program_buffer = array_init;
 
       program = clCreateProgramWithSource(current_context,
                                           1,
@@ -1277,12 +1240,10 @@ static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR ty
                                           &err);
       if (err < 0) {
         CL_SET_ERROR(err);
-        free(program_buffer);
         IDL_KW_FREE;
         return IDL_GettmpLong(err);
       }
 
-      free(program_buffer);
       sprintf(options, "-DTYPE=\"%s\" -DCOMMAND=\"%s\"", CL_TypeNames[type], CL_ArrayInitCommands[type]);
       err = clBuildProgram(program, 1, &current_device, options, NULL, NULL);
       if (err < 0) {
@@ -1416,7 +1377,7 @@ int IDL_Load(void) {
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     // initialization
-    { (IDL_SYSRTN_GENERIC) IDL_cl_initialize, "MG_CL_INITIALIZE", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { (IDL_SYSRTN_GENERIC) IDL_cl_init, "MG_CL_INIT", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // query
     { (IDL_SYSRTN_GENERIC) IDL_cl_help, "MG_CL_HELP", 0, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
@@ -1431,15 +1392,10 @@ int IDL_Load(void) {
 
   IDL_ExitRegister(mg_cl_exit_handler);
 
-  kernel_location_env = getenv("MG_CL_KERNEL_LOCATION");
-  if (kernel_location_env != NULL) {
-    mg_cl_set_kernel_location(kernel_location_env);
-  }
-
   kernel_table = mg_table_new(0);
 
   // default initialization
-  IDL_cl_initialize(0, NULL, NULL);
+  IDL_cl_init(0, NULL, NULL);
 
   return IDL_SysRtnAdd(procedure_addr, FALSE, IDL_CARRAY_ELTS(procedure_addr))
          && IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));
