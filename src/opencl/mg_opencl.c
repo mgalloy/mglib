@@ -1232,6 +1232,7 @@ static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR ty
 
     if (!kernel) {
       program_buffer = array_init;
+      program_size = strlen(array_init);
 
       program = clCreateProgramWithSource(current_context,
                                           1,
@@ -1337,6 +1338,347 @@ CL_ARRAY_INIT(ulon64arr,    15);
 
 // ===
 
+#pragma mark --- custom kernels ---
+
+static IDL_VPTR IDL_cl_compile(int argc, IDL_VPTR *argv, char *argk) {
+  int nargs, slen;
+  cl_int err = 0;
+
+  char *program_buffer;
+  char *full_program_buffer;
+  cl_program program;
+  size_t program_size;
+  cl_kernel kernel;
+  char *kernel_name;
+  char *vars;
+  CL_KERNEL *kernel_struct;
+
+  IDL_VPTR result;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+    IDL_LONG simple;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { "SIMPLE", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(simple) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  CL_INIT;
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  IDL_ENSURE_STRING(argv[0]);
+  IDL_ENSURE_ARRAY(argv[1]);
+  IDL_ENSURE_STRING(argv[1]);
+  IDL_ENSURE_ARRAY(argv[2]);
+
+  if (!kw.simple) {
+    IDL_ENSURE_STRING(argv[3]);
+  }
+
+  if (nargs < 3) {
+    IDL_KW_FREE;
+    IDL_MessageFromBlock(msg_block, OPENCL_INCORRECT_N_PARAMS, IDL_MSG_RET);
+    return IDL_GettmpLong(err);
+  }
+
+  if (kw.simple) {
+    int n_params = argv[2]->value.arr->n_elts;
+    char *param_types = (char *) malloc(2 * n_params + 1);
+    char type_code[3];
+    param_types[2 * n_params] = '\0';
+
+    for (int p = 0; p < n_params; p++) {
+      sprintf(type_code,
+              "%02d",
+              ((IDL_LONG *) argv[2]->value.arr->data)[p]);
+      param_types[2 * p] = type_code[0];
+      param_types[2 * p + 1] = type_code[1];
+    }
+
+    slen = 14 + argv[0]->value.str.slen + 2 * n_params + 1;
+    kernel_name = (char *) malloc(slen + 1);
+
+    sprintf(kernel_name,
+            "custom_simple_%s%s",
+            param_types,
+            IDL_VarGetString(argv[0]));
+
+    kernel_name[slen] = '\0';
+  } else {
+    slen = 12 + argv[0]->value.str.slen + 1;
+    kernel_name = (char *) malloc(slen + 1);
+    sprintf(kernel_name,
+            "custom_full_%s",
+            IDL_VarGetString(argv[0]));
+    kernel_name[slen] = '\0';
+  }
+  printf("kernel_name: %s\n", kernel_name);
+
+  kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
+  if (!kernel) {
+    if (kw.simple) {
+      int n_params = argv[1]->value.arr->n_elts;
+      int p, names_len = 0, types_len = 0, vars_pos = 0;
+      for (p = 0; p < n_params; p++) {
+        names_len += ((IDL_STRING *) argv[1]->value.arr->data)[p].slen;
+        types_len += strlen(CL_TypeNames[((IDL_LONG *) argv[2]->value.arr->data)[p]]);
+      }
+
+      program_buffer = custom_simple;
+      program_size = strlen(custom_simple);
+
+      vars = (char *) malloc(13 * n_params + names_len + types_len + 1);
+      vars[13 * n_params + names_len + types_len] = '\0';
+      vars_pos = 0;
+      for (p = 0; p < n_params; p++) {
+        sprintf(vars + vars_pos,
+                "__global %s *%s, ",
+                CL_TypeNames[((IDL_LONG *) argv[2]->value.arr->data)[p]],
+                ((IDL_STRING *) argv[1]->value.arr->data)[p].s);
+        vars_pos += strlen(CL_TypeNames[((IDL_LONG *) argv[2]->value.arr->data)[p]])
+          + ((IDL_STRING *) argv[1]->value.arr->data)[p].slen + 13;
+      }
+
+      program_size = strlen(program_buffer) - 4 + strlen(vars) + strlen(IDL_VarGetString(argv[0]));
+      full_program_buffer = (char *) malloc(program_size + 1);
+      sprintf(full_program_buffer, program_buffer, vars, IDL_VarGetString(argv[0]));
+      full_program_buffer[program_size] = '\0';
+
+      free(vars);
+    } else {
+      program_size = strlen(IDL_VarGetString(argv[0]));
+      full_program_buffer = (char *) malloc(program_size + 1);
+      sprintf(full_program_buffer, "%s", IDL_VarGetString(argv[0]));
+      full_program_buffer[program_size] = '\0';
+    }
+
+    program = clCreateProgramWithSource(current_context,
+                                        1,
+                                        (const char**) &full_program_buffer,
+                                        &program_size,
+                                        &err);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    free(full_program_buffer);
+
+    err = clBuildProgram(program, 0, NULL, "", NULL, NULL);
+    if (err < 0) {
+      CL_CHECK_BUILD;
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    kernel = clCreateKernel(program,
+                            kw.simple ? "custom_simple" : IDL_VarGetString(argv[3]),
+                            &err);
+    if (err < 0) {
+      printf("clCreateKernel error\n");
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    mg_table_put(kernel_table, kernel_name, (void *) kernel);
+  }
+
+  IDL_KW_FREE;
+
+  kernel_struct = (CL_KERNEL *) malloc(sizeof(CL_KERNEL));
+  kernel_struct->simple = kw.simple ? 1 : 0;
+  kernel_struct->expr = (char *) malloc(strlen(IDL_VarGetString(argv[0])) + 1);
+  sprintf(kernel_struct->expr, "%s", IDL_VarGetString(argv[0]));
+  kernel_struct->expr[strlen(IDL_VarGetString(argv[0]))] = '\0';
+  kernel_struct->kernel = kernel;
+
+  result = IDL_Gettmp();
+  result->type = IDL_TYP_PTRINT;
+  result->value.ptrint = (IDL_PTRINT) kernel_struct;
+
+  return result;
+}
+
+
+static IDL_VPTR IDL_cl_execute(int argc, IDL_VPTR *argv, char *argk, char *op) {
+  int nargs, slen, n, i;
+  cl_int err = 0;
+
+  CL_KERNEL *kernel_struct;
+  cl_kernel kernel;
+  size_t local_size, global_size;
+  IDL_VPTR param;
+  IDL_VPTR result;
+  IDL_MEMINT offset;
+  CL_VPTR cl_param;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  IDL_ENSURE_STRUCTURE(argv[1]);
+
+  CL_INIT;
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  kernel_struct = (CL_KERNEL *) argv[0]->value.ptrint;
+  kernel = kernel_struct->kernel;
+
+  if (kernel_struct->simple) {
+    for (i = 0; i < IDL_StructNumTags(argv[1]->value.s.sdef); i++) {
+      offset = IDL_StructTagInfoByIndex(argv[1]->value.s.sdef, i, i, &param);
+      if (param->type != IDL_TYP_PTRINT) {
+        CL_SET_ERROR(-1);
+        IDL_MessageFromBlock(msg_block, OPENCL_INCORRECT_PARAM_TYPE, IDL_MSG_RET);
+        return IDL_GettmpLong(-1);
+      }
+
+      cl_param = (CL_VPTR) (((IDL_PTRINT *) (argv[1]->value.s.arr->data + offset))[0]);
+      n = cl_param->n_elts;
+      err = clSetKernelArg(kernel, i, sizeof(cl_mem), &(cl_param->buffer));
+      if (err < 0) {
+        CL_SET_ERROR(err);
+        IDL_KW_FREE;
+        return IDL_GettmpLong(err);
+      }
+
+    }
+
+    err = clSetKernelArg(kernel, i, sizeof(unsigned int), &n);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    local_size = 64;
+    global_size = ceil(n / (float) local_size) * local_size;
+
+    err = clEnqueueNDRangeKernel(current_queue,
+                                 kernel,
+                                 1,
+                                 NULL,
+                                 &global_size,
+                                 &local_size,
+                                 0,
+                                 NULL,
+                                 NULL);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+  } else {
+    for (i = 0; i < IDL_StructNumTags(argv[1]->value.s.sdef); i++) {
+      offset = IDL_StructTagInfoByIndex(argv[1]->value.s.sdef, i, 0, &param);
+      switch(param->type) {
+        case IDL_TYP_PTRINT:
+          cl_param = (CL_VPTR) (((IDL_PTRINT *) (argv[1]->value.s.arr->data + offset))[0]);
+          n = cl_param->n_elts;
+          err = clSetKernelArg(kernel, i, sizeof(cl_mem), &(cl_param->buffer));
+          break;
+        case IDL_TYP_BYTE:
+          err = clSetKernelArg(kernel, i, sizeof(char), (char *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_INT:
+          err = clSetKernelArg(kernel, i, sizeof(short int), (short int *) (argv[1]->value.s.arr->data + offset));
+          break;
+#if IDL_TYP_PTRINT != IDL_TYP_LONG
+        case IDL_TYP_LONG:
+          err = clSetKernelArg(kernel, i, sizeof(int), (int *) (argv[1]->value.s.arr->data + offset));
+          break;
+#endif
+        case IDL_TYP_FLOAT:
+          err = clSetKernelArg(kernel, i, sizeof(float), (float *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_DOUBLE:
+          err = clSetKernelArg(kernel, i, sizeof(double), (double *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_COMPLEX:
+          err = clSetKernelArg(kernel, i, sizeof(IDL_COMPLEX), (IDL_COMPLEX *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_DCOMPLEX:
+          err = clSetKernelArg(kernel, i, sizeof(IDL_DCOMPLEX), (IDL_DCOMPLEX *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_UINT:
+          err = clSetKernelArg(kernel, i, sizeof(unsigned short int), (unsigned short int *) (argv[1]->value.s.arr->data + offset));
+          break;
+        case IDL_TYP_ULONG:
+          err = clSetKernelArg(kernel, i, sizeof(unsigned int), (unsigned int *) (argv[1]->value.s.arr->data + offset));
+          break;
+#if IDL_TYP_PTRINT != IDL_TYP_LONG64
+        case IDL_TYP_LONG64:
+          err = clSetKernelArg(kernel, i, sizeof(long), (long *) (argv[1]->value.s.arr->data + offset));
+          break;
+#endif
+        case IDL_TYP_ULONG64:
+          err = clSetKernelArg(kernel, i, sizeof(unsigned long), (unsigned long *) (argv[1]->value.s.arr->data + offset));
+          break;
+      }
+      if (err < 0) {
+        CL_SET_ERROR(err);
+        IDL_KW_FREE;
+        return IDL_GettmpLong(err);
+      }
+    }
+
+    local_size = 64;
+    global_size = ceil(n / (float) local_size) * local_size;
+
+    err = clEnqueueNDRangeKernel(current_queue,
+                                 kernel,
+                                 1,
+                                 NULL,
+                                 &global_size,
+                                 &local_size,
+                                 0,
+                                 NULL,
+                                 NULL);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+  }
+
+  IDL_KW_FREE;
+
+  return(IDL_GettmpLong(0));
+}
+
+
+// ===
+
 #pragma mark --- Lifecycle ---
 
 
@@ -1373,6 +1715,10 @@ int IDL_Load(void) {
     { IDL_cl_ulonarr,     "MG_CL_ULONARR",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_lon64arr,    "MG_CL_LON64ARR",    1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_ulon64arr,   "MG_CL_ULON64ARR",   1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // custom kernels
+    { IDL_cl_compile,     "MG_CL_COMPILE",     3, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_execute,     "MG_CL_EXECUTE",     2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
