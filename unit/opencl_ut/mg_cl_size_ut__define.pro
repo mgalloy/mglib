@@ -59,7 +59,7 @@ function mg_cl_size_ut::test_2d
 end
 
 
-function mg_cl_size_ut::test_2d
+function mg_cl_size_ut::test_3d
   compile_opt strictarr
 
   x = findgen(5, 3, 4)

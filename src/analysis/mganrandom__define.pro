@@ -121,9 +121,7 @@ function mganrandom::getIntegers, n, minimum=minimum, maximum=maximum, $
   compile_opt strictarr
   on_error, 2
 
-  if (n_elements(n) eq 0) then begin
-    message, 'n parameter required'
-  endif
+  if (n_elements(n) eq 0) then message, 'n parameter required'
 
   _minimum = n_elements(minimum) eq 0 ? 0 : minimum
   _maximum = n_elements(maximum) eq 0 ? 100 : maximum
@@ -161,9 +159,7 @@ function mganrandom::getGaussians, n, mean=mean, stddev=stddev, error=error
   compile_opt strictarr
   on_error, 2
 
-  if (n_elements(n) eq 0) then begin
-    message, 'n parameter required'
-  endif
+  if (n_elements(n) eq 0) then message, 'n parameter required'
 
   _mean = n_elements(mean) eq 0 ? 0. : mean
   _stddev = n_elements(stddev) eq 0 ? 1. : stddev
