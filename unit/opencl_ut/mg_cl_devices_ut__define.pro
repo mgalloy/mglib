@@ -1,5 +1,24 @@
 ; docformat = 'rst'
 
+function mg_cl_devices_ut::test_current
+  compile_opt strictarr
+
+  p = mg_cl_devices(/current)
+
+  return, 1
+end
+
+
+function mg_cl_devices_ut::test_error
+  compile_opt strictarr
+
+  p = mg_cl_devices(error=err)
+
+  assert, size(err, /type) eq 3, 'incorrect type for ERROR: %d', size(err, /type)
+
+  return, 1
+end
+
 
 function mg_cl_devices_ut::test_count
   compile_opt strictarr
