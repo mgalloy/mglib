@@ -32,6 +32,8 @@ if (OpenCL_INCLUDE_DIRS AND OpenCL_LIBRARIES)
 
     file(GLOB PRO_FILES "*.pro")
     install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
+    file(GLOB CL_FILES "*.cl")
+    install(FILES ${CL_FILES} DESTINATION lib/${DIRNAME})
     install(FILES .idldoc DESTINATION lib/${DIRNAME})
   else ()
     message(WARNING "OpenCL library specified, but does not exist")

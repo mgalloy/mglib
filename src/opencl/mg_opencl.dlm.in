@@ -5,6 +5,11 @@ source       mgalloy
 build_date   ${mglib_BUILD_DATE}
 
 
+#= initialization
+
+procedure  mg_cl_init                         0   0   keywords
+
+
 #= query
 
 function   mg_cl_platforms                    0   0   keywords
@@ -12,13 +17,24 @@ function   mg_cl_devices                      0   0   keywords
 procedure  mg_cl_help                         0   1   keywords
 function   mg_cl_size                         1   1   keywords
 
-#= initialization
-
-procedure  mg_cl_init                         0   0   keywords
-
 
 #= memory
 
 function   mg_cl_putvar                       1   1   keywords
 function   mg_cl_getvar                       1   1   keywords
 procedure  mg_cl_free                         1   1   keywords
+
+
+#= array initialization
+
+function   mg_cl_bytarr                       1   8   keywords
+function   mg_cl_intarr                       1   8   keywords
+function   mg_cl_lonarr                       1   8   keywords
+function   mg_cl_fltarr                       1   8   keywords
+function   mg_cl_dblarr                       1   8   keywords
+function   mg_cl_complexarr                   1   8   keywords
+function   mg_cl_dcomplexarr                  1   8   keywords
+function   mg_cl_uintarr                      1   8   keywords
+function   mg_cl_ulonarr                      1   8   keywords
+function   mg_cl_lon64arr                     1   8   keywords
+function   mg_cl_ulon64arr                    1   8   keywords

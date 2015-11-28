@@ -16,9 +16,62 @@
 
 #pragma mark --- header definitions ---
 
+char *kernel_location;
+
 // CL_INIT macro needs to know IDL_cl_init definition
 static void IDL_cl_init(int argc, IDL_VPTR *argv, char *argk);
 
+
+char *CL_TypeNames[] = { "",
+                         "uchar",
+                         "short",
+                         "int",
+                         "float",
+                         "double",
+                         "float2",
+                         "char *",
+                         "",
+                         "double2",
+                         "",
+                         "",
+                         "ushort",
+                         "uint",
+                         "long",
+                         "ulong" };
+
+char *CL_ArrayIndexCommands[] = { "",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i].x=i;result[i].y=0.0f;",
+                                  "",
+                                  "",
+                                  "result[i].x=i;result[i].y=0.0;",
+                                  "",
+                                  "",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i]=i;",
+                                  "result[i]=i;" };
+
+char *CL_ArrayInitCommands[] = { "",
+                                 "result[i]=0;",
+                                 "result[i]=0;",
+                                 "result[i]=0;",
+                                 "result[i]=0.0f;",
+                                 "result[i]=0.0;",
+                                 "result[i].x=0.0f;result[i].y=0.0f;",
+                                 "",
+                                 "",
+                                 "result[i].x=0.0;result[i].y=0.0;",
+                                 "",
+                                 "",
+                                 "result[i]=0;",
+                                 "result[i]=0;",
+                                 "result[i]=0;",
+                                 "result[i]=0;" };
 
 // CL_VARIABLE flags
 #define CL_V_VIEW 128
@@ -88,6 +141,46 @@ void mg_cl_release_kernel(void *k) {
 }
 
 
+static void mg_cl_set_kernel_location(char *kernel_loc) {
+  kernel_location = (char *) malloc(strlen(kernel_loc) + 1);
+  sprintf(kernel_location, "%s", kernel_loc);
+  kernel_location[strlen(kernel_loc)] = '\0';
+}
+
+
+static char *mg_cl_kernel_filename(char *basename) {
+  int len = strlen(kernel_location) + 1 + strlen(basename) + 1;
+  char *filename = (char *) malloc(len);
+  sprintf(filename, "%s/%s", kernel_location, basename);
+  filename[len - 1] = '\0';
+  return(filename);
+}
+
+
+static char *mg_cl_read_program(char *basename, size_t *program_size) {
+  FILE *program_handle;
+  char *program_buffer;
+  int err = 0;
+
+  char *filename = mg_cl_kernel_filename(basename);
+
+  program_handle = fopen(filename, "r");
+
+  err = fseek(program_handle, 0, SEEK_END);
+  *program_size = ftell(program_handle);
+  rewind(program_handle);
+
+  program_buffer = (char *) malloc(*program_size + 1);
+  fread(program_buffer, sizeof(char), *program_size, program_handle);
+  program_buffer[*program_size] = '\0';
+
+  fclose(program_handle);
+  free(filename);
+
+  return program_buffer;
+}
+
+
 // ===
 
 #pragma mark --- helper macros ---
@@ -99,6 +192,17 @@ void mg_cl_release_kernel(void *k) {
     IDL_cl_init(0, NULL, NULL);   \
   }
 
+#define CL_CHECK_BUILD                                                       \
+  size_t log_size;                                                           \
+  char *program_log;                                                         \
+  err = clGetProgramBuildInfo(program, current_device, CL_PROGRAM_BUILD_LOG, \
+                              0, NULL, &log_size);                           \
+  program_log = (char *) calloc(log_size + 1, sizeof(char));                 \
+  err = clGetProgramBuildInfo(program, current_device, CL_PROGRAM_BUILD_LOG, \
+                              log_size + 1, program_log, NULL);              \
+  printf("%s\n", program_log);                                               \
+  free(program_log);
+
 #define CL_SET_ERROR(err)                      \
   if (kw.error_present) {                      \
     kw.error->type = IDL_TYP_LONG;             \
@@ -108,7 +212,7 @@ void mg_cl_release_kernel(void *k) {
 
 // ===
 
-#pragma mark --- query routines ---
+#pragma mark --- query ---
 
 static IDL_VPTR IDL_cl_platforms(int argc, IDL_VPTR *argv, char *argk) {
   int nargs;
@@ -1059,6 +1163,185 @@ static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
 
 // ===
 
+#pragma mark --- array initialization ---
+
+static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR type) {
+  int nargs, n, d, n_elts, slen, i;
+  cl_int err = 0;
+  cl_mem buffer;
+  IDL_VPTR result;
+  IDL_VPTR idl_dimsize;
+  CL_VPTR cl_var;
+
+  char *program_buffer;
+  cl_program program;
+  char options[80];
+  size_t program_size, global_size, local_size;
+  cl_kernel kernel;
+  char *kernel_name;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+    IDL_LONG nozero;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(nozero) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // initialize error
+  CL_SET_ERROR(err);
+
+  CL_INIT;
+
+  n = 1;
+  for (i = 0; i < nargs; i++) {
+    idl_dimsize = IDL_CvtULng(1, &argv[i]);
+    n *= idl_dimsize->value.ul;
+    IDL_Deltmp(idl_dimsize);
+  }
+
+  local_size = 64;
+  global_size = ceil(n / (float) local_size) * local_size;
+
+  buffer = clCreateBuffer(current_context,
+                          CL_MEM_READ_WRITE,
+                          IDL_TypeSize[type] * n,
+                          NULL,
+                          &err);
+  if (err < 0) {
+    CL_SET_ERROR(err);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(err);
+  }
+
+  // initialize to zeros, unless NOZERO set
+  if (!kw.nozero) {
+    slen = 11 + strlen(CL_TypeNames[type]);
+    kernel_name = (char *) malloc(slen + 1);
+    sprintf(kernel_name, "array_init_%s", CL_TypeNames[type]);
+    kernel_name[slen] = '\0';
+
+    kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
+
+    if (!kernel) {
+      program_buffer = mg_cl_read_program("array_init.cl", &program_size);
+      program = clCreateProgramWithSource(current_context,
+                                          1,
+                                          (const char**) &program_buffer,
+                                          &program_size,
+                                          &err);
+      if (err < 0) {
+        CL_SET_ERROR(err);
+        free(program_buffer);
+        IDL_KW_FREE;
+        return IDL_GettmpLong(err);
+      }
+
+      free(program_buffer);
+      sprintf(options, "-DTYPE=\"%s\" -DCOMMAND=\"%s\"", CL_TypeNames[type], CL_ArrayInitCommands[type]);
+      err = clBuildProgram(program, 1, &current_device, options, NULL, NULL);
+      if (err < 0) {
+        CL_CHECK_BUILD;
+        CL_SET_ERROR(err);
+        IDL_KW_FREE;
+        return IDL_GettmpLong(err);
+      }
+
+      kernel = clCreateKernel(program, "array_init", &err);
+      if (err < 0) {
+        CL_SET_ERROR(err);
+        IDL_KW_FREE;
+        return IDL_GettmpLong(err);
+      }
+
+      mg_table_put(kernel_table, kernel_name, (void *) kernel);
+    }
+
+    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer);
+    err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &n);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    err = clEnqueueNDRangeKernel(current_queue,
+                                 kernel,
+                                 1,
+                                 NULL,
+                                 &global_size,
+                                 &local_size,
+                                 0,
+                                 NULL,
+                                 NULL);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+
+    err = clFinish(current_queue);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(err);
+    }
+  }
+
+  cl_var = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
+  cl_var->type = type;
+  cl_var->flags = IDL_V_ARR | IDL_V_DYNAMIC;
+  cl_var->n_dim = nargs;
+  n_elts = 1;
+  for (d = 0; d < nargs; d++) {
+    cl_var->dim[d] = argv[d]->value.l;
+    n_elts *= argv[d]->value.l;
+  }
+  cl_var->n_elts = n_elts;
+  cl_var->buffer = buffer;
+
+  result = IDL_Gettmp();
+  result->type = IDL_TYP_PTRINT;
+  result->value.ptrint = (IDL_PTRINT) cl_var;
+
+  IDL_KW_FREE;
+
+  return result;
+}
+
+
+#define CL_ARRAY_INIT(NAME, TYPE_CODE)                                    \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {     \
+  return IDL_cl_array_init(argc, argv, argk, TYPE_CODE);                  \
+}
+
+
+CL_ARRAY_INIT(bytarr,        1);
+CL_ARRAY_INIT(intarr,        2);
+CL_ARRAY_INIT(lonarr,        3);
+CL_ARRAY_INIT(fltarr,        4);
+CL_ARRAY_INIT(dblarr,        5);
+CL_ARRAY_INIT(complexarr,    6);
+CL_ARRAY_INIT(dcomplexarr,   9);
+CL_ARRAY_INIT(uintarr,      12);
+CL_ARRAY_INIT(ulonarr,      13);
+CL_ARRAY_INIT(lon64arr,     14);
+CL_ARRAY_INIT(ulon64arr,    15);
+
+
+// ===
+
 #pragma mark --- Lifecycle ---
 
 
@@ -1073,16 +1356,37 @@ static void mg_cl_exit_handler(void) {
 
 int IDL_Load(void) {
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { IDL_cl_platforms, "MG_CL_PLATFORMS", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_cl_devices,   "MG_CL_DEVICES",   0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_cl_putvar,    "MG_CL_PUTVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_cl_getvar,    "MG_CL_GETVAR",    1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    { IDL_cl_size,      "MG_CL_SIZE",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // query
+    { IDL_cl_platforms,   "MG_CL_PLATFORMS",   0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_devices,     "MG_CL_DEVICES",     0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_size,        "MG_CL_SIZE",        1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // memory
+    { IDL_cl_putvar,      "MG_CL_PUTVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_getvar,      "MG_CL_GETVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // array initialization
+    { IDL_cl_bytarr,      "MG_CL_BYTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_intarr,      "MG_CL_INTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_lonarr,      "MG_CL_LONARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_fltarr,      "MG_CL_FLTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_dblarr,      "MG_CL_DBLARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_complexarr,  "MG_CL_COMPLEXARR",  1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_dcomplexarr, "MG_CL_DCOMPLEXARR", 1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_uintarr,     "MG_CL_UINTARR",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ulonarr,     "MG_CL_ULONARR",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_lon64arr,    "MG_CL_LON64ARR",    1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ulon64arr,   "MG_CL_ULON64ARR",   1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
+    // initialization
     { (IDL_SYSRTN_GENERIC) IDL_cl_init, "MG_CL_INIT", 0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // query
     { (IDL_SYSRTN_GENERIC) IDL_cl_help, "MG_CL_HELP", 0, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // memory
     { (IDL_SYSRTN_GENERIC) IDL_cl_free, "MG_CL_FREE", 1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
@@ -1093,6 +1397,9 @@ int IDL_Load(void) {
   IDL_ExitRegister(mg_cl_exit_handler);
 
   kernel_table = mg_table_new(0);
+
+  // TODO: this needs to be set dynamically
+  mg_cl_set_kernel_location("/Users/mgalloy/software/mglib/lib/opencl");
 
   // default initialization
   IDL_cl_init(0, NULL, NULL);
