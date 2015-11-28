@@ -292,6 +292,8 @@ end
 ; :Params:
 ;   config_filename : in, optional, type=string, default=~/.mysqldb
 ;     configuration file with login information for database
+;
+; :Keywords:
 ;   section : in, optional, type=string
 ;     section of the configuration file to use; defaults to the first
 ;     section
