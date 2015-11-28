@@ -82,5 +82,10 @@ function mg_cl_error_message, code
               'CL_INVALID_PROPERTY'])[- code]
   endif
 
+  if (code le - 100L) then begin
+    code += 100L
+    return, (['MG_CL_KERNEL_LOCATION_NOT_SET'])[- code]
+  endif
+
   return, string(code, format='(%"unknown error code (%d)")')
 end

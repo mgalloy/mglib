@@ -7,7 +7,7 @@ build_date   ${mglib_BUILD_DATE}
 
 #= initialization
 
-procedure  mg_cl_init                         0   0   keywords
+procedure  mg_cl_initialize                   0   0   keywords
 
 
 #= query
