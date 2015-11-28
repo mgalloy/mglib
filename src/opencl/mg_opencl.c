@@ -873,7 +873,7 @@ static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk) {
     platform_index = kw.platform->value.l;
   } else {
     char *platform_index_env;
-    platform_index_env = getenv("CL_DEFAULT_PLATFORM");
+    platform_index_env = getenv("MG_CL_DEFAULT_PLATFORM");
     if (platform_index_env != NULL) {
       platform_index = atoi(platform_index_env);
     }
@@ -882,7 +882,7 @@ static void IDL_cl_initialize(int argc, IDL_VPTR *argv, char *argk) {
     device_index = kw.device->value.l;
   } else {
     char *device_index_env;
-    device_index_env = getenv("CL_DEFAULT_DEVICE");
+    device_index_env = getenv("MG_CL_DEFAULT_DEVICE");
     if (device_index_env != NULL) {
       device_index = atoi(device_index_env);
     }
@@ -1053,9 +1053,9 @@ static IDL_VPTR IDL_cl_getvar(int argc, IDL_VPTR *argv, char *argk) {
   cl_int err = 0;
 
   CL_VPTR cl_var = (CL_VPTR) argv[0]->value.ptrint;
-  cl_mem buffer = cl_var->buffer;
-  IDL_LONG type = cl_var->type;
-  size_t n_bytes = cl_var->n_elts * IDL_TypeSize[type];
+  cl_mem buffer;
+  IDL_LONG type;
+  size_t n_bytes;
   IDL_VPTR result;
   IDL_ARRAY_DIM dims;
   UCHAR *data;
@@ -1078,6 +1078,16 @@ static IDL_VPTR IDL_cl_getvar(int argc, IDL_VPTR *argv, char *argk) {
 
   // initialize error
   CL_SET_ERROR(err);
+
+  if (!cl_var) {
+    CL_SET_ERROR(-101);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(0);
+  }
+
+  buffer = cl_var->buffer;
+  type = cl_var->type;
+  n_bytes = cl_var->n_elts * IDL_TypeSize[type];
 
   CL_INIT;
 
@@ -1379,6 +1389,7 @@ static void mg_cl_exit_handler(void) {
 
 
 int IDL_Load(void) {
+  char *kernel_location_env;
   static IDL_SYSFUN_DEF2 function_addr[] = {
     // query
     { IDL_cl_platforms,   "MG_CL_PLATFORMS",   0, 0, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
@@ -1419,6 +1430,11 @@ int IDL_Load(void) {
   }
 
   IDL_ExitRegister(mg_cl_exit_handler);
+
+  kernel_location_env = getenv("MG_CL_KERNEL_LOCATION");
+  if (kernel_location_env != NULL) {
+    mg_cl_set_kernel_location(kernel_location_env);
+  }
 
   kernel_table = mg_table_new(0);
 
