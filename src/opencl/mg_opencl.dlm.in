@@ -39,6 +39,18 @@ function   mg_cl_ulonarr                      1   8   keywords
 function   mg_cl_lon64arr                     1   8   keywords
 function   mg_cl_ulon64arr                    1   8   keywords
 
+function   mg_cl_bindgen                      1   8   keywords
+function   mg_cl_indgen                       1   8   keywords
+function   mg_cl_lindgen                      1   8   keywords
+function   mg_cl_findgen                      1   8   keywords
+function   mg_cl_dindgen                      1   8   keywords
+function   mg_cl_cindgen                      1   8   keywords
+function   mg_cl_dcindgen                     1   8   keywords
+function   mg_cl_uindgen                      1   8   keywords
+function   mg_cl_ulindgen                     1   8   keywords
+function   mg_cl_l64indgen                    1   8   keywords
+function   mg_cl_ul64indgen                   1   8   keywords
+
 
 #= custom kernels
 

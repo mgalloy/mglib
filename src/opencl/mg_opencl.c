@@ -1309,44 +1309,43 @@ static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int
 }
 
 
-#define CL_ARRAY_INIT(NAME, TYPE_CODE)                                    \
-static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {     \
-  int i, n_dims; \
-  IDL_ARRAY_DIM dims; \
-  IDL_VPTR dimsize; \
-  int init; \
-  cl_int err; \
-    \
-  typedef struct { \
-    IDL_KW_RESULT_FIRST_FIELD; \
-    IDL_VPTR error; \
-    int error_present; \
-    IDL_LONG nozero; \
-  } KW_RESULT; \
-    \
-  static IDL_KW_PAR kw_pars[] = { \
-    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT, \
-      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) }, \
-    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO, \
-      0, IDL_KW_OFFSETOF(nozero) }, \
-    { NULL } \
-  }; \
-    \
-  KW_RESULT kw; \
-            \
-  n_dims = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); \
-  \
-  for (i = 0; i < n_dims; i++) { \
-    dimsize = IDL_CvtULng(1, &argv[i]); \
-    dims[i] = dimsize->value.ul; \
-    IDL_Deltmp(dimsize); \
-  } \
-  init = kw.nozero ? IDL_ARR_INI_NOP : IDL_ARR_INI_ZERO; \
-  IDL_VPTR result = IDL_cl_array_init(n_dims, dims, TYPE_CODE, init, &err);                  \
-  CL_SET_ERROR(err) \
-  return(result);   \
+#define CL_ARRAY_INIT(NAME, TYPE_CODE)                                                   \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                    \
+  int i, n_dims;                                                                         \
+  IDL_ARRAY_DIM dims;                                                                    \
+  IDL_VPTR dimsize;                                                                      \
+  int init;                                                                              \
+  cl_int err;                                                                            \
+                                                                                         \
+  typedef struct {                                                                       \
+    IDL_KW_RESULT_FIRST_FIELD;                                                           \
+    IDL_VPTR error;                                                                      \
+    int error_present;                                                                   \
+    IDL_LONG nozero;                                                                     \
+  } KW_RESULT;                                                                           \
+                                                                                         \
+  static IDL_KW_PAR kw_pars[] = {                                                        \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                              \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                          \
+    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO,                                            \
+      0, IDL_KW_OFFSETOF(nozero) },                                                      \
+    { NULL }                                                                             \
+  };                                                                                     \
+                                                                                         \
+  KW_RESULT kw;                                                                          \
+                                                                                         \
+  n_dims = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);  \
+                                                                                         \
+  for (i = 0; i < n_dims; i++) {                                                         \
+    dimsize = IDL_CvtULng(1, &argv[i]);                                                  \
+    dims[i] = dimsize->value.ul;                                                         \
+    IDL_Deltmp(dimsize);                                                                 \
+  }                                                                                      \
+  init = kw.nozero ? IDL_ARR_INI_NOP : IDL_ARR_INI_ZERO;                                 \
+  IDL_VPTR result = IDL_cl_array_init(n_dims, dims, TYPE_CODE, init, &err);              \
+  CL_SET_ERROR(err)                                                                      \
+  return(result);                                                                        \
 }
-
 
 CL_ARRAY_INIT(bytarr,        1);
 CL_ARRAY_INIT(intarr,        2);
@@ -1359,6 +1358,55 @@ CL_ARRAY_INIT(uintarr,      12);
 CL_ARRAY_INIT(ulonarr,      13);
 CL_ARRAY_INIT(lon64arr,     14);
 CL_ARRAY_INIT(ulon64arr,    15);
+
+
+#define CL_INDEX_GEN(NAME, TYPE_CODE)                                                    \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                    \
+  int i, n_dims;                                                                         \
+  IDL_ARRAY_DIM dims;                                                                    \
+  IDL_VPTR dimsize;                                                                      \
+  int init;                                                                              \
+  cl_int err;                                                                            \
+                                                                                         \
+  typedef struct {                                                                       \
+    IDL_KW_RESULT_FIRST_FIELD;                                                           \
+    IDL_VPTR error;                                                                      \
+    int error_present;                                                                   \
+    IDL_LONG nozero;                                                                     \
+  } KW_RESULT;                                                                           \
+                                                                                         \
+  static IDL_KW_PAR kw_pars[] = {                                                        \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                              \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                          \
+    { NULL }                                                                             \
+  };                                                                                     \
+                                                                                         \
+  KW_RESULT kw;                                                                          \
+                                                                                         \
+  n_dims = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);  \
+                                                                                         \
+  for (i = 0; i < n_dims; i++) {                                                         \
+    dimsize = IDL_CvtULng(1, &argv[i]);                                                  \
+    dims[i] = dimsize->value.ul;                                                         \
+    IDL_Deltmp(dimsize);                                                                 \
+  }                                                                                      \
+  init = IDL_ARR_INI_INDEX;                                                              \
+  IDL_VPTR result = IDL_cl_array_init(n_dims, dims, TYPE_CODE, init, &err);              \
+  CL_SET_ERROR(err)                                                                      \
+  return(result);                                                                        \
+}
+
+CL_INDEX_GEN(bindgen,        1);
+CL_INDEX_GEN(indgen,         2);
+CL_INDEX_GEN(lindgen,        3);
+CL_INDEX_GEN(findgen,        4);
+CL_INDEX_GEN(dindgen,        5);
+CL_INDEX_GEN(cindgen,        6);
+CL_INDEX_GEN(dcindgen,       9);
+CL_INDEX_GEN(uindgen,       12);
+CL_INDEX_GEN(ulindgen,      13);
+CL_INDEX_GEN(l64indgen,     14);
+CL_INDEX_GEN(ul64indgen,    15);
 
 
 // ===
@@ -1746,6 +1794,18 @@ int IDL_Load(void) {
     { IDL_cl_ulonarr,     "MG_CL_ULONARR",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_lon64arr,    "MG_CL_LON64ARR",    1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_ulon64arr,   "MG_CL_ULON64ARR",   1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_bindgen,     "MG_CL_BINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_indgen,      "MG_CL_INDGEN",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_lindgen,     "MG_CL_LINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_findgen,     "MG_CL_FINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_dindgen,     "MG_CL_DINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_cindgen,     "MG_CL_CINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_dcindgen,    "MG_CL_DCINDGEN",    1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_uindgen,     "MG_CL_UINDGEN",     1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ulindgen,    "MG_CL_ULINDGEN",    1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_l64indgen,   "MG_CL_L64INDGEN",   1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ul64indgen,  "MG_CL_UL64INDGEN",  1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // custom kernels
     { IDL_cl_compile,     "MG_CL_COMPILE",     3, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
