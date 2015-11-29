@@ -1189,16 +1189,18 @@ static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
 #pragma mark --- array initialization ---
 
 // init can be IDL_ARR_INI_INDEX, IDL_ARR_INI_NOP, IDL_ARR_INI_ZERO
-static IDL_VPTR IDL_cl_array_init2(int n_dims, IDL_MEMINT dims[], UCHAR type, int init, cl_int *err) {
+static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int init, cl_int *err) {
   CL_VPTR cl_var;
   size_t program_size, global_size, local_size;
+
   cl_kernel kernel;
   cl_mem buffer;
+  cl_program program;
+
   char *kernel_name;
   char *command;
   char *kernel_basename;
   char *program_buffer;
-  cl_program program;
   char options[80];
   int i, slen, n_elts = 1;
 
@@ -1297,6 +1299,9 @@ static IDL_VPTR IDL_cl_array_init2(int n_dims, IDL_MEMINT dims[], UCHAR type, in
   cl_var->type = type;
   cl_var->flags = IDL_V_ARR | IDL_V_DYNAMIC;
   cl_var->n_dim = n_dims;
+  for (i = 0; i < n_dims; i++) {
+    cl_var->dim[i] = dims[i];
+  }
   cl_var->n_elts = n_elts;
   cl_var->buffer = buffer;
 
@@ -1304,165 +1309,42 @@ static IDL_VPTR IDL_cl_array_init2(int n_dims, IDL_MEMINT dims[], UCHAR type, in
 }
 
 
-static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR type) {
-  int nargs, n, d, n_elts, slen, i;
-  cl_int err = 0;
-  cl_mem buffer;
-  IDL_VPTR result;
-  IDL_VPTR idl_dimsize;
-  CL_VPTR cl_var;
-
-  char *program_buffer;
-  cl_program program;
-  char options[80];
-  size_t program_size, global_size, local_size;
-  cl_kernel kernel;
-  char *kernel_name;
-
-  typedef struct {
-    IDL_KW_RESULT_FIRST_FIELD;
-    IDL_VPTR error;
-    int error_present;
-    IDL_LONG nozero;
-  } KW_RESULT;
-
-  static IDL_KW_PAR kw_pars[] = {
-    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
-      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
-    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO,
-      0, IDL_KW_OFFSETOF(nozero) },
-    { NULL }
-  };
-
-  KW_RESULT kw;
-
-  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
-
-  // initialize error
-  CL_SET_ERROR(err);
-
-  CL_INIT;
-
-  n = 1;
-  for (i = 0; i < nargs; i++) {
-    idl_dimsize = IDL_CvtULng(1, &argv[i]);
-    n *= idl_dimsize->value.ul;
-    IDL_Deltmp(idl_dimsize);
-  }
-
-  local_size = 64;
-  global_size = ceil(n / (float) local_size) * local_size;
-
-  buffer = clCreateBuffer(current_context,
-                          CL_MEM_READ_WRITE,
-                          IDL_TypeSize[type] * n,
-                          NULL,
-                          &err);
-  if (err < 0) {
-    CL_SET_ERROR(err);
-    IDL_KW_FREE;
-    return IDL_GettmpLong(err);
-  }
-
-  // initialize to zeros, unless NOZERO set
-  if (!kw.nozero) {
-    slen = 11 + strlen(CL_TypeNames[type]);
-    kernel_name = (char *) malloc(slen + 1);
-    sprintf(kernel_name, "array_init_%s", CL_TypeNames[type]);
-    kernel_name[slen] = '\0';
-
-    kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
-
-    if (!kernel) {
-      program_buffer = array_zero;
-      program_size = strlen(array_zero);
-
-      program = clCreateProgramWithSource(current_context,
-                                          1,
-                                          (const char**) &program_buffer,
-                                          &program_size,
-                                          &err);
-      if (err < 0) {
-        CL_SET_ERROR(err);
-        IDL_KW_FREE;
-        return IDL_GettmpLong(err);
-      }
-
-      sprintf(options, "-DTYPE=\"%s\" -DCOMMAND=\"%s\"", CL_TypeNames[type], CL_ArrayZeroCommands[type]);
-      err = clBuildProgram(program, 1, &current_device, options, NULL, NULL);
-      if (err < 0) {
-        CL_CHECK_BUILD;
-        CL_SET_ERROR(err);
-        IDL_KW_FREE;
-        return IDL_GettmpLong(err);
-      }
-
-      kernel = clCreateKernel(program, "array_init", &err);
-      if (err < 0) {
-        CL_SET_ERROR(err);
-        IDL_KW_FREE;
-        return IDL_GettmpLong(err);
-      }
-
-      mg_table_put(kernel_table, kernel_name, (void *) kernel);
-    }
-
-    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer);
-    err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &n);
-    if (err < 0) {
-      CL_SET_ERROR(err);
-      IDL_KW_FREE;
-      return IDL_GettmpLong(err);
-    }
-
-    err = clEnqueueNDRangeKernel(current_queue,
-                                 kernel,
-                                 1,
-                                 NULL,
-                                 &global_size,
-                                 &local_size,
-                                 0,
-                                 NULL,
-                                 NULL);
-    if (err < 0) {
-      CL_SET_ERROR(err);
-      IDL_KW_FREE;
-      return IDL_GettmpLong(err);
-    }
-
-    err = clFinish(current_queue);
-    if (err < 0) {
-      CL_SET_ERROR(err);
-      IDL_KW_FREE;
-      return IDL_GettmpLong(err);
-    }
-  }
-
-  cl_var = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
-  cl_var->type = type;
-  cl_var->flags = IDL_V_ARR | IDL_V_DYNAMIC;
-  cl_var->n_dim = nargs;
-  n_elts = 1;
-  for (d = 0; d < nargs; d++) {
-    cl_var->dim[d] = argv[d]->value.l;
-    n_elts *= argv[d]->value.l;
-  }
-  cl_var->n_elts = n_elts;
-  cl_var->buffer = buffer;
-
-  result = IDL_Gettmp();
-  result->type = IDL_TYP_PTRINT;
-  result->value.ptrint = (IDL_PTRINT) cl_var;
-
-  IDL_KW_FREE;
-
-  return result;
-}
-
-
 #define CL_ARRAY_INIT(NAME, TYPE_CODE)                                    \
 static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {     \
-  return IDL_cl_array_init(argc, argv, argk, TYPE_CODE);                  \
+  int i, n_dims; \
+  IDL_ARRAY_DIM dims; \
+  IDL_VPTR dimsize; \
+  int init; \
+  cl_int err; \
+    \
+  typedef struct { \
+    IDL_KW_RESULT_FIRST_FIELD; \
+    IDL_VPTR error; \
+    int error_present; \
+    IDL_LONG nozero; \
+  } KW_RESULT; \
+    \
+  static IDL_KW_PAR kw_pars[] = { \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT, \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) }, \
+    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO, \
+      0, IDL_KW_OFFSETOF(nozero) }, \
+    { NULL } \
+  }; \
+    \
+  KW_RESULT kw; \
+            \
+  n_dims = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); \
+  \
+  for (i = 0; i < n_dims; i++) { \
+    dimsize = IDL_CvtULng(1, &argv[i]); \
+    dims[i] = dimsize->value.ul; \
+    IDL_Deltmp(dimsize); \
+  } \
+  init = kw.nozero ? IDL_ARR_INI_NOP : IDL_ARR_INI_ZERO; \
+  IDL_VPTR result = IDL_cl_array_init(n_dims, dims, TYPE_CODE, init, &err);                  \
+  CL_SET_ERROR(err) \
+  return(result);   \
 }
 
 
