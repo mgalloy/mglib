@@ -56,7 +56,7 @@ char *CL_ArrayIndexCommands[] = { "",
                                   "result[i]=i;",
                                   "result[i]=i;" };
 
-char *CL_ArrayInitCommands[] = { "",
+char *CL_ArrayZeroCommands[] = { "",
                                  "result[i]=0;",
                                  "result[i]=0;",
                                  "result[i]=0;",
@@ -178,6 +178,31 @@ static char *mg_cl_read_program(char *filename, size_t *program_size) {
   if (!current_context) {         \
     IDL_cl_init(0, NULL, NULL);   \
   }
+
+cl_int IDL_cl_check_build(cl_program program) {
+  size_t log_size;
+  char *program_log;
+  cl_int err;
+
+  // query to get program build log size first
+  err = clGetProgramBuildInfo(program,
+                              current_device,
+                              CL_PROGRAM_BUILD_LOG,
+                              0,
+                              NULL,
+                              &log_size);
+  program_log = (char *) calloc(log_size + 1, sizeof(char));
+  err = clGetProgramBuildInfo(program,
+                              current_device,
+                              CL_PROGRAM_BUILD_LOG,
+                              log_size + 1,
+                              program_log,
+                              NULL);
+  printf("%s\n", program_log);
+  free(program_log);
+
+  return(err);
+}
 
 #define CL_CHECK_BUILD                                                       \
   size_t log_size;                                                           \
@@ -1163,6 +1188,122 @@ static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
 
 #pragma mark --- array initialization ---
 
+// init can be IDL_ARR_INI_INDEX, IDL_ARR_INI_NOP, IDL_ARR_INI_ZERO
+static IDL_VPTR IDL_cl_array_init2(int n_dims, IDL_MEMINT dims[], UCHAR type, int init, cl_int *err) {
+  CL_VPTR cl_var;
+  size_t program_size, global_size, local_size;
+  cl_kernel kernel;
+  cl_mem buffer;
+  char *kernel_name;
+  char *command;
+  char *kernel_basename;
+  char *program_buffer;
+  cl_program program;
+  char options[80];
+  int i, slen, n_elts = 1;
+
+  for (i = 0; i < n_dims; i++) {
+    n_elts *= dims[i];
+  }
+
+  local_size = 64;
+  global_size = ceil(n_elts / (float) local_size) * local_size;
+
+  buffer = clCreateBuffer(current_context,
+                          CL_MEM_READ_WRITE,
+                          IDL_TypeSize[type] * n_elts,
+                          NULL,
+                          err);
+
+  if (*err < 0) {
+    return IDL_GettmpLong(0);
+  }
+
+  // initialize
+  if (init != IDL_ARR_INI_NOP) {
+    if (init == IDL_ARR_INI_ZERO) {
+      program_buffer = array_zero;
+      kernel_basename = "array_zero";
+      command = CL_ArrayZeroCommands[type];
+    } else if (init == IDL_ARR_INI_INDEX) {
+      program_buffer = array_index;
+      kernel_basename = "array_index";
+      command = CL_ArrayIndexCommands[type];
+    }
+
+    program_size = strlen(program_buffer);
+    slen = 11 + strlen(CL_TypeNames[type]);
+    kernel_name = (char *) malloc(slen + 1);
+    sprintf(kernel_name, "%s_%s", kernel_basename, CL_TypeNames[type]);
+    kernel_name[slen] = '\0';
+
+    kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
+
+    if (!kernel) {
+      program = clCreateProgramWithSource(current_context,
+                                          1,
+                                          (const char**) &program_buffer,
+                                          &program_size,
+                                          err);
+      if (*err < 0) {
+        return IDL_GettmpLong(0);
+      }
+
+      sprintf(options,
+              "-DTYPE=\"%s\" -DCOMMAND=\"%s\"",
+              CL_TypeNames[type],
+              command);
+
+      *err = clBuildProgram(program, 1, &current_device, options, NULL, NULL);
+      if (*err < 0) {
+        *err = IDL_cl_check_build(program);
+        return IDL_GettmpLong(0);
+      }
+
+      kernel = clCreateKernel(program, kernel_basename, err);
+      if (*err < 0) {
+        return IDL_GettmpLong(0);
+      }
+
+      mg_table_put(kernel_table, kernel_name, (void *) kernel);
+    }
+
+    *err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer);
+    *err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &n_elts);
+    if (*err < 0) {
+      return IDL_GettmpLong(0);
+    }
+
+    *err = clEnqueueNDRangeKernel(current_queue,
+                                  kernel,
+                                  1,
+                                  NULL,
+                                  &global_size,
+                                  &local_size,
+                                  0,
+                                  NULL,
+                                  NULL);
+    if (*err < 0) {
+      return IDL_GettmpLong(0);
+    }
+
+    *err = clFinish(current_queue);
+    if (*err < 0) {
+      return IDL_GettmpLong(0);
+    }
+  }
+
+  cl_var = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
+  cl_var->type = type;
+  cl_var->flags = IDL_V_ARR | IDL_V_DYNAMIC;
+  cl_var->n_dim = n_dims;
+  cl_var->n_elts = n_elts;
+  cl_var->buffer = buffer;
+
+  return(IDL_GettmpMEMINT((IDL_PTRINT) cl_var));
+}
+
+
 static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR type) {
   int nargs, n, d, n_elts, slen, i;
   cl_int err = 0;
@@ -1233,8 +1374,8 @@ static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR ty
     kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
 
     if (!kernel) {
-      program_buffer = array_init;
-      program_size = strlen(array_init);
+      program_buffer = array_zero;
+      program_size = strlen(array_zero);
 
       program = clCreateProgramWithSource(current_context,
                                           1,
@@ -1247,7 +1388,7 @@ static IDL_VPTR IDL_cl_array_init(int argc, IDL_VPTR *argv, char *argk, UCHAR ty
         return IDL_GettmpLong(err);
       }
 
-      sprintf(options, "-DTYPE=\"%s\" -DCOMMAND=\"%s\"", CL_TypeNames[type], CL_ArrayInitCommands[type]);
+      sprintf(options, "-DTYPE=\"%s\" -DCOMMAND=\"%s\"", CL_TypeNames[type], CL_ArrayZeroCommands[type]);
       err = clBuildProgram(program, 1, &current_device, options, NULL, NULL);
       if (err < 0) {
         CL_CHECK_BUILD;
