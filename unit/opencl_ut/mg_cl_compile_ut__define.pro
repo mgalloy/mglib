@@ -14,6 +14,26 @@ function mg_cl_compile_ut::test_simple
 end
 
 
+function mg_cl_compile_ut::test_simple_error
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, 1
+  endif
+
+  kernel = mg_cl_compile('z[i] = 2. * x[i] + sin(y[i])', $
+                         ['x', 'y'], $      ; error: only two args
+                         lonarr(3) + 4L, $
+                         /simple, error=err)
+
+  assert, err eq 0, 'error compiling kernel: %s', mg_cl_error_message(err)
+
+  return, 1
+end
+
+
 function mg_cl_compile_ut::test_full
   compile_opt strictarr
 

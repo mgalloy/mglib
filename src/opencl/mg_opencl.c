@@ -116,7 +116,9 @@ static IDL_MSG_DEF msg_arr[] = {
   { "OPENCL_INCORRECT_N_PARAMS",     "%NIncorrect number of parameters." },
 #define OPENCL_INCORRECT_PARAM_TYPE -5
   { "OPENCL_INCORRECT_PARAM_TYPE",   "%NIncorrect parameter type." },
-#define OPENCL_INVALID_PLATFORM_INDEX -6
+#define OPENCL_INCORRECT_PARAM_LENGTH -6
+  { "OPENCL_INCORRECT_PARAM_LENGTH",   "%NMismatched parameter lengths." },
+#define OPENCL_INVALID_PLATFORM_INDEX -7
   { "OPENCL_INVALID_PLATFORM_INDEX", "%NInvalid platform index: %d." },
 };
 
@@ -1384,6 +1386,13 @@ static IDL_VPTR IDL_cl_compile(int argc, IDL_VPTR *argv, char *argk) {
   IDL_ENSURE_STRING(argv[1]);
   IDL_ENSURE_ARRAY(argv[2]);
 
+  if (argv[1]->value.arr->n_elts != argv[2]->value.arr->n_elts) {
+    IDL_KW_FREE;
+    CL_SET_ERROR(-102);
+    IDL_MessageFromBlock(msg_block, OPENCL_INCORRECT_PARAM_LENGTH, IDL_MSG_LONGJMP);
+    return IDL_GettmpLong(0);
+  }
+
   if (!kw.simple) {
     IDL_ENSURE_STRING(argv[3]);
   }
@@ -1425,7 +1434,6 @@ static IDL_VPTR IDL_cl_compile(int argc, IDL_VPTR *argv, char *argk) {
             IDL_VarGetString(argv[0]));
     kernel_name[slen] = '\0';
   }
-  printf("kernel_name: %s\n", kernel_name);
 
   kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
   if (!kernel) {
