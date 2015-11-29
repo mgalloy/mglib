@@ -1183,6 +1183,117 @@ static void IDL_cl_free(int argc, IDL_VPTR *argv, char *argk) {
   IDL_KW_FREE;
 }
 
+static IDL_VPTR IDL_cl_reform(int argc, IDL_VPTR *argv, char *argk) {
+  int nargs, i, n_dims;
+
+  IDL_VPTR dimsize;
+  unsigned int total_n_elts = 1;
+  IDL_ARRAY_DIM dim = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+  cl_int err;
+  CL_VPTR x = (CL_VPTR) argv[0]->value.ptrint;
+  CL_VPTR cl_var;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+    IDL_LONG overwrite;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { "OVERWRITE", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(overwrite) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  nargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // the second argument could actually be an array of dimensions
+  n_dims = nargs - 1;
+  for (i = 1; i < nargs; i++) {
+    dimsize = IDL_CvtULng(1, &argv[i]);
+
+    if (i == 1 && (dimsize->flags & IDL_V_ARR)) {
+      for (i = 0; i < dimsize->value.arr->n_elts; i++) {
+        dim[i] = ((IDL_ULONG *) dimsize->value.arr->data)[i];
+        total_n_elts *= dim[i];
+      }
+      IDL_Deltmp(dimsize);
+      n_dims = dimsize->value.arr->n_elts;
+      break;
+    }
+
+    dim[i - 1] = dimsize->value.ul;
+    total_n_elts *= dim[i - 1];
+    IDL_Deltmp(dimsize);
+  }
+
+  // make sure total number of elements does not change
+  if (total_n_elts != x->n_elts) {
+    IDL_Message(IDL_M_NAMED_GENERIC,
+                IDL_MSG_LONGJMP,
+                "New subscripts must not change the number elements in input");
+  }
+
+  if (kw.overwrite) {
+    cl_var = x;
+  } else {
+    // allocate result to return
+    cl_var = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
+    cl_var->type = x->type;
+    cl_var->flags = x->flags;
+    cl_var->n_elts = x->n_elts;
+
+    cl_var->buffer = clCreateBuffer(current_context,
+                                    CL_MEM_READ_WRITE,
+                                    x->n_elts * IDL_TypeSizeFunc(x->type),
+                                    NULL,
+                                    &err);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(0);
+    }
+
+    err = clFinish(current_queue);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(0);
+    }
+
+    err = clEnqueueCopyBuffer(current_queue,
+                              x->buffer, cl_var->buffer,
+                              0, 0,  // offsets
+                              x->n_elts * IDL_TypeSizeFunc(x->type), // data_size
+                              0, NULL, NULL);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(0);
+    }
+
+    err = clFinish(current_queue);
+    if (err < 0) {
+      CL_SET_ERROR(err);
+      IDL_KW_FREE;
+      return IDL_GettmpLong(0);
+    }
+  }
+
+  cl_var->n_dim = n_dims;
+  memcpy(cl_var->dim, dim, sizeof(IDL_ARRAY_DIM));
+
+  IDL_KW_FREE;
+
+  return(IDL_GettmpMEMINT((IDL_PTRINT) cl_var));
+}
+
 
 // ===
 
@@ -1781,6 +1892,7 @@ int IDL_Load(void) {
     // memory
     { IDL_cl_putvar,      "MG_CL_PUTVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_getvar,      "MG_CL_GETVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_reform,      "MG_CL_REFORM",      2, 9, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // array initialization
     { IDL_cl_bytarr,      "MG_CL_BYTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
