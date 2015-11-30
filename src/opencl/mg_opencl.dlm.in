@@ -59,3 +59,43 @@ function   mg_cl_ul64indgen                   1   8   keywords
 
 function   mg_cl_compile                      3   4   keywords
 function   mg_cl_execute                      2   2   keywords
+
+
+#= unary operations
+
+function   mg_cl_not                          1   3   keywords
+
+function   mg_cl_exp                          1   3   keywords
+function   mg_cl_expm1                        1   3   keywords
+function   mg_cl_exp2                         1   3   keywords
+function   mg_cl_exp10                        1   3   keywords
+
+function   mg_cl_sqrt                         1   3   keywords
+function   mg_cl_cbrt                         1   3   keywords
+function   mg_cl_rsqrt                        1   3   keywords
+
+function   mg_cl_log                          1   3   keywords
+function   mg_cl_log1p                        1   3   keywords
+function   mg_cl_log2                         1   3   keywords
+function   mg_cl_log10                        1   3   keywords
+function   mg_cl_logb                         1   3   keywords
+
+function   mg_cl_erf                          1   3   keywords
+function   mg_cl_erfc                         1   3   keywords
+
+function   mg_cl_tgamma                       1   3   keywords
+function   mg_cl_lgamma                       1   3   keywords
+
+function   mg_cl_sin                          1   3   keywords
+function   mg_cl_cos                          1   3   keywords
+function   mg_cl_tan                          1   3   keywords
+function   mg_cl_asin                         1   3   keywords
+function   mg_cl_acos                         1   3   keywords
+function   mg_cl_atan                         1   3   keywords
+
+function   mg_cl_sinh                         1   3   keywords
+function   mg_cl_cosh                         1   3   keywords
+function   mg_cl_tanh                         1   3   keywords
+function   mg_cl_asinh                        1   3   keywords
+function   mg_cl_acosh                        1   3   keywords
+function   mg_cl_atanh                        1   3   keywords

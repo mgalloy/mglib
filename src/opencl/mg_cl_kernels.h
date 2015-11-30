@@ -24,14 +24,44 @@ char *array_index =
 
 char *custom_simple = 
   "#ifdef cl_khr_fp64\n"
-  "    #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+  "  #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
   "#elif defined(cl_amd_fp64)\n"
-  "    #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
+  "  #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
   "#endif\n"
   "\n"
   "__kernel void custom_simple(%s\n"
   "                            const unsigned int n) {\n"
   "\n"
-  "  int i = get_global_id(0);\n"
+  "  size_t i = get_global_id(0);\n"
   "  if (i < n) %s;\n"
+  "}\n";
+
+char *unary_op =
+  "#ifdef cl_khr_fp64\n"
+  "  #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+  "#elif defined(cl_amd_fp64)\n"
+  "  #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
+  "#endif\n"
+  "\n"
+  "__kernel void unary_op(__global TYPE *x,\n"
+  "                       __global TYPE *result,\n"
+  "                       const unsigned int n) {\n"
+  "\n"
+  "  size_t i = get_global_id(0);\n"
+  "  if (i < n) result[i] = OP(x[i]);\n"
+  "}\n";
+
+char *unary_z_op =
+  "#ifdef cl_khr_fp64\n"
+  "  #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+  "#elif defined(cl_amd_fp64)\n"
+  "  #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
+  "#endif\n"
+  "\n"
+  "__kernel void unary_op(__global TYPE *z,\n"
+  "                       __global TYPE *result,\n"
+  "                       const unsigned int n) {\n"
+  "\n"
+  "  size_t i = get_global_id(0);\n"
+  "  if (i < n) { result[i].x = RE_EXPR; result[i].y = IM_EXPR; }\n"
   "}\n";

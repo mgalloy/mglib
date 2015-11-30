@@ -1488,7 +1488,7 @@ static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int
 static IDL_VPTR IDL_cl_make_array(int argc, IDL_VPTR *argv, char *argk) {
   int i, n_args, n_dims, type_code, init;
   cl_int err;
-  IDL_ARRAY_DIM dims = { 3, 0, 0, 0, 0, 0, 0, 0 };
+  IDL_ARRAY_DIM dims = { 0, 0, 0, 0, 0, 0, 0, 0 };
   IDL_VPTR dimsize, result;
 
   typedef struct {
@@ -1995,7 +1995,166 @@ static IDL_VPTR IDL_cl_execute(int argc, IDL_VPTR *argv, char *argk, char *op) {
 
 // ===
 
-#pragma mark --- Lifecycle ---
+#pragma mark --- unary operations ---
+
+
+static cl_int IDL_cl_unary_op(IDL_VPTR input, IDL_VPTR output, char *op, char *re_expr, char *im_expr) {
+  cl_int err = 0;
+  CL_VPTR x = (CL_VPTR) input->value.ptrint;
+  unsigned int n_elts = x->n_elts;
+  char is_complex = x->type == 6 || x->type == 9;
+
+  size_t local_size = 64;
+  size_t global_size = ceil(n_elts / (float) local_size) * local_size;
+
+  CL_VPTR result = (CL_VPTR) output->value.ptrint;
+  char *program_buffer;
+  cl_program program;
+  char options[500];
+  size_t program_size;
+  cl_kernel kernel;
+  char *kernel_name;
+  int slen;
+
+  slen = 9 + strlen(op) + 1 + strlen(CL_TypeNames[x->type]) + 1;
+  kernel_name = (char *) malloc(slen);
+  sprintf(kernel_name, "unary_op_%s_%s", op, CL_TypeNames[x->type]);
+  kernel_name[slen] = '\0';
+
+  kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
+  if (!kernel) {
+    program_buffer = is_complex ? unary_z_op : unary_op;
+    program_size = strlen(program_buffer);
+    program = clCreateProgramWithSource(current_context,
+                                        1,
+                                        (const char**) &program_buffer,
+                                        &program_size,
+                                        &err);
+    if (err < 0) return(err);
+
+    if (is_complex) {
+      sprintf(options, "-DTYPE=%s -DRE_EXPR=%s -DIM_EXPR=%s",
+              CL_TypeNames[x->type], re_expr, im_expr);
+    } else {
+      sprintf(options, "-DTYPE=%s -DOP=%s", CL_TypeNames[x->type], op);
+    }
+
+    err = clBuildProgram(program, 0, NULL, options, NULL, NULL);
+    if (err < 0) {
+      CL_CHECK_BUILD;
+      return(err);
+    }
+  
+    kernel = clCreateKernel(program, "unary_op", &err);
+    if (err < 0) return(err);
+
+    mg_table_put(kernel_table, kernel_name, (void *) kernel);
+  }
+
+  err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &x->buffer);
+  if (err < 0) return(err);
+
+  err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &result->buffer);
+  if (err < 0) return(err);
+
+  err = clSetKernelArg(kernel, 2, sizeof(unsigned int), &n_elts);
+  if (err < 0) return(err);
+
+  err = clEnqueueNDRangeKernel(current_queue,
+                               kernel,
+                               1,
+                               NULL,
+                               &global_size,
+                               &local_size,
+                               0,
+                               NULL,
+                               NULL);
+  if (err < 0) return(err);
+
+  err = clFinish(current_queue);
+  if (err < 0) return(err);
+
+  return(CL_SUCCESS);
+}
+
+
+#define CL_UNARY_OP(NAME, OP, RE_EXPR, IM_EXPR)                                         \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                   \
+  IDL_VPTR input = argv[0];                                                             \
+    CL_VPTR cl_input = (CL_VPTR) input->value.ptrint; \
+  IDL_VPTR output;                                                                      \
+  int n_args;                                                                           \
+  cl_int err;                                                                           \
+                                                                                        \
+  typedef struct {                                                                      \
+    IDL_KW_RESULT_FIRST_FIELD;                                                          \
+    IDL_VPTR error;                                                                     \
+    int error_present;                                                                  \
+    IDL_VPTR lhs;                                                                       \
+    int lhs_present;                                                                    \
+  } KW_RESULT;                                                                          \
+                                                                                        \
+  static IDL_KW_PAR kw_pars[] = {                                                       \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                             \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                         \
+    { "LHS", IDL_TYP_UNDEF, 1, IDL_KW_VIN,                                              \
+      IDL_KW_OFFSETOF(lhs_present), IDL_KW_OFFSETOF(lhs) },                             \
+    { NULL }                                                                            \
+  };                                                                                    \
+                                                                                        \
+  KW_RESULT kw;                                                                         \
+                                                                                        \
+  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); \
+                                                                                        \
+  if (kw.lhs_present) {                                                                 \
+    output = kw.lhs;                                                                    \
+  } else {                                                                              \
+    IDL_ARRAY_DIM dims = { 0, 0, 0, 0, 0, 0, 0, 0 };                                    \
+    memcpy(dims, cl_input->dim, sizeof(IDL_ARRAY_DIM));                                 \
+    output = IDL_cl_array_init(cl_input->n_dim,                                         \
+                               dims,                                                    \
+                               cl_input->type,                                          \
+                               IDL_ARR_INI_NOP,                                         \
+                               &err);                                                   \
+  }                                                                                     \
+  err = IDL_cl_unary_op(input, output, #OP, #RE_EXPR, #IM_EXPR);                        \
+  return(output);                                                                       \
+}
+
+CL_UNARY_OP(not, ~, 0, 0)
+CL_UNARY_OP(exp, exp, exp(z[i].x)*cos(z[i].y), exp(z[i].x)*sin(z[i].y))
+CL_UNARY_OP(expm1, expm1, exp(z[i].x)*cos(z[i].y)-1, exp(z[i].x)*sin(z[i].y))
+CL_UNARY_OP(exp2, exp2, exp2(z[i].x)*cos(log(2.0)*z[i].y), exp2(z[i].x)*sin(log(2.0)*z[i].y))
+CL_UNARY_OP(exp10, exp10, exp10(z[i].x)*cos(log(10.0)*z[i].y), exp10(z[i].x)*sin(log(10.0)*z[i].y))
+CL_UNARY_OP(sqrt, sqrt, sqrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*cos(atan2(z[i].y,z[i].x)/2), sqrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*sin(atan2(z[i].y,z[i].x)/2))
+CL_UNARY_OP(cbrt, cbrt, cbrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*cos(atan2(z[i].y,z[i].x)/3), cbrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*sin(atan2(z[i].y,z[i].x)/3))
+CL_UNARY_OP(rsqrt, rsqrt, sqrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*cos(atan2(z[i].y,z[i].x)/2)/sqrt(z[i].x*z[i].x+z[i].y*z[i].y), -sqrt(sqrt(z[i].x*z[i].x+z[i].y*z[i].y))*sin(atan2(z[i].y,z[i].x)/2)/sqrt(z[i].x*z[i].x+z[i].y*z[i].y))
+CL_UNARY_OP(log, log, 0.5*log(z[i].x*z[i].x+z[i].y*z[i].y), (z[i].x!=0.)?atan2(z[i].y,z[i].x):acos(0.))
+CL_UNARY_OP(log1p, log1p, 0.5*log((z[i].x+1.0)*(z[i].x+1.0)+z[i].y*z[i].y), (z[i].x!=-1.0)?atan2(z[i].y,z[i].x+1.0f):acos(0.))
+CL_UNARY_OP(log2, log2, 0.5*log2(z[i].x*z[i].x+z[i].y*z[i].y), ((z[i].x!=0.)?atan2(z[i].y,z[i].x)/log(2.0):acos(0.)))
+CL_UNARY_OP(log10, log10, 0.5*log10(z[i].x*z[i].x+z[i].y*z[i].y), (z[i].x!=0.)?atan2(z[i].y,z[i].x)/log(10.):acos(0.))
+CL_UNARY_OP(logb, logb, 0, 0)
+CL_UNARY_OP(erf, erf, 0, 0)
+CL_UNARY_OP(erfc, erfc, 0, 0)
+CL_UNARY_OP(tgamma, tgamma, 0, 0)
+CL_UNARY_OP(lgamma, lgamma, 0, 0)
+CL_UNARY_OP(sin, sin, sin(z[i].x)*cosh(z[i].y), cos(z[i].x)*sinh(z[i].y))
+CL_UNARY_OP(cos, cos, cos(z[i].x)*cosh(z[i].y), -sin(z[i].x)*sinh(z[i].y))
+CL_UNARY_OP(tan, tan, sin(2*z[i].x)/(cos(2*z[i].x)+cosh(2*z[i].y)), sinh(2*z[i].y)/(cos(2*z[i].x)+cosh(2*z[i].y)))
+CL_UNARY_OP(asin, asin, asin(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)-0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)), log(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)+sqrt((0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))*(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))-1)))
+CL_UNARY_OP(acos, acos, acos(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)-0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)), -log(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)+sqrt((0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))*(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))-1)))
+CL_UNARY_OP(atan, atan, 0.5*atan2(2*z[i].x,(1-z[i].x*z[i].x-z[i].y*z[i].y)), 0.25*log((z[i].x*z[i].x+(z[i].y+1)*(z[i].y+1))/(z[i].x*z[i].x+(z[i].y-1)*(z[i].y-1))))
+CL_UNARY_OP(sinh, sinh, sinh(z[i].x)*cos(z[i].y), cosh(z[i].x)*sin(z[i].y))
+CL_UNARY_OP(cosh, cosh, cosh(z[i].x)*cos(z[i].y), sinh(z[i].x)*sin(z[i].y))
+CL_UNARY_OP(tanh, tanh, sinh(2*z[i].x)/(cosh(2*z[i].x)+cos(2*z[i].y)), sin(2*z[i].y)/(cosh(2*z[i].x)+cos(2*z[i].y)))
+CL_UNARY_OP(asinh, asinh, log(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)+sqrt((0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))*(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))-1)), -asin(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)-0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)))
+CL_UNARY_OP(acosh, acosh, log(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)+sqrt((0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))*(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))-1)), acos(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)-0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)))
+CL_UNARY_OP(atanh, atanh, 0.25*log((z[i].y*z[i].y+(z[i].x+1)*(z[i].x+1))/(z[i].y*z[i].y+(z[i].x-1)*(z[i].x-1))), -0.5*atan2(-2*z[i].y,(1-z[i].y*z[i].y-z[i].x*z[i].x)))
+
+
+// ===
+
+#pragma mark --- lifecycle ---
 
 
 // handle any cleanup required
@@ -2051,6 +2210,46 @@ int IDL_Load(void) {
     // custom kernels
     { IDL_cl_compile,     "MG_CL_COMPILE",     3, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_execute,     "MG_CL_EXECUTE",     2, 2, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // unary operations
+    { IDL_cl_not,         "MG_CL_NOT",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_sqrt,        "MG_CL_SQRT",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_exp,         "MG_CL_EXP",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_expm1,       "MG_CL_EXPM1",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_exp2,        "MG_CL_EXP2",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_exp10,       "MG_CL_EXP10",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_sqrt,        "MG_CL_SQRT",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_cbrt,        "MG_CL_CBRT",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_rsqrt,       "MG_CL_RSQRT",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_log,         "MG_CL_LOG",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_log1p,       "MG_CL_LOG1P",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_log2,        "MG_CL_LOG2",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_log10,       "MG_CL_LOG10",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_logb,        "MG_CL_LOGB",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_erf,         "MG_CL_ERF",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_erfc,        "MG_CL_ERFC",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_tgamma,      "MG_CL_TGAMMA",      1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_lgamma,      "MG_CL_LGAMMA",      1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_sin,         "MG_CL_SIN",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_cos,         "MG_CL_COS",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_tan,         "MG_CL_TAN",         1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_asin,        "MG_CL_ASIN",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_acos,        "MG_CL_ACOS",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_atan,        "MG_CL_ATAN",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    { IDL_cl_sinh,        "MG_CL_SINH",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_cosh,        "MG_CL_COSH",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_tanh,        "MG_CL_TANH",        1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_asinh,       "MG_CL_ASINH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_acosh,       "MG_CL_ACOSH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_atanh,       "MG_CL_ATANH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
