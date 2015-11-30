@@ -1420,6 +1420,67 @@ static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int
 }
 
 
+static IDL_VPTR IDL_cl_make_array(int argc, IDL_VPTR *argv, char *argk) {
+  int i, n_args, n_dims, type_code, init;
+  cl_int err;
+  IDL_ARRAY_DIM dims = { 3, 0, 0, 0, 0, 0, 0, 0 };
+  IDL_VPTR dimsize, result;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+    IDL_LONG index;
+    IDL_LONG nozero;
+    IDL_LONG type;
+    int type_present;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { "INDEX", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(index) },
+    { "NOZERO", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(nozero) },
+    { "TYPE", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      IDL_KW_OFFSETOF(type_present), IDL_KW_OFFSETOF(type) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // the first argument could actually be an array of dimensions
+  n_dims = n_args;
+  for (i = 0; i < n_args; i++) {
+    dimsize = IDL_CvtULng(1, &argv[i]);
+
+    if (i == 0 && (dimsize->flags & IDL_V_ARR)) {
+      for (i = 0; i < dimsize->value.arr->n_elts; i++) {
+        dims[i] = ((IDL_ULONG *) dimsize->value.arr->data)[i];
+      }
+      IDL_Deltmp(dimsize);
+      n_dims = dimsize->value.arr->n_elts;
+      break;
+    }
+
+    dims[i] = dimsize->value.ul;
+    IDL_Deltmp(dimsize);
+  }
+
+  type_code = kw.type_present ? kw.type : 4;
+  init = kw.index ? IDL_ARR_INI_INDEX : (kw.nozero ? IDL_ARR_INI_NOP : IDL_ARR_INI_ZERO);
+
+  result = IDL_cl_array_init(n_dims, dims, type_code, init, &err);
+
+  CL_SET_ERROR(err)
+
+  return(result);
+}
+
+
 #define CL_ARRAY_INIT(NAME, TYPE_CODE)                                                   \
 static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                    \
   int i, n_dims;                                                                         \
@@ -1895,6 +1956,8 @@ int IDL_Load(void) {
     { IDL_cl_reform,      "MG_CL_REFORM",      2, 9, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // array initialization
+    { IDL_cl_make_array,  "MG_CL_MAKE_ARRAY",  1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
     { IDL_cl_bytarr,      "MG_CL_BYTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_intarr,      "MG_CL_INTARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_lonarr,      "MG_CL_LONARR",      1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },

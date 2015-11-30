@@ -28,6 +28,8 @@ function   mg_cl_reform                       2   9   keywords
 
 #= array initialization
 
+function   mg_cl_make_array                   1   8   keywords
+
 function   mg_cl_bytarr                       1   8   keywords
 function   mg_cl_intarr                       1   8   keywords
 function   mg_cl_lonarr                       1   8   keywords
