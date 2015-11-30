@@ -24,7 +24,7 @@ function   mg_cl_putvar                       1   1   keywords
 function   mg_cl_getvar                       1   1   keywords
 procedure  mg_cl_free                         1   1   keywords
 function   mg_cl_reform                       2   9   keywords
-
+function   mg_cl_view                         3   3   keywords
 
 #= array initialization
 

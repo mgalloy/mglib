@@ -1295,6 +1295,71 @@ static IDL_VPTR IDL_cl_reform(int argc, IDL_VPTR *argv, char *argk) {
 }
 
 
+static IDL_VPTR IDL_cl_view(int argc, IDL_VPTR *argv, char *argk) {
+  int n_args;
+  cl_int err = 0;
+
+  CL_VPTR x = (CL_VPTR) argv[0]->value.ptrint;
+  IDL_VPTR offset;
+  IDL_VPTR n_elements;
+  IDL_ARRAY_DIM dim = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+  CL_VPTR result;
+  cl_buffer_region buffer_info;
+
+  typedef struct {
+    IDL_KW_RESULT_FIRST_FIELD;
+    IDL_VPTR error;
+    int error_present;
+  } KW_RESULT;
+
+  static IDL_KW_PAR kw_pars[] = {
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },
+    { NULL }
+  };
+
+  KW_RESULT kw;
+
+  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);
+
+  // initialize error
+  CL_SET_ERROR(err);
+  CL_INIT;
+
+  offset = IDL_CvtULng(1, &argv[1]);
+  n_elements = IDL_CvtULng(1, &argv[2]);
+
+  result = (CL_VPTR) malloc(sizeof(CL_VARIABLE));
+  result->type = x->type;
+  result->flags = x->flags | CL_V_VIEW;
+  result->n_elts = n_elements->value.ul;
+  result->n_dim = 1;
+  dim[0] = n_elements->value.ul;
+  memcpy(result->dim, dim, sizeof(IDL_ARRAY_DIM));
+
+  buffer_info.origin = offset->value.ul * IDL_TypeSizeFunc(x->type);
+  buffer_info.size = n_elements->value.ul * IDL_TypeSizeFunc(x->type);
+  result->buffer = clCreateSubBuffer(x->buffer,
+                                     CL_MEM_READ_WRITE,
+                                     CL_BUFFER_CREATE_TYPE_REGION,
+                                     &buffer_info,
+                                     &err);
+  if (err < 0) {
+    CL_SET_ERROR(err);
+    IDL_KW_FREE;
+    return IDL_GettmpLong(0);
+  }
+
+  IDL_Deltmp(offset);
+  IDL_Deltmp(n_elements);
+
+  IDL_KW_FREE;
+
+  return IDL_GettmpMEMINT((IDL_PTRINT) result);
+}
+
+
 // ===
 
 #pragma mark --- array initialization ---
@@ -1954,6 +2019,7 @@ int IDL_Load(void) {
     { IDL_cl_putvar,      "MG_CL_PUTVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_getvar,      "MG_CL_GETVAR",      1, 1, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_reform,      "MG_CL_REFORM",      2, 9, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_view,        "MG_CL_VIEW",        3, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // array initialization
     { IDL_cl_make_array,  "MG_CL_MAKE_ARRAY",  1, 8, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
