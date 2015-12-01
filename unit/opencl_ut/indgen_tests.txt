@@ -1,0 +1,11 @@
+bindgen 1
+indgen 2
+lindgen 3
+findgen 4
+dindgen 5
+cindgen 6
+dcindgen 9
+uindgen 12
+ulindgen 13
+l64indgen 14
+ul64indgen 15

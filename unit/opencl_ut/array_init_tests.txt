@@ -1,0 +1,11 @@
+bytarr 1
+intarr 2
+lonarr 3
+fltarr 4
+dblarr 5
+complexarr 6
+dcomplexarr 9
+uintarr 12
+ulonarr 13
+lon64arr 14
+ulon64arr 15
