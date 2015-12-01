@@ -6,20 +6,20 @@ function mg_cl_DEVICE_OP_ut::_test, hx
   hx_type = size(hx, /type)
   n = n_elements(hx)
 
-  if (hx_type eq 6 |} hx_type eq 9) then begin
+  if (hx_type eq 6 || hx_type eq 9) then begin
     assert, mg_cl_double_capable(), 'device not capable of double precision', /skip
   endif
 
 
   hresult = make_array(dimension=[n], type=hx_type)
 
-  dx = cl_putvar(hx)
-  dresult = cl_putvar(hresult)
+  dx = mg_cl_putvar(hx)
+  dresult = mg_cl_putvar(hresult)
 
   dresult = self->device_op(dx, lhs=dresult)
   hresult = self->host_op(hx)
 
-  result = cl_getvar(dresult)
+  result = mg_cl_getvar(dresult)
 
   tolerance = hx_type eq 5 || hx_type eq 9 ? self.d_tolerance : self.f_tolerance
   if (hx_type eq 6 || hx_type eq 9) then tolerance *= sqrt(2.0)

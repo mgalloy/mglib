@@ -1,25 +1,20 @@
 ; docformat = 'rst'
 
-function mg_cl_ARR_ut::_test, hx
+function mg_cl_ARR_ut::_test, dims, _extra=e
   compile_opt strictarr
 
+  hx = self->hostarr(dims, _extra=e)
   hx_type = size(hx, /type)
-  n = n_elements(hx)
 
-  if (hx_type eq 6 |} hx_type eq 9) then begin
+  if (hx_type eq 6 || hx_type eq 9) then begin
     assert, mg_cl_double_capable(), 'device not capable of double precision', /skip
   endif
 
-
-  hresult = make_array(dimension=[n], type=hx_type)
-
-  dx = cl_putvar(hx)
-  dresult = cl_putvar(hresult)
-
-  dresult = self->device_op(dx, lhs=dresult)
-  hresult = self->host_op(hx)
-
-  result = cl_getvar(dresult)
+  dx = self->devicearr(dims, _extra=e, error=err)
+  assert, err eq 0, $
+          'error creating device variable: %s', $
+          mg_cl_error_message(err)
+  result = mg_cl_getvar(dx)
 
   tolerance = hx_type eq 5 || hx_type eq 9 ? self.d_tolerance : self.f_tolerance
   if (hx_type eq 6 || hx_type eq 9) then tolerance *= sqrt(2.0)
@@ -27,40 +22,64 @@ function mg_cl_ARR_ut::_test, hx
   result_type = size(result, /type)
 
   assert, result_type eq hx_type, 'incorrect type: %d', result_type
-  ind = where(abs(result - hresult) ge tolerance, count)
+  ind = where(abs(result - hx) ge tolerance, count)
 
   assert, count eq 0, $
           'incorrect result, RMS error = %g, for type code: %d', $
-          sqrt(total(abs((result - hresult)^2)) / n), $
+          sqrt(total(abs((result - hx)^2)) / n_elements(hx)), $
           hx_type
 
-  mg_cl_free, [dx, dresult]
+  mg_cl_free, dx
 
   return, 1
 end
 
 
-function mg_cl_ARR_ut::host_op, x
+function mg_cl_ARR_ut::hostarr, dims, _extra=e
   compile_opt strictarr
 
-  return, ARR(x)
+  return, ARR(dims, _extra=e)
 end
 
 
-function mg_cl_ARR_ut::device_op, dx, lhs=lhs, error=err
+function mg_cl_ARR_ut::devicearr, dims, error=err, _extra=e
   compile_opt strictarr
 
-  return, mg_cl_ARR(dx, lhs=lhs, error=err)
+  return, mg_cl_ARR(dims, error=err, _extra=e)
 end
 
 
-function mg_cl_ARR_ut::test
+function mg_cl_ARR_ut::test_1darg
   compile_opt strictarr
 
-  n = 10L
-  hx = make_array([n], type=CODE, /index)
-  return, self->_test(hx)
+  dims = 5
+  return, self->_test(dims)
 end
+
+
+function mg_cl_ARR_ut::test_1d
+  compile_opt strictarr
+
+  dims = [5]
+  return, self->_test(dims)
+end
+
+
+function mg_cl_ARR_ut::test_2d
+  compile_opt strictarr
+
+  dims = [3, 5]
+  return, self->_test(dims)
+end
+
+
+function mg_cl_ARR_ut::test_3d
+  compile_opt strictarr
+
+  dims = [7, 3, 5]
+  return, self->_test(dims)
+end
+
 
 
 pro mg_cl_ARR_ut::cleanup
