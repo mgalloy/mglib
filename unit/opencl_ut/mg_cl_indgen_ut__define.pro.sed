@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-function mg_cl_DEVICE_OP_ut::_test, hx
+function mg_cl_ARR_ut::_test, hx
   compile_opt strictarr
 
   hx_type = size(hx, /type)
@@ -40,47 +40,40 @@ function mg_cl_DEVICE_OP_ut::_test, hx
 end
 
 
-function mg_cl_DEVICE_OP_ut::host_op, x
+function mg_cl_ARR_ut::host_op, x
   compile_opt strictarr
 
-  return, HOST_OP(x)
+  return, ARR(x)
 end
 
 
-function mg_cl_DEVICE_OP_ut::device_op, dx, lhs=lhs, error=err
+function mg_cl_ARR_ut::device_op, dx, lhs=lhs, error=err
   compile_opt strictarr
 
-  return, mg_cl_DEVICE_OP(dx, lhs=lhs, error=err)
+  return, mg_cl_ARR(dx, lhs=lhs, error=err)
 end
 
 
-function mg_cl_DEVICE_OP_ut::test
+function mg_cl_ARR_ut::test
   compile_opt strictarr
 
   n = 10L
-  for t = 0L, n_elements(*self.valid_codes) - 1L do begin
-    hx = make_array([n], type=(*self.valid_codes)[t], /index)
-    result = self->_test(hx)
-  endfor
-
-  return, 1
+  hx = make_array([n], type=CODE, /index)
+  return, self->_test(hx)
 end
 
 
-pro mg_cl_DEVICE_OP_ut::cleanup
+pro mg_cl_ARR_ut::cleanup
   compile_opt strictarr
 
-  ptr_free, self.valid_codes
   self->MGutLibTestCase::cleanup
 end
 
 
-function mg_cl_DEVICE_OP_ut::init, _extra=e
+function mg_cl_ARR_ut::init, _extra=e
   compile_opt strictarr
 
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
-
-  self.valid_codes = ptr_new([CODES])
 
   eps = (machar()).eps
   self.f_tolerance = 2.01 * eps
@@ -90,12 +83,11 @@ function mg_cl_DEVICE_OP_ut::init, _extra=e
 end
 
 
-pro mg_cl_DEVICE_OP_ut__define
+pro mg_cl_ARR_ut__define
   compile_opt strictarr
 
-  define = { mg_cl_DEVICE_OP_ut, inherits MGutLibTestCase, $
+  define = { mg_cl_ARR_ut, inherits MGutLibTestCase, $
              f_tolerance: 0.0, $
-             d_tolerance: 0.0D, $
-             valid_codes: ptr_new() $
+             d_tolerance: 0.0D $
            }
 end
