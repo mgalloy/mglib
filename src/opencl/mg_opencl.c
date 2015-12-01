@@ -2149,7 +2149,7 @@ CL_UNARY_OP(cosh, cosh, cosh(z[i].x)*cos(z[i].y), sinh(z[i].x)*sin(z[i].y))
 CL_UNARY_OP(tanh, tanh, sinh(2*z[i].x)/(cosh(2*z[i].x)+cos(2*z[i].y)), sin(2*z[i].y)/(cosh(2*z[i].x)+cos(2*z[i].y)))
 CL_UNARY_OP(asinh, asinh, log(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)+sqrt((0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))*(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))-1)), -asin(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)-0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)))
 CL_UNARY_OP(acosh, acosh, log(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)+sqrt((0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))*(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))-1)), acos(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)-0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)))
-CL_UNARY_OP(atanh, atanh, 0.25*log((z[i].y*z[i].y+(z[i].x+1)*(z[i].x+1))/(z[i].y*z[i].y+(z[i].x-1)*(z[i].x-1))), -0.5*atan2(-2*z[i].y,(1-z[i].y*z[i].y-z[i].x*z[i].x)))
+CL_UNARY_OP(atanh, atanh, 0.25*log((z[i].y*z[i].y+(z[i].x+1)*(z[i].x+1))/(z[i].y*z[i].y+(z[i].x-1)*(z[i].x-1))), 0.5*atan2(-2*z[i].y,(1-z[i].y*z[i].y-z[i].x*z[i].x)))
 
 
 // ===
