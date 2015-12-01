@@ -90,7 +90,10 @@ function mg_fits_diff_ut::init, _extra=e
 
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
 
-  self->addTestingRoutine, ['mg_fits_diff', 'mg_fits_diff_keywords'], $
+  self->addTestingRoutine, ['mg_fits_diff', $
+                            'mg_fits_diff_getkeywords', $
+                            'mg_fits_diff_checkkeywords', $
+                            'mg_fits_diff_checkdata'], $
                            /is_function
 
   self.fits_data_root = mg_src_root()

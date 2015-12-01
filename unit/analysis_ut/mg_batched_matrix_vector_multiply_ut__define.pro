@@ -127,8 +127,6 @@ function mg_batched_matrix_vector_multiply_ut::init, _extra=e
 
   if (~self->MGutLibTestCase::init(_extra=e)) then return, 0
 
-  self->addTestingRoutine, 'mg_batched_matrix_vector_multiply_ut', /is_function
-
   return, 1
 end
 
