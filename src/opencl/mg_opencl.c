@@ -1017,7 +1017,7 @@ static IDL_VPTR IDL_cl_putvar(int argc, IDL_VPTR *argv, char *argk) {
 
   buffer = clCreateBuffer(current_context,
                           CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-                          IDL_TypeSize[argv[0]->type] * argv[0]->value.arr->n_elts,
+                          IDL_TypeSizeFunc(argv[0]->type) * argv[0]->value.arr->n_elts,
                           argv[0]->value.arr->data,
                           &err);
   if (err < 0) {
@@ -1082,7 +1082,7 @@ static IDL_VPTR IDL_cl_getvar(int argc, IDL_VPTR *argv, char *argk) {
 
   buffer = cl_var->buffer;
   type = cl_var->type;
-  n_bytes = cl_var->n_elts * IDL_TypeSize[type];
+  n_bytes = cl_var->n_elts * IDL_TypeSizeFunc(type);
 
   CL_INIT;
 
@@ -1389,10 +1389,9 @@ static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int
 
   buffer = clCreateBuffer(current_context,
                           CL_MEM_READ_WRITE,
-                          IDL_TypeSize[type] * n_elts,
+                          IDL_TypeSizeFunc(type) * n_elts,
                           NULL,
                           err);
-
   if (*err < 0) {
     return IDL_GettmpLong(0);
   }
@@ -1447,7 +1446,11 @@ static IDL_VPTR IDL_cl_array_init(int n_dims, IDL_MEMINT dims[], UCHAR type, int
     }
 
     *err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer);
-    *err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &n_elts);
+    if (*err < 0) {
+      return IDL_GettmpLong(0);
+    }
+
+    *err = clSetKernelArg(kernel, 1, sizeof(unsigned int), &n_elts);
     if (*err < 0) {
       return IDL_GettmpLong(0);
     }
