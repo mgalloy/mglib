@@ -21,7 +21,7 @@ pro mgwidobjectwidget::setProperty, title=title, offset=offset
   compile_opt strictarr
 
   if (n_elements(title) gt 0) then begin
-    widget_control, self.tlb, tlb_set_title=title
+    widget_control, self.tlb, tlb_set_title=self.name ' - ' + title
   endif
 
   if (n_elements(offset) gt 0) then begin
@@ -63,6 +63,38 @@ end
 pro mgwidobjectwidget::handle_events, event
   compile_opt strictarr
 
+end
+
+
+;= widget helper methods
+
+;+
+; Set status bar message. Find the widget with `UNAME` "statusbar", if
+; available, and sets its `VALUE`. Call without any arguments to set status
+; message to the empty string.
+;
+; :Params:
+;   msg : in, optional, type=string, default=''
+;     message (or C format string) to set status to
+;   arg1, arg2, arg3, arg4 : in, optional, type=any
+;     arguments to use if `msg` is a C format string
+;-
+pro mgwidobjectwidget::set_status, msg, arg1, arg2, arg3, arg4
+  compile_opt strictarr
+
+  statusbar = widget_info(self.tlb, find_by_uname='statusbar')
+  if (statusbar eq -1) then return
+
+  case n_params() of
+    0: _msg = ''
+    1: _msg = msg
+    2: _msg = string(arg1, format='(%"' + msg + '")')
+    3: _msg = string(arg1, arg2, format='(%"' + msg + '")')
+    4: _msg = string(arg1, arg2, arg3, format='(%"' + msg + '")')
+    5: _msg = string(arg1, arg2, arg3, arg4, format='(%"' + msg + '")')
+  endcase
+
+  widget_control, statusbar, set_value=_msg
 end
 
 
