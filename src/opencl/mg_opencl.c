@@ -2084,7 +2084,7 @@ static cl_int IDL_cl_unary_op(IDL_VPTR input, IDL_VPTR output, char *op, char *r
 #define CL_UNARY_OP(NAME, OP, RE_EXPR, IM_EXPR)                                         \
 static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                   \
   IDL_VPTR input = argv[0];                                                             \
-    CL_VPTR cl_input = (CL_VPTR) input->value.ptrint; \
+  CL_VPTR cl_input = (CL_VPTR) input->value.ptrint;                                     \
   IDL_VPTR output;                                                                      \
   int n_args;                                                                           \
   cl_int err;                                                                           \
@@ -2153,6 +2153,169 @@ CL_UNARY_OP(tanh, tanh, sinh(2*z[i].x)/(cosh(2*z[i].x)+cos(2*z[i].y)), sin(2*z[i
 CL_UNARY_OP(asinh, asinh, log(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)+sqrt((0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))*(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)+0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x))-1)), -asin(0.5*sqrt((-z[i].y+1)*(-z[i].y+1)+z[i].x*z[i].x)-0.5*sqrt((-z[i].y-1)*(-z[i].y-1)+z[i].x*z[i].x)))
 CL_UNARY_OP(acosh, acosh, log(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)+sqrt((0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))*(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)+0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y))-1)), acos(0.5*sqrt((z[i].x+1)*(z[i].x+1)+z[i].y*z[i].y)-0.5*sqrt((z[i].x-1)*(z[i].x-1)+z[i].y*z[i].y)))
 CL_UNARY_OP(atanh, atanh, 0.25*log((z[i].y*z[i].y+(z[i].x+1)*(z[i].x+1))/(z[i].y*z[i].y+(z[i].x-1)*(z[i].x-1))), 0.5*atan2(-2*z[i].y,(1-z[i].y*z[i].y-z[i].x*z[i].x)))
+
+
+// ===
+
+#pragma mark --- binary operations ---
+
+static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output, char *op, char *re_expr, char *im_expr) {
+  cl_int err = 0;
+  CL_VPTR x = (CL_VPTR) input1->value.ptrint;
+  CL_VPTR y = (CL_VPTR) input2->value.ptrint;
+  unsigned int n_elts = x->n_elts;
+  char is_complex = x->type == 6 || x->type == 9;
+
+  size_t local_size = 64;
+  size_t global_size = ceil(n_elts / (float) local_size) * local_size;
+
+  CL_VPTR result = (CL_VPTR) output->value.ptrint;
+  char *program_buffer;
+  cl_program program;
+  char options[500];
+  size_t program_size;
+  cl_kernel kernel;
+  char *kernel_name;
+  int slen;
+
+  // check to make sure both operands are the same type and same length
+  if (x->n_elts != y->n_elts) {
+    IDL_Message(IDL_M_NAMED_GENERIC,
+                IDL_MSG_LONGJMP,
+                "Binary operands must have the same number of elements");
+  }
+  if (x->type != y->type) {
+    IDL_Message(IDL_M_NAMED_GENERIC,
+                IDL_MSG_LONGJMP,
+                "Binary operands must match type");
+  }
+
+  slen = 9 + strlen(op) + 1 + strlen(CL_TypeNames[x->type]) + 1;
+  kernel_name = (char *) malloc(slen);
+  sprintf(kernel_name, "binary_op_%s_%s", op, CL_TypeNames[x->type]);
+  kernel_name[slen] = '\0';
+
+  kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
+  if (!kernel) {
+    program_buffer = is_complex ? binary_z_op : binary_op;
+    program_size = strlen(program_buffer);
+    program = clCreateProgramWithSource(current_context,
+                                        1,
+                                        (const char**) &program_buffer,
+                                        &program_size,
+                                        &err);
+    if (err < 0) return(err);
+
+    if (is_complex) {
+      sprintf(options, "-DTYPE=%s -DRE_EXPR=%s -DIM_EXPR=%s",
+              CL_TypeNames[x->type], re_expr, im_expr);
+    } else {
+      sprintf(options, "-DTYPE=%s -DOP=%s", CL_TypeNames[x->type], op);
+    }
+
+    err = clBuildProgram(program, 0, NULL, options, NULL, NULL);
+    if (err < 0) {
+      CL_CHECK_BUILD;
+      return(err);
+    }
+  
+    kernel = clCreateKernel(program, "binary_op", &err);
+    if (err < 0) return(err);
+
+    mg_table_put(kernel_table, kernel_name, (void *) kernel);
+  }
+
+  err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &x->buffer);
+  if (err < 0) return(err);
+
+  err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &y->buffer);
+  if (err < 0) return(err);
+
+  err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &result->buffer);
+  if (err < 0) return(err);
+
+  err = clSetKernelArg(kernel, 3, sizeof(unsigned int), &n_elts);
+  if (err < 0) return(err);
+
+  err = clEnqueueNDRangeKernel(current_queue,
+                               kernel,
+                               1,
+                               NULL,
+                               &global_size,
+                               &local_size,
+                               0,
+                               NULL,
+                               NULL);
+  if (err < 0) return(err);
+
+  err = clFinish(current_queue);
+  if (err < 0) return(err);
+
+  return(CL_SUCCESS);
+}
+
+#define CL_BINARY_OP(NAME, OP, RE_EXPR, IM_EXPR)                                        \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                   \
+  IDL_VPTR input1 = argv[0];                                                            \
+  IDL_VPTR input2 = argv[1];                                                            \
+  CL_VPTR cl_input1 = (CL_VPTR) input1->value.ptrint;                                   \
+  CL_VPTR cl_input2 = (CL_VPTR) input2->value.ptrint;                                   \
+  IDL_VPTR output;                                                                      \
+  int n_args;                                                                           \
+  cl_int err;                                                                           \
+                                                                                        \
+  typedef struct {                                                                      \
+    IDL_KW_RESULT_FIRST_FIELD;                                                          \
+    IDL_VPTR error;                                                                     \
+    int error_present;                                                                  \
+    IDL_VPTR lhs;                                                                       \
+    int lhs_present;                                                                    \
+  } KW_RESULT;                                                                          \
+                                                                                        \
+  static IDL_KW_PAR kw_pars[] = {                                                       \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                             \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                         \
+    { "LHS", IDL_TYP_UNDEF, 1, IDL_KW_VIN,                                              \
+      IDL_KW_OFFSETOF(lhs_present), IDL_KW_OFFSETOF(lhs) },                             \
+    { NULL }                                                                            \
+  };                                                                                    \
+                                                                                        \
+  KW_RESULT kw;                                                                         \
+                                                                                        \
+  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); \
+                                                                                        \
+  if (kw.lhs_present) {                                                                 \
+    output = kw.lhs;                                                                    \
+  } else {                                                                              \
+    IDL_ARRAY_DIM dims = { 0, 0, 0, 0, 0, 0, 0, 0 };                                    \
+    memcpy(dims, cl_input1->dim, sizeof(IDL_ARRAY_DIM));                                \
+    output = IDL_cl_array_init(cl_input1->n_dim,                                        \
+                               dims,                                                    \
+                               cl_input1->type,                                         \
+                               IDL_ARR_INI_NOP,                                         \
+                               &err);                                                   \
+  }                                                                                     \
+  err = IDL_cl_binary_op(input1, input2, output, #OP, #RE_EXPR, #IM_EXPR);              \
+  return(output);                                                                       \
+}
+
+CL_BINARY_OP(add, +, z[i].x+w[i].x, z[i].y+w[i].y);
+CL_BINARY_OP(sub, -, z[i].x-w[i].x, z[i].y-w[i].y);
+CL_BINARY_OP(mult, *, z[i].x*w[i].x-z[i].y*w[i].y, z[i].y*w[i].x+z[i].x*w[i].y);
+CL_BINARY_OP(div, /, (z[i].x*w[i].x+z[i].y*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y), (z[i].y*w[i].x-z[i].x*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y));
+
+CL_BINARY_OP(and, &, z[i].x&w[i]x, z[i].y&w[i].y);
+CL_BINARY_OP(or, |, z[i].x|w[i]x, z[i].y|w[i].y);
+CL_BINARY_OP(xor, ^, z[i].x^w[i]x, z[i].y^w[i].y);
+
+// CL_BINARY_OP(mod, %, fmod, fmod());
+
+// CL_BINARY_OP(eq, ==, (z[i].x==w[i].x)&&(z[i].y==w[i].y), 0);
+// CL_BINARY_OP(ne, !=, (z[i].x!=w[i].x)||(z[i].y!=w[i].y), 0);
+// CL_BINARY_OP(gt, >, 0, 0);
+// CL_BINARY_OP(ge, >=, 0, 0);
+// CL_BINARY_OP(lt, <, 0, 0);
+// CL_BINARY_OP(le, <=, 0, 0);
 
 
 // ===
@@ -2253,6 +2416,24 @@ int IDL_Load(void) {
     { IDL_cl_asinh,       "MG_CL_ASINH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_acosh,       "MG_CL_ACOSH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_atanh,       "MG_CL_ATANH",       1, 3, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // binary operations
+    { IDL_cl_add,         "MG_CL_ADD",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_sub,         "MG_CL_SUB",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_mult,        "MG_CL_MULT",        2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_div,         "MG_CL_DIV",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_and,         "MG_CL_AND",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_or,          "MG_CL_OR",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_xor,         "MG_CL_XOR",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // { IDL_cl_mod,         "MG_CL_MOD",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+
+    // { IDL_cl_eq,          "MG_CL_EQ",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // { IDL_cl_ne,          "MG_CL_NE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // { IDL_cl_gt,          "MG_CL_GT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // { IDL_cl_ge,          "MG_CL_GE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // { IDL_cl_lt,          "MG_CL_LT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    // { IDL_cl_le,          "MG_CL_LE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
