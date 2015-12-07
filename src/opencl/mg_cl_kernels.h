@@ -79,7 +79,7 @@ char *binary_op =
   "                        const unsigned int n) {\n"
   "\n"
   "  size_t i = get_global_id(0);\n"
-  "  if (i < n) result[i] = x[i] OP y[i];\n"
+  "  if (i < n) result[i] = OP;\n"
   "}\n";
 
 char *binary_z_op =
@@ -97,3 +97,4 @@ char *binary_z_op =
   "  size_t i = get_global_id(0);\n"
   "  if (i < n) { result[i].x = RE_EXPR; result[i].y = IM_EXPR; }\n"
   "}\n";
+

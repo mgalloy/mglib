@@ -2159,7 +2159,7 @@ CL_UNARY_OP(atanh, atanh, 0.25*log((z[i].y*z[i].y+(z[i].x+1)*(z[i].x+1))/(z[i].y
 
 #pragma mark --- binary operations ---
 
-static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output, char *op, char *re_expr, char *im_expr) {
+static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output, char *op, char *re_expr, char *im_expr, char is_comparison) {
   cl_int err = 0;
   CL_VPTR x = (CL_VPTR) input1->value.ptrint;
   CL_VPTR y = (CL_VPTR) input2->value.ptrint;
@@ -2197,7 +2197,7 @@ static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output
 
   kernel = (cl_kernel) mg_table_get(kernel_table, kernel_name);
   if (!kernel) {
-    program_buffer = is_complex ? binary_z_op : binary_op;
+    program_buffer = (is_complex && !is_comparison) ? binary_z_op : binary_op;
     program_size = strlen(program_buffer);
     program = clCreateProgramWithSource(current_context,
                                         1,
@@ -2206,7 +2206,7 @@ static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output
                                         &err);
     if (err < 0) return(err);
 
-    if (is_complex) {
+    if (is_complex && !is_comparison) {
       sprintf(options, "-DTYPE=%s -DRE_EXPR=%s -DIM_EXPR=%s",
               CL_TypeNames[x->type], re_expr, im_expr);
     } else {
@@ -2254,68 +2254,67 @@ static cl_int IDL_cl_binary_op(IDL_VPTR input1, IDL_VPTR input2, IDL_VPTR output
   return(CL_SUCCESS);
 }
 
-#define CL_BINARY_OP(NAME, OP, RE_EXPR, IM_EXPR)                                        \
-static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                   \
-  IDL_VPTR input1 = argv[0];                                                            \
-  IDL_VPTR input2 = argv[1];                                                            \
-  CL_VPTR cl_input1 = (CL_VPTR) input1->value.ptrint;                                   \
-  CL_VPTR cl_input2 = (CL_VPTR) input2->value.ptrint;                                   \
-  IDL_VPTR output;                                                                      \
-  int n_args;                                                                           \
-  cl_int err;                                                                           \
-                                                                                        \
-  typedef struct {                                                                      \
-    IDL_KW_RESULT_FIRST_FIELD;                                                          \
-    IDL_VPTR error;                                                                     \
-    int error_present;                                                                  \
-    IDL_VPTR lhs;                                                                       \
-    int lhs_present;                                                                    \
-  } KW_RESULT;                                                                          \
-                                                                                        \
-  static IDL_KW_PAR kw_pars[] = {                                                       \
-    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                             \
-      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                         \
-    { "LHS", IDL_TYP_UNDEF, 1, IDL_KW_VIN,                                              \
-      IDL_KW_OFFSETOF(lhs_present), IDL_KW_OFFSETOF(lhs) },                             \
-    { NULL }                                                                            \
-  };                                                                                    \
-                                                                                        \
-  KW_RESULT kw;                                                                         \
-                                                                                        \
-  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw); \
-                                                                                        \
-  if (kw.lhs_present) {                                                                 \
-    output = kw.lhs;                                                                    \
-  } else {                                                                              \
-    IDL_ARRAY_DIM dims = { 0, 0, 0, 0, 0, 0, 0, 0 };                                    \
-    memcpy(dims, cl_input1->dim, sizeof(IDL_ARRAY_DIM));                                \
-    output = IDL_cl_array_init(cl_input1->n_dim,                                        \
-                               dims,                                                    \
-                               cl_input1->type,                                         \
-                               IDL_ARR_INI_NOP,                                         \
-                               &err);                                                   \
-  }                                                                                     \
-  err = IDL_cl_binary_op(input1, input2, output, #OP, #RE_EXPR, #IM_EXPR);              \
-  return(output);                                                                       \
+#define CL_BINARY_OP(NAME, OP, RE_EXPR, IM_EXPR, IS_COMPARISON)                           \
+static IDL_VPTR IDL_cl_##NAME(int argc, IDL_VPTR *argv, char *argk) {                     \
+  IDL_VPTR input1 = argv[0];                                                              \
+  IDL_VPTR input2 = argv[1];                                                              \
+  CL_VPTR cl_input1 = (CL_VPTR) input1->value.ptrint;                                     \
+  CL_VPTR cl_input2 = (CL_VPTR) input2->value.ptrint;                                     \
+  IDL_VPTR output;                                                                        \
+  int n_args;                                                                             \
+  cl_int err;                                                                             \
+                                                                                          \
+  typedef struct {                                                                        \
+    IDL_KW_RESULT_FIRST_FIELD;                                                            \
+    IDL_VPTR error;                                                                       \
+    int error_present;                                                                    \
+    IDL_VPTR lhs;                                                                         \
+    int lhs_present;                                                                      \
+  } KW_RESULT;                                                                            \
+                                                                                          \
+  static IDL_KW_PAR kw_pars[] = {                                                         \
+    { "ERROR", IDL_TYP_LONG, 1, IDL_KW_OUT,                                               \
+      IDL_KW_OFFSETOF(error_present), IDL_KW_OFFSETOF(error) },                           \
+    { "LHS", IDL_TYP_UNDEF, 1, IDL_KW_VIN,                                                \
+      IDL_KW_OFFSETOF(lhs_present), IDL_KW_OFFSETOF(lhs) },                               \
+    { NULL }                                                                              \
+  };                                                                                      \
+                                                                                          \
+  KW_RESULT kw;                                                                           \
+                                                                                          \
+  n_args = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);   \
+                                                                                          \
+  if (kw.lhs_present) {                                                                   \
+    output = kw.lhs;                                                                      \
+  } else {                                                                                \
+    IDL_ARRAY_DIM dims = { 0, 0, 0, 0, 0, 0, 0, 0 };                                      \
+    memcpy(dims, cl_input1->dim, sizeof(IDL_ARRAY_DIM));                                  \
+    output = IDL_cl_array_init(cl_input1->n_dim,                                          \
+                               dims,                                                      \
+                               IS_COMPARISON ? 1 : cl_input1->type,                       \
+                               IDL_ARR_INI_NOP,                                           \
+                               &err);                                                     \
+  }                                                                                       \
+  err = IDL_cl_binary_op(input1, input2, output, #OP, #RE_EXPR, #IM_EXPR, IS_COMPARISON); \
+  return(output);                                                                         \
 }
 
-CL_BINARY_OP(add, +, z[i].x+w[i].x, z[i].y+w[i].y);
-CL_BINARY_OP(sub, -, z[i].x-w[i].x, z[i].y-w[i].y);
-CL_BINARY_OP(mult, *, z[i].x*w[i].x-z[i].y*w[i].y, z[i].y*w[i].x+z[i].x*w[i].y);
-CL_BINARY_OP(div, /, (z[i].x*w[i].x+z[i].y*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y), (z[i].y*w[i].x-z[i].x*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y));
+CL_BINARY_OP(add, x[i]+y[i], z[i].x+w[i].x, z[i].y+w[i].y, 0);
+CL_BINARY_OP(sub, x[i]-y[i], z[i].x-w[i].x, z[i].y-w[i].y, 0);
+CL_BINARY_OP(mult, x[i]*y[i], z[i].x*w[i].x-z[i].y*w[i].y, z[i].y*w[i].x+z[i].x*w[i].y, 0);
+CL_BINARY_OP(div, x[i]/y[i], (z[i].x*w[i].x+z[i].y*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y), (z[i].y*w[i].x-z[i].x*w[i].y)/(w[i].x*w[i].x+w[i].y*w[i].y), 0);
 
-CL_BINARY_OP(and, &, z[i].x&w[i]x, z[i].y&w[i].y);
-CL_BINARY_OP(or, |, z[i].x|w[i]x, z[i].y|w[i].y);
-CL_BINARY_OP(xor, ^, z[i].x^w[i]x, z[i].y^w[i].y);
+CL_BINARY_OP(and, x[i]&y[i], z[i].x&w[i].x, z[i].y&w[i].y, 0);
+CL_BINARY_OP(or, x[i]|y[i], z[i].x|w[i].x, z[i].y|w[i].y, 0);
+CL_BINARY_OP(xor, x[i]^y[i], z[i].x^w[i].x, z[i].y^w[i].y, 0);
+CL_BINARY_OP(mod, fmod(x[i], y[i]), fmod(z[i].x, w[i].x), fmod(z[i].y, w[i].y), 0);
 
-// CL_BINARY_OP(mod, %, fmod, fmod());
-
-// CL_BINARY_OP(eq, ==, (z[i].x==w[i].x)&&(z[i].y==w[i].y), 0);
-// CL_BINARY_OP(ne, !=, (z[i].x!=w[i].x)||(z[i].y!=w[i].y), 0);
-// CL_BINARY_OP(gt, >, 0, 0);
-// CL_BINARY_OP(ge, >=, 0, 0);
-// CL_BINARY_OP(lt, <, 0, 0);
-// CL_BINARY_OP(le, <=, 0, 0);
+CL_BINARY_OP(eq, x[i]==y[i], (x[i].x==y[i].x)&&(x[i].y==y[i].y), 0, 1);
+CL_BINARY_OP(ne, x[i]!=y[i], (x[i].x!=y[i].x)||(x[i].y!=y[i].y), 0, 1);
+CL_BINARY_OP(gt, x[i]>y[i], (x[i].x*x[i].x+x[i].y*x[i].y)>(y[i].x*y[i].x+y[i].y*y[i].y), 0, 1);
+CL_BINARY_OP(ge, x[i]>=y[i], (x[i].x*x[i].x+x[i].y*x[i].y)>=(y[i].x*y[i].x+y[i].y*y[i].y), 0, 1);
+CL_BINARY_OP(lt, x[i]<y[i], (x[i].x*x[i].x+x[i].y*x[i].y)<(y[i].x*y[i].x+y[i].y*y[i].y), 0, 1);
+CL_BINARY_OP(le, x[i]<=y[i], (x[i].x*x[i].x+x[i].y*x[i].y)<=(y[i].x*y[i].x+y[i].y*y[i].y), 0, 1);
 
 
 // ===
@@ -2425,8 +2424,7 @@ int IDL_Load(void) {
     { IDL_cl_and,         "MG_CL_AND",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_or,          "MG_CL_OR",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_xor,         "MG_CL_XOR",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-
-    // { IDL_cl_mod,         "MG_CL_MOD",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_mod,         "MG_CL_MOD",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
     // { IDL_cl_eq,          "MG_CL_EQ",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     // { IDL_cl_ne,          "MG_CL_NE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
