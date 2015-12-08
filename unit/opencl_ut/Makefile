@@ -22,6 +22,19 @@ generate: unary_tests.txt
 		IFS=' ' read -r NAME CODES <<< $$line; \
 		sed -e "s/HOST_OP/$${NAME}/g" -e "s/DEVICE_OP/$${NAME}/g" -e "s/CODES/$${CODES}/g" mg_cl_unary_ut__define.pro.sed > mg_cl_"$${NAME}"_ut__define.pro; \
 	done < unary_tests.txt
+	
+	@echo "Generating binary tests..."
+	@while read -r line; do \
+		IFS=' ' read -r NAME OP CODES <<< $$line; \
+		sed -e "s/HOST_OP/$${OP}/g" -e "s/DEVICE_OP/$${NAME}/g" -e "s/CODES/$${CODES}/g" mg_cl_binary_ut__define.pro.sed > mg_cl_"$${NAME}"_ut__define.pro; \
+	done < binary_tests.txt
+	
+	@echo "Generating comparison binary tests..."
+	@while read -r line; do \
+		IFS=' ' read -r NAME OP CODES <<< $$line; \
+		sed -e "s/HOST_OP/$${OP}/g" -e "s/DEVICE_OP/$${NAME}/g" -e "s/CODES/$${CODES}/g" mg_cl_comparison_ut__define.pro.sed > mg_cl_"$${NAME}"_ut__define.pro; \
+	done < comparison_tests.txt
+
 
 clean:
 	@while read -r line; do \
@@ -39,4 +52,13 @@ clean:
 		IFS=' ' read -r NAME CODES <<< $$line; \
 		rm -f mg_cl_"$${NAME}"_ut__define.pro; \
 	done < unary_tests.txt
-
+	
+	@while read -r line; do \
+		IFS=' ' read -r NAME OP CODES <<< $$line; \
+		rm -f mg_cl_"$${NAME}"_ut__define.pro; \
+	done < binary_tests.txt
+	
+	@while read -r line; do \
+		IFS=' ' read -r NAME OP CODES <<< $$line; \
+		rm -f mg_cl_"$${NAME}"_ut__define.pro; \
+	done < comparison_tests.txt

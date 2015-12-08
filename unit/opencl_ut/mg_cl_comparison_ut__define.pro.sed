@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-function mg_cl_DEVICE_OP_ut::_test, hx
+function mg_cl_DEVICE_OP_ut::_test, hx, hy
   compile_opt strictarr
 
   hx_type = size(hx, /type)
@@ -10,13 +10,15 @@ function mg_cl_DEVICE_OP_ut::_test, hx
     assert, mg_cl_double_capable(), 'device not capable of double precision', /skip
   endif
 
-  hresult = make_array(dimension=[n], type=hx_type)
+  hresult = make_array(dimension=[n], type=1)
 
   dx = mg_cl_putvar(hx)
+  dy = mg_cl_putvar(hy)
+
   dresult = mg_cl_putvar(hresult)
 
-  dresult = self->device_op(dx, lhs=dresult)
-  hresult = self->host_op(hx)
+  dresult = self->device_op(dx, dy, lhs=dresult)
+  hresult = self->host_op(hx, hy)
 
   result = mg_cl_getvar(dresult)
 
@@ -25,7 +27,7 @@ function mg_cl_DEVICE_OP_ut::_test, hx
 
   result_type = size(result, /type)
 
-  assert, result_type eq hx_type, 'incorrect type: %d', result_type
+  assert, result_type eq 1, 'incorrect type: %d', result_type
   ind = where(abs(result - hresult) ge tolerance, count)
 
   assert, count eq 0, $
@@ -33,23 +35,23 @@ function mg_cl_DEVICE_OP_ut::_test, hx
           sqrt(total(abs((result - hresult)^2)) / n), $
           hx_type
 
-  mg_cl_free, [dx, dresult]
+  mg_cl_free, [dx, dy, dresult]
 
   return, 1
 end
 
 
-function mg_cl_DEVICE_OP_ut::host_op, x
+function mg_cl_DEVICE_OP_ut::host_op, x, y
   compile_opt strictarr
 
-  return, HOST_OP(x)
+  return, x HOST_OP y
 end
 
 
-function mg_cl_DEVICE_OP_ut::device_op, dx, lhs=lhs, error=err
+function mg_cl_DEVICE_OP_ut::device_op, dx, dy, lhs=lhs, error=err
   compile_opt strictarr
 
-  return, mg_cl_DEVICE_OP(dx, lhs=lhs, error=err)
+  return, mg_cl_DEVICE_OP(dx, dy, lhs=lhs, error=err)
 end
 
 
@@ -59,7 +61,8 @@ function mg_cl_DEVICE_OP_ut::test
   n = 10L
   for t = 0L, n_elements(*self.valid_codes) - 1L do begin
     hx = make_array([n], type=(*self.valid_codes)[t], /index)
-    result = self->_test(hx)
+    hy = fix(2, type=(*self.valid_codes)[t]) * make_array([n], type=(*self.valid_codes)[t], /index)
+    result = self->_test(hx, hy)
   endfor
 
   return, 1

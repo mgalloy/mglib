@@ -2426,12 +2426,12 @@ int IDL_Load(void) {
     { IDL_cl_xor,         "MG_CL_XOR",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
     { IDL_cl_mod,         "MG_CL_MOD",         2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
 
-    // { IDL_cl_eq,          "MG_CL_EQ",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    // { IDL_cl_ne,          "MG_CL_NE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    // { IDL_cl_gt,          "MG_CL_GT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    // { IDL_cl_ge,          "MG_CL_GE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    // { IDL_cl_lt,          "MG_CL_LT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
-    // { IDL_cl_le,          "MG_CL_LE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_eq,          "MG_CL_EQ",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ne,          "MG_CL_NE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_gt,          "MG_CL_GT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_ge,          "MG_CL_GE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_lt,          "MG_CL_LT",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
+    { IDL_cl_le,          "MG_CL_LE",          2, 4, IDL_SYSFUN_DEF_F_KEYWORDS, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
