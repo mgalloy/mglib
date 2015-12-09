@@ -1,0 +1,11 @@
+digraph hierarchy_of_LIST {
+node [fontname=Courier]
+LIST[shape=box]
+IDL_CONTAINER -> LIST
+IDL_CONTAINER[shape=box]
+COLLECTION -> LIST
+COLLECTION[shape=box]
+IDL_OBJECT -> COLLECTION
+IDL_OBJECT[shape=box]
+{ rank=same; IDL_CONTAINER COLLECTION  }
+}

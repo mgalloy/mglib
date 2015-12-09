@@ -1,0 +1,34 @@
+digraph hierarchy_of_widget {
+node [fontname=Courier]
+1[shape=box, label="tlb [BASE]"]
+1 -> 2
+2[shape=box, label="toolbar [BASE]"]
+2 -> 3
+3[shape=box, label="[BASE]"]
+3 -> 4
+4[shape=box, label="open [BUTTON]"]
+2 -> 5
+5[shape=box, label="[BASE]"]
+5 -> 6
+6[shape=box, label="cmdline [BUTTON]"]
+2 -> 7
+7[shape=box, label="[BASE]"]
+7 -> 8
+8[shape=box, label="annotate [BUTTON]"]
+1 -> 9
+9[shape=box, label="content_base [BASE]"]
+9 -> 10
+10[shape=box, label="browser [TREE]"]
+9 -> 11
+11[shape=box, label="tabs [TAB]"]
+11 -> 12
+12[shape=box, label="[BASE]"]
+12 -> 13
+13[shape=box, label="draw [DRAW]"]
+11 -> 14
+14[shape=box, label="[BASE]"]
+14 -> 15
+15[shape=box, label="fits_header [TEXT]"]
+1 -> 16
+16[shape=box, label="[LABEL]"]
+}
