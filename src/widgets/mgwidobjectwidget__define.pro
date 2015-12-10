@@ -21,7 +21,7 @@ pro mgwidobjectwidget::setProperty, title=title, offset=offset
   compile_opt strictarr
 
   if (n_elements(title) gt 0) then begin
-    widget_control, self.tlb, tlb_set_title=self.name ' - ' + title
+    widget_control, self.tlb, tlb_set_title=self.name + ' - ' + title
   endif
 
   if (n_elements(offset) gt 0) then begin
