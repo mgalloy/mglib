@@ -37,6 +37,8 @@ IDL library of Michael Galloy.
     ENVI user routines
   fileio/
     file input/output routines
+  geometry/
+    routines for computing geometric quantities such as the convex hull
   googlevoice/
     class for connecting to Google Voice
   grib/
@@ -63,8 +65,12 @@ IDL library of Michael Galloy.
     routines for handling network communication
   objects/
     classes for doing object-oriented programming
+  plasma/
+    bindings for Plasma library
   profiling/
     helper routines for profiling code and processing the output
+  rust/
+    attempt to allow writing IDL DLMs in Rust
   save/
     routines for reading/writing/querying save files
   strings/
