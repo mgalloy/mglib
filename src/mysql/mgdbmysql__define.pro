@@ -253,8 +253,12 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
   row_result = create_struct(idl_validname(fields[0].name, /convert_all), $
                              self->_get_type(fields[0]))
   for f = 1L, n_fields - 1L do begin
+    field_name = strupcase(fields[f].name)
+    while (total(tag_names(row_result) eq field_name, /integer) gt 0L) do begin
+      field_name = '_' + field_name
+    endwhile
     row_result = create_struct(row_result, $
-                               fields[f].name, self->_get_type(fields[f]))
+                               field_name, self->_get_type(fields[f]))
   endfor
 
   query_result = replicate(row_result, n_rows)
