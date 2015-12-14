@@ -41,6 +41,22 @@ pro mg_fits_browser_cleanup, tlb
 end
 
 
+;+
+; Wrapper for `STREGEX` to catch errors.
+;-
+function mg_fits_browser_stregex, text, re, boolean=boolean, _ref_extra=e
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, keyword_set(boolean) ? bytarr(n_elements(text)) : -1L
+  endif
+
+  return, stregex(text, re, boolean=boolean, _extra=e)
+end
+
+
 ;= data specific to be overridden by subclass
 
 
@@ -260,6 +276,8 @@ end
 pro mg_fits_browser::redisplay
   compile_opt strictarr
 
+  if (self.currently_selected eq 0L) then return
+
   uname = widget_info(self.currently_selected, /uname)
   case uname of
       'fits:file': begin
@@ -384,6 +402,68 @@ pro mg_fits_browser::open_files
 end
 
 
+;+
+; Resize to the given dimensions.
+;
+; :Params:
+;   x : in, required, type=float
+;     width of browser in pixels
+;   y : in, required, type=float
+;     height of browser in pixels
+;-
+pro mg_fits_browser::resize, x, y
+  compile_opt strictarr
+
+  draw = widget_info(self.tlb, find_by_uname='draw')
+  content_base = widget_info(self.tlb, find_by_uname='content_base')
+  details_base = widget_info(self.tlb, find_by_uname='details')
+  search_text = widget_info(self.tlb, find_by_uname='search')
+  fits_header = widget_info(self.tlb, find_by_uname='fits_header')
+  toolbar = widget_info(self.tlb, find_by_uname='toolbar')
+
+  tlb_geometry = widget_info(self.tlb, /geometry)
+  tree_geometry = widget_info(self.tree, /geometry)
+  draw_geometry = widget_info(draw, /geometry)
+  statusbar_geometry = widget_info(self.statusbar, /geometry)
+  content_base_geometry = widget_info(content_base, /geometry)
+  toolbar_geometry = widget_info(toolbar, /geometry)
+  details_geometry = widget_info(details_base, /geometry)
+  search_geometry = widget_info(search_text, /geometry)
+
+  statusbar_width = x - 2 * tlb_geometry.xpad
+
+  tree_height = y $
+                  - statusbar_geometry.scr_ysize $
+                  - toolbar_geometry.scr_ysize $
+                  - 2 * tlb_geometry.ypad $
+                  - 2 * tlb_geometry.margin
+  draw_size = draw_geometry.scr_ysize $
+                + tree_height - tree_geometry.scr_ysize
+
+  tree_width = x $
+                 - draw_size $
+                 - 2 * tlb_geometry.xpad $
+                 - tlb_geometry.space $
+                 - 2 * content_base_geometry.xpad $
+                 - 2 * content_base_geometry.margin
+  fits_header_ysize = draw_size $
+                      - search_geometry.scr_ysize $
+                      - details_geometry.space
+
+  widget_control, self.tlb, update=0
+
+  widget_control, draw, scr_xsize=draw_size, scr_ysize=draw_size
+  widget_control, search_text, scr_xsize=draw_size
+  widget_control, fits_header, scr_xsize=draw_size, scr_ysize=fits_header_ysize
+  widget_control, self.statusbar, scr_xsize=statusbar_width
+  widget_control, self.tree, scr_xsize=tree_width, scr_ysize=tree_height
+
+  widget_control, self.tlb, update=1
+
+  self->redisplay
+end
+
+
 ;= event handling
 
 ;+
@@ -399,7 +479,7 @@ pro mg_fits_browser::handle_events, event
   uname = widget_info(event.id, /uname)
   case uname of
     'open': self->open_files
-    'tlb':
+    'tlb': self->resize, event.x, event.y
     'export_data':
     'export_header':
     'tabs':
@@ -496,6 +576,35 @@ pro mg_fits_browser::handle_events, event
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
       end
+    'search': begin
+        search_text = widget_info(self.tlb, find_by_uname='search')
+        fits_header = widget_info(self.tlb, find_by_uname='fits_header')
+
+        ; get contents of text box
+        widget_control, search_text, get_value=search_term
+        search_term = search_term[0]
+        if (search_term eq '') then begin
+          self->set_status, /clear
+          widget_control, fits_header, set_text_select=[0, 0]
+          return
+        endif
+
+        ; search header text for search text
+        widget_control, fits_header, get_value=header_text
+        hits = mg_fits_browser_stregex(header_text, search_term, /fold_case, /boolean)
+        hit_lines = where(hits, n_hit_lines)
+        self->set_status, string(search_term, n_hit_lines, $
+                                 format='(%"Found ''%s'' on %d lines")')
+
+        if (n_hit_lines eq 0L) then return
+
+        ; highlight search text in header text
+        hit_line = header_text[hit_lines[0]]
+        pos = mg_fits_browser_stregex(hit_line, search_term, length=len, /fold_case)
+        xy = [pos[0], hit_lines[0]]
+        offset = widget_info(fits_header, text_xy_to_offset=xy)
+        widget_control, fits_header, set_text_select=[offset, len]
+      end
     else: begin
       ; this should never happen, but this message will make debugging easier
       ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
@@ -570,11 +679,14 @@ pro mg_fits_browser::create_widgets, _extra=e
                            uname='draw', retain=2)
 
   ; details column
-  details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column)
+  details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column, $
+                             uname='details')
 
   ; metadata
+  search_text = widget_text(details_base, value='', xsize=80, ysize=1, $
+                            /editable, /all_events, uname='search')
   header_text = widget_text(details_base, value='', $
-                            xsize=80, scr_ysize=scr_ysize, $
+                            xsize=80, scr_ysize=scr_ysize - 100.0, $
                             /scroll, $
                             uname='fits_header')
 
@@ -599,6 +711,8 @@ pro mg_fits_browser::realize_widgets
   image_draw = widget_info(self.tlb, find_by_uname='draw')
   widget_control, image_draw, get_value=draw_id
   self.draw_id = draw_id
+
+  self->resize, 850, 600
 end
 
 
