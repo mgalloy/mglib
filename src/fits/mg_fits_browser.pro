@@ -464,6 +464,39 @@ pro mg_fits_browser::resize, x, y
 end
 
 
+pro mg_fits_browser::select_header_text
+  compile_opt strictarr
+
+  search_text = widget_info(self.tlb, find_by_uname='search')
+  fits_header = widget_info(self.tlb, find_by_uname='fits_header')
+
+  ; get contents of text box
+  widget_control, search_text, get_value=search_term
+  search_term = search_term[0]
+  if (search_term eq '') then begin
+    self->set_status, /clear
+    widget_control, fits_header, set_text_select=[0, 0]
+    return
+  endif
+
+  ; search header text for search text
+  widget_control, fits_header, get_value=header_text
+  hits = mg_fits_browser_stregex(header_text, search_term, /fold_case, /boolean)
+  hit_lines = where(hits, n_hit_lines)
+  self->set_status, string(search_term, n_hit_lines, $
+                                 format='(%"Found ''%s'' on %d lines")')
+
+  if (n_hit_lines eq 0L) then return
+
+  ; highlight search text in header text
+  hit_line = header_text[hit_lines[0]]
+  pos = mg_fits_browser_stregex(hit_line, search_term, length=len, /fold_case)
+  xy = [pos[0], hit_lines[0]]
+  offset = widget_info(fits_header, text_xy_to_offset=xy)
+  widget_control, fits_header, set_text_select=[offset, len]
+end
+
+
 ;= event handling
 
 ;+
@@ -554,6 +587,7 @@ pro mg_fits_browser::handle_events, event
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
+        self->select_header_text
       end
     'fits:extension': begin
         self.currently_selected = event.id
@@ -575,36 +609,9 @@ pro mg_fits_browser::handle_events, event
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
+        self->select_header_text
       end
-    'search': begin
-        search_text = widget_info(self.tlb, find_by_uname='search')
-        fits_header = widget_info(self.tlb, find_by_uname='fits_header')
-
-        ; get contents of text box
-        widget_control, search_text, get_value=search_term
-        search_term = search_term[0]
-        if (search_term eq '') then begin
-          self->set_status, /clear
-          widget_control, fits_header, set_text_select=[0, 0]
-          return
-        endif
-
-        ; search header text for search text
-        widget_control, fits_header, get_value=header_text
-        hits = mg_fits_browser_stregex(header_text, search_term, /fold_case, /boolean)
-        hit_lines = where(hits, n_hit_lines)
-        self->set_status, string(search_term, n_hit_lines, $
-                                 format='(%"Found ''%s'' on %d lines")')
-
-        if (n_hit_lines eq 0L) then return
-
-        ; highlight search text in header text
-        hit_line = header_text[hit_lines[0]]
-        pos = mg_fits_browser_stregex(hit_line, search_term, length=len, /fold_case)
-        xy = [pos[0], hit_lines[0]]
-        offset = widget_info(fits_header, text_xy_to_offset=xy)
-        widget_control, fits_header, set_text_select=[offset, len]
-      end
+    'search': self->select_header_text
     else: begin
       ; this should never happen, but this message will make debugging easier
       ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
