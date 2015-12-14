@@ -120,7 +120,7 @@ if (idlwave_FOUND)
   add_custom_target(idlwave_catalog
     COMMAND ${idlwave_DIR}/idlwave_catalog -v mglib
     WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
-  endif ()
+endif ()
 
 # setup installer
 
