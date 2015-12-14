@@ -474,7 +474,6 @@ pro mg_fits_browser::select_header_text
   widget_control, search_text, get_value=search_term
   search_term = search_term[0]
   if (search_term eq '') then begin
-    self->set_status, /clear
     widget_control, fits_header, set_text_select=[0, 0]
     return
   endif
