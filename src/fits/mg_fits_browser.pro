@@ -464,10 +464,27 @@ pro mg_fits_browser::resize, x, y
 end
 
 
-pro mg_fits_browser::select_header_text
+pro mg_fits_browser::select_header_text, event
   compile_opt strictarr
 
   search_text = widget_info(self.tlb, find_by_uname='search')
+
+  if (strmatch(tag_names(event, /structure_name), 'WIDGET_TEXT*')) then begin
+    ; TODO: maybe should filter on all unprintable characters here
+    if (event.type eq 0 && (event.ch eq 7B || event.ch eq 16B)) then begin
+      widget_control, search_text, get_value=search_term
+      text_select = widget_info(search_text, /text_select)
+      case event.offset of
+        0L: search_term = strmid(search_term, 1)
+        strlen(search_term) - 1: search_term = strmid(search_term, 0, event.offset) + strmid(search_term, event.offset + 1)
+        else: search_term = strmid(search_term, 0, strlen(search_term) - 1)
+      endcase
+      widget_control, search_text, set_value=search_term
+      widget_control, search_text, set_text_select=text_select
+      if (event.ch eq 7B) then self.search_index++ else self.search_index--
+    endif
+  endif
+
   fits_header = widget_info(self.tlb, find_by_uname='fits_header')
 
   ; get contents of text box
@@ -482,15 +499,17 @@ pro mg_fits_browser::select_header_text
   widget_control, fits_header, get_value=header_text
   hits = mg_fits_browser_stregex(header_text, search_term, /fold_case, /boolean)
   hit_lines = where(hits, n_hit_lines)
+
+  self.search_index = 0 > self.search_index < (n_hit_lines - 1L)
   self->set_status, string(search_term, n_hit_lines, $
                                  format='(%"Found ''%s'' on %d lines")')
 
   if (n_hit_lines eq 0L) then return
 
   ; highlight search text in header text
-  hit_line = header_text[hit_lines[0]]
+  hit_line = header_text[hit_lines[self.search_index]]
   pos = mg_fits_browser_stregex(hit_line, search_term, length=len, /fold_case)
-  xy = [pos[0], hit_lines[0]]
+  xy = [pos[0], hit_lines[self.search_index]]
   offset = widget_info(fits_header, text_xy_to_offset=xy)
   widget_control, fits_header, set_text_select=[offset, len]
 end
@@ -586,7 +605,7 @@ pro mg_fits_browser::handle_events, event
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
-        self->select_header_text
+        self->select_header_text, event
       end
     'fits:extension': begin
         self.currently_selected = event.id
@@ -608,9 +627,9 @@ pro mg_fits_browser::handle_events, event
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
-        self->select_header_text
+        self->select_header_text, event
       end
-    'search': self->select_header_text
+    'search': self->select_header_text, event
     else: begin
       ; this should never happen, but this message will make debugging easier
       ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
@@ -799,6 +818,7 @@ pro mg_fits_browser__define
              path: '', $
              nfiles: 0L, $
              currently_selected: 0L, $
+             search_index: 0L, $
              annotate: 0B $
            }
 end
