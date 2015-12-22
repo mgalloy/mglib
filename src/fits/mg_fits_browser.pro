@@ -842,9 +842,12 @@ end
 ;     of the FITS browser
 ;   classname : in, optional, type=string, default='mg_fits_browser'
 ;     classname of subclass of `mg_fits_browser` class
+;   _extra : in, optional, type=keywords
+;     keywords to `::init` for `MG_FITS_BROWSER` or, if specified, the
+;     class of `CLASSNAME`
 ;-
 function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb, $
-                          classname=classname
+                          classname=classname, _extra=e
   compile_opt strictarr
 
   ; parameter filename takes precedence (it clobbers keyword filename, if
@@ -853,7 +856,7 @@ function mg_fits_browser, pfilenames, filenames=kfilenames, tlb=tlb, $
   if (n_elements(pfilenames) gt 0L) then _filenames = pfilenames
 
   _classname = n_elements(classname) eq 0L ? 'mg_fits_browser' : classname
-  b = obj_new(_classname, filenames=_filenames, tlb=tlb)
+  b = obj_new(_classname, filenames=_filenames, tlb=tlb, _extra=e)
 
   return, b
 end
