@@ -35,7 +35,8 @@ function mg_dirwalkiterator::done, only_self_left=only_self_left
       for d = 0L, n_dirs - 1L do begin
        (*self.current_subiterators)[d] = obj_new('MG_DirWalkIterator', $
                                                  dirs[d], $
-                                                 topdown=self.topdown)
+                                                 topdown=self.topdown, $
+                                                 details=self.details)
       endfor
       self.current_subiterator_index = 0L
       return, 0B
@@ -74,7 +75,19 @@ function mg_dirwalkiterator::next
 
   if ((self.topdown && ~self.done_self) || only_self_left) then begin
     self.done_self = 1B
-    return, self.top
+    if (self.details) then begin
+      filenames = file_search(filepath('*', root=self.top), /test_regular, count=n_files)
+      if (n_files gt 0L) then filenames = file_basename(filenames)
+      dirnames = file_search(filepath('*', root=self.top), /test_directory, count=n_dirs)
+      if (n_dirs gt 0L) then dirnames = file_basename(dirnames)
+      return, {dirpath: self.top, $
+               n_files: n_files, $
+               filenames: filenames, $
+               n_dirs: n_dirs, $
+               dirnames: dirnames}
+    endif else begin
+      return, self.top
+    endelse
   endif
 
   current = (*self.current_subiterators)[self.current_subiterator_index]
@@ -91,10 +104,11 @@ end
 ;+
 ; :Private:
 ;-
-pro mg_dirwalkiterator::setProperty, topdown=topdown
+pro mg_dirwalkiterator::setProperty, topdown=topdown, details=details
   compile_opt strictarr
 
   if (n_elements(topdown) gt 0L) then self.topdown = topdown
+  if (n_elements(details) gt 0L) then self.details = details
 end
 
 
@@ -114,13 +128,13 @@ end
 ;+
 ; :Private:
 ;-
-function mg_dirwalkiterator::init, top, topdown=topdown
+function mg_dirwalkiterator::init, top, topdown=topdown, details=details
   compile_opt strictarr
 
   self.top = file_expand_path(top)
   self.current_subiterators = ptr_new(/allocate_heap)
 
-  self->setProperty, topdown=topdown
+  self->setProperty, topdown=topdown, details=details
 
   return, 1
 end
@@ -136,6 +150,7 @@ pro mg_dirwalkiterator__define
             top: '', $
             done_self: 0B, $
             topdown: 0B, $
+            details: 0B, $
             current_subiterators: ptr_new(), $
             current_subiterator_index: 0L $
           }
@@ -163,7 +178,8 @@ function mg_dirwalk::_overloadForeach, value, iterator
   if (n_elements(iterator) eq 0L) then begin
     iterator = obj_new('MG_DirWalkIterator', $
                        self.top, $
-                       topdown=self.topdown)
+                       topdown=self.topdown, $
+                       details=self.details)
   endif
 
   if (iterator->done()) then begin
@@ -181,10 +197,11 @@ end
 ;+
 ; Set properties.
 ;-
-pro mg_dirwalk::setProperty, topdown=topdown
+pro mg_dirwalk::setProperty, topdown=topdown, details=details
   compile_opt strictarr
 
   if (n_elements(topdown) gt 0L) then self.topdown = topdown
+  if (n_elements(details) gt 0L) then self.details = details
 end
 
 
@@ -197,11 +214,11 @@ end
 ;   top : in, required, type=string
 ;     top-level directory to traverse
 ;-
-function mg_dirwalk::init, top, topdown=topdown
+function mg_dirwalk::init, top, topdown=topdown, details=details
   compile_opt strictarr
 
   self.top = file_expand_path(top)
-  self->setProperty, topdown=topdown
+  self->setProperty, topdown=topdown, details=details
 
   return, 1
 end
@@ -215,16 +232,29 @@ pro mg_dirwalk__define
 
   !null = { MG_DirWalk, inherits IDL_Object, $
             top: '', $
-            topdown: 0B $
+            topdown: 0B, $
+            details: 0B $
           }
 end
 
 
 ; main-level example program
 
+; simple walk through directory names visiting each directory path before its
+; subdirectories
 root = filepath('', subdir=['..'], root=mg_src_root())
 foreach dir, mg_dirwalk(root, /topdown) do begin
-  print, dir
+ print, dir
+endforeach
+
+; use details to retrive immediate subdirectories and files for each path
+; visited; visiting each directory path after its subdirectories
+root = filepath('', subdir=['..'], root=mg_src_root())
+foreach dir, mg_dirwalk(root, /details) do begin
+  print, dir.dirpath, dir.n_dirs, dir.n_files, $
+         format='(%"dir path: %s, n_subdirs: %d, n_files: %d")'
+  print, strjoin(dir.dirnames, ', '), format='(%"  subdirs: %s")'
+  print, '  ' + (dir.n_files gt 0L ? transpose(dir.filenames) : '')
 endforeach
 
 end
