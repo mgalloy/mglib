@@ -4,7 +4,7 @@
 ; `MG_DirWalk` is an object that can be used with `FOREACH` to walk through a
 ; directory hierarchy.
 ;
-; :Example:
+; :Examples:
 ;   For example, to traverse the source directories of this library, do the
 ;   following::
 ;
