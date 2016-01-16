@@ -1,7 +1,31 @@
 ; docformat = 'rst'
 
 ;+
-; Class representing a pool of processes.
+; Class representing a pool of processes. In particular, the `::map` method, in
+; both function and procedure form, is useful to run a routine on a list of
+; inputs.
+;
+; For example::
+;
+;  IDL> x = !dtor * findgen(360)
+;  IDL> pool = mg_pool()
+;  IDL> y = pool->map('sin', x)
+;  IDL> plot, x, y
+;
+; For a procedural example, we will set the `OUTPUT` to log the output of a
+; `PRINT` statement::
+;
+;   IDL> x = findgen(4)
+;   IDL> pool = mg_pool(n_processes=4, output='/Users/mgalloy/Desktop/output-%(p)d.log')
+;   IDL> pool->map, 'print', x
+;
+; Checking the files, we see they contain the expected values::
+;
+;   Desktop$ cat output-*
+;         0.00000
+;         1.00000
+;         2.00000
+;         3.00000
 ;
 ; :Properties:
 ;   n_processes : type=long
@@ -9,6 +33,20 @@
 ;   polling_cycle : type=float
 ;     time, in seconds, to wait before checking again to see if work is
 ;     completed
+;   output : in, optional, type=string
+;     form of filename of logs for the processes; this filename should use the
+;     syntax of `MG_SUBS` for substituting the process number into the filename
+;     using the variable name "p", such as::
+;
+;       output = '/Users/mgalloy/output-%(p)02d.log'
+;
+;     which will produce output filenames::
+;
+;       /Users/mgalloy/output-00.log
+;       /Users/mgalloy/output-01.log
+;       /Users/mgalloy/output-02.log
+;
+;     etc.
 ;   _extra : type=keywords
 ;     properties of individual `MG_Process` objects
 ;-
@@ -445,6 +483,56 @@ function mg_pool::_overloadHelp, name
 
   return, string(name, obj_class(self), self.n_processes, $
                  format='(%"%-16s%s  <N_PROCESSES=%d>")')
+end
+
+
+;+
+; Allow indexing a pool to retrieve individual processes. For example::
+;
+;   IDL> pool = mg_pool(n_processes=12)
+;   IDL> foreach p, pool[1:3] do help, p
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=2>
+;   P               MG_PROCESS  <NAME=3>
+;   IDL> foreach p, pool[[2, 3, 7]] do help, p
+;   P               MG_PROCESS  <NAME=2>
+;   P               MG_PROCESS  <NAME=3>
+;   P               MG_PROCESS  <NAME=7>
+;   IDL> foreach p, pool[1:6:2] do help, p
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=3>
+;   P               MG_PROCESS  <NAME=5>
+;-
+function mg_pool::_overloadBracketsRightSide, is_range, subscript
+  compile_opt strictarr
+
+  if (is_range[0]) then begin
+    return, (*self.processes)[subscript[0]:subscript[1]:subscript[2]]
+  endif else begin
+    return, (*self.processes)[subscript]
+  endelse
+end
+
+
+;+
+; Overload `FOREACH` for a pool. For example::
+;
+;   IDL> pool = mg_pool(n_processes=3)
+;   IDL> foreach p, pool do help, p
+;   P               MG_PROCESS  <NAME=0>
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=2>
+;-
+function mg_pool::_overloadForeach, value, index
+  compile_opt strictarr
+
+  if (n_elements(index) eq 0L) then index = 0L
+
+  if (index lt self.n_processes) then begin
+    value = (*self.processes)[index]
+    index += 1
+    return, 1B
+  endif else return, 0B
 end
 
 
