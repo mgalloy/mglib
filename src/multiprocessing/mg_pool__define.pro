@@ -289,6 +289,7 @@ function mg_pool::map, f, iterable1, iterable2, iterable3, iterable4, $
                 pool=self, $
                 func=f, $
                 iterable=iterable, $
+                is_procedure=is_procedure, $
                 _extra=e)
   map->launch
 
