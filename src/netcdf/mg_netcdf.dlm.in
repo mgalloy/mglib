@@ -1,0 +1,8 @@
+MODULE        mg_netcdf
+DESCRIPTION   Tools for dealing with netCDF files
+VERSION       ${VERSION}
+SOURCE        mgalloy
+BUILD_DATE    ${mglib_BUILD_DATE}
+
+
+FUNCTION MG_NC_ISNCDF                              1   1
