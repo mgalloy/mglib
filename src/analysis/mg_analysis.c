@@ -433,7 +433,7 @@ int IDL_Load(void) {
 
   /*
    * Register our routines. The routines must be specified exactly the same
-   * as in mg_introspection.dlm.
+   * as in mg_analysis.dlm.
    */
   return IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));
 }
