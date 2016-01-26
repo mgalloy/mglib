@@ -22,6 +22,12 @@ cmake \
   -Didlwave_DIR:PATH=~/software/idlwave \
   -DPLASMA_INCLUDE_DIR:PATH=~/software/plasma/include \
   -DPLASMA_LIBRARY_DIR:PATH=~/software/plasma/lib \
-  -DIDL_ROOT_DIR=/Applications/exelis/idl85 \
+  -DNETCDF_INCLUDE_DIR:PATH=/usr/local/include \
+  -DNETCDF_LIBRARY:PATH=/usr/local/lib/libnetcdf.a \
+  -DHDF5_LIBRARY:PATH=/usr/local/lib/libhdf5.a \
+  -DHDF5_LA_LIBRARY:PATH=/usr/local/lib/libhdf5_hl.a \
+  -DCURL_LIBRARY:PATH=/usr/lib/libcurl.dylib \
+  -DSZ_LIBRARY:PATH=/usr/local/lib/libsz.a \
+  -DZ_LIBRARY:PATH=/usr/lib/libz.dylib \
   ..
 

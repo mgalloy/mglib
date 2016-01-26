@@ -1,7 +1,31 @@
 ; docformat = 'rst'
 
 ;+
-; Class representing a pool of processes.
+; Class representing a pool of processes. In particular, the `::map` method, in
+; both function and procedure form, is useful to run a routine on a list of
+; inputs.
+;
+; For example::
+;
+;  IDL> x = !dtor * findgen(360)
+;  IDL> pool = mg_pool()
+;  IDL> y = pool->map('sin', x)
+;  IDL> plot, x, y
+;
+; For a procedural example, we will set the `OUTPUT` to log the output of a
+; `PRINT` statement::
+;
+;   IDL> x = findgen(4)
+;   IDL> pool = mg_pool(n_processes=4, output='/Users/mgalloy/Desktop/output-%(p)d.log')
+;   IDL> pool->map, 'print', x
+;
+; Checking the files, we see they contain the expected values::
+;
+;   Desktop$ cat output-*
+;         0.00000
+;         1.00000
+;         2.00000
+;         3.00000
 ;
 ; :Properties:
 ;   n_processes : type=long
@@ -9,6 +33,20 @@
 ;   polling_cycle : type=float
 ;     time, in seconds, to wait before checking again to see if work is
 ;     completed
+;   output : in, optional, type=string
+;     form of filename of logs for the processes; this filename should use the
+;     syntax of `MG_SUBS` for substituting the process number into the filename
+;     using the variable name "p", such as::
+;
+;       output = '/Users/mgalloy/output-%(p)02d.log'
+;
+;     which will produce output filenames::
+;
+;       /Users/mgalloy/output-00.log
+;       /Users/mgalloy/output-01.log
+;       /Users/mgalloy/output-02.log
+;
+;     etc.
 ;   _extra : type=keywords
 ;     properties of individual `MG_Process` objects
 ;-
@@ -260,15 +298,12 @@ end
 ;     items are given by `iterable[i]` with `i=0,1,...n-1`)
 ;
 ; :Keywords:
-;   is_procedure : in, optional, type=boolean
-;     set to indicate `f` is procedure, otherwise it is assumed to be
-;     a function
 ;   _extra : in, optional, type=numeric/string
 ;     keywords to pass to `f`; keywords are not iterated through, they are
 ;     passed as a whole to `f` in each call
 ;-
 function mg_pool::map, f, iterable1, iterable2, iterable3, iterable4, $
-                       is_procedure=is_procedure, _extra=e
+                       _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -296,15 +331,80 @@ function mg_pool::map, f, iterable1, iterable2, iterable3, iterable4, $
     wait, self.polling_cycle
   endwhile
 
-  if (keyword_set(is_procedure)) then begin
-    result = !null
-  endif else begin
-    result = map->get_result()
-  endelse
+  result = map->get_result()
 
   obj_destroy, map
 
   return, result
+end
+
+
+;+
+; Execute a function/procedure on each item of an array and returns
+; the result.
+;
+; :Todo:
+;   this should be able to handle multiple arguments
+;
+; :Examples:
+;   For example, suppose we want to execute a simple function on an array of
+;   items and return the result. The function we wish to execute on each
+;   element is::
+;
+;     function mg_map_demo_func, x
+;       return, x^2
+;     end
+;
+;   Then the function can be done with::
+;
+;     pool = obj_new('MG_Pool')
+;     x_squared = pool->map('mg_map_demo_func', findgen(100))
+;
+; :Params:
+;   f : in, required, type=string
+;     function to call on each item of the iterable arguments, unless
+;     `is_procedure` is set, in which case it is considered a procedure
+;   iterable1, iterable2, iterable3 , iterable4 : in, required, type=iterable type
+;     array or list (technically any `IDL_Object` subclass which implements
+;     the `_overloadSize` and `_overloadBracketsRightSide` methods where the
+;     items are given by `iterable[i]` with `i=0,1,...n-1`)
+;
+; :Keywords:
+;   _extra : in, optional, type=numeric/string
+;     keywords to pass to `f`; keywords are not iterated through, they are
+;     passed as a whole to `f` in each call
+;-
+pro mg_pool::map, f, iterable1, iterable2, iterable3, iterable4, $
+                  _extra=e
+  compile_opt strictarr
+  on_error, 2
+
+  iterable = list()
+  switch n_params() of
+    5: iterable->add, iterable4, 0
+    4: iterable->add, iterable3, 0
+    3: iterable->add, iterable2, 0
+    2: begin
+        iterable->add, iterable1, 0
+        break
+      end
+    1: message, 'at least one iterable argument required'
+    0: message, 'function name argument required'
+  endswitch
+
+  map = obj_new('MG_Map', $
+                pool=self, $
+                func=f, $
+                iterable=iterable, $
+                /is_procedure, $
+                _extra=e)
+  map->launch
+
+  while (~map->is_done()) do begin
+    wait, self.polling_cycle
+  endwhile
+
+  obj_destroy, map
 end
 
 
@@ -386,6 +486,56 @@ function mg_pool::_overloadHelp, name
 end
 
 
+;+
+; Allow indexing a pool to retrieve individual processes. For example::
+;
+;   IDL> pool = mg_pool(n_processes=12)
+;   IDL> foreach p, pool[1:3] do help, p
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=2>
+;   P               MG_PROCESS  <NAME=3>
+;   IDL> foreach p, pool[[2, 3, 7]] do help, p
+;   P               MG_PROCESS  <NAME=2>
+;   P               MG_PROCESS  <NAME=3>
+;   P               MG_PROCESS  <NAME=7>
+;   IDL> foreach p, pool[1:6:2] do help, p
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=3>
+;   P               MG_PROCESS  <NAME=5>
+;-
+function mg_pool::_overloadBracketsRightSide, is_range, subscript
+  compile_opt strictarr
+
+  if (is_range[0]) then begin
+    return, (*self.processes)[subscript[0]:subscript[1]:subscript[2]]
+  endif else begin
+    return, (*self.processes)[subscript]
+  endelse
+end
+
+
+;+
+; Overload `FOREACH` for a pool. For example::
+;
+;   IDL> pool = mg_pool(n_processes=3)
+;   IDL> foreach p, pool do help, p
+;   P               MG_PROCESS  <NAME=0>
+;   P               MG_PROCESS  <NAME=1>
+;   P               MG_PROCESS  <NAME=2>
+;-
+function mg_pool::_overloadForeach, value, index
+  compile_opt strictarr
+
+  if (n_elements(index) eq 0L) then index = 0L
+
+  if (index lt self.n_processes) then begin
+    value = (*self.processes)[index]
+    index += 1
+    return, 1B
+  endif else return, 0B
+end
+
+
 ;= property access
 
 ;+
@@ -440,11 +590,26 @@ end
 ;   polling_cycle : in, optional, type=float, default=0.5
 ;     time, in seconds, to wait before checking again to see if work is
 ;     completed
+;   output : in, optional, type=string
+;     form of filename of logs for the processes; this filename should use the
+;     syntax of `MG_SUBS` for substituting the process number into the filename
+;     using the variable name "p", such as::
+;
+;       output = '/Users/mgalloy/output-%(p)02d.log'
+;
+;     which will produce output filenames::
+;
+;       /Users/mgalloy/output-00.log
+;       /Users/mgalloy/output-01.log
+;       /Users/mgalloy/output-02.log
+;
+;     etc.
 ;   _extra : in, optional, type=keywords
 ;     keywords to 'MG_Process::init'
 ;-
 function mg_pool::init, n_processes=n_processes, $
                         polling_cycle=polling_cycle, $
+                        output=output, $
                         _extra=e
   compile_opt strictarr
 
@@ -452,10 +617,12 @@ function mg_pool::init, n_processes=n_processes, $
 
   self.processes = ptr_new(objarr(self.n_processes))
   for p = 0L, self.n_processes - 1L do begin
-    (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2), _extra=e)
+    if (n_elements(output) gt 0L) then _output = mg_subs(output, {p: p})
+    (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2), output=_output, _extra=e)
   endfor
 
   self.polling_cycle = n_elements(polling_cycle) eq 0 ? 0.5 : polling_cycle
+  self->setProperty, _extra=e
 
   return, 1
 end
