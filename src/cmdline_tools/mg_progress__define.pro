@@ -1,5 +1,44 @@
 ; docformat = 'rst'
 
+;+
+; Simple progress bar for use when iterating over elements of an array or
+; elements in an `IDL_Object` which supports `FOREACH` and `N_ELEMENTS`.
+;
+; :Examples:
+;   First, let's construct a hash to iterate over. The keys will just be
+;   the first `n` letters of the alphabet::
+;
+;     n = 16
+;     letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
+;
+;   The values of the hash will be proportional to the amount of work to do to
+;   process that element of the hash. We will make one element have a much
+;   higher amount of work::
+;
+;     indices = randomu(seed, n)
+;     indices[5] = 5.0
+;
+;     h = hash(letters, indices, /extract))
+;
+;   In the simple use of `mg_progress`, we get an indicator of the progress
+;   through the work, but the estimated time to complete all the work jumps
+;   around::
+;
+;     foreach v, mg_progress(h), k do begin
+;       wait, v
+;     endforeach
+;
+;   If, on the other hand, we can provide an amount of the total work and then
+;   update the progress as we go, the estimate timed to complete all work is
+;   much more accurate:
+;
+;     p = mg_progress(h, total=total(indices))
+;     foreach v, p, k do begin
+;       wait, v
+;       p->update, v
+;     endforeach
+;-
+
 
 ;+
 ; Helper routine to format a number of seconds as a string.
@@ -70,6 +109,13 @@ function mg_progress::termcolumns, default=default
 end
 
 
+pro mg_progress::update, x
+  compile_opt strictarr
+
+  self.current += x
+end
+
+
 ;= overload methods
 
 ;+
@@ -102,14 +148,21 @@ function mg_progress::_overloadForeach, value, key
 
   self.counter = (self.counter + 1) < self.n
 
+  c = self.use_total ? self.current : self.counter
+  t = self.use_total ? self.total : self.n
+
   n_cols = self->termcolumns() - 1L
 
-  n_width = floor(alog10(self.n)) + 1L
+  n_width = floor(alog10(t)) + 1L
 
   elapsed_time = now - self.start_time
-  est_time = elapsed_time / self.counter * self.n
-
-  est_time = self->secs2minsec(est_time, width=est_width)
+  if (c ne 0) then begin
+    est_time = elapsed_time / c * t
+    est_time = self->secs2minsec(est_time, width=est_width)
+  endif else begin
+    est_time = '--:--'
+    est_width = 5L
+  endelse
   elapsed_time = self->secs2minsec(elapsed_time, width=est_width)
 
   format = string(n_width, n_width, $
@@ -117,7 +170,7 @@ function mg_progress::_overloadForeach, value, key
 
   bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width
 
-  done_length = bar_length * self.counter / self.n
+  done_length = round(bar_length * c / t)
   todo_length = bar_length - done_length
 
   done_char = '#'
@@ -126,7 +179,7 @@ function mg_progress::_overloadForeach, value, key
   done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
   todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
 
-  msg = string(100L * self.counter / self.n, done, todo, self.counter, self.n, $
+  msg = string(round(100L * c / t), done, todo, self.counter, self.n, $
                elapsed_time, est_time, $
                format=format)
 
@@ -153,12 +206,18 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable
+function mg_progress::init, iterable, total=total
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
   self.n = n_elements(iterable)
   self.counter = 0L
+
+  if (n_elements(total) gt 0L) then begin
+    self.use_total = 1B
+    self.current = 0.0
+    self.total = total
+  endif
 
   return, 1
 end
@@ -174,6 +233,9 @@ pro mg_progress__define
             iterable: ptr_new(), $
             n: 0L, $
             counter: 0L, $
+            use_total: 0B, $
+            current: 0.0, $
+            total: 0.0, $
             start_time: 0.0D $
           }
 end
@@ -181,12 +243,22 @@ end
 
 ; main-level example program
 
-n = 10
+n = 16
 letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
-indices = 5.0 * indgen(n)
-p = mg_progress(hash(letters, indices, /extract))
+indices = randomu(seed, n)
+indices[5] = 5.0
+h = hash(letters, indices, /extract)
+
+print, 'Simple progress with no pre-calculation, note estimated time changes'
+foreach v, mg_progress(h), k do begin
+  wait, v
+endforeach
+
+print, 'Updating progress with pre-calculation gives a constant estimated time'
+p = mg_progress(h, total=total(indices))
 foreach v, p, k do begin
-  wait, v / 10.0
+  wait, v
+  p->update, v
 endforeach
 
 end
