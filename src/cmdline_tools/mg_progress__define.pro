@@ -109,6 +109,13 @@ function mg_progress::termcolumns, default=default
 end
 
 
+;+
+; Update the amount of work completed by adding `x` to the current amount.
+;
+; :Params:
+;   x : in, required, type=float
+;     amount to add to current amount of work done
+;-
 pro mg_progress::update, x
   compile_opt strictarr
 
