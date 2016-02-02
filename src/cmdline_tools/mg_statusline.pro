@@ -173,7 +173,7 @@ pro mg_statusline, str, column, length=length, clear=clear, $
 
     ; prevent errors from crashing program
     catch, catcherr
-    if (catcherr eq 0L) then begn
+    if (catcherr eq 0L) then begin
       writeu, statusline_unit, outstring
     endif else error = 3L
 
@@ -212,11 +212,11 @@ end
 ; main-level example program
 
 for i = 0, 10 do begin
-  mg_statusline, string(i, format='(%"item: %d")'), /right, length=100
+  mg_statusline, string(i, format='(%"item: %d")'), /right, length=90
   wait, 0.2
 endfor
 
-mg_statusline, /clear, length=100
+mg_statusline, /clear, length=90
 
 print, 'This is the next line of normal output.'
 
