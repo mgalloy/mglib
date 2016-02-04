@@ -173,9 +173,9 @@ function mg_progress::_overloadForeach, value, key
   elapsed_time = self->secs2minsec(elapsed_time, width=est_width)
 
   format = string(n_width, n_width, $
-                  format='(%"(%%\"%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
+                  format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
 
-  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width
+  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width - strlen(self.title)
 
   done_length = round(bar_length * c / t)
   todo_length = bar_length - done_length
@@ -186,7 +186,10 @@ function mg_progress::_overloadForeach, value, key
   done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
   todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
 
-  msg = string(round(100L * c / t), done, todo, self.counter, self.n, $
+  msg = string(self.title,$
+               round(100L * c / t), $
+               done, todo, $
+               self.counter, self.n, $
                elapsed_time, est_time, $
                format=format)
 
@@ -213,12 +216,13 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable, total=total
+function mg_progress::init, iterable, total=total, title=title
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
   self.n = n_elements(iterable)
   self.counter = 0L
+  self.title = n_elements(title) eq 0L ? '' : (title + ' ')
 
   if (n_elements(total) gt 0L) then begin
     self.use_total = 1B
@@ -238,6 +242,7 @@ pro mg_progress__define
 
   !null = { mg_progress, inherits IDL_Object, $
             iterable: ptr_new(), $
+            title: '', $
             n: 0L, $
             counter: 0L, $
             use_total: 0B, $
@@ -262,7 +267,7 @@ foreach v, mg_progress(h), k do begin
 endforeach
 
 print, 'Updating progress with pre-calculation gives a constant estimated time'
-p = mg_progress(h, total=total(indices))
+p = mg_progress(h, total=total(indices), title='Updating progess...')
 foreach v, p, k do begin
   wait, v
   p->update, v
