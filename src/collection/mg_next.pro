@@ -1,7 +1,33 @@
 ; docformat = 'rst'
 
 ;+
-; Advance an iterator.
+; Advance an iterator. Create an iterator with `MG_Iter` class.
+;
+; An iterator for a standard array can be created and responds to `mg_next`::
+;
+;   x = findgen(10)
+;   i = mg_iter(x)
+;   while (mg_next(i, index=index, value=value)) do begin
+;     print, index, value, format='(%"x[%d] = %f")'
+;   endwhile
+;
+; Iterators for objects of class `IDL_Object` which implement `_overloadForeach`
+; can also be created and respond to `mg_next`::
+;
+;   x = list(x, /extract)
+;   i = mg_iter(x)
+;   while (mg_next(i, index=index, value=value)) do begin
+;     print, index, value, format='(%"x[%d] = %f")'
+;   endwhile
+;
+;   n = 26
+;   letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
+;   indices = indgen(n)
+;   h = hash(letters, indices, /extract)
+;   i = mg_iter(h)
+;   while (mg_next(i, index=index, value=value)) do begin
+;     print, index, value, format='(%"h[''%s''] = %d")'
+;   endwhile
 ;
 ; :Returns:
 ;   1 if more elements, 0 if no more elements
