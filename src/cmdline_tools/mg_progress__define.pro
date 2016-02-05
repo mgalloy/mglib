@@ -267,7 +267,7 @@ foreach v, mg_progress(h), k do begin
 endforeach
 
 print, 'Updating progress with pre-calculation gives a constant estimated time'
-p = mg_progress(h, total=total(indices), title='Updating progess...')
+p = mg_progress(h, total=total(indices), title='Updating progress...')
 foreach v, p, k do begin
   wait, v
   p->update, v
