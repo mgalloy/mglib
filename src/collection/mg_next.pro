@@ -77,4 +77,22 @@ while (mg_next(i, index=index, value=value)) do begin
   print, index, value, format='(%"h[''%s''] = %d")'
 endwhile
 
+print, 'Iterating in a cycle over an array...'
+x = ['red', 'blue', 'green']
+i = mg_iter(x, /cycle)
+counter = 0L
+n_cycles = 3
+while (mg_next(i, index=index, value=value)) do begin
+  print, index, value, format='(%"x[%d] = %s")'
+  if (counter++ ge n_cycles * n_elements(x) - 1L) then break
+endwhile
+
+print, 'Iterating in a cycle over a list...'
+i = mg_iter(list(x, /extract), /cycle)
+counter = 0L
+while (mg_next(i, index=index, value=value)) do begin
+  print, index, value, format='(%"x[%d] = %s")'
+  if (counter++ ge n_cycles * n_elements(x) - 1L) then break
+endwhile
+
 end

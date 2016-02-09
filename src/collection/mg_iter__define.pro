@@ -30,6 +30,10 @@
 ;   while (mg_next(i, index=index, value=value)) do begin
 ;     print, index, value, format='(%"h[''%s''] = %d")'
 ;   endwhile
+;
+; :Properties:
+;   cycle : type=boolean
+;     set to cycle through iterator over and over
 ;-
 
 
@@ -56,7 +60,6 @@ function mg_iter::next, value=value, index=index
     more_elements = (*self.iterable)->_overloadForeach(value, _index)
     *self.index = _index
     index = _index
-    return, more_elements
   endif else begin
     if (is_initialized) then begin
       index = *self.index + 1L
@@ -64,11 +67,27 @@ function mg_iter::next, value=value, index=index
       index = 0L
     endelse
 
-    value = (*self.iterable)[index]
+    more_elements = index lt n_elements(*self.iterable)
+    if (more_elements) then value = (*self.iterable)[index]
     *self.index = index
-    more_elements = (index + 1L) lt n_elements(*self.iterable)
-    return, more_elements
   endelse
+
+  if (~more_elements && self.cycle) then begin
+    !null = temporary(*self.index)
+    return, self->next(value=value, index=index)
+  endif else return, more_elements
+end
+
+
+;= property access
+
+;+
+; Set properties.
+;-
+pro mg_iter::setProperty, cycle=cycle
+  compile_opt strictarr
+
+  if (n_elements(cycle) gt 0L) then self.cycle = cycle
 end
 
 
@@ -95,11 +114,13 @@ end
 ;     either an array or an object of class `IDL_Object` which implements
 ;     `_overloadForeach`
 ;-
-function mg_iter::init, iterable
+function mg_iter::init, iterable, cycle=cycle
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
   self.index = ptr_new(/allocate_heap)
+
+  self->setProperty, cycle=cycle
 
   return, 1
 end
@@ -113,6 +134,7 @@ pro mg_iter__define
 
   !null = {mg_iter, inherits IDL_Object, $
            iterable: ptr_new(), $
-           index: ptr_new() $
+           index: ptr_new(), $
+           cycle: 0B $
           }
 end
