@@ -430,8 +430,6 @@ pro mg_fits_browser::resize, x, y
   details_geometry = widget_info(details_base, /geometry)
   search_geometry = widget_info(search_text, /geometry)
 
-  statusbar_width = x - 2 * tlb_geometry.xpad
-
   tree_height = y $
                   - statusbar_geometry.scr_ysize $
                   - toolbar_geometry.scr_ysize $
@@ -446,9 +444,13 @@ pro mg_fits_browser::resize, x, y
                  - tlb_geometry.space $
                  - 2 * content_base_geometry.xpad $
                  - 2 * content_base_geometry.margin
+
+  tree_width >= 100.0
   fits_header_ysize = draw_size $
                       - search_geometry.scr_ysize $
                       - details_geometry.space
+
+  statusbar_width = tree_width + draw_size + 2 * tlb_geometry.xpad + tlb_geometry.space
 
   widget_control, self.tlb, update=0
 
@@ -662,7 +664,7 @@ pro mg_fits_browser::create_widgets, _extra=e
   compile_opt strictarr
 
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
-                         _extra=e)
+                         /tlb_size_events, _extra=e)
 
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
