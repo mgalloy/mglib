@@ -37,6 +37,39 @@ end
 
 
 ;+
+; Print the methods of a class in basic syntax, i.e., without arguments.
+;
+; :Params:
+;   classname : in, required, type=string
+;     name of the class to check for method of
+;
+; :Keywords:
+;   indent : in, optional, type=string, default=''
+;     prefix to indent output by
+;-
+pro mg_class_hierarchy_print_methods, classname, indent=indent
+  compile_opt strictarr
+
+;   man, classname + '::*', output=output
+;   ind = where(~output.startsWith('Filename') and output ne '', n_good)
+;   good = output[ind]
+;   dashes = strarr(n_good) + '  '
+;   d_ind = where(~good.startsWith(' '))
+; ;  stop
+;   dashes[d_ind] = '- '
+;   if (n_good gt 0L) then print, transpose(indent + '  ' + dashes + good)
+
+  method_indent = '    '
+  functions = [routine_info(/functions), routine_info(/functions, /system)]
+  procedures = [routine_info(), routine_info(/system)]
+  f_ind = where(functions.startsWith(classname + '::'), n_functions)
+  p_ind = where(procedures.startsWith(classname + '::'), n_procedures)
+  if (n_functions gt 0L) then print, transpose(indent + method_indent + 'result = ' + strlowcase(functions[f_ind]) + '()')
+  if (n_procedures gt 0L) then print, transpose(indent + method_indent + strlowcase(procedures[p_ind]))
+end
+
+
+;+
 ; Helper function to print the class hierarchy hash.
 ;
 ; :Private:
@@ -49,15 +82,20 @@ end
 ; :Keywords:
 ;   indent : in, optional, type=string, default=''
 ;     prefix to indent output by
+;   methods : in, optional, type=boolean
+;     if set, list methods of each class as well
 ;-
-pro mg_class_hierarchy_print, hierarchy, indent=indent
+pro mg_class_hierarchy_print, hierarchy, indent=indent, methods=methods
   compile_opt strictarr
 
   _indent = n_elements(indent) eq 0L ? '' : indent
 
   foreach h, hierarchy, classname do begin
     print, _indent, classname, format='(%"%s%s")'
-    mg_class_hierarchy_print, h, indent=_indent + '  '
+    if (keyword_set(methods)) then begin
+      mg_class_hierarchy_print_methods, classname, indent=_indent
+    endif
+    mg_class_hierarchy_print, h, indent=_indent + '  ', methods=methods
   endforeach
 end
 
@@ -101,15 +139,21 @@ end
 ;     for that superclass
 ;   no_print : in, optional, type=boolean
 ;     set to not print the hierarchy
+;   methods : in, optional, type=boolean
+;     if set, list methods of each class as well
 ;-
-pro mg_class_hierarchy, object, hierarchy=hierarchy, no_print=no_print
+pro mg_class_hierarchy, object, $
+                        hierarchy=hierarchy, $
+                        no_print=no_print, $
+                        methods=methods
   compile_opt strictarr
 
   hierarchy = hash()
   classname = size(object, /type) eq 11 ? obj_class(object) : strupcase(object)
+  resolve_all, class=classname, /quiet, /continue_on_error
   hierarchy[classname] = mg_class_hierarchy_helper(object)
 
-  if (~keyword_set(no_print)) then mg_class_hierarchy_print, hierarchy
+  if (~keyword_set(no_print)) then mg_class_hierarchy_print, hierarchy, methods=methods
   if (~arg_present(hierarchy)) then mg_class_hierarchy_cleanup, hierarchy
 end
 
