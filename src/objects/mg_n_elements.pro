@@ -7,16 +7,16 @@
 ; overloaded value.
 ;
 ; :Returns:
-;    long
+;   long
 ;
 ; :Params:
-;    var : in, optional, type=any
-;       variable to find number of elements of
+;   var : in, optional, type=any
+;     variable to find number of elements of
 ;
 ; :Keywords:
-;    no_operatoroverload : in, optional, type=boolean
-;       set to find the number of array elements in var, not the operator
-;       overloaded value
+;   no_operatoroverload : in, optional, type=boolean
+;     set to find the number of array elements in var, not the operator
+;     overloaded value
 ;-
 function mg_n_elements, var, no_operatoroverload=noOperatoroverload
   compile_opt strictarr
