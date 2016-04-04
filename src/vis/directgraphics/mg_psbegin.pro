@@ -35,6 +35,7 @@
 pro mg_psbegin, image=image, $
                 charsize=charsize, thick=thick, symsize=symsize, $
                 xsize=xsize, ysize=ysize, retina=retina, $
+                bits_per_pixel=bits_per_pixel, $
                 _extra=e
   compile_opt strictarr
   common _$mg_ps, origdev, _image, psconfig
@@ -73,7 +74,8 @@ pro mg_psbegin, image=image, $
     device, /helvetica
   endif
 
-  device, /color, bits_per_pixel=8, xsize=_xsize, ysize=_ysize, _extra=e
+  device, /color, bits_per_pixel=mg_default(bits_per_pixel, 8), $
+          xsize=_xsize, ysize=_ysize, _extra=e
 end
 
 
