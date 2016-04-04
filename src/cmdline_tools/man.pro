@@ -409,14 +409,17 @@ end
 ; Print comments about a routine or finds matching routines.
 ;
 ; :Params:
-;    routine : in, required, type=string
-;       routine name to look up
+;   routine : in, required, type=string
+;     routine name to look up
 ;
 ; :Keywords:
-;    no_page : in, optional, type=boolean
-;       set to not page the output
+;   no_page : in, optional, type=boolean
+;     set to not page the output
+;   output : out, optional, type=strarr
+;     set to a named variable to retrieve the output as a string array instead
+;     of printing it
 ;-
-pro man, routine, no_page=noPage
+pro man, routine, no_page=noPage, output=output
   compile_opt strictarr, hidden
 
   ; check if there are wildcards in the routine name
@@ -484,16 +487,18 @@ pro man, routine, no_page=noPage
     endfor
   endelse
 
-  termAvailable = man_termavailable()
+  if (~arg_present(output)) then begin
+    termAvailable = man_termavailable()
 
-  if (keyword_set(noPage) || ~termAvailable) then begin
-    print, transpose(output)
-  endif else begin
-    terminal = !version.os_family eq 'unix' ? '/dev/tty' : 'CON:'
-    openw, outlun, terminal, /get_lun, /more
-    printf, outlun, transpose(output)
-    free_lun, outlun
-  endelse
+    if (keyword_set(noPage) || ~termAvailable) then begin
+      print, transpose(output)
+    endif else begin
+      terminal = !version.os_family eq 'unix' ? '/dev/tty' : 'CON:'
+      openw, outlun, terminal, /get_lun, /more
+      printf, outlun, transpose(output)
+      free_lun, outlun
+    endelse
+  endif
 end
 
 
