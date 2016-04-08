@@ -223,12 +223,15 @@ end
 ;   differences : out, optional, type=strarr
 ;     set to a named variable to retrieve a an array of difference messages,
 ;     `!null` if no differences found
+;   headers_only : in, optional, type=boolean
+;     set to only compare headers
 ;-
 function mg_fits_diff, filename1, filename2, $
                        ignore_keywords=ignore_keywords, $
                        ignore_whitespace=ignore_whitespace, $
                        tolerance=tolerance, $
-                       differences=differences
+                       differences=differences, $
+                       headers_only=headers_only
   compile_opt strictarr
 
   fits_open, filename1, fcb1
@@ -247,9 +250,11 @@ function mg_fits_diff, filename1, filename2, $
 
   ; check data
 
-  diff or= mg_fits_diff_checkdata(data1, filename1, $
-                                  data2, filename2, $
-                                  differences=_differences)
+  if (not keyword_set(headers_only)) then begin
+    diff or= mg_fits_diff_checkdata(data1, filename1, $
+                                    data2, filename2, $
+                                    differences=_differences)
+  endif
 
   extend_diff = fcb1.nextend ne fcb1.nextend
   if (extend_diff gt 0) then begin
@@ -270,10 +275,12 @@ function mg_fits_diff, filename1, filename2, $
                                         extension=e, $
                                         differences=_differences)
 
-    diff or= mg_fits_diff_checkdata(data1, filename1, $
-                                    data2, filename2, $
-                                    extension=e, $
-                                    differences=_differences)
+    if (not keyword_set(headers_only)) then begin
+      diff or= mg_fits_diff_checkdata(data1, filename1, $
+                                      data2, filename2, $
+                                      extension=e, $
+                                      differences=_differences)
+    endif
   endfor
 
   fits_close, fcb1
