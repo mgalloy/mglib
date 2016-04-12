@@ -503,8 +503,8 @@ pro mg_fits_browser::select_header_text, event
   hit_lines = where(hits, n_hit_lines)
 
   self.search_index = 0 > self.search_index < (n_hit_lines - 1L)
-  self->set_status, string(search_term, n_hit_lines, $
-                                 format='(%"Found ''%s'' on %d lines (ctrl-g/ctrl-p to cycle through hits)")')
+  self->set_status, string(search_term, self.search_index + 1L, n_hit_lines, $
+                           format='(%"Found ''%s'': %d of %d lines (ctrl-g/ctrl-p to move through hits)")')
 
   if (n_hit_lines eq 0L) then return
 
