@@ -140,8 +140,13 @@ end
 ;     extension name
 ;   ext_header : in, required, type=strarr
 ;     header for extension
+;
+; :Keywords:
+;   filename : in, required, type=string
+;     filename of file
 ;-
-function mg_fits_browser::extension_bitmap, ext_number, ext_name, ext_header
+function mg_fits_browser::extension_bitmap, ext_number, ext_name, ext_header, $
+                                            filename=filename
   compile_opt strictarr
 
   return, 0
@@ -381,7 +386,8 @@ pro mg_fits_browser::load_files, filenames
     for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
       ext_node = widget_tree(file_node, $
-                             bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header), $
+                             bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header, $
+                                                           filename=f), $
                              value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
