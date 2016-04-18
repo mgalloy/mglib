@@ -19,11 +19,11 @@
 ; a stable sort.
 ;
 ; :Returns:
-;    `lonarr(n_elements(data))`
+;   `lonarr(n_elements(data))`
 ;
 ; :Params:
-;    data : in, required, type=strarr
-;       array of strings to sort
+;   data : in, required, type=strarr
+;     array of strings to sort
 ;-
 function mg_sort_strings, data
   compile_opt idl2, logical_predicate
@@ -50,21 +50,18 @@ end
 ; Radix sort input data.
 ;
 ; :Returns:
-;    `lonarr(n_elements(data))`
+;   `lonarr(n_elements(data))`
 ;
 ; :Params:
-;    data : in, required, type="int, long, float, double, or string array"
-;       data to sort
+;   data : in, required, type="int, long, float, double, or string array"
+;     data to sort
 ;
 ; :Keywords:
-;    radix : in, optional, type=int, default=256
-;       radix to use for sort
+;   radix : in, optional, type=int, default=256
+;     radix to use for sort
 ;-
-function mg_sort, data, radix=radix
+function mg_sort_base, data, radix=radix
   compile_opt idl2, logical_predicate
-
-   ; default radix if not specified
-   _radix = n_elements(radix) eq 0L ? 256 : radix
 
   ; support signed ints
   case size(data, /type) of
@@ -93,22 +90,63 @@ function mg_sort, data, radix=radix
 
   ; implement a slight speed improvement for small data ranges
   rng = mx - mn
-  if (rng lt mn / _radix) then begin
+  if (rng lt mn / radix) then begin
     sorted -= mn
     mx -= mn
   endif
 
   factor = 1ull
   while (mx gt 0) do begin
-    mx /= _radix
+    mx /= radix
     rem = sorted / factor
-    digit = rem mod _radix
-    factor = factor * _radix
-    h = histogram(digit, min=0, max=_radix-1, binsize=1, reverse_indices=ri)
-    ind = ri[_radix + 1:*]
+    digit = rem mod radix
+    factor = factor * radix
+    h = histogram(digit, min=0, max=radix-1, binsize=1, reverse_indices=ri)
+    ind = ri[radix + 1:*]
     sorted = sorted[ind]
     indices = indices[ind]
   endwhile
 
   return, indices
+end
+
+
+;+
+; Radix sort input data.
+;
+; :Returns:
+;   `lonarr(n_elements(data))`
+;
+; :Params:
+;   key1 : in, required, type="int, long, float, double, or string array"
+;     data to sort
+;   key2 : in, optional, type="int, long, float, double, or string array"
+;     data to sort to break ties for key1
+;
+; :Keywords:
+;   radix : in, optional, type=int, default=256
+;     radix to use for sort
+;-
+function mg_sort, key1, key2, radix=radix
+  compile_opt strictarr
+
+   ; default radix if not specified
+   _radix = n_elements(radix) eq 0L ? 256 : radix
+
+  ind1 = mg_sort_base(key1, radix=_radix)
+
+  if (n_elements(key2) gt 0L) then begin
+    uniq_key1_ind = uniq(key1, ind1)
+    ; for each unique key1 that has multiple values, sort same section of y
+    for u = 0L, n_elements(uniq_key1_ind) - 1L do begin
+      tied_ind = where(key1 eq key1[uniq_key1_ind[u]], n_tied)
+      if (n_tied gt 1L) then begin
+        ind2 = mg_sort_base(key2[tied_ind], radix=_radix)
+        ind = where(ind1 eq tied_ind[0], count)
+        ind1[ind[0]:ind[0] + n_tied - 1L] = (ind1[ind[0]:ind[0] + n_tied - 1L])[ind2]
+      endif
+    endfor
+  endif
+
+  return, ind1
 end
