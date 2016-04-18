@@ -105,17 +105,25 @@ end
 ;   string
 ;
 ; :Params:
-;   ext_number : in, required, type=long
-;     extension number
-;   ext_name : in, required, type=long
-;     extension name
-;   ext_header : in, required, type=strarr
-;     header for extension
+;   n_exts : in, required, type=long
+;     number of extensions
+;   ext_names : in, required, type=strarr
+;     extension names
+;
+; :Keywords:
+;   filename : in, required, type=string
+;     filename of file
 ;-
-function mg_fits_browser::extension_title, ext_number, ext_name, ext_header
+function mg_fits_browser::extension_title, n_exts, ext_names, $
+                                           filename=filename
   compile_opt strictarr
 
-  return, ext_name eq '' ? ('extension ' + strtrim(ext_number, 2)) : ext_name
+  titles = strarr(n_exts)
+  for e = 1L, n_exts do begin
+    titles[e - 1L] = ext_names[e] eq '' ? ('ext ' + strtrim(e, 2)) : ext_names[e]
+  endfor
+
+  return, titles
 end
 
 
@@ -362,17 +370,19 @@ pro mg_fits_browser::load_files, filenames
       continue
     endif
     fits_open, f, fcb
-    fits_read, fcb, data, header, exten_no=0
+    fits_read, fcb, data, header, exten_no=0, /header_only
 
     file_node = widget_tree(self.tree, /folder, $
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
                             uname='fits:file', uvalue=file_expand_path(f))
+    extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
+                                             filename=f)
     for i = 1L, fcb.nextend do begin
-      fits_read, fcb, ext_data, ext_header, exten_no=i
+      fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
       ext_node = widget_tree(file_node, $
                              bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header), $
-                             value=self->extension_title(i, fcb.extname[i], ext_header), $
+                             value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
     fits_close, fcb
