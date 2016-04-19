@@ -122,31 +122,32 @@ end
 ;     data to sort
 ;   key2 : in, optional, type="int, long, float, double, or string array"
 ;     data to sort to break ties for key1
+;   key3 : in, optional, type="int, long, float, double, or string array"
+;     data to sort to break ties for key1 and key2
 ;
 ; :Keywords:
 ;   radix : in, optional, type=int, default=256
 ;     radix to use for sort
 ;-
-function mg_sort, key1, key2, radix=radix
+function mg_sort, key1, key2, key3, radix=radix
   compile_opt strictarr
 
-   ; default radix if not specified
-   _radix = n_elements(radix) eq 0L ? 256 : radix
+  ; default radix if not specified
+  _radix = n_elements(radix) eq 0L ? 256 : radix
 
-  ind1 = mg_sort_base(key1, radix=_radix)
+  if (n_elements(key3) gt 0L) then begin
+    ind3 = mg_sort_base(key3, radix=_radix)
+    ind2 = mg_sort_base(key2[ind3], radix=_radix)
+    ind1 = mg_sort_base(key1[ind3[ind2]], radix=_radix)
+    ind = ind3[ind2[ind1]]
+  endif else if (n_elements(key2) gt 0L) then begin 
+    ind2 = mg_sort_base(key2, radix=_radix)
+    ind1 = mg_sort_base(key1[ind2], radix=_radix)
+    ind = ind2[ind1]
+  endif else begin
+    ind = mg_sort_base(key1, radix=_radix)
+  endelse
 
-  if (n_elements(key2) gt 0L) then begin
-    uniq_key1_ind = uniq(key1, ind1)
-    ; for each unique key1 that has multiple values, sort same section of y
-    for u = 0L, n_elements(uniq_key1_ind) - 1L do begin
-      tied_ind = where(key1 eq key1[uniq_key1_ind[u]], n_tied)
-      if (n_tied gt 1L) then begin
-        ind2 = mg_sort_base(key2[tied_ind], radix=_radix)
-        ind = where(ind1 eq tied_ind[0], count)
-        ind1[ind[0]:ind[0] + n_tied - 1L] = (ind1[ind[0]:ind[0] + n_tied - 1L])[ind2]
-      endif
-    endfor
-  endif
 
-  return, ind1
+  return, ind
 end
