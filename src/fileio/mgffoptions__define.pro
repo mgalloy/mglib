@@ -481,6 +481,7 @@ function mgffoptions::get, option, $
                            raw=raw, $
                            extract=extract, $
                            boolean=boolean, $
+                           type=type, $
                            count=count, $
                            default=default
   compile_opt strictarr
