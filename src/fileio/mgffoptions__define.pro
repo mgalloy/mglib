@@ -467,6 +467,8 @@ end
 ;   boolean : in, optional, type=boolean
 ;     set to convert retrieved values to boolean values, 0B or 1B; accepts 1,
 ;     "yes", "true" (either case) as true, everything else as false
+;   type : in, optional, type=integer
+;     type code to convert result to; default is a string
 ;   count : out, optional, type=long
 ;     set to a named variable to determine the number of elements returned (most
 ;     useful when using `EXTRACT`)
@@ -486,6 +488,7 @@ function mgffoptions::get, option, $
 
   count = 0L
   _default = n_elements(default) eq 0L ? !null : default
+  _type = n_elements(type) eq 0L ? 7 : type
 
   if (n_params() lt 1L) then message, 'option not specified'
   _option = option
@@ -528,7 +531,7 @@ function mgffoptions::get, option, $
     endelse
   endif
 
-  return, keyword_set(boolean) ? self->_convertBoolean(value) : value
+  return, keyword_set(boolean) ? self->_convertBoolean(value) : fix(value, type=_type)
 end
 
 
