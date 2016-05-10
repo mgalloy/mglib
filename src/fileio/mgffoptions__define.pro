@@ -22,6 +22,25 @@
 ;-
 
 
+;= helper routines
+
+;+
+; Use ordered hashes if running on IDL 8.3+, otherwise use hash.
+;
+; :Returns:
+;   hash or orderedhash object
+;-
+function mgffoptions::_hash
+  compile_opt strictarr
+
+  if (mg_idlversion(require='8.3')) then begin
+    h = orderedhash()
+  endif else begin
+    h = hash()
+  endelse
+  return, h
+end
+
 ;= overload methods
 
 
@@ -309,7 +328,7 @@ pro mgffoptions::put, option, value, section=section
     _option = strlowcase(_option)
   endif
 
-  if (~self.sections->hasKey(_section)) then (self.sections)[_section] = hash()
+  if (~self.sections->hasKey(_section)) then (self.sections)[_section] = self->_hash()
   ((self.sections)[_section])[_option] = size(value, /n_dimensions) eq 0L $
                                          ? value $
                                          : ('[ ' + strjoin(value, ', ') + ' ]')
@@ -579,7 +598,7 @@ function mgffoptions::init, fold_case=fold_case, $
 
   self.fold_case = keyword_set(fold_case)
   self.use_environment = keyword_set(use_environment)
-  self.sections = hash()
+  self.sections = self->_hash()
   self.output_separator = n_elements(output_separator) gt 0L $
                             ? output_separator $
                             : ':'
