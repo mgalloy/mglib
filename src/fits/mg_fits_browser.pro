@@ -175,8 +175,12 @@ end
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::display_image, data, header
+pro mg_fits_browser::display_image, data, header, filename=filename
   compile_opt strictarr
 
   ndims = size(data, /n_dimensions)
@@ -226,8 +230,12 @@ end
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::annotate_image, data, header
+pro mg_fits_browser::annotate_image, data, header, filename=filename
   compile_opt strictarr
 
   ; by default nothing is done
@@ -235,15 +243,19 @@ end
 
 
 ;+
-; Determine if annotation is avalable for a given image.
+; Determine if annotation is available for a given image.
 ;
 ; :Params:
 ;   data : in, required, type=2D array
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-function mg_fits_browser::annotate_available, data, header
+function mg_fits_browser::annotate_available, data, header, filename=filename
   compile_opt strictarr
 
   return, 0B
@@ -274,12 +286,16 @@ end
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::display, data, header
+pro mg_fits_browser::display, data, header, filename=filename
   compile_opt strictarr
 
-  self->display_image, data, header
-  if (self.annotate) then self->annotate_image, data, header
+  self->display_image, data, header, filename=filename
+  if (self.annotate) then self->annotate_image, data, header, filename=filename
 end
 
 
@@ -311,7 +327,8 @@ pro mg_fits_browser::redisplay
       end
     else:
   endcase
-  self->display, data, header
+
+  self->display, data, header, filename=f
 end
 
 
@@ -635,10 +652,11 @@ pro mg_fits_browser::handle_events, event
         fits_close, fcb
 
         annotate_button = widget_info(self.tlb, find_by_uname='annotate')
-        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
+        widget_control, annotate_button, $
+                        sensitive=self->annotate_available(data, header, filename=f)
 
         *self.current_data = data
-        self->display, data, header
+        self->display, data, header, filename=f
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
@@ -658,10 +676,11 @@ pro mg_fits_browser::handle_events, event
         fits_close, fcb
 
         annotate_button = widget_info(self.tlb, find_by_uname='annotate')
-        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
+        widget_control, annotate_button, $
+                        sensitive=self->annotate_available(data, header, filename=f)
 
         *self.current_data = data
-        self->display, data, header
+        self->display, data, header, filename=f
 
         header_widget = widget_info(self.tlb, find_by_uname='fits_header')
         widget_control, header_widget, set_value=header
