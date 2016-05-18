@@ -118,6 +118,8 @@ function mg_fits_browser::extension_title, n_exts, ext_names, $
                                            filename=filename
   compile_opt strictarr
 
+  if (n_exts eq 0L) then return, []
+
   titles = strarr(n_exts)
   for e = 1L, n_exts do begin
     titles[e - 1L] = ext_names[e] eq '' ? ('ext ' + strtrim(e, 2)) : ext_names[e]
@@ -175,8 +177,12 @@ end
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   dimensions : in, required, type=fltarr(2)
+;     dimensions of target window
 ;-
-pro mg_fits_browser::display_image, data, header
+pro mg_fits_browser::display_image, data, header, dimensions=dimensions
   compile_opt strictarr
 
   ndims = size(data, /n_dimensions)
@@ -185,36 +191,30 @@ pro mg_fits_browser::display_image, data, header
     return
   endif
 
-  draw_wid = widget_info(self.tlb, find_by_uname='draw')
-  geo_info = widget_info(draw_wid, /geometry)
-
   dims = size(data, /dimensions)
 
   data_aspect_ratio = float(dims[1]) / float(dims[0])
-  draw_aspect_ratio = float(geo_info.draw_ysize) / float(geo_info.draw_xsize)
+  draw_aspect_ratio = float(dimensions[1]) / float(dimensions[0])
 
   if (data_aspect_ratio gt draw_aspect_ratio) then begin
     ; use y as limiting factor for new dimensions
-    dims *= geo_info.draw_ysize / float(dims[1])
+    dims *= dimensions[1] / float(dims[1])
   endif else begin
     ; use x as limiting factor for new dimensions
-    dims *= geo_info.draw_xsize / float(dims[0])
+    dims *= dimensions[0] / float(dims[0])
   endelse
 
   _data = congrid(data, dims[0], dims[1])
 
-  if (dims[0] gt geo_info.draw_xsize || dims[1] gt geo_info.draw_ysize) then begin
+  if (dims[0] gt dimensions[0] || dims[1] gt dimensions[1]) then begin
     xoffset = 0
     yoffset = 0
   endif else begin
-    xoffset = (geo_info.draw_xsize - dims[0]) / 2
-    yoffset = (geo_info.draw_ysize - dims[1]) / 2
+    xoffset = (dimensions[0] - dims[0]) / 2
+    yoffset = (dimensions[1] - dims[1]) / 2
   endelse
 
-  old_win_id = !d.window
-  wset, self.draw_id
   tvscl, _data, xoffset, yoffset
-  wset, old_win_id
 end
 
 
@@ -226,8 +226,12 @@ end
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   dimensions : in, required, type=fltarr(2)
+;     dimensions of target window
 ;-
-pro mg_fits_browser::annotate_image, data, header
+pro mg_fits_browser::annotate_image, data, header, dimensions=dimensions
   compile_opt strictarr
 
   ; by default nothing is done
@@ -259,61 +263,37 @@ end
 pro mg_fits_browser::erase
   compile_opt strictarr
 
-  old_win_id = !d.window
-  wset, self.draw_id
   erase
-  wset, old_win_id
 end
 
 
 ;+
 ; Display the image and its annotations (if desired).
-;
-; :Params:
-;   data : in, required, type=2D array
-;     data to display
-;   header : in, required, type=strarr
-;     FITS header
 ;-
-pro mg_fits_browser::display, data, header
+pro mg_fits_browser::display
   compile_opt strictarr
 
-  self->display_image, data, header
-  if (self.annotate) then self->annotate_image, data, header
+  if (n_elements(*self.current_data) eq 0L) then return
+
+  draw_wid = widget_info(self.tlb, find_by_uname='draw')
+  geo_info = widget_info(draw_wid, /geometry)
+
+  ; get current graphics status to be able to reset afterwards
+  old_win_id = !d.window
+  device, get_decomposed=odec
+  tvlct, rgb, /get
+
+  wset, self.draw_id
+  dimensions = [geo_info.draw_xsize, geo_info.draw_ysize]
+  self->display_image, *self.current_data, *self.current_header, $
+                       dimensions=dimensions
+  if (self.annotate) then self->annotate_image, *self.current_data, *self.current_header, dimensions=dimensions
+
+  ; reset graphics status
+  wset, old_win_id
+  tvlct, rgb
+  device, decomposed=odec
 end
-
-
-;+
-; Redisplay the currently selected item.
-;-
-pro mg_fits_browser::redisplay
-  compile_opt strictarr
-
-  if (self.currently_selected eq 0L) then return
-
-  uname = widget_info(self.currently_selected, /uname)
-  case uname of
-      'fits:file': begin
-        widget_control, self.currently_selected, get_uvalue=f
-
-        fits_open, f, fcb
-        fits_read, fcb, data, header, exten_no=0
-        fits_close, fcb
-      end
-    'fits:extension': begin
-        widget_control, self.currently_selected, get_uvalue=e
-        parent_id = widget_info(self.currently_selected, /parent)
-        widget_control, parent_id, get_uvalue=f
-
-        fits_open, f, fcb
-        fits_read, fcb, data, header, exten_no=e
-        fits_close, fcb
-      end
-    else:
-  endcase
-  self->display, data, header
-end
-
 
 
 ;+
@@ -478,7 +458,7 @@ pro mg_fits_browser::resize, x, y
 
   widget_control, self.tlb, update=1
 
-  self->redisplay
+  self->display
 end
 
 
@@ -536,6 +516,156 @@ end
 ;= event handling
 
 ;+
+; Retrieves the data corresponding to a tree identifier.
+;
+; :Private:
+;
+; :Params:
+;   id : in, required, type=long
+;     widget identifier for tree widget
+;
+; :Keywords:
+;   header : out, optional, type=strarr
+;     set to a named variable to retrieve the FITS header for the `id` as well
+;-
+function mg_fits_browser::_data_for_tree_id, id, header=header
+  compile_opt strictarr
+
+  uname = widget_info(id, /uname)
+  case uname of
+    'fits:file': begin
+        widget_control, id, get_uvalue=f
+        self->set_status, f
+
+        fits_open, f, fcb
+        fits_read, fcb, data, header, exten_no=0
+        fits_close, fcb
+      end
+    'fits:extension': begin
+        widget_control, id, get_uvalue=e
+
+        parent_id = widget_info(id, /parent)
+        widget_control, parent_id, get_uvalue=f
+
+        fits_open, f, fcb
+        fits_read, fcb, data, header, exten_no=e
+        fits_close, fcb
+      end
+  endcase
+  return, data
+end
+
+
+;+
+; Handle events for tree widgets.
+;
+; :Params:
+;    event : in, required, type=structure
+;       event structure for event handler to handle
+;-
+pro mg_fits_browser::_handle_tree_event, event
+  compile_opt strictarr
+
+  ; only handle selection
+  if (event.type ne 0) then return
+
+  uname = widget_info(event.id, /uname)
+  ids = widget_info(self.tree, /tree_select)
+
+  nids = n_elements(ids)
+  if (ids[0] lt 0L) then begin
+    self.currently_selected = lonarr(2) - 1L
+  endif else if (nids eq 1) then begin
+    self.currently_selected = [event.id, -1L]
+    data = self->_data_for_tree_id(event.id, header=header)
+    *self.current_data = data
+    *self.current_header = header
+
+    ; set header
+    header_widget = widget_info(self.tlb, find_by_uname='fits_header')
+    widget_control, header_widget, set_value=header
+    self->select_header_text, event
+  endif else if (nids eq 2) then begin
+    data = self->_data_for_tree_id(event.id, header=header)
+    self.currently_selected[1] = event.id
+    ; TODO: compare dims of data to *self.current_data
+    *self.compare_data = data
+    *self.compare_header = header
+  endif else begin
+    self.currently_selected[1] = event.id
+    for i = 0L, nids - 1L do begin
+      if (total(ids[i] eq self.currently_selected) lt 1) then begin
+        widget_control, ids[i], set_tree_select=0
+      endif
+    endfor
+    data = self->_data_for_tree_id(event.id, header=header)
+    self.currently_selected[1] = event.id
+    ; TODO: compare dims of data to *self.current_data
+    *self.compare_data = data
+    *self.compare_header = header
+  endelse
+
+  ; set status
+  self->_set_status_for_tree_selection
+
+  ; set annotation button sensitivity
+  annotate_button = widget_info(self.tlb, find_by_uname='annotate')
+  widget_control, annotate_button, sensitive=self->annotate_available(data, header)
+
+  self->display
+end
+
+
+;+
+; Determine the name for a tree widget.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   id : in, required, type=long
+;     widget identifier for the tree widget
+;-
+function mg_fits_browser::_name_for_tree_id, id
+  compile_opt strictarr
+
+  uname = widget_info(id, /uname)
+  case uname of
+    'fits:file' : begin
+        widget_control, id, get_uvalue=f
+        return, file_basename(f)
+      end
+    'fits:extension': begin
+        widget_control, id, get_uvalue=e
+        parent_id = widget_info(id, /parent)
+        widget_control, parent_id, get_uvalue=f
+        return, string(file_basename(f), e, format='(%"%s ext %d")')
+      end
+  endcase
+  return, ''
+end
+
+
+;+
+; Sets status bar for the current tree widget selection.
+;-
+pro mg_fits_browser::_set_status_for_tree_selection
+  compile_opt strictarr
+
+  if (self.currently_selected[0] lt 0) then begin
+    self->set_status, /clear
+  endif else if (self.currently_selected[1] lt 0) then begin
+    self->set_status, self->_name_for_tree_id(self.currently_selected[0])
+  endif else begin
+    msg = string(self->_name_for_tree_id(self.currently_selected[0]), $
+                 self->_name_for_tree_id(self.currently_selected[1]), $
+                 format='(%"%s and %s")')
+    self->set_status, msg
+  endelse
+end
+
+
+;+
 ; Handle all events from the widget program.
 ;
 ; :Params:
@@ -563,26 +693,37 @@ pro mg_fits_browser::handle_events, event
                 draw_geometry = widget_info(image_draw, /geometry)
                 x = event.x / draw_geometry.scr_xsize * dims[0]
                 y = event.y / draw_geometry.scr_ysize * dims[1]
-                value = (*self.current_data)[x, y]
-                self->set_status, string(x, y, value, $
-                                         format='(%"x: %d, y: %d, value: %0.2f")')
+                if (self.currently_selected[0] lt 0) then begin
+                  ; nothing
+                endif else if (self.currently_selected[1] lt 1) then begin
+                  value = (*self.current_data)[x, y]
+                  self->set_status, string(x, y, value, $
+                                           format='(%"x: %d, y: %d, value: %0.2f")')
+                endif else begin
+                  self->set_status, string(x, y, $
+                                           (*self.current_data)[x, y], $
+                                           (*self.compare_data)[x, y], $
+                                           self->_name_for_tree_id(self.currently_selected[0]), $
+                                           self->_name_for_tree_id(self.currently_selected[1]), $
+                                           format='(%"x: %d, y: %d, value: %0.2f, %0.2f (%s, %s)")')
+                endelse
               endif
             end
           else:
         endcase
       end
     'cmdline': begin
-        if (self.currently_selected eq 0L) then return
+        if (self.currently_selected[0] lt 0L) then return
 
-        current_uname = widget_info(self.currently_selected, /uname)
+        current_uname = widget_info(self.currently_selected[0], /uname)
         case current_uname of
           'fits:file': begin
-              widget_control, self.currently_selected, get_uvalue=f
+              widget_control, self.currently_selected[0], get_uvalue=f
               exten_no = 0
             end
           'fits:extension': begin
-              widget_control, self.currently_selected, get_uvalue=exten_no
-              parent_id = widget_info(self.currently_selected, /parent)
+              widget_control, self.currently_selected[0], get_uvalue=exten_no
+              parent_id = widget_info(self.currently_selected[0], /parent)
               widget_control, parent_id, get_uvalue=f
             end
           else: begin
@@ -621,52 +762,11 @@ pro mg_fits_browser::handle_events, event
                                                        /bitmap
         endelse
 
-        if (self.currently_selected le 0L) then return
-        self->redisplay
+        if (self.currently_selected[0] le 0L) then return
+        self->display
       end
-    'fits:file': begin
-        self.currently_selected = event.id
-
-        widget_control, event.id, get_uvalue=f
-        self->set_status, f
-
-        fits_open, f, fcb
-        fits_read, fcb, data, header, exten_no=0
-        fits_close, fcb
-
-        annotate_button = widget_info(self.tlb, find_by_uname='annotate')
-        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
-
-        *self.current_data = data
-        self->display, data, header
-
-        header_widget = widget_info(self.tlb, find_by_uname='fits_header')
-        widget_control, header_widget, set_value=header
-        self->select_header_text, event
-      end
-    'fits:extension': begin
-        self.currently_selected = event.id
-
-        widget_control, event.id, get_uvalue=e
-        self->set_status, string(e, format='(%"Extension: %d")')
-
-        parent_id = widget_info(event.id, /parent)
-        widget_control, parent_id, get_uvalue=f
-
-        fits_open, f, fcb
-        fits_read, fcb, data, header, exten_no=e
-        fits_close, fcb
-
-        annotate_button = widget_info(self.tlb, find_by_uname='annotate')
-        widget_control, annotate_button, sensitive=self->annotate_available(data, header)
-
-        *self.current_data = data
-        self->display, data, header
-
-        header_widget = widget_info(self.tlb, find_by_uname='fits_header')
-        widget_control, header_widget, set_value=header
-        self->select_header_text, event
-      end
+    'fits:file': self->_handle_tree_event, event
+    'fits:extension': self->_handle_tree_event, event
     'search': self->select_header_text, event
     else: begin
       ; this should never happen, but this message will make debugging easier
@@ -732,7 +832,8 @@ pro mg_fits_browser::create_widgets, _extra=e
 
   ; tree
   self.tree = widget_tree(content_base, uname='browser', $
-                          scr_xsize=tree_xsize, scr_ysize=scr_ysize)
+                          scr_xsize=tree_xsize, scr_ysize=scr_ysize, $
+                          /multiple)
 
   tabs = widget_tab(content_base, uname='tabs')
 
@@ -800,7 +901,7 @@ end
 pro mg_fits_browser::cleanup
   compile_opt strictarr
 
-  ptr_free, self.current_data
+  ptr_free, self.current_data, self.current_header, self.compare_data, self.compare_header
 end
 
 
@@ -823,15 +924,18 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
 
   self.title = 'FITS Browser'
   self.path = ''
+  self.annotate = 0B
+  self.currently_selected = lonarr(2) - 1L
+  self.current_data = ptr_new(/allocate_heap)
+  self.current_header = ptr_new(/allocate_heap)
+  self.compare_data = ptr_new(/allocate_heap)
+  self.compare_header = ptr_new(/allocate_heap)
 
   self->create_widgets, _extra=e
   self->realize_widgets
   self->start_xmanager
 
   tlb = self.tlb
-
-  self.annotate = 0B
-  self.current_data = ptr_new(/allocate_heap)
 
   if (n_elements(filenames) gt 0L) then self->load_files, filenames
 
@@ -858,10 +962,14 @@ pro mg_fits_browser__define
              title: '', $
              path: '', $
              nfiles: 0L, $
-             currently_selected: 0L, $
+             currently_selected: lonarr(2), $
+             pixmaps: lonarr(2), $
              search_index: 0L, $
              annotate: 0B, $
-             current_data: ptr_new() $
+             current_data: ptr_new(), $
+             current_header: ptr_new(), $
+             compare_data: ptr_new(), $
+             compare_header: ptr_new() $
            }
 end
 
