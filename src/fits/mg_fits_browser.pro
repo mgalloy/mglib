@@ -719,6 +719,70 @@ pro mg_fits_browser::_set_status_for_tree_selection
   endelse
 end
 
+pro mg_fits_browser::_set_status_for_draw, event
+  compile_opt strictarr
+
+  dims = size(*self.current_data, /dimensions)
+  image_draw = widget_info(self.tlb, find_by_uname='draw')
+  draw_geometry = widget_info(image_draw, /geometry)
+  x = event.x / draw_geometry.scr_xsize * dims[0]
+  y = event.y / draw_geometry.scr_ysize * dims[1]
+  if (self.currently_selected[0] lt 0) then begin
+    ; nothing
+  endif else if (self.currently_selected[1] lt 1) then begin
+    value = (*self.current_data)[x, y]
+    self->set_status, string(x, y, value, $
+                             format='(%"x: %d, y: %d, value: %0.2f")')
+  endif else begin
+    self->set_status, string(x, y, $
+                             (*self.current_data)[x, y], $
+                             (*self.compare_data)[x, y], $
+                             self->_name_for_tree_id(self.currently_selected[0]), $
+                             self->_name_for_tree_id(self.currently_selected[1]), $
+                             format='(%"x: %d, y: %d, value: %0.2f, %0.2f (%s, %s)")')
+  endelse
+end
+
+
+;+
+; Display the inset of the compare image.
+;
+; :Params:
+;   event : in, required, type=structure
+;     DRAW_WIDGET event
+;-
+pro mg_fits_browser::_show_compare_inset, event
+  compile_opt strictarr
+
+  draw_wid = widget_info(self.tlb, find_by_uname='draw')
+  geo_info = widget_info(draw_wid, /geometry)
+  dimensions = [geo_info.draw_xsize, geo_info.draw_ysize]
+
+  inset_size = 80
+
+  ; get current graphics status to be able to reset afterwards
+  old_win_id = !d.window
+
+  ; refresh backing store from pixmaps[0]
+  wset, self.backing_store
+  device, copy=[0, 0, dimensions, 0, 0, self.pixmaps[0]]
+
+  ; copy inset from pixmaps[1]
+  x_src = (event.x - inset_size / 2) > 0
+  y_src = (event.y - inset_size / 2) > 0
+  n_x = ((event.x + inset_size / 2) < dimensions[0]) - x_src
+  n_y = ((event.y + inset_size / 2) < dimensions[1]) - y_src
+  x_dst = x_src
+  y_dst = y_src
+  device, copy=[x_src, y_src, n_x, n_y, x_dst, y_dst, self.pixmaps[1]]
+
+  ; refresh display
+  wset, self.draw_id
+  device, copy=[0, 0, dimensions, 0, 0, self.backing_store]
+
+  wset, old_win_id
+end
+
 
 ;+
 ; Handle all events from the widget program.
@@ -740,28 +804,29 @@ pro mg_fits_browser::handle_events, event
     'browser':
     'draw': begin
         case event.type of
+          0: begin
+              if (self.currently_selected[1] gt 0L && (event.press and 1) gt 0) then begin
+                self.show_inset = 1B
+                self->_show_compare_inset, event
+              endif
+            end
+          1: begin
+              if ((event.release and 1) gt 0) then begin
+                self.show_inset = 0B
+                self->display
+              endif
+            end
           2: begin
+              draw_wid = widget_info(self.tlb, find_by_uname='draw')
+              geo_info = widget_info(draw_wid, /geometry)
+              if (event.x lt 0 || event.x ge geo_info.draw_xsize $
+                    || event.y lt 0 || event.y ge geo_info.draw_ysize) then break
               n_dims = size(*self.current_data, /n_dimensions)
               if (n_dims eq 2) then begin
-                dims = size(*self.current_data, /dimensions)
-                image_draw = widget_info(self.tlb, find_by_uname='draw')
-                draw_geometry = widget_info(image_draw, /geometry)
-                x = event.x / draw_geometry.scr_xsize * dims[0]
-                y = event.y / draw_geometry.scr_ysize * dims[1]
-                if (self.currently_selected[0] lt 0) then begin
-                  ; nothing
-                endif else if (self.currently_selected[1] lt 1) then begin
-                  value = (*self.current_data)[x, y]
-                  self->set_status, string(x, y, value, $
-                                           format='(%"x: %d, y: %d, value: %0.2f")')
-                endif else begin
-                  self->set_status, string(x, y, $
-                                           (*self.current_data)[x, y], $
-                                           (*self.compare_data)[x, y], $
-                                           self->_name_for_tree_id(self.currently_selected[0]), $
-                                           self->_name_for_tree_id(self.currently_selected[1]), $
-                                           format='(%"x: %d, y: %d, value: %0.2f, %0.2f (%s, %s)")')
-                endelse
+                self->_set_status_for_draw, event
+              endif
+              if (self.currently_selected[1] gt 0L && self.show_inset) then begin
+                self->_show_compare_inset, event
               endif
             end
           else:
@@ -897,7 +962,7 @@ pro mg_fits_browser::create_widgets, _extra=e
 
   image_base = widget_base(tabs, xpad=0, ypad=0, title='Data', /column)
   image_draw = widget_draw(image_base, xsize=scr_ysize, ysize=scr_ysize, $
-                           /motion_events, $
+                           /motion_events, /button_events, $
                            uname='draw', retain=2)
 
   window, /free, /pixmap, xsize=scr_ysize, ysize=scr_ysize
@@ -1033,6 +1098,7 @@ pro mg_fits_browser__define
              path: '', $
              nfiles: 0L, $
              currently_selected: lonarr(2), $
+             show_inset: 0B, $
              backing_store: 0L, $
              pixmaps: lonarr(2), $
              search_index: 0L, $
