@@ -181,8 +181,10 @@ end
 ; :Keywords:
 ;   dimensions : in, required, type=fltarr(2)
 ;     dimensions of target window
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::display_image, data, header, dimensions=dimensions
+pro mg_fits_browser::display_image, data, header, filename=filename, dimensions=dimensions
   compile_opt strictarr
 
   ndims = size(data, /n_dimensions)
@@ -230,8 +232,10 @@ end
 ; :Keywords:
 ;   dimensions : in, required, type=fltarr(2)
 ;     dimensions of target window
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::annotate_image, data, header, dimensions=dimensions
+pro mg_fits_browser::annotate_image, data, header, filename=filename, dimensions=dimensions
   compile_opt strictarr
 
   ; by default nothing is done
@@ -239,15 +243,19 @@ end
 
 
 ;+
-; Determine if annotation is avalable for a given image.
+; Determine if annotation is available for a given image.
 ;
 ; :Params:
 ;   data : in, required, type=2D array
 ;     data to display
 ;   header : in, required, type=strarr
 ;     FITS header
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-function mg_fits_browser::annotate_available, data, header
+function mg_fits_browser::annotate_available, data, header, filename=filename
   compile_opt strictarr
 
   return, 0B
@@ -269,8 +277,13 @@ end
 
 ;+
 ; Display the image and its annotations (if desired).
+;
+; :Keywords:
+;   filename : in, optional, type=string
+;     filename of file containing image
 ;-
-pro mg_fits_browser::display
+;-
+pro mg_fits_browser::display, filename=filename
   compile_opt strictarr
 
   if (n_elements(*self.current_data) eq 0L) then return
@@ -286,7 +299,7 @@ pro mg_fits_browser::display
   wset, self.draw_id
   dimensions = [geo_info.draw_xsize, geo_info.draw_ysize]
   self->display_image, *self.current_data, *self.current_header, $
-                       dimensions=dimensions
+                       filename=filename, dimensions=dimensions
   if (self.annotate) then self->annotate_image, *self.current_data, *self.current_header, dimensions=dimensions
 
   ; reset graphics status

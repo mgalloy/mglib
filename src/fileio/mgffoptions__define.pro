@@ -12,6 +12,8 @@
 ;   use_environment
 ;     set to use environment variables for values in substitution not found in
 ;     file
+;   output_separator
+;     string to use between key and value, default is ":"
 ;   sections
 ;     array of section names
 ;
@@ -19,6 +21,25 @@
 ;   IDL 8.0
 ;-
 
+
+;= helper routines
+
+;+
+; Use ordered hashes if running on IDL 8.3+, otherwise use hash.
+;
+; :Returns:
+;   hash or orderedhash object
+;-
+function mgffoptions::_hash
+  compile_opt strictarr
+
+  if (mg_idlversion(require='8.3')) then begin
+    h = orderedhash()
+  endif else begin
+    h = hash()
+  endelse
+  return, h
+end
 
 ;= overload methods
 
@@ -239,7 +260,7 @@ function mgffoptions::_overloadPrint
     default_sec = (self.sections)['']
     foreach option, default_sec, o do begin
       first_line = 0B
-      output_list->add, string(o + ':', option, format=format)
+      output_list->add, string(o + self.output_separator, option, format=format)
     endforeach
   endif
 
@@ -249,7 +270,7 @@ function mgffoptions::_overloadPrint
 
     output_list->add, string(s, format='(%"[%s]")')
     foreach option, sec, o do begin
-      output_list->add, string(o + ':', option, format=format)
+      output_list->add, string(o + self.output_separator, option, format=format)
     endforeach
   endforeach
 
@@ -307,7 +328,7 @@ pro mgffoptions::put, option, value, section=section
     _option = strlowcase(_option)
   endif
 
-  if (~self.sections->hasKey(_section)) then (self.sections)[_section] = hash()
+  if (~self.sections->hasKey(_section)) then (self.sections)[_section] = self->_hash()
   ((self.sections)[_section])[_option] = size(value, /n_dimensions) eq 0L $
                                          ? value $
                                          : ('[ ' + strjoin(value, ', ') + ' ]')
@@ -536,6 +557,20 @@ function mgffoptions::get, option, $
 end
 
 
+;= property access
+
+;+
+; Set properties.
+;-
+pro mgffoptions::setProperty, output_separator=output_separator
+  compile_opt strictarr
+
+  if (n_elements(output_separator) gt 0L) then begin
+    self.output_separator = output_separator
+  endif
+end
+
+
 ;= lifecycle
 
 
@@ -556,12 +591,17 @@ end
 ; :Returns:
 ;   1 for success, 0 for failure
 ;-
-function mgffoptions::init, fold_case=fold_case, use_environment=use_environment
+function mgffoptions::init, fold_case=fold_case, $
+                            use_environment=use_environment, $
+                            output_separator=output_separator
   compile_opt strictarr
 
   self.fold_case = keyword_set(fold_case)
   self.use_environment = keyword_set(use_environment)
-  self.sections = hash()
+  self.sections = self->_hash()
+  self.output_separator = n_elements(output_separator) gt 0L $
+                            ? output_separator $
+                            : ':'
 
   return, 1
 end
@@ -582,6 +622,7 @@ pro mgffoptions__define
   dummy = { MGffOptions, inherits IDL_Object, $
             fold_case: 0B, $
             use_environment: 0B, $
+            output_separator: '', $
             sections: obj_new() $
           }
 end
