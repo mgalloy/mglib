@@ -277,13 +277,8 @@ end
 
 ;+
 ; Display the image and its annotations (if desired).
-;
-; :Keywords:
-;   filename : in, optional, type=string
-;     filename of file containing image
 ;-
-;-
-pro mg_fits_browser::display, filename=filename
+pro mg_fits_browser::display
   compile_opt strictarr
 
   if (n_elements(*self.current_data) eq 0L) then return
@@ -301,20 +296,20 @@ pro mg_fits_browser::display, filename=filename
   if (self.currently_selected[0] gt 0L) then begin
     wset, self.pixmaps[0]
     self->display_image, *self.current_data, *self.current_header, $
-                         filename=filename, dimensions=dimensions
+                         filename=self.current_filename, dimensions=dimensions
     if (self.annotate) then begin
       self->annotate_image, *self.current_data, *self.current_header, $
-                            dimensions=dimensions, filename=filename
+                            filename=self.current_filename, dimensions=dimensions
     endif
   endif
 
   if (self.currently_selected[1] gt 0L) then begin
     wset, self.pixmaps[1]
     self->display_image, *self.compare_data, *self.compare_header, $
-                         filename=filename, dimensions=dimensions
+                         filename=self.compare_filename, dimensions=dimensions
     if (self.annotate) then begin
       self->annotate_image, *self.compare_data, *self.compare_header, $
-                            dimensions=dimensions, filename=filename
+                            filename=self.compare_filename, dimensions=dimensions
     endif
   endif
 
@@ -635,17 +630,19 @@ pro mg_fits_browser::_handle_tree_event, event
     data = self->_data_for_tree_id(event.id, header=header, filename=filename)
     *self.current_data = data
     *self.current_header = header
+    self.current_filename = filename
 
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
     widget_control, header_widget, set_value=header
     self->select_header_text, event
   endif else if (nids eq 2) then begin
-    data = self->_data_for_tree_id(event.id, header=header)
+    data = self->_data_for_tree_id(event.id, header=header, filename=filename)
     self.currently_selected[1] = event.id
     ; TODO: compare dims of data to *self.current_data
     *self.compare_data = data
     *self.compare_header = header
+    self.compare_filename = filename
   endif else begin
     self.currently_selected[1] = event.id
     for i = 0L, nids - 1L do begin
@@ -658,6 +655,7 @@ pro mg_fits_browser::_handle_tree_event, event
     ; TODO: compare dims of data to *self.current_data
     *self.compare_data = data
     *self.compare_header = header
+    self.compare_filename = filename
   endelse
 
   ; set status
@@ -667,7 +665,7 @@ pro mg_fits_browser::_handle_tree_event, event
   annotate_button = widget_info(self.tlb, find_by_uname='annotate')
   widget_control, annotate_button, sensitive=self->annotate_available(data, header)
 
-  self->display, filename=filename
+  self->display
 end
 
 
@@ -1103,8 +1101,10 @@ pro mg_fits_browser__define
              pixmaps: lonarr(2), $
              search_index: 0L, $
              annotate: 0B, $
+             current_filename: '', $
              current_data: ptr_new(), $
              current_header: ptr_new(), $
+             compare_filename: '', $
              compare_data: ptr_new(), $
              compare_header: ptr_new() $
            }
