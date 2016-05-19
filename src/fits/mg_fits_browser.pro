@@ -296,11 +296,36 @@ pro mg_fits_browser::display, filename=filename
   device, get_decomposed=odec
   tvlct, rgb, /get
 
-  wset, self.draw_id
   dimensions = [geo_info.draw_xsize, geo_info.draw_ysize]
-  self->display_image, *self.current_data, *self.current_header, $
-                       filename=filename, dimensions=dimensions
-  if (self.annotate) then self->annotate_image, *self.current_data, *self.current_header, dimensions=dimensions
+
+  if (self.currently_selected[0] gt 0L) then begin
+    wset, self.pixmaps[0]
+    self->display_image, *self.current_data, *self.current_header, $
+                         filename=filename, dimensions=dimensions
+    if (self.annotate) then begin
+      self->annotate_image, *self.current_data, *self.current_header, $
+                            dimensions=dimensions, filename=filename
+    endif
+  endif
+
+  if (self.currently_selected[1] gt 0L) then begin
+    wset, self.pixmaps[1]
+    self->display_image, *self.compare_data, *self.compare_header, $
+                         filename=filename, dimensions=dimensions
+    if (self.annotate) then begin
+      self->annotate_image, *self.compare_data, *self.compare_header, $
+                            dimensions=dimensions, filename=filename
+    endif
+  endif
+
+  ; create backing_store
+  if (self.currently_selected[0] gt 0L) then begin
+    wset, self.backing_store
+    device, copy=[0, 0, dimensions, 0, 0, self.pixmaps[0]]
+
+    wset, self.draw_id
+    device, copy=[0, 0, dimensions, 0, 0, self.backing_store]
+  endif
 
   ; reset graphics status
   wset, old_win_id
@@ -471,6 +496,22 @@ pro mg_fits_browser::resize, x, y
 
   widget_control, self.tlb, update=1
 
+  self->set_status, string(draw_size, draw_size, $
+                           format='(%"Resized to %dx%d graphics window")')
+
+  ; update pixmaps
+  old_window = !d.window
+
+  wdelete, self.backing_store, self.pixmaps[0], self.pixmaps[1]
+  window, /free, /pixmap, xsize=draw_size, ysize=draw_size
+  self.backing_store = !d.window
+  window, /free, /pixmap, xsize=draw_size, ysize=draw_size
+  self.pixmaps[0] = !d.window
+  window, /free, /pixmap, xsize=draw_size, ysize=draw_size
+  self.pixmaps[1] = !d.window
+
+  wset, old_window
+
   self->display
 end
 
@@ -540,17 +581,18 @@ end
 ; :Keywords:
 ;   header : out, optional, type=strarr
 ;     set to a named variable to retrieve the FITS header for the `id` as well
+;   filename : out, optional, type=string
+;     set to a named variable to retrieve the filename corresponding to the `id`
 ;-
-function mg_fits_browser::_data_for_tree_id, id, header=header
+function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filename
   compile_opt strictarr
 
   uname = widget_info(id, /uname)
   case uname of
     'fits:file': begin
-        widget_control, id, get_uvalue=f
-        self->set_status, f
+        widget_control, id, get_uvalue=filename
 
-        fits_open, f, fcb
+        fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
       end
@@ -558,9 +600,9 @@ function mg_fits_browser::_data_for_tree_id, id, header=header
         widget_control, id, get_uvalue=e
 
         parent_id = widget_info(id, /parent)
-        widget_control, parent_id, get_uvalue=f
+        widget_control, parent_id, get_uvalue=filename
 
-        fits_open, f, fcb
+        fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
       end
@@ -590,7 +632,7 @@ pro mg_fits_browser::_handle_tree_event, event
     self.currently_selected = lonarr(2) - 1L
   endif else if (nids eq 1) then begin
     self.currently_selected = [event.id, -1L]
-    data = self->_data_for_tree_id(event.id, header=header)
+    data = self->_data_for_tree_id(event.id, header=header, filename=filename)
     *self.current_data = data
     *self.current_header = header
 
@@ -625,7 +667,7 @@ pro mg_fits_browser::_handle_tree_event, event
   annotate_button = widget_info(self.tlb, find_by_uname='annotate')
   widget_control, annotate_button, sensitive=self->annotate_available(data, header)
 
-  self->display
+  self->display, filename=filename
 end
 
 
@@ -851,10 +893,21 @@ pro mg_fits_browser::create_widgets, _extra=e
   tabs = widget_tab(content_base, uname='tabs')
 
   ; visualization
+  old_window = !d.window
+
   image_base = widget_base(tabs, xpad=0, ypad=0, title='Data', /column)
   image_draw = widget_draw(image_base, xsize=scr_ysize, ysize=scr_ysize, $
                            /motion_events, $
                            uname='draw', retain=2)
+
+  window, /free, /pixmap, xsize=scr_ysize, ysize=scr_ysize
+  self.backing_store = !d.window
+  window, /free, /pixmap, xsize=scr_ysize, ysize=scr_ysize
+  self.pixmaps[0] = !d.window
+  window, /free, /pixmap, xsize=scr_ysize, ysize=scr_ysize
+  self.pixmaps[1] = !d.window
+
+  wset, old_window
 
   ; details column
   details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column, $
@@ -914,6 +967,8 @@ end
 pro mg_fits_browser::cleanup
   compile_opt strictarr
 
+  wdelete, self.backing_store, self.pixmaps[0], self.pixmaps[1]
+  
   ptr_free, self.current_data, self.current_header, self.compare_data, self.compare_header
 end
 
@@ -943,6 +998,8 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   self.current_header = ptr_new(/allocate_heap)
   self.compare_data = ptr_new(/allocate_heap)
   self.compare_header = ptr_new(/allocate_heap)
+  self.backing_store = -1L
+  self.pixmaps = lonarr(2) - 1L
 
   self->create_widgets, _extra=e
   self->realize_widgets
@@ -976,6 +1033,7 @@ pro mg_fits_browser__define
              path: '', $
              nfiles: 0L, $
              currently_selected: lonarr(2), $
+             backing_store: 0L, $
              pixmaps: lonarr(2), $
              search_index: 0L, $
              annotate: 0B, $
