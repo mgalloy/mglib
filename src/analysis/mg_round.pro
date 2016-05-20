@@ -10,22 +10,22 @@
 ; :Params:
 ;    x : in, required, type=numeric (array)
 ;       value to round
-;    roundTo : in, optional, type=numeric scalar, default=1
+;    round_to : in, optional, type=numeric scalar, default=1
 ;       value to round to
 ;
 ; :Keywords:
 ;    l64 : in, optional, type=boolean
 ;       set to return result as a 64-bit integer
 ;-
-function mg_round, x, roundTo, l64=l64
+function mg_round, x, round_to, l64=l64
   compile_opt strictarr
   on_error, 2
 
-  case n_params() of
-    1: return, round(x, l64=l64)
-    2: return, round(x / roundTo) * roundTo
-    else: message, 'invalid number of parameters'
-  endcase
+  if (n_elements(round_to) eq 0L) then begin
+    return, round(x, l64=l64)
+  endif else begin
+    return, round(x / round_to) * round_to
+  endelse
 end
 
 
