@@ -20,7 +20,7 @@ function mg_human_size, sizes
   for i = 0L, nSizes - 1L do begin
     level = 0L
     s = sizes[i]
-    while (s ge 1024L) do begin
+    while (s ge 1024L && level lt 5) do begin
       s /= 1024L
       level++
     endwhile
