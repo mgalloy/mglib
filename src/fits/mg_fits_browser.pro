@@ -206,7 +206,7 @@ pro mg_fits_browser::display_image, data, header, filename=filename, dimensions=
     dims *= dimensions[0] / float(dims[0])
   endelse
 
-  _data = congrid(data, dims[0], dims[1])
+  _data = congrid(data, dims[0], dims[1], /interp)
 
   if (dims[0] gt dimensions[0] || dims[1] gt dimensions[1]) then begin
     xoffset = 0
