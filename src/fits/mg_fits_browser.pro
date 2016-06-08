@@ -352,8 +352,8 @@ pro mg_fits_browser::datacoords_for_screen, screen_x, screen_y, x=x, y=y
   dims = size(*self.current_data, /dimensions)
   image_draw = widget_info(self.tlb, find_by_uname='draw')
   draw_geometry = widget_info(image_draw, /geometry)
-  x = screen_x / draw_geometry.scr_xsize * dims[0]
-  y = screen_y / draw_geometry.scr_ysize * dims[1]
+  x = long(screen_x / draw_geometry.scr_xsize * dims[0])
+  y = long(screen_y / draw_geometry.scr_ysize * dims[1])
 end
 
 
