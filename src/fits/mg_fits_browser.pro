@@ -330,6 +330,34 @@ end
 
 
 ;+
+; Convert device coordinates of draw widget to pixel location of image.
+;
+; :Params:
+;   screen_x : in, required, type=long
+;     x location on screen
+;   screen_y : in, required, type=long
+;     y location on screen
+;
+; :Keywords:
+;   x : out, optional, type=long
+;     set to a named variable to retrieve the corresponding x pixel location in
+;     image
+;   y : out, optional, type=long
+;     set to a named variable to retrieve the corresponding y pixel location in
+;     image
+;-
+pro mg_fits_browser::datacoords_for_screen, screen_x, screen_y, x=x, y=y
+  compile_opt strictarr
+
+  dims = size(*self.current_data, /dimensions)
+  image_draw = widget_info(self.tlb, find_by_uname='draw')
+  draw_geometry = widget_info(image_draw, /geometry)
+  x = screen_x / draw_geometry.scr_xsize * dims[0]
+  y = screen_y / draw_geometry.scr_ysize * dims[1]
+end
+
+
+;+
 ; Set the window title based on the current filename. Set the filename to the
 ; empty string if there is no title to display.
 ;
@@ -730,16 +758,6 @@ pro mg_fits_browser::_set_status_for_tree_selection
 end
 
 
-pro mg_fits_browser::_datacoords_for_screen, screen_x, screen_y, x=x, y=y
-  compile_opt strictarr
-
-  dims = size(*self.current_data, /dimensions)
-  image_draw = widget_info(self.tlb, find_by_uname='draw')
-  draw_geometry = widget_info(image_draw, /geometry)
-  x = screen_x / draw_geometry.scr_xsize * dims[0]
-  y = screen_y / draw_geometry.scr_ysize * dims[1]
-end
-
 function mg_fits_browser::_format_code_for_data
   compile_opt strictarr
 
@@ -755,7 +773,7 @@ pro mg_fits_browser::_set_status_for_draw, event
   compile_opt strictarr
 
   draw_wid = widget_info(self.tlb, find_by_uname='draw')
-  self->_datacoords_for_screen, event.x, event.y, x=x, y=y
+  self->datacoords_for_screen, event.x, event.y, x=x, y=y
   fc = self->_format_code_for_data()
 
   if (self.currently_selected[0] lt 0) then begin
@@ -820,10 +838,10 @@ end
 pro mg_fits_browser::_compute_box_stats, event
   compile_opt strictarr
 
-  self->_datacoords_for_screen, event.x, event.y, x=x1, y=y1
-  self->_datacoords_for_screen, self.rubberband_box_start[0], $
-                                self.rubberband_box_start[1], $
-                                x=x2, y=y2
+  self->datacoords_for_screen, event.x, event.y, x=x1, y=y1
+  self->datacoords_for_screen, self.rubberband_box_start[0], $
+                               self.rubberband_box_start[1], $
+                               x=x2, y=y2
 
   x = [x1 < x2, x1 > x2]
   y = [y1 < y2, y1 > y2]
@@ -904,28 +922,35 @@ pro mg_fits_browser::handle_events, event
     'draw': begin
         case event.type of
           0: begin
-              if ((event.press and 1) gt 0) then begin
-                if (self.currently_selected[1] gt 0L) then begin
-                  self.show_inset = 1B
-                  self->_show_compare_inset, event
-                endif else begin
-                  self.show_rubberband_box = 1B
-                  self.rubberband_box_start = [event.x, event.y]
-                  self->_show_rubberband_box, event
-                endelse
+            if ((event.press and 1) gt 0) then begin
+              if (self.currently_selected[1] gt 0L) then begin
+                self.show_inset = 1B
+                self->_show_compare_inset, event
+              endif else begin
+                self.show_rubberband_box = 1B
+                self.rubberband_box_start = [event.x, event.y]
+                self->_show_rubberband_box, event
+              endelse
+            endif
+            if ((event.press and 4) gt 0) then begin
+              if (self.draw_contextmenu gt 0) then begin
+                self.contextmenu_loc = [event.x, event.y]
+                widget_displaycontextmenu, event.id, event.x, event.y, $
+                                           self.draw_contextmenu
               endif
-            end
+            endif
+          end
           1: begin
-              if ((event.release and 1) gt 0) then begin
-                if (self.currently_selected[1] gt 0L) then begin
-                  self.show_inset = 0B
-                  self->display
-                endif else begin
-                  self.show_rubberband_box = 0B
-                  self->_compute_box_stats, event
-                endelse
-              endif
-            end
+            if ((event.release and 1) gt 0) then begin
+              if (self.currently_selected[1] gt 0L) then begin
+                self.show_inset = 0B
+                self->display
+              endif else begin
+                self.show_rubberband_box = 0B
+                self->_compute_box_stats, event
+              endelse
+            endif
+          end
           2: begin
               draw_wid = widget_info(self.tlb, find_by_uname='draw')
               geo_info = widget_info(draw_wid, /geometry)
@@ -1001,12 +1026,29 @@ pro mg_fits_browser::handle_events, event
     'fits:file': self->_handle_tree_event, event
     'fits:extension': self->_handle_tree_event, event
     'search': self->select_header_text, event
-    else: begin
-      ; this should never happen, but this message will make debugging easier
-      ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
-                          dialog_parent=self.tlb)
-    end
+    else: self->handle_contextmenu_events, event
   endcase
+end
+
+
+;+
+; Handle context menu events.
+;
+; Override this method if your subclass creates context menus in
+; `create_draw_contextmenu`.
+;
+; :Params:
+;   event : in, required, type=structure
+;     `WIDGET_CONTEXT` event
+;-
+pro mg_fits_browser::handle_contextmenu_events, event
+  compile_opt strictarr
+
+  ; this should never happen since we don't create context menus, but
+  ; this message will make debugging easier
+  uname = widget_info(event.id, /uname)
+  ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
+                      dialog_parent=self.tlb)
 end
 
 
@@ -1019,6 +1061,24 @@ pro mg_fits_browser::cleanup_widgets
   compile_opt strictarr
 
   obj_destroy, self
+end
+
+
+;+
+; Create the context menu associated with the draw widget.
+;
+; :Returns:
+;   long, widget identifier for context menu, 0L if no context menu
+;
+; :Params:
+;   image_draw : in, required, type=long
+;     widget identifier for draw widget
+;-
+function mg_fits_browser::create_draw_contextmenu, image_draw
+  compile_opt strictarr
+
+  ; no context menu by default, child classes can override
+  return, 0L
 end
 
 
@@ -1093,6 +1153,8 @@ pro mg_fits_browser::create_widgets, _extra=e
   self.pixmaps[1] = !d.window
 
   wset, old_window
+
+  self.draw_contextmenu = self->create_draw_contextmenu(image_draw)
 
   ; details column
   details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column, $
@@ -1214,6 +1276,8 @@ pro mg_fits_browser__define
              draw_id: 0L, $
              statusbar: 0L, $
              secondary_statusbar: 0L, $
+             draw_contextmenu: 0L, $
+             contextmenu_loc: lonarr(2), $
              filename: '', $
              title: '', $
              path: '', $
