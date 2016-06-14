@@ -110,16 +110,37 @@ end
 
 
 ;+
-; Update the amount of work completed by adding `x` to the current amount.
+; Update the amount of work completed by adding `work` to the current amount.
 ;
 ; :Params:
-;   x : in, required, type=float
+;   work : in, required, type=float
 ;     amount to add to current amount of work done
 ;-
-pro mg_progress::update, x
+pro mg_progress::update, work
   compile_opt strictarr
 
-  self.current += x
+  self.current += work
+end
+
+
+;+
+; Advance the progress bar a step. This is useful for using `MG_PROGRESS` with a
+; `FOR` loop.
+;
+; Warning: If iterating through an iterable with an `_overloadForeach`, then
+; `advance` must be called an additional time after the loop to complete the
+; progress to 100%.
+;
+; :Keywords:
+;   work : in, required, type=float
+;     amount to add to current amount of work done
+;-
+pro mg_progress::advance, work=work
+  compile_opt strictarr
+
+  new_i = self.counter eq 0L ? !null : self.counter
+  not_done = self->_overloadForeach(new_element, new_i)
+  if (n_elements(work) gt 0L) then self->update, work
 end
 
 
@@ -148,7 +169,7 @@ function mg_progress::_overloadForeach, value, key
     more_elements = it->_overloadForeach(value, key)
   endif else begin
     if (n_elements(key) eq 0L) then key = 0L
-    value = it[key++]
+    value = it[key++ < (self.n - 1L)]
 
     more_elements = key lt self.n
   endelse
@@ -186,7 +207,7 @@ function mg_progress::_overloadForeach, value, key
   done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
   todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
 
-  msg = string(self.title,$
+  msg = string(self.title, $
                round(100L * c / t), $
                done, todo, $
                self.counter, self.n, $
@@ -257,20 +278,44 @@ end
 
 n = 16
 letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
-indices = randomu(seed, n)
-indices[5] = 5.0
-h = hash(letters, indices, /extract)
+wait_times = randomu(seed, n)
+wait_times[5] = 5.0
+h = hash(letters, wait_times, /extract)
+
+; basic example
 
 print, 'Simple progress with no pre-calculation, note estimated time changes'
-foreach v, mg_progress(h), k do begin
-  wait, v
+foreach t, mg_progress(h), k do begin
+  wait, t
 endforeach
 
+; example with pre-calculation
+
 print, 'Updating progress with pre-calculation gives a constant estimated time'
-p = mg_progress(h, total=total(indices), title='Updating progress...')
-foreach v, p, k do begin
-  wait, v
-  p->update, v
+p = mg_progress(h, total=total(wait_times), title='Updating progress...')
+foreach t, p, k do begin
+  wait, t
+  p->update, t
 endforeach
+
+
+p = mg_progress(h, total=total(wait_times), title='Updating progress...')
+foreach t, h, k do begin
+  wait, t
+  p->advance, work=t
+endforeach
+p->advance
+
+; example of using with a FOR loop
+
+idl_dir = filepath('')
+print, idl_dir, format='(%"Finding files in IDL distribution: %s")'
+files = file_search(idl_dir, '*', count=n_files)
+p = mg_progress(files, title='Checking files...')
+for f = 0L, n_files - 1L do begin
+  p->advance
+  ; process files[f]
+endfor
+print, 'Done'
 
 end
