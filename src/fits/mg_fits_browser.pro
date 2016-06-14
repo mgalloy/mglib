@@ -415,7 +415,6 @@ pro mg_fits_browser::load_files, filenames
   self->set_status, string(n_files, n_files eq 1 ? '' : 's', $
                            format='(%"Loading %d FITS file%s...")')
 
-  widget_control, self.tree, update=0
   foreach f, filenames do begin
     if (~file_test(f, /regular)) then begin
       message, 'file not found or not regular: ' + f, /informational
@@ -424,23 +423,37 @@ pro mg_fits_browser::load_files, filenames
     fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
 
-    file_node = widget_tree(self.tree, /folder, $
+    extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
+                                             filename=f)
+
+
+    for i = 1L, fcb.nextend do begin
+      fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
+      if (i eq 1) then begin
+        ext_headers = strarr(n_elements(ext_header), fcb.nextend)
+      endif
+      ext_headers[*, i - 1] = ext_header
+    endfor
+    fits_close, fcb
+
+    widget_control, self.tlb, update=0
+
+    file_node = widget_tree(self.tree, /folder, /expanded, $
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
                             uname='fits:file', uvalue=file_expand_path(f))
-    extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
-                                             filename=f)
+
     for i = 1L, fcb.nextend do begin
-      fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
       ext_node = widget_tree(file_node, $
-                             bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header, $
+                             bitmap=self->extension_bitmap(i, $
+                                                           fcb.extname[i], $
+                                                           ext_headers[*, i - 1], $
                                                            filename=f), $
                              value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
-    fits_close, fcb
+    widget_control, self.tlb, update=1
   endforeach
-  widget_control, self.tree, update=1
 
   self->set_status, /clear
 end
