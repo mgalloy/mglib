@@ -432,7 +432,9 @@ pro mg_fits_browser::load_files, filenames
       if (i eq 1) then begin
         ext_headers = strarr(n_elements(ext_header), fcb.nextend)
       endif
-      ext_headers[*, i - 1] = ext_header
+      ; warning: this assumes the extension headers are all the same size or at
+      ; least that they are never larger than the first header
+      ext_headers[0, i - 1] = reform(ext_header, n_elements(ext_header), 1)
     endfor
     fits_close, fcb
 
