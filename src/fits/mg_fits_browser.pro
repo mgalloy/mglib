@@ -206,7 +206,7 @@ pro mg_fits_browser::display_image, data, header, filename=filename, dimensions=
     dims *= dimensions[0] / float(dims[0])
   endelse
 
-  _data = congrid(data, dims[0], dims[1])
+  _data = congrid(data, dims[0], dims[1], /interp)
 
   if (dims[0] gt dimensions[0] || dims[1] gt dimensions[1]) then begin
     xoffset = 0
@@ -330,6 +330,34 @@ end
 
 
 ;+
+; Convert device coordinates of draw widget to pixel location of image.
+;
+; :Params:
+;   screen_x : in, required, type=long
+;     x location on screen
+;   screen_y : in, required, type=long
+;     y location on screen
+;
+; :Keywords:
+;   x : out, optional, type=long
+;     set to a named variable to retrieve the corresponding x pixel location in
+;     image
+;   y : out, optional, type=long
+;     set to a named variable to retrieve the corresponding y pixel location in
+;     image
+;-
+pro mg_fits_browser::datacoords_for_screen, screen_x, screen_y, x=x, y=y
+  compile_opt strictarr
+
+  dims = size(*self.current_data, /dimensions)
+  image_draw = widget_info(self.tlb, find_by_uname='draw')
+  draw_geometry = widget_info(image_draw, /geometry)
+  x = long(screen_x / draw_geometry.scr_xsize * dims[0])
+  y = long(screen_y / draw_geometry.scr_ysize * dims[1])
+end
+
+
+;+
 ; Set the window title based on the current filename. Set the filename to the
 ; empty string if there is no title to display.
 ;
@@ -354,12 +382,22 @@ end
 ; :Params:
 ;   msg : in, optional, type=string
 ;     message to display in the status bar
+;
+; :Keywords:
+;   clear : in, optional, type=boolean
+;     set to clear the current status bar message
+;   secondary : in, optional, type=boolean
+;     set to indicate the message should be display on the secondary status line
 ;-
-pro mg_fits_browser::set_status, msg, clear=clear
+pro mg_fits_browser::set_status, msg, clear=clear, secondary=secondary
   compile_opt strictarr
 
   _msg = keyword_set(clear) || n_elements(msg) eq 0L ? '' : msg
-  widget_control, self.statusbar, set_value=_msg
+  if (keyword_set(secondary)) then begin
+    widget_control, self.secondary_statusbar, set_value=_msg
+  endif else begin
+    widget_control, self.statusbar, set_value=_msg
+  endelse
 end
 
 
@@ -381,7 +419,6 @@ pro mg_fits_browser::load_files, filenames
   self->set_status, string(n_files, n_files eq 1 ? '' : 's', $
                            format='(%"Loading %d FITS file%s...")')
 
-  widget_control, self.tree, update=0
   foreach f, filenames do begin
     if (~file_test(f, /regular)) then begin
       message, 'file not found or not regular: ' + f, /informational
@@ -390,23 +427,30 @@ pro mg_fits_browser::load_files, filenames
     fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
 
-    file_node = widget_tree(self.tree, /folder, $
+    extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
+                                             filename=f)
+
+    widget_control, self.tlb, update=0
+
+    file_node = widget_tree(self.tree, /folder, /expanded, $
                             value=self->file_title(f, header), $
                             bitmap=self->file_bitmap(f, header), $
                             uname='fits:file', uvalue=file_expand_path(f))
-    extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
-                                             filename=f)
+
     for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
       ext_node = widget_tree(file_node, $
-                             bitmap=self->extension_bitmap(i, fcb.extname[i], ext_header, $
+                             bitmap=self->extension_bitmap(i, $
+                                                           fcb.extname[i], $
+                                                           ext_header, $
                                                            filename=f), $
                              value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
     fits_close, fcb
+
+    widget_control, self.tlb, update=1
   endforeach
-  widget_control, self.tree, update=1
 
   self->set_status, /clear
 end
@@ -448,20 +492,23 @@ pro mg_fits_browser::resize, x, y
   details_base = widget_info(self.tlb, find_by_uname='details')
   search_text = widget_info(self.tlb, find_by_uname='search')
   fits_header = widget_info(self.tlb, find_by_uname='fits_header')
-  toolbar = widget_info(self.tlb, find_by_uname='toolbar')
+  file_toolbar = widget_info(self.tlb, find_by_uname='file_toolbar')
+  button_toolbar = widget_info(self.tlb, find_by_uname='button_toolbar')
+  spacer = widget_info(self.tlb, find_by_uname='spacer')
 
   tlb_geometry = widget_info(self.tlb, /geometry)
   tree_geometry = widget_info(self.tree, /geometry)
   draw_geometry = widget_info(draw, /geometry)
   statusbar_geometry = widget_info(self.statusbar, /geometry)
   content_base_geometry = widget_info(content_base, /geometry)
-  toolbar_geometry = widget_info(toolbar, /geometry)
+  file_toolbar_geometry = widget_info(file_toolbar, /geometry)
+  button_toolbar_geometry = widget_info(button_toolbar, /geometry)
   details_geometry = widget_info(details_base, /geometry)
   search_geometry = widget_info(search_text, /geometry)
 
   tree_height = y $
                   - statusbar_geometry.scr_ysize $
-                  - toolbar_geometry.scr_ysize $
+                  - file_toolbar_geometry.scr_ysize $
                   - 2 * tlb_geometry.ypad $
                   - 2 * tlb_geometry.margin
   draw_size = draw_geometry.scr_ysize $
@@ -480,6 +527,7 @@ pro mg_fits_browser::resize, x, y
                       - details_geometry.space
 
   statusbar_width = tree_width + draw_size + 2 * tlb_geometry.xpad + tlb_geometry.space
+  spacer_width = tree_width - button_toolbar_geometry.xsize
 
   widget_control, self.tlb, update=0
 
@@ -487,6 +535,8 @@ pro mg_fits_browser::resize, x, y
   widget_control, search_text, scr_xsize=draw_size
   widget_control, fits_header, scr_xsize=draw_size, scr_ysize=fits_header_ysize
   widget_control, self.statusbar, scr_xsize=statusbar_width
+  widget_control, spacer, scr_xsize=spacer_width
+  widget_control, self.secondary_statusbar, scr_xsize=draw_size
   widget_control, self.tree, scr_xsize=tree_width, scr_ysize=tree_height
 
   widget_control, self.tlb, update=1
@@ -650,7 +700,7 @@ pro mg_fits_browser::_handle_tree_event, event
         widget_control, ids[i], set_tree_select=0
       endif
     endfor
-    data = self->_data_for_tree_id(event.id, header=header)
+    data = self->_data_for_tree_id(event.id, header=header, filename=filename)
     self.currently_selected[1] = event.id
     ; TODO: compare dims of data to *self.current_data
     *self.compare_data = data
@@ -717,27 +767,40 @@ pro mg_fits_browser::_set_status_for_tree_selection
   endelse
 end
 
+
+function mg_fits_browser::_format_code_for_data
+  compile_opt strictarr
+
+  type = size(*self.current_data, /type)
+  if (type eq 4 || type eq 5) then begin
+    return, '%0.1f'
+  endif else begin
+    return, '%d'
+  endelse
+end
+
 pro mg_fits_browser::_set_status_for_draw, event
   compile_opt strictarr
 
-  dims = size(*self.current_data, /dimensions)
-  image_draw = widget_info(self.tlb, find_by_uname='draw')
-  draw_geometry = widget_info(image_draw, /geometry)
-  x = event.x / draw_geometry.scr_xsize * dims[0]
-  y = event.y / draw_geometry.scr_ysize * dims[1]
+  draw_wid = widget_info(self.tlb, find_by_uname='draw')
+  self->datacoords_for_screen, event.x, event.y, x=x, y=y
+  fc = self->_format_code_for_data()
+
   if (self.currently_selected[0] lt 0) then begin
     ; nothing
   endif else if (self.currently_selected[1] lt 1) then begin
     value = (*self.current_data)[x, y]
     self->set_status, string(x, y, value, $
-                             format='(%"x: %d, y: %d, value: %0.2f")')
+                             format='(%"x: %d, y: %d, value: ' + fc + '")'), $
+                      /secondary
   endif else begin
     self->set_status, string(x, y, $
                              (*self.current_data)[x, y], $
                              (*self.compare_data)[x, y], $
                              self->_name_for_tree_id(self.currently_selected[0]), $
                              self->_name_for_tree_id(self.currently_selected[1]), $
-                             format='(%"x: %d, y: %d, value: %0.2f, %0.2f (%s, %s)")')
+                             format='(%"x: %d, y: %d, value: ' + fc + ', ' + fc + ' (%s, %s)")'), $
+                      /secondary
   endelse
 end
 
@@ -747,7 +810,7 @@ end
 ;
 ; :Params:
 ;   event : in, required, type=structure
-;     DRAW_WIDGET event
+;     `WIDGET_DRAW` event
 ;-
 pro mg_fits_browser::_show_compare_inset, event
   compile_opt strictarr
@@ -782,6 +845,72 @@ pro mg_fits_browser::_show_compare_inset, event
 end
 
 
+pro mg_fits_browser::_compute_box_stats, event
+  compile_opt strictarr
+
+  self->datacoords_for_screen, event.x, event.y, x=x1, y=y1
+  self->datacoords_for_screen, self.rubberband_box_start[0], $
+                               self.rubberband_box_start[1], $
+                               x=x2, y=y2
+
+  x = [x1 < x2, x1 > x2]
+  y = [y1 < y2, y1 > y2]
+
+  values = float((*self.current_data)[x[0]:x[1], y[0]:y[1]])
+  n_values = n_elements(values)
+  fc = self->_format_code_for_data()
+
+  if (n_values eq 1) then begin
+    msg = string(x[0], y[0], values[0], $
+                 format='(%"x: %d, y: %d, value: ' + fc + '")')
+  endif else begin
+    msg = string(x, y, $
+                 mean(values), median(values), stddev(values), $
+                 min(values, max=max_value), max_value, $
+                 n_values, $
+                 format='(%"x: %d:%d, y: %d:%d, mean: %0.1f, median: %0.1f, std dev: %0.1f, range: [' + fc + ', ' + fc + '] (%d values)")')
+  endelse
+  self->set_status, msg
+end
+
+
+pro mg_fits_browser::_show_rubberband_box, event
+  compile_opt strictarr
+
+  draw_wid = widget_info(self.tlb, find_by_uname='draw')
+  geo_info = widget_info(draw_wid, /geometry)
+  dimensions = [geo_info.draw_xsize, geo_info.draw_ysize]
+
+  inset_size = 80
+
+  ; get current graphics status to be able to reset afterwards
+  old_win_id = !d.window
+
+  ; refresh backing store from pixmaps[0]
+  wset, self.backing_store
+  device, copy=[0, 0, dimensions, 0, 0, self.pixmaps[0]]
+
+  ; draw rubberband box on backing store
+  plots, [self.rubberband_box_start[0], $
+          event.x, $
+          event.x, $
+          self.rubberband_box_start[0], $
+          self.rubberband_box_start[0]], $
+         [self.rubberband_box_start[1], $
+          self.rubberband_box_start[1], $
+          event.y, $
+          event.y, $
+          self.rubberband_box_start[1]], $
+         /device
+
+  ; refresh display
+  wset, self.draw_id
+  device, copy=[0, 0, dimensions, 0, 0, self.backing_store]
+
+  wset, old_win_id
+end
+
+
 ;+
 ; Handle all events from the widget program.
 ;
@@ -803,17 +932,35 @@ pro mg_fits_browser::handle_events, event
     'draw': begin
         case event.type of
           0: begin
-              if (self.currently_selected[1] gt 0L && (event.press and 1) gt 0) then begin
+            if ((event.press and 1) gt 0) then begin
+              if (self.currently_selected[1] gt 0L) then begin
                 self.show_inset = 1B
                 self->_show_compare_inset, event
+              endif else begin
+                self.show_rubberband_box = 1B
+                self.rubberband_box_start = [event.x, event.y]
+                self->_show_rubberband_box, event
+              endelse
+            endif
+            if ((event.press and 4) gt 0) then begin
+              if (self.draw_contextmenu gt 0) then begin
+                self.contextmenu_loc = [event.x, event.y]
+                widget_displaycontextmenu, event.id, event.x, event.y, $
+                                           self.draw_contextmenu
               endif
-            end
+            endif
+          end
           1: begin
-              if ((event.release and 1) gt 0) then begin
+            if ((event.release and 1) gt 0) then begin
+              if (self.currently_selected[1] gt 0L) then begin
                 self.show_inset = 0B
                 self->display
-              endif
-            end
+              endif else begin
+                self.show_rubberband_box = 0B
+                self->_compute_box_stats, event
+              endelse
+            endif
+          end
           2: begin
               draw_wid = widget_info(self.tlb, find_by_uname='draw')
               geo_info = widget_info(draw_wid, /geometry)
@@ -825,6 +972,9 @@ pro mg_fits_browser::handle_events, event
               endif
               if (self.currently_selected[1] gt 0L && self.show_inset) then begin
                 self->_show_compare_inset, event
+              endif
+              if (self.show_rubberband_box) then begin
+                self->_show_rubberband_box, event
               endif
             end
           else:
@@ -886,12 +1036,29 @@ pro mg_fits_browser::handle_events, event
     'fits:file': self->_handle_tree_event, event
     'fits:extension': self->_handle_tree_event, event
     'search': self->select_header_text, event
-    else: begin
-      ; this should never happen, but this message will make debugging easier
-      ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
-                          dialog_parent=self.tlb)
-    end
+    else: self->handle_contextmenu_events, event
   endcase
+end
+
+
+;+
+; Handle context menu events.
+;
+; Override this method if your subclass creates context menus in
+; `create_draw_contextmenu`.
+;
+; :Params:
+;   event : in, required, type=structure
+;     `WIDGET_CONTEXT` event
+;-
+pro mg_fits_browser::handle_contextmenu_events, event
+  compile_opt strictarr
+
+  ; this should never happen since we don't create context menus, but
+  ; this message will make debugging easier
+  uname = widget_info(event.id, /uname)
+  ok = dialog_message(string(uname, format='(%"unknown uname: %s")'), $
+                      dialog_parent=self.tlb)
 end
 
 
@@ -908,6 +1075,24 @@ end
 
 
 ;+
+; Create the context menu associated with the draw widget.
+;
+; :Returns:
+;   long, widget identifier for context menu, 0L if no context menu
+;
+; :Params:
+;   image_draw : in, required, type=long
+;     widget identifier for draw widget
+;-
+function mg_fits_browser::create_draw_contextmenu, image_draw
+  compile_opt strictarr
+
+  ; no context menu by default, child classes can override
+  return, 0L
+end
+
+
+;+
 ; Create the widget hierarchy.
 ;
 ; :Keywords:
@@ -917,6 +1102,9 @@ end
 pro mg_fits_browser::create_widgets, _extra=e
   compile_opt strictarr
 
+  tree_xsize = 300
+  scr_ysize = 512
+
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
                          /tlb_size_events, _extra=e)
 
@@ -924,29 +1112,33 @@ pro mg_fits_browser::create_widgets, _extra=e
   bitmapdir = ['resource', 'bitmaps']
   toolbar = widget_base(self.tlb, /toolbar, /row, uname='toolbar')
 
-  file_toolbar = widget_base(toolbar, /toolbar, /row)
+  button_toolbar = widget_base(toolbar, /row, uname='button_toolbar', xpad=0, ypad=0)
+
+  file_toolbar = widget_base(button_toolbar, /toolbar, /row, uname='file_toolbar')
   open_button = widget_button(file_toolbar, /bitmap, uname='open', $
                               tooltip='Open FITS file', $
                               value=filepath('open.bmp', subdir=bitmapdir))
 
-  export_toolbar = widget_base(toolbar, /toolbar, /row)
+  export_toolbar = widget_base(button_toolbar, /toolbar, /row)
   cmdline_button = widget_button(export_toolbar, /bitmap, uname='cmdline', $
                                  tooltip='Export to command line', $
                                  value=filepath('commandline.bmp', $
                                                 subdir=bitmapdir))
 
-  toggle_toolbar = widget_base(toolbar, /row, /nonexclusive)
+  toggle_toolbar = widget_base(button_toolbar, /row, /nonexclusive)
   annotate_button = widget_button(toggle_toolbar, /bitmap, uname='annotate', $
                                   tooltip='Annotate image', $
                                   value=filepath('ellipse.bmp', $
                                                  subdir=bitmapdir), $
                                   sensitive=0)
 
+  spacer = widget_label(toolbar, value=' ', scr_xsize=1, uname='spacer')
+
+  self.secondary_statusbar = widget_label(toolbar, value=' ', $
+                                          scr_xsize=scr_ysize, /align_center)
+
   ; content row
   content_base = widget_base(self.tlb, /row, uname='content_base')
-
-  tree_xsize = 300
-  scr_ysize = 512
 
   ; tree
   self.tree = widget_tree(content_base, uname='browser', $
@@ -971,6 +1163,8 @@ pro mg_fits_browser::create_widgets, _extra=e
   self.pixmaps[1] = !d.window
 
   wset, old_window
+
+  self.draw_contextmenu = self->create_draw_contextmenu(image_draw)
 
   ; details column
   details_base = widget_base(tabs, xpad=0, ypad=0, title='Header', /column, $
@@ -1091,12 +1285,17 @@ pro mg_fits_browser__define
              tree: 0L, $
              draw_id: 0L, $
              statusbar: 0L, $
+             secondary_statusbar: 0L, $
+             draw_contextmenu: 0L, $
+             contextmenu_loc: lonarr(2), $
              filename: '', $
              title: '', $
              path: '', $
              nfiles: 0L, $
              currently_selected: lonarr(2), $
              show_inset: 0B, $
+             show_rubberband_box: 0B, $
+             rubberband_box_start: lonarr(2), $
              backing_store: 0L, $
              pixmaps: lonarr(2), $
              search_index: 0L, $

@@ -3,6 +3,28 @@
 ;+
 ; Wrap a string into a character width limit space.
 ;
+; :Examples:
+;   Try::
+;
+;     IDL> s1 = '@mdpiper You upgrading the go-cart??'
+;     IDL> print, mg_strmerge(mg_strwrap(s1, width=20))
+;     @mdpiper You
+;     upgrading the
+;     go-cart??
+;     IDL> s2 = 'Twitterrific 2.0.1 is now approved for sale in the App Store. Important bug fixes & increases # of tweets. Coming later today.'
+;     IDL> print, mg_strmerge(mg_strwrap(s2, width=40, indent=2, first_indent=0))
+;     Twitterrific 2.0.1 is now approved for
+;       sale in the App Store. Important bug
+;       fixes & increases # of tweets. Coming
+;       later today.
+;     IDL> s3 = 'Other winners - @daviderota, @mattsa, @NetworkShadow, @adrianzzzz, @Singularity Be sure to follow @Twitterrific so we can DM your promo code'
+;     IDL> print, mg_strmerge(mg_strwrap(s3, width=40, indent=0, first_indent=2))
+;       Other winners - @daviderota, @mattsa,
+;     @NetworkShadow, @adrianzzzz,
+;     @Singularity Be sure to follow
+;     @Twitterrific so we can DM your promo
+;     code
+;
 ; :Returns:
 ;    strarr
 ;
