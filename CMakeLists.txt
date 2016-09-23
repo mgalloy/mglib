@@ -137,7 +137,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${MGLIB_PACKAGE_VERSION}-${MG
 include(CPack)
 
 install(FILES
-          COPYING.rst
+          LICENSE
           INSTALL.rst
           README.rst
         DESTINATION .)
