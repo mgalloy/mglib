@@ -640,6 +640,8 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
+
+        header = header[0:-2]   ; remove END
       end
     'fits:extension': begin
         widget_control, id, get_uvalue=e
@@ -650,6 +652,12 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
+
+        ; return just the extension header
+        pos = strpos(header, 'BEGIN EXTENSION HEADER')
+        ind = where(pos ge 0, count)
+        if (count gt 0L) then header = header[ind[0] + 1:*]
+        header = header[0:-2]   ; remove END
       end
   endcase
   return, data

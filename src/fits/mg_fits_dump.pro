@@ -65,7 +65,7 @@ pro mg_fits_dump, filename, exten_no=exten_no
       if (e ne 0) then begin
         pos = strpos(header, 'BEGIN EXTENSION HEADER')
         ind = where(pos ge 0, count)
-        header = header[ind[0] + 1:*]
+        if (count gt 0L) then header = header[ind[0] + 1:*]
       endif
       if (n_elements(header) gt 1L) then begin
         header = header[0:-2]  ; remove 'END'
