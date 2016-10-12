@@ -30,6 +30,8 @@
 ;   places_sep : in, optional, type=string, default=''
 ;     separator to use in between groups of 3 places left of the decimal point
 ;     when not using exponential form
+;   decimal_sep : in, optional, type=string, default='.'
+;     decimal point separator
 ;-
 function mg_float2str, f, $
                        n_places=n_places, n_digits=n_digits, $
@@ -53,6 +55,7 @@ function mg_float2str, f, $
   _decimal_sep = n_elements(decimal_sep) eq 0L ? '.' : decimal_sep
 
   type = size(f, /type)
+  integer_type = 0B
   switch type of
     1:
     2:
@@ -62,6 +65,7 @@ function mg_float2str, f, $
     14:
     15: begin
         default_width = 0L
+        integer_type = 1B
         break
       end
     4: begin
@@ -80,19 +84,28 @@ function mg_float2str, f, $
 
   n_places_present = long(alog10(abs(f))) + 1L
   if (n_places_present gt _n_places && _n_places gt 0L) then begin
-    format = string(_n_digits, format='(%"(\%\"\%0.%dg\")")')
-    return, string(f, format=format)
+    format = string(_n_digits, format='(%"(\%\"\%0.%de\")")')
+    s = string(f, format=format)
+    tokens = strsplit(s, '.', /extract)
+    return, strjoin(tokens, _decimal_sep)
   endif
 
-  format = string(_n_digits, format='(%"(\%\"\%0.%df\")")')
-  s = string(f, format=format)
+  if (integer_type) then begin
+    format = '(%"%d")'
+  endif else begin
+    format = string(_n_digits, format='(%"(\%\"\%0.%df\")")')
+  endelse
 
+  s = string(f, format=format)
   if (_places_sep eq '') then return, s
 
   tokens = strsplit(s, '.', /extract)
 
   places = string(reverse(byte(tokens[0])))
-  if (strlen(places) le 3) then return, s
+  if (strlen(places) le 3) then begin
+    tokens = strsplit(s, '.', /extract)
+    return, strjoin(tokens, _decimal_sep)
+  endif
 
   b = bytarr(3 * ceil(strlen(places) / 3.0)) + (byte(' '))[0]
   b[0] = byte(places)
@@ -101,7 +114,7 @@ function mg_float2str, f, $
   b = [b, psep]
   places = reform(b, n_elements(b))
   places[-1] = (byte(' '))[0]
-  places = strtrim(reverse(places), 2)
+  tokens[0] = strtrim(reverse(places), 2)
 
-  return, places + _decimal_sep + tokens[1]
+  return, strjoin(tokens, _decimal_sep)
 end
