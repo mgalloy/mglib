@@ -28,8 +28,12 @@
 ; :Params:
 ;   filename : in, required, type=string
 ;     filename of FITS file to examine
+;
+; :Keywords:
+;   exten_no : in, optional, type=integer
+;     if present, `MG_FITS_DUMP` prints information about the extension given
 ;-
-pro mg_fits_dump, filename
+pro mg_fits_dump, filename, exten_no=exten_no
   compile_opt strictarr
 
   if (n_elements(filename) eq 0L) then begin
@@ -50,10 +54,24 @@ pro mg_fits_dump, filename
   output = []
 
   for e = 0L, fcb.nextend do begin
+    if (n_elements(exten_no) gt 0 && exten_no ne e) then continue
     fits_read, fcb, data, header, exten_no=e
     name = (fcb.extname[e] eq '' && e eq 0L) ? 'primary' : fcb.extname[e]
     output = [output, $
               string(e, name, mg_variable_declaration(data), format='(%"%d: [%s] %s")')]
+
+    if (n_elements(exten_no) gt 0L && exten_no eq e) then begin
+
+      if (e ne 0) then begin
+        pos = strpos(header, 'BEGIN EXTENSION HEADER')
+        ind = where(pos ge 0, count)
+        if (count gt 0L) then header = header[ind[0] + 1:*]
+      endif
+      if (n_elements(header) gt 1L) then begin
+        header = header[0:-2]  ; remove 'END'
+        output = [output, header]
+      endif
+    endif
 
     full_size += total(strlen(header) + 1, /integer) $
                    + n_elements(data) * mg_typesize(size(data, /type))
@@ -61,7 +79,7 @@ pro mg_fits_dump, filename
 
   fits_close, fcb
 
-  compression = is_compressed $
+  compression = is_compressed && n_elements(exten_no) eq 0L $
                   ? string(100.0 * (full_size - fcb.nbytes) / full_size, $
                            format='(%", %0.1f%% compression")') $
                 : ''
