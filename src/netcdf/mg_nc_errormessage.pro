@@ -15,6 +15,9 @@ function mg_nc_errormessage, code
 
   case code of
       0: m = 'No error'
+     -1: m = 'v2 API error'
+    -31: m = ''
+    -32: m = 'System error'
     -33: m = 'Not a netcdf id'
     -34: m = 'Too many netcdfs open'
     -35: m = 'netcdf file exists && NC_NOCLOBBER'
@@ -89,6 +92,8 @@ function mg_nc_errormessage, code
     -127: m = 'Bad chunksize'
     -128: m = 'Attempt to use feature that was not turned on when netCDF was built'
     -129: m = 'Error in using diskless access'
+    -130: m = 'Attempt to extend dataset during ind. I/O operation'
+    -131: m = 'MPI operation failed'
     else: m = 'Unknown error code'
   endcase
 
