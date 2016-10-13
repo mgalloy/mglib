@@ -1026,6 +1026,59 @@ pro mg_fits_browser::handle_events, event
           end
         endcase
       end
+    'screenshot': begin
+        if (self.currently_selected[0] lt 0L) then return
+
+        basename = file_basename(file_basename(self.current_filename, '.gz'), '.fts')
+        cd, current=cwd
+
+        widget_control, self.currently_selected[0], get_uvalue=extension
+        if (size(extension, /type) eq 7) then extension = 0L
+
+        tabs = widget_info(self.tlb, find_by_uname='tabs')
+        tab_index = widget_info(tabs, /tab_current)
+        case tab_index of
+          0: begin
+              orig_window = !d.window
+              wset, self.draw_id
+              im = tvrd(true=1)
+              wset, orig_window
+
+              default_filename = string(basename, extension, $
+                                        format='(%"%s-ext%d.png")')
+              results = dialog_write_image(im, $
+                                           dialog_parent=self.tlb, $
+                                           filename=default_filename, $
+                                           path=cwd, $
+                                           options=options, $
+                                           type='PNG')
+              if (results) then self->set_status, 'Wrote image to ' + options.filename
+            end
+          1: begin
+              header_text = widget_info(self.tlb, find_by_uname='fits_header')
+              widget_control, header_text, get_value=text
+
+
+              default_filename = string(basename, extension, $
+                                        format='(%"%s-ext%d.txt")')
+              full_filename = dialog_pickfile(dialog_parent=self.tlb, $
+                                              file=default_filename, $
+                                              path=cwd, $
+                                              /write)
+              if (full_filename ne '') then begin
+                openw, lun, full_filename, /get_lun
+                printf, lun, text
+                free_lun, lun
+                self->set_status, 'Wrote header to ' + full_filename
+              endif
+            end
+          else: begin
+            ; this should never happen, but this message will make debugging easier
+            ok = dialog_message(string(tab_index, format='(%"unknown tab: %d")'), $
+                                dialog_parent=self.tlb)
+          end
+        endcase
+      end
     'annotate': begin
         self.annotate = event.select
         if (event.select) then begin
@@ -1132,6 +1185,11 @@ pro mg_fits_browser::create_widgets, _extra=e
                                  tooltip='Export to command line', $
                                  value=filepath('commandline.bmp', $
                                                 subdir=bitmapdir))
+  screenshot_button = widget_button(export_toolbar, $
+                                    /bitmap, uname='screenshot', $
+                                    tooltip='Save screenshot of image display', $
+                                    value=filepath('export.bmp', $
+                                                   subdir=bitmapdir))
 
   toggle_toolbar = widget_base(button_toolbar, /row, /nonexclusive)
   annotate_button = widget_button(toggle_toolbar, /bitmap, uname='annotate', $
