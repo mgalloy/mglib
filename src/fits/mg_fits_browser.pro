@@ -406,7 +406,7 @@ end
 ;
 ; :Params:
 ;   filenames : in, optional, type=string/strarr
-;     filenames of files to load
+;     filenames (or glob expressions) of files to load
 ;-
 pro mg_fits_browser::load_files, filenames
   compile_opt strictarr
@@ -420,10 +420,16 @@ pro mg_fits_browser::load_files, filenames
                            format='(%"Loading %d FITS file%s...")')
 
   foreach f, filenames do begin
-    if (~file_test(f, /regular)) then begin
-      message, 'file not found or not regular: ' + f, /informational
-      continue
-    endif
+    files = file_search(f, count=files_found)
+
+    skip = 1
+    case files_found of
+      0: self->set_status, 'file not found or not regular: ' + f
+      1: skip = 0
+      else: self->load_files, files
+    endcase
+    if (skip) then continue
+
     fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
 
