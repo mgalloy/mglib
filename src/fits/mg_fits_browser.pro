@@ -938,7 +938,13 @@ pro mg_fits_browser::handle_events, event
   uname = widget_info(event.id, /uname)
   case uname of
     'open': self->open_files
-    'tlb': self->resize, event.x, event.y
+    'tlb': begin
+        case tag_names(event, /structure_name) of
+          'WIDGET_TLB_MOVE': self.prefs->set, 'location', {x:event.x, y:event.y}
+          'WIDGET_BASE': self->resize, event.x, event.y
+          else:
+        endcase
+      end
     'export_data':
     'export_header':
     'tabs':
@@ -1172,8 +1178,10 @@ pro mg_fits_browser::create_widgets, _extra=e
   tree_xsize = 300
   scr_ysize = 512
 
+  loc = self.prefs->get('location', default={x:0L, y:0L})
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
-                         /tlb_size_events, _extra=e)
+                         /tlb_size_events, /tlb_move_events, _extra=e, $
+                         xoffset=loc.x, yoffset=loc.y)
 
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
@@ -1296,6 +1304,8 @@ end
 pro mg_fits_browser::cleanup
   compile_opt strictarr
 
+  obj_destroy, self.prefs
+
   wdelete, self.backing_store, self.pixmaps[0], self.pixmaps[1]
   
   ptr_free, self.current_data, self.current_header, self.compare_data, self.compare_header
@@ -1318,6 +1328,10 @@ end
 ;-
 function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   compile_opt strictarr
+
+  self.prefs = obj_new('MGffPrefs', $
+                       author_name='mgalloy', $
+                       app_name='mg_fits_browser')
 
   self.title = 'FITS Browser'
   self.path = ''
@@ -1353,6 +1367,7 @@ pro mg_fits_browser__define
   compile_opt strictarr
 
   define = { mg_fits_browser, $
+             prefs: obj_new(), $
              tlb: 0L, $
              tree: 0L, $
              draw_id: 0L, $
