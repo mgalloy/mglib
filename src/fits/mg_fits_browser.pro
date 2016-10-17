@@ -420,28 +420,28 @@ pro mg_fits_browser::load_files, filenames
                            format='(%"Loading %d FITS file%s...")')
 
   foreach f, filenames do begin
-    files = file_search(f, count=files_found)
+    files = file_search(f, count=n_files_found)
 
     skip = 1
-    case files_found of
+    case n_files_found of
       0: self->set_status, 'file not found or not regular: ' + f
       1: skip = 0
       else: self->load_files, files
     endcase
     if (skip) then continue
 
-    fits_open, f, fcb
+    fits_open, files[0], fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
 
     extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
-                                             filename=f)
+                                             filename=files[0])
 
     widget_control, self.tlb, update=0
 
     file_node = widget_tree(self.tree, /folder, /expanded, $
-                            value=self->file_title(f, header), $
-                            bitmap=self->file_bitmap(f, header), $
-                            uname='fits:file', uvalue=file_expand_path(f))
+                            value=self->file_title(files[0], header), $
+                            bitmap=self->file_bitmap(files[0], header), $
+                            uname='fits:file', uvalue=file_expand_path(files[0]))
 
     for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
@@ -449,7 +449,7 @@ pro mg_fits_browser::load_files, filenames
                              bitmap=self->extension_bitmap(i, $
                                                            fcb.extname[i], $
                                                            ext_header, $
-                                                           filename=f), $
+                                                           filename=files[0]), $
                              value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
@@ -666,6 +666,7 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         header = header[0:-2]   ; remove END
       end
   endcase
+
   return, data
 end
 
@@ -938,13 +939,7 @@ pro mg_fits_browser::handle_events, event
   uname = widget_info(event.id, /uname)
   case uname of
     'open': self->open_files
-    'tlb': begin
-        case tag_names(event, /structure_name) of
-          'WIDGET_TLB_MOVE': self.prefs->set, 'location', {x:event.x, y:event.y}
-          'WIDGET_BASE': self->resize, event.x, event.y
-          else:
-        endcase
-      end
+    'tlb': self->resize, event.x, event.y
     'export_data':
     'export_header':
     'tabs':
@@ -1023,6 +1018,7 @@ pro mg_fits_browser::handle_events, event
         endcase
 
         fits_open, f, fcb
+help, fcb
         fits_read, fcb, data, header, exten_no=exten_no
         fits_close, fcb
 
@@ -1178,10 +1174,8 @@ pro mg_fits_browser::create_widgets, _extra=e
   tree_xsize = 300
   scr_ysize = 512
 
-  loc = self.prefs->get('location', default={x:0L, y:0L})
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
-                         /tlb_size_events, /tlb_move_events, _extra=e, $
-                         xoffset=loc.x, yoffset=loc.y)
+                         /tlb_size_events, _extra=e)
 
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
@@ -1304,8 +1298,6 @@ end
 pro mg_fits_browser::cleanup
   compile_opt strictarr
 
-  obj_destroy, self.prefs
-
   wdelete, self.backing_store, self.pixmaps[0], self.pixmaps[1]
   
   ptr_free, self.current_data, self.current_header, self.compare_data, self.compare_header
@@ -1328,10 +1320,6 @@ end
 ;-
 function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   compile_opt strictarr
-
-  self.prefs = obj_new('MGffPrefs', $
-                       author_name='mgalloy', $
-                       app_name='mg_fits_browser')
 
   self.title = 'FITS Browser'
   self.path = ''
@@ -1367,7 +1355,6 @@ pro mg_fits_browser__define
   compile_opt strictarr
 
   define = { mg_fits_browser, $
-             prefs: obj_new(), $
              tlb: 0L, $
              tree: 0L, $
              draw_id: 0L, $
