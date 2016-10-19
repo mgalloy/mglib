@@ -171,7 +171,7 @@ function mg_progress::_overloadForeach, value, key
     if (n_elements(key) eq 0L) then key = 0L
     value = it[key++ < (self.n - 1L)]
 
-    more_elements = key lt self.n
+    more_elements = self.use_total ? (self.current lt self.total) : (key lt self.n)
   endelse
 
   self.counter = (self.counter + 1) < self.n
@@ -196,7 +196,8 @@ function mg_progress::_overloadForeach, value, key
   format = string(n_width, n_width, $
                   format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
 
-  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width - strlen(self.title)
+  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width $
+                 - strlen(self.title)
 
   done_length = round(bar_length * c / t)
   todo_length = bar_length - done_length
