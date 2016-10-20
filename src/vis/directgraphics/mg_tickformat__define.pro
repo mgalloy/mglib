@@ -5,16 +5,16 @@
 ; direct graphics plot.
 ;
 ; :Properties:
-;   places_sep : type=string, default=''
+;   places_sep : type=string
 ;     separator to use in between groups of 3 places left of the decimal point
-;     when not using exponential form
-;   decimal_sep : type=string, default='.'
-;     decimal point separator
-;   n_places : type=integer, default="0, 7, or 15"
+;     when not using exponential form; default is the empty string
+;   decimal_sep : type=string
+;     decimal point separator; default is '.'
+;   n_places : type=integer
 ;     cutoff number of digits to the left of the decimal point before switching
 ;     to the exponential form; defaults to 0 for integers, 7 for floats, or 15
 ;     for doubles
-;   n_digits : type=integer, default="0, 7 or 15"
+;   n_digits : type=integer
 ;     number of positions after the decimal point in the standard form or the
 ;     number of significant digits in the exponential form; defaults to 0 for
 ;     integers, 7 for floats, or 15 for doubles
