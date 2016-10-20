@@ -15,33 +15,75 @@
 ;   process that element of the hash. We will make one element have a much
 ;   higher amount of work::
 ;
-;     indices = randomu(seed, n)
-;     indices[5] = 5.0
-;
-;     h = hash(letters, indices, /extract))
+;     work_amount = randomu(seed, n)
+;     work_amount[5] = 5.0
+;     h = hash(letters, work_amount, /extract)
 ;
 ;   In the simple use of `mg_progress`, we get an indicator of the progress
 ;   through the work, but the estimated time to complete all the work jumps
-;   around::
+;   around because there is not a constant amount of work to be done on each
+;   iteration::
 ;
-;     foreach v, mg_progress(h), k do begin
-;       wait, v
+;     foreach w, mg_progress(h), i do begin
+;       wait, w
 ;     endforeach
 ;
 ;   If, on the other hand, we can provide an amount of the total work and then
-;   update the progress as we go, the estimate timed to complete all work is
-;   much more accurate:
+;   update the progress as we go, the estimate time to complete all work is
+;   much more accurate::
 ;
-;     p = mg_progress(h, total=total(indices))
-;     foreach v, p, k do begin
-;       wait, v
-;       p->update, v
+;     p = mg_progress(h, total=total(indices), title='Pre-calculation)
+;     foreach w, p, i do begin
+;       wait, w
+;       p->advance, work=w
 ;     endforeach
+;
+;   It might also be necessary to not loop directly over the progress bar, but
+;   to have some other type of loop, i.e., a FOR loop, WHILE loop, or a FOREACH
+;   loop over some other object and manually update the progress bar. In this
+;   case, set the `MANUAL` property of the progress bar and use the `advance`
+;   method again to update the progress::
+;
+;     p = mg_progress(h, total=total(work_amount), title='Manual', /manual)
+;     foreach w, h, i do begin
+;       wait, w
+;       p->advance, work=w
+;     endforeach
+;     p->advance
+;
+;   Note, that in the case of setting the `MANUAL` property, an extra `advance`
+;   call is needed for the progress bar to show 100% completion.
+;
+;   For an example of using advance with a constant amount of work in each
+;   iteration and not looping over the progress bar object itself, let's
+;   do some processing on all the files in the IDL distribution::
+;
+;     idl_dir = filepath('')
+;     files = file_search(idl_dir, '*', count=n_files)
+;     p = mg_progress(files, title='Checking files', /manual)
+;     for f = 0L, n_files - 1L do begin
+;       ; process files[f]
+;       p->advance
+;     endfor
+;     p->advance
+;
+; :Properties:
+;   title : type=string
+;     title to show on the left side of the progress bar display
+;   total : type=float
+;     set to indicate the total amount of work to be done and displayed; use
+;     when the amount of work is not the same for each iteration; use the
+;     `advance` method to step forward the correct amount
+;   manual : type=boolean
+;     set to indicate the progress bar will be updated via the `advance` method
+;     instead of by looping with `FOREACH` on the progress bar object
 ;-
 
 
 ;+
 ; Helper routine to format a number of seconds as a string.
+;
+; :Private:
 ;
 ; :Returns:
 ;   formatted string such as "00:10" (10 seconds) or "02:10:00" (2 hours and 10
@@ -55,7 +97,7 @@
 ;   width : out, optional, type=long
 ;     set to a named variable to retrieve the length of the returned string
 ;-
-function mg_progress::secs2minsec, secs, width=width
+function mg_progress::_secs2minsec, secs, width=width
   compile_opt strictarr
 
   hours = long(secs) / 60L / 60L
@@ -88,6 +130,8 @@ end
 ; Wrapper for `MG_TERMCOLUMNS` which returns a default if `MG_TERMCOLUMNS` not
 ; found.
 ;
+; :Private:
+;
 ; :Returns:
 ;   number of columns in terminal
 ;
@@ -95,7 +139,7 @@ end
 ;   default : in, optional, type=long, default=80
 ;     if `MG_TERMCOLUMNS` not present, will return this value
 ;-
-function mg_progress::termcolumns, default=default
+function mg_progress::_termcolumns, default=default
   compile_opt strictarr
 
   catch, error
@@ -110,27 +154,11 @@ end
 
 
 ;+
-; Update the amount of work completed by adding `work` to the current amount.
-;
-; :Params:
-;   work : in, required, type=float
-;     amount to add to current amount of work done
-;-
-pro mg_progress::update, work
-  compile_opt strictarr
-
-  self.current += work
-end
-
-
-;+
 ; Advance the progress bar a step. This is useful for using `MG_PROGRESS` with a
-; `FOR` loop.
-;
-; Warning: If iterating through an iterable with an `_overloadForeach`, then
-; `advance` must be called an additional time after the loop to complete the
-; progress to 100%.
-;
+; when the `TOTAL` keyword is needed, i.e., when the amount of progress each
+; iteration is not the same, or when not using a `FOREACH` loop on the progress
+; bar iself.
+; 
 ; :Keywords:
 ;   work : in, required, type=float
 ;     amount to add to current amount of work done
@@ -138,9 +166,12 @@ end
 pro mg_progress::advance, work=work
   compile_opt strictarr
 
-  new_i = self.counter eq 0L ? !null : self.counter
-  not_done = self->_overloadForeach(new_element, new_i)
-  if (n_elements(work) gt 0L) then self->update, work
+  if (self.manual) then begin
+    new_i = self.counter eq 0L ? !null : self.counter
+    not_done = self->_overloadForeach(new_element, new_i)
+  endif
+
+  if (n_elements(work) gt 0L) then self.current += work
 end
 
 
@@ -169,29 +200,31 @@ function mg_progress::_overloadForeach, value, key
     more_elements = it->_overloadForeach(value, key)
   endif else begin
     if (n_elements(key) eq 0L) then key = 0L
-    value = it[key++ < (self.n - 1L)]
+    value = it[key < (self.n - 1L)]
 
-    more_elements = self.use_total ? (self.current lt self.total) : (key lt self.n)
+    ;more_elements = self.manual ? (self.current lt self.total) : (key lt self.n)
+    more_elements = key lt self.n
+    key += 1
   endelse
 
   self.counter = (self.counter + 1) < self.n
 
-  c = self.use_total ? self.current : self.counter
+  c = self.use_total ? self.current : (self.counter < self.n)
   t = self.use_total ? self.total : self.n
 
-  n_cols = self->termcolumns() - 1L
+  n_cols = self->_termcolumns() - 1L
 
   n_width = floor(alog10(t)) + 1L
 
   elapsed_time = now - self.start_time
   if (c ne 0) then begin
     est_time = elapsed_time / c * t
-    est_time = self->secs2minsec(est_time, width=est_width)
+    est_time = self->_secs2minsec(est_time, width=est_width)
   endif else begin
     est_time = '--:--'
     est_width = 5L
   endelse
-  elapsed_time = self->secs2minsec(elapsed_time, width=est_width)
+  elapsed_time = self->_secs2minsec(elapsed_time, width=est_width)
 
   format = string(n_width, n_width, $
                   format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
@@ -238,13 +271,15 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable, total=total, title=title
+function mg_progress::init, iterable, total=total, title=title, manual=manual
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
   self.n = n_elements(iterable)
   self.counter = 0L
   self.title = n_elements(title) eq 0L ? '' : (title + ' ')
+
+  self.manual = keyword_set(manual)
 
   if (n_elements(total) gt 0L) then begin
     self.use_total = 1B
@@ -264,6 +299,7 @@ pro mg_progress__define
 
   !null = { mg_progress, inherits IDL_Object, $
             iterable: ptr_new(), $
+            manual: 0B, $
             title: '', $
             n: 0L, $
             counter: 0L, $
@@ -279,44 +315,48 @@ end
 
 n = 16
 letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
-wait_times = randomu(seed, n)
-wait_times[5] = 5.0
-h = hash(letters, wait_times, /extract)
+
+work_amount = randomu(seed, n)
+work_amount[5] = 5.0
+h = hash(letters, work_amount, /extract)
 
 ; basic example
 
-print, 'Simple progress with no pre-calculation, note estimated time changes'
-foreach t, mg_progress(h), k do begin
-  wait, t
+print, 'Simple progress with no pre-calculation, estimated time changes greatly'
+foreach w, mg_progress(h), i do begin
+  wait, w
 endforeach
 
 ; example with pre-calculation
 
 print, 'Updating progress with pre-calculation gives a constant estimated time'
-p = mg_progress(h, total=total(wait_times), title='Updating progress...')
-foreach t, p, k do begin
-  wait, t
-  p->update, t
+p = mg_progress(h, total=total(work_amount), title='Pre-calculation')
+foreach w, p, i do begin
+  wait, w
+  p->advance, work=w
 endforeach
 
+; example of looping on the hash and manually advancing progress bar
 
-p = mg_progress(h, total=total(wait_times), title='Updating progress...')
-foreach t, h, k do begin
-  wait, t
-  p->advance, work=t
+print, 'Looping over hash and manually advancing progress bar'
+p = mg_progress(h, total=total(work_amount), title='Manual', /manual)
+foreach w, h, i do begin
+  wait, w
+  p->advance, work=w
 endforeach
-p->advance
+p->advance   ; extra advance needed when not looping on the progress bar
 
 ; example of using with a FOR loop
 
 idl_dir = filepath('')
 print, idl_dir, format='(%"Finding files in IDL distribution: %s")'
 files = file_search(idl_dir, '*', count=n_files)
-p = mg_progress(files, title='Checking files...')
+p = mg_progress(files, title='Checking files', /manual)
 for f = 0L, n_files - 1L do begin
-  p->advance
   ; process files[f]
+  p->advance
 endfor
+p->advance   ; extra advance needed when not looping on the progress bar
 print, 'Done'
 
 end
