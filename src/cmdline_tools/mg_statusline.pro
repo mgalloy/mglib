@@ -104,8 +104,10 @@ pro mg_statusline, str, column, length=length, clear=clear, $
               : length
   _column = n_elements(column) eq 0L ? 0L : (column > 0L)
 
+  statusline_enabled = 0B
   termtype = getenv('TERM')
   switch 1 of
+    termtype eq 'screen':
     strmid(termtype, 0, 2) eq 'vt':
     strmid(termtype, 0, 5) eq 'xterm':
     strmid(termtype, 0, 3) eq 'dec':
