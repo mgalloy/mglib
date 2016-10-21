@@ -411,24 +411,23 @@ end
 pro mg_fits_browser::load_files, filenames
   compile_opt strictarr
 
-  n_files = n_elements(filenames)
-  self.nfiles += n_elements(filenames)
-
-  self->set_title, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
-
-  self->set_status, string(n_files, n_files eq 1 ? '' : 's', $
-                           format='(%"Loading %d FITS file%s...")')
-
   foreach f, filenames do begin
     files = file_search(f, count=n_files_found)
 
-    skip = 1
-    case n_files_found of
-      0: self->set_status, 'file not found or not regular: ' + f
-      1: skip = 0
-      else: self->load_files, files
-    endcase
-    if (skip) then continue
+    if (n_files_found eq 0L) then begin
+      self->set_status, 'file pattern not found: ' + f
+      continue
+    endif
+
+    self.nfiles += n_files_found
+    self->set_title, self.nfiles eq 1L ? file_basename(files[0]) : 'many files'
+    self->set_status, string(n_files_found, n_files_found eq 1 ? '' : 's', f, $
+                             format='(%"Loading %d FITS file%s: %s")')
+
+    if (n_files_found gt 1L) then begin
+      self->load_files, files
+      continue
+    endif
 
     fits_open, files[0], fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
@@ -456,9 +455,8 @@ pro mg_fits_browser::load_files, filenames
     fits_close, fcb
 
     widget_control, self.tlb, update=1
+    self->set_status, /clear
   endforeach
-
-  self->set_status, /clear
 end
 
 
@@ -1337,6 +1335,8 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   self->start_xmanager
 
   tlb = self.tlb
+
+  self->set_status, /clear
 
   if (n_elements(filenames) gt 0L) then self->load_files, filenames
 
