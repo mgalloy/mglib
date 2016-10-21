@@ -194,19 +194,24 @@ end
 ;-
 function mg_progress::_overloadForeach, value, key
   compile_opt strictarr
+  on_error, 2
 
   if (n_elements(key) eq 0L) then self.start_time = systime(/seconds)
   now = systime(/seconds)
 
-  it = *self.iterable
-  if (isa(it, 'IDL_OBJECT')) then begin
-    more_elements = it->_overloadForeach(value, key)
+  iterable = *self.iterable
+  if (isa(iterable, 'IDL_OBJECT')) then begin
+    more_elements = iterable->_overloadForeach(value, key)
   endif else begin
-    if (n_elements(key) eq 0L) then key = 0L
-    value = it[key < (self.n - 1L)]
+    if (n_elements(key) eq 0L) then begin
+      key = 0L
+    endif else begin
+      key += 1
+    endelse
+
+    value = iterable[key < (self.n - 1L)]
 
     more_elements = key lt self.n
-    key += 1
   endelse
 
   self.counter = (self.counter + 1) < self.n
