@@ -77,6 +77,9 @@
 ;   manual : type=boolean
 ;     set to indicate the progress bar will be updated via the `advance` method
 ;     instead of by looping with `FOREACH` on the progress bar object
+;   hide : type=boolean
+;     set to not show output; useful when running scripts both interactively and
+;     non-interactively
 ;-
 
 
@@ -202,58 +205,59 @@ function mg_progress::_overloadForeach, value, key
     if (n_elements(key) eq 0L) then key = 0L
     value = it[key < (self.n - 1L)]
 
-    ;more_elements = self.manual ? (self.current lt self.total) : (key lt self.n)
     more_elements = key lt self.n
     key += 1
   endelse
 
   self.counter = (self.counter + 1) < self.n
 
-  c = self.use_total ? self.current : (self.counter < self.n)
-  t = self.use_total ? self.total : self.n
+  if (~self.hide) then begin
+    c = self.use_total ? self.current : (self.counter < self.n)
+    t = self.use_total ? self.total : self.n
 
-  n_cols = self->_termcolumns() - 1L
+    n_cols = self->_termcolumns() - 1L
 
-  n_width = floor(alog10(t)) + 1L
+    n_width = floor(alog10(t)) + 1L
 
-  elapsed_time = now - self.start_time
-  if (c ne 0) then begin
-    est_time = elapsed_time / c * t
-    est_time = self->_secs2minsec(est_time, width=est_width)
-  endif else begin
-    est_time = '--:--'
-    est_width = 5L
-  endelse
-  elapsed_time = self->_secs2minsec(elapsed_time, width=est_width)
+    elapsed_time = now - self.start_time
+    if (c ne 0) then begin
+      est_time = elapsed_time / c * t
+      est_time = self->_secs2minsec(est_time, width=est_width)
+    endif else begin
+      est_time = '--:--'
+      est_width = 5L
+    endelse
+    elapsed_time = self->_secs2minsec(elapsed_time, width=est_width)
 
-  format = string(n_width, n_width, $
-                  format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
+    format = string(n_width, n_width, $
+                    format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
 
-  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width $
-                 - strlen(self.title)
+    bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width $
+                   - strlen(self.title)
 
-  done_length = round(bar_length * c / t)
-  todo_length = bar_length - done_length
+    done_length = round(bar_length * c / t)
+    todo_length = bar_length - done_length
 
-  done_char = '#'
-  todo_char = '-'
+    done_char = '#'
+    todo_char = '-'
 
-  done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
-  todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
+    done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
+    todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
 
-  msg = string(self.title, $
-               round(100L * c / t), $
-               done, todo, $
-               self.counter, self.n, $
-               elapsed_time, est_time, $
-               format=format)
+    msg = string(self.title, $
+                 round(100L * c / t), $
+                 done, todo, $
+                 self.counter, self.n, $
+                 elapsed_time, est_time, $
+                 format=format)
 
-  if (more_elements) then begin
-    mg_statusline, msg
-  endif else begin
-    mg_statusline, /clear
-    print, msg
-  endelse
+    if (more_elements) then begin
+      mg_statusline, msg
+    endif else begin
+      mg_statusline, /clear
+      print, msg
+    endelse
+  endif
 
   return, more_elements
 end
@@ -271,7 +275,7 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable, total=total, title=title, manual=manual
+function mg_progress::init, iterable, total=total, title=title, manual=manual, hide=hide
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
@@ -280,6 +284,7 @@ function mg_progress::init, iterable, total=total, title=title, manual=manual
   self.title = n_elements(title) eq 0L ? '' : (title + ' ')
 
   self.manual = keyword_set(manual)
+  self.hide = keyword_set(hide)
 
   if (n_elements(total) gt 0L) then begin
     self.use_total = 1B
@@ -300,6 +305,7 @@ pro mg_progress__define
   !null = { mg_progress, inherits IDL_Object, $
             iterable: ptr_new(), $
             manual: 0B, $
+            hide: 0B, $
             title: '', $
             n: 0L, $
             counter: 0L, $
