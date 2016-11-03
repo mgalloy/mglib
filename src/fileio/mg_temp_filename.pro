@@ -6,7 +6,8 @@
 ; :Examples:
 ;   Try the main-level example program at the end of this file::
 ;
-;     IDL> .run mg_temp_filename
+;     IDL> print, mg_temp_filename('mg_temp_filename-%s.txt')
+;     /usr/tmp/mg_temp_filename-001478206709795.txt
 ;
 ; :Returns:
 ;   string
