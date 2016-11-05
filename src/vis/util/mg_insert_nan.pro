@@ -3,18 +3,28 @@
 ;+
 ; Insert NaNs into an array at the given locations.
 ;
+; :Returns:
+;   new `y` values
+;
 ; :Params:
-;   x : in, out, required, type=numeric array
+;   x : in, required, type=numeric array
 ;     independent values to insert a value from `values` into
-;   y : in, out, required, type=numeric array
+;   y : in, required, type=numeric array
 ;     dependent values to insert a NaN into
 ;   values : in, required, type=numeric array
 ;     `x` locations to insert NaN values at
+;
+; :Keywords:
+;   new_x : out, optional, type=numeric array
+;     new `x` values
+;   locations : out, optional, type=lonarr
+;     index locations of new values
 ;-
-pro mg_insert_nan, x, y, values, locations=locations
+function mg_insert_nan, x, y, values, new_x=new_x, locations=locations
   compile_opt strictarr
 
   ind = value_locate(x, values)
+  locations = lonarr(n_elements(values))
 
   new_x = make_array(n_elements(x) + n_elements(values), type=size(x, /type))
   new_y = make_array(n_elements(y) + n_elements(values), type=size(y, /type))
@@ -31,6 +41,7 @@ pro mg_insert_nan, x, y, values, locations=locations
 
     new_x[new_loc] = values[i]
     new_y[new_loc] = !values.f_nan
+    locations[i] = new_loc
 
     loc = ind[i] + 1
 
@@ -43,7 +54,8 @@ pro mg_insert_nan, x, y, values, locations=locations
   endif
 
   x = new_x
-  y = new_y
+
+  return, new_y
 end
 
 
