@@ -32,7 +32,7 @@ function mg_insert_nan, x, y, values, new_x=new_x, locations=locations
   loc = 0L
   new_loc = 0L
   for i = 0L, n_elements(values) - 1L do begin
-    if (ind[i] ge 0L) then begin
+    if (ind[i] ge 0L && (loc le ind[i])) then begin
       new_x[new_loc] = x[loc:ind[i]]
       new_y[new_loc] = y[loc:ind[i]]
 
@@ -64,8 +64,8 @@ end
 x = findgen(10)
 y = 2.0 * findgen(10)
 
-mg_insert_nan, x, y, [-0.5, 1.5, 8.8, 9.5]
-print, x
-print, y
+new_y = mg_insert_nan(x, y, [-1.0, -0.5, 1.5, 8.8, 8.9, 9.5, 10.0], new_x=new_x)
+print, new_x
+print, new_y
 
 end
