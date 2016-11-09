@@ -90,3 +90,14 @@ pro mg_fits_dump, filename, exten_no=exten_no
 
   print, transpose(output)
 end
+
+
+; main-level example program
+
+filename = filepath('20150428_223017_kcor.fts', $
+                    subdir=['..', '..', 'unit', 'fits_ut'], root=mg_src_root())
+mg_fits_dump, filename
+print
+mg_fits_dump, filename, exten_no=0
+
+end

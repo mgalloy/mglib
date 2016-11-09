@@ -19,7 +19,8 @@
 ;     set to a named variable to retrieve the number of keywords found in the
 ;     header
 ;-
-function mg_fits_diff_getkeywords, header, ignore_keywords=ignore_keywords, $
+function mg_fits_diff_getkeywords, header, $
+                                   ignore_keywords=ignore_keywords, $
                                    n_keywords=n_keywords
   compile_opt strictarr
 
@@ -203,6 +204,17 @@ end
 ; Uses `FITS_OPEN`, `FITS_READ`, `FITS_CLOSE`, and `SXPAR` from IDL Astronomy
 ; User's library.
 ;
+; :Examples:
+;   For example::
+;
+;     IDL> filename1 = '20150428_223017_kcor.fts'
+;     IDL> filename2 = '20150428_223017_kcor_diffkeywordvalue.fts'
+;     IDL> diff = mg_fits_diff(filename1, filename2, differences=diffs)
+;     IDL> help, diff
+;     DIFF            BYTE      =    1
+;     IDL> print, diffs
+;     value for keyword OBSSWID not the same, 1.0.6 ne 1.0.7
+;
 ; :Uses:
 ;   fits_open, fits_read, fits_close, sxpar
 ;
@@ -301,6 +313,13 @@ filename1 = filepath('20150428_223017_kcor.fts', $
                      subdir=['..', '..', 'unit', 'fits_ut'], root=mg_src_root())
 filename2 = filepath('20150428_223017_kcor_copy.fts', $
                      subdir=['..', '..', 'unit', 'fits_ut'], root=mg_src_root())
-print, mg_fits_diff(filename1, filename2)
+print, mg_fits_diff(filename1, filename2) ? 'different' : 'same'
+
+filename1 = filepath('20150428_223017_kcor.fts', $
+                     subdir=['..', '..', 'unit', 'fits_ut'], root=mg_src_root())
+filename2 = filepath('20150428_223017_kcor_diffkeywordvalue.fts', $
+                     subdir=['..', '..', 'unit', 'fits_ut'], root=mg_src_root())
+print, mg_fits_diff(filename1, filename2, differences=diffs) ? 'different' : 'same'
+print, diffs
 
 end
