@@ -8,7 +8,10 @@ function mg_insert_nan_ut::test_basic
   standard_y = [0.0, !values.f_nan, 2.0, 4.0, 6.0, !values.f_nan, 8.0]
 
   assert, array_equal(new_x, standard_x), 'incorrect x-values'
-  assert, array_equal(new_y, standard_y), 'incorrect y-values'
+  finite_ind = where(finite(standard_y), n_finite, complement=nan_ind, ncomplement=n_nan)
+  assert, array_equal(new_y[finite_ind], standard_y[finite_ind]), 'incorrect y-values'
+  !null = where(~finite(new_y), n_new_nan)
+  assert, n_new_nan eq n_nan, 'incorrect number of NaNs inserted into y-values: %d', n_new_nan
 
   return, 1
 end
@@ -24,7 +27,10 @@ function mg_insert_nan_ut::test_double
   standard_y = [0.0, !values.f_nan, !values.f_nan, 2.0, 4.0, 6.0, 8.0]
 
   assert, array_equal(new_x, standard_x), 'incorrect x-values'
-  assert, array_equal(new_y, standard_y), 'incorrect y-values'
+  finite_ind = where(finite(standard_y), n_finite, complement=nan_ind, ncomplement=n_nan)
+  assert, array_equal(new_y[finite_ind], standard_y[finite_ind]), 'incorrect y-values'
+  !null = where(~finite(new_y), n_new_nan)
+  assert, n_new_nan eq n_nan, 'incorrect number of NaNs inserted into y-values: %d', n_new_nan
 
   return, 1
 end
@@ -40,7 +46,10 @@ function mg_insert_nan_ut::test_ends
   standard_y = [!values.f_nan, 0.0, 2.0, 4.0, 6.0, 8.0, !values.f_nan]
 
   assert, array_equal(new_x, standard_x), 'incorrect x-values'
-  assert, array_equal(new_y, standard_y), 'incorrect y-values'
+  finite_ind = where(finite(standard_y), n_finite, complement=nan_ind, ncomplement=n_nan)
+  assert, array_equal(new_y[finite_ind], standard_y[finite_ind]), 'incorrect y-values'
+  !null = where(~finite(new_y), n_new_nan)
+  assert, n_new_nan eq n_nan, 'incorrect number of NaNs inserted into y-values: %d', n_new_nan
 
   return, 1
 end
