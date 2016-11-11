@@ -142,6 +142,37 @@ function mg_array_equal_ut::test_no_typeconv
 end
 
 
+function mg_array_equal_ut::test_nan1
+  compile_opt strictarr
+
+  assert, self->have_dlm('mg_analysis'), 'MG_ANALYSIS DLM not found', /skip
+
+  a = [0.0, !values.f_nan, 2.0, 3.0]
+  b = [0.0, !values.f_nan, 2.0, 3.0]
+  result = mg_array_equal(a, b)
+  standard = array_equal(a, b)
+
+  assert, result eq standard, 'incorrect result'
+
+  return, 1
+end
+
+
+function mg_array_equal_ut::test_nan2
+  compile_opt strictarr
+
+  assert, self->have_dlm('mg_analysis'), 'MG_ANALYSIS DLM not found', /skip
+
+  a = [0.0, !values.f_nan, 2.0, 3.0]
+  b = [0.0, !values.f_nan, 2.0, 3.0]
+  result = mg_array_equal(a, b, /nan)
+
+  assert, result eq 1, 'incorrect result'
+
+  return, 1
+end
+
+
 ; function mg_array_equal_ut::test_typeconversion
 ;   compile_opt strictarr
 ;

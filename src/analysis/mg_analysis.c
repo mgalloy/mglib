@@ -11,77 +11,82 @@
 #define MG_C_ABS(z) sqrt(z.r*z.r + z.i*z.i)
 #define MG_U_ABS(x) (x)
 
-#define MG_ARRAY_EQUAL_ARR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS)  \
-static int mg_array_equal_ ## TYPE ## _arr2arr(int n,                       \
-                                        TYPE *arr1, TYPE *arr2,             \
-                                        TOLERANCE_TYPE tolerance) {         \
-  int i;                                                                    \
-  for (i = 0; i < n; i++) {                                                 \
-    TYPE d, a1 = arr1[i], a2 = arr2[i];                                     \
-    DIFFERENCE_EXPR;                                                        \
-    if (ABS(d) > tolerance) return 0;                                       \
-  }                                                                         \
-  return 1;                                                                 \
+#define MG_C_NAN(z) (z.r != z.r || z.i != z.i)
+#define MG_R_NAN(x) (x != x)
+
+#define MG_ARRAY_EQUAL_ARR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS, NAN) \
+  static int mg_array_equal_ ## TYPE ## _arr2arr(int n, 			\
+                                        TYPE *arr1, TYPE *arr2,                 \
+					TOLERANCE_TYPE tolerance, int nan) {    \
+  int i;                                                                        \
+  for (i = 0; i < n; i++) {                                                     \
+    TYPE d, a1 = arr1[i], a2 = arr2[i];                                         \
+    DIFFERENCE_EXPR;                                                            \
+    if (ABS(d) > tolerance || !nan * NAN(a1) || !nan * NAN(a2)) return 0;       \
+  }                                                                             \
+  return 1;                                                                     \
 }
 
-MG_ARRAY_EQUAL_ARR2ARR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_INT, IDL_INT, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_LONG, IDL_LONG, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_ARR2ARR(float, float, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_ARR2ARR(double, double, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs)
-MG_ARRAY_EQUAL_ARR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS)
+MG_ARRAY_EQUAL_ARR2ARR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_INT, IDL_INT, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_LONG, IDL_LONG, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(float, float, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(double, double, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs, MG_R_NAN)
+MG_ARRAY_EQUAL_ARR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS, MG_R_NAN)
 
-#define MG_ARRAY_EQUAL_SCALAR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS) \
-static int mg_array_equal_ ## TYPE ## _scalar2arr(int n,                      \
-                                           TYPE scalar, TYPE *arr,            \
-                                           TOLERANCE_TYPE tolerance) {        \
-  int i;                                                                      \
-  for (i = 0; i < n; i++) {                                                   \
-    TYPE d, a1 = scalar, a2 = arr[i];                                         \
-    DIFFERENCE_EXPR;                                                          \
-    if (ABS(d) > tolerance) return 0;                                         \
-  }                                                                           \
-  return 1;                                                                   \
+#define MG_ARRAY_EQUAL_SCALAR2ARR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS, NAN) \
+static int mg_array_equal_ ## TYPE ## _scalar2arr(int n,                           \
+                                                  TYPE scalar, TYPE *arr,          \
+     					          TOLERANCE_TYPE tolerance,        \
+                                                  int nan) {                       \
+  int i;                                                                           \
+  for (i = 0; i < n; i++) {                                                        \
+    TYPE d, a1 = scalar, a2 = arr[i];                                              \
+    DIFFERENCE_EXPR;                                                               \
+    if (ABS(d) > tolerance || !nan * NAN(a1) || !nan * NAN(a2)) return 0;	   \
+  }                                                                                \
+  return 1;                                                                        \
 }
 
-MG_ARRAY_EQUAL_SCALAR2ARR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_INT, IDL_INT, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_LONG, IDL_LONG, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_SCALAR2ARR(float, float, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_SCALAR2ARR(double, double, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs)
-MG_ARRAY_EQUAL_SCALAR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS)
+MG_ARRAY_EQUAL_SCALAR2ARR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_INT, IDL_INT, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_LONG, IDL_LONG, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(float, float, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(double, double, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2ARR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS, MG_R_NAN)
 
-#define MG_ARRAY_EQUAL_SCALAR2SCALAR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS) \
-static int mg_array_equal_ ## TYPE ## _scalar2scalar(TYPE scalar1, TYPE scalar2, \
-                                              TOLERANCE_TYPE tolerance) {        \
-  int i;                                                                         \
-  TYPE d, a1 = scalar1, a2 = scalar2;                                            \
-  DIFFERENCE_EXPR;                                                               \
-  if (ABS(d) > tolerance) return 0;                                              \
-  return 1;                                                                      \
+#define MG_ARRAY_EQUAL_SCALAR2SCALAR(TYPE, TOLERANCE_TYPE, DIFFERENCE_EXPR, ABS, NAN) \
+static int mg_array_equal_ ## TYPE ## _scalar2scalar(TYPE scalar1, TYPE scalar2,      \
+                                                     TOLERANCE_TYPE tolerance,        \
+						     int nan) {	                      \
+  int i;                                                                              \
+  TYPE d, a1 = scalar1, a2 = scalar2;                                                 \
+  DIFFERENCE_EXPR;                                                                    \
+  if (ABS(d) > tolerance || !nan * NAN(a2) || !nan * NAN(a2)) return 0;	              \
+  return 1;                                                                           \
 }
 
-MG_ARRAY_EQUAL_SCALAR2SCALAR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_INT, IDL_INT, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_LONG, IDL_LONG, d = a1 - a2, abs)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(float, float, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(double, double, d = a1 - a2, fabs)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs)
-MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(UCHAR, UCHAR, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_INT, IDL_INT, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_LONG, IDL_LONG, d = a1 - a2, abs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(float, float, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(double, double, d = a1 - a2, fabs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_COMPLEX, float, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_DCOMPLEX, double, d.r = a1.r - a2.r; d.i = a1.i - a2.i, MG_C_ABS, MG_C_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_UINT, IDL_UINT, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG, IDL_ULONG, d = a1 - a2, MG_U_ABS, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_LONG64, IDL_LONG64, d = a1 - a2, labs, MG_R_NAN)
+MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS, MG_R_NAN)
 
 
 #define MG_ARRAY_EQUAL_ARR2ARR_CASE(TYPE_VALUE, TYPE, TOLERANCE_TYPE, IDL_MEMBER, ZERO)          \
@@ -89,7 +94,7 @@ MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS)
       is_equal = mg_array_equal_ ## TYPE ## _arr2arr(argv[0]->value.arr->n_elts,                 \
                                                      (TYPE *) argv[0]->value.arr->data,          \
                                                      (TYPE *) argv[1]->value.arr->data,          \
-                                                     kw.tolerance_present ? kw.tolerance->value.IDL_MEMBER : ZERO); \
+                                                     kw.tolerance_present ? kw.tolerance->value.IDL_MEMBER : ZERO, kw.nan); \
       break;
 
 #define MG_ARRAY_EQUAL_SCALAR2ARR_CASE(TYPE_VALUE, TYPE, SCALAR_ARG, ARR_ARG, TOLERANCE_TYPE, IDL_ARGMEMBER, IDL_TOLMEMBER, ZERO) \
@@ -97,14 +102,14 @@ MG_ARRAY_EQUAL_SCALAR2SCALAR(IDL_ULONG64, IDL_ULONG64, d = a1 - a2, MG_U_ABS)
       is_equal = mg_array_equal_ ## TYPE ## _scalar2arr(ARR_ARG->value.arr->n_elts,               \
                                                         (TYPE) SCALAR_ARG->value.IDL_ARGMEMBER,   \
                                                         (TYPE *) ARR_ARG->value.arr->data,        \
-                                                        kw.tolerance_present ? kw.tolerance->value.IDL_TOLMEMBER : ZERO); \
+                                                        kw.tolerance_present ? kw.tolerance->value.IDL_TOLMEMBER : ZERO, kw.nan); \
       break;
 
 #define MG_ARRAY_EQUAL_SCALAR2SCALAR_CASE(TYPE_VALUE, TYPE, TOLERANCE_TYPE, IDL_ARGMEMBER, IDL_TOLMEMBER, ZERO)    \
     case TYPE_VALUE:                                                                              \
       is_equal = mg_array_equal_ ## TYPE ## _scalar2scalar((TYPE) argv[0]->value.IDL_ARGMEMBER,   \
                                                            (TYPE) argv[1]->value.IDL_ARGMEMBER,   \
-                                                           kw.tolerance_present ? kw.tolerance->value.IDL_TOLMEMBER : ZERO); \
+                                                           kw.tolerance_present ? kw.tolerance->value.IDL_TOLMEMBER : ZERO, kw.nan); \
       break;
 
 
@@ -113,12 +118,15 @@ static IDL_VPTR IDL_CDECL IDL_mg_array_equal(int argc, IDL_VPTR *argv, char *arg
 
   typedef struct {
     IDL_KW_RESULT_FIRST_FIELD;
+    IDL_LONG nan;
     IDL_LONG no_typeconv;
     IDL_VPTR tolerance;
     int tolerance_present;
   } KW_RESULT;
 
   static IDL_KW_PAR kw_pars[] = {
+    { "NAN", IDL_TYP_LONG, 1, IDL_KW_ZERO,
+      0, IDL_KW_OFFSETOF(nan) },
     { "NO_TYPECONV", IDL_TYP_LONG, 1, IDL_KW_ZERO,
       0, IDL_KW_OFFSETOF(no_typeconv) },
     { "TOLERANCE", IDL_TYP_UNDEF, 1, IDL_KW_VIN | IDL_KW_OUT,
