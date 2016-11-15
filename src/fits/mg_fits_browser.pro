@@ -656,16 +656,22 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
-
-        ; return just the extension header
-        pos = strpos(header, 'BEGIN EXTENSION HEADER')
-        ind = where(pos ge 0, count)
-        if (count gt 0L) then header = header[ind[0] + 1:*]
-        header = header[0:-2]   ; remove END
       end
   endcase
 
   return, data
+end
+
+
+function mg_fits_browser::_get_ext_header, header
+  compile_opt strictarr
+
+  ; return just the extension header
+  pos = strpos(header, 'BEGIN EXTENSION HEADER')
+  ind = where(pos ge 0, count)
+  if (count gt 0L) then ext_header = header[ind[0] + 1:*]
+  ext_header = ext_header[0:-2]   ; remove END
+  return, ext_header
 end
 
 
@@ -697,7 +703,7 @@ pro mg_fits_browser::_handle_tree_event, event
 
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
-    widget_control, header_widget, set_value=header
+    widget_control, header_widget, set_value=self->_get_ext_header(header)
     self->select_header_text, event
   endif else if (nids eq 2) then begin
     data = self->_data_for_tree_id(event.id, header=header, filename=filename)
@@ -1016,7 +1022,6 @@ pro mg_fits_browser::handle_events, event
         endcase
 
         fits_open, f, fcb
-help, fcb
         fits_read, fcb, data, header, exten_no=exten_no
         fits_close, fcb
 
