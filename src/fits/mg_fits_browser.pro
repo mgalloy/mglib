@@ -349,6 +349,8 @@ end
 pro mg_fits_browser::datacoords_for_screen, screen_x, screen_y, x=x, y=y
   compile_opt strictarr
 
+  if (n_elements(*self.current_data) eq 0L) then return
+
   dims = size(*self.current_data, /dimensions)
   image_draw = widget_info(self.tlb, find_by_uname='draw')
   draw_geometry = widget_info(image_draw, /geometry)
@@ -411,36 +413,37 @@ end
 pro mg_fits_browser::load_files, filenames
   compile_opt strictarr
 
+  n_files = n_elements(filenames)
+  self.nfiles += n_elements(filenames)
+
+  self->set_title, self.nfiles eq 1L ? file_basename(filenames[0]) : 'many files'
+
+  self->set_status, string(n_files, n_files eq 1 ? '' : 's', $
+                           format='(%"Loading %d FITS file%s...")')
+
   foreach f, filenames do begin
-    files = file_search(f, count=n_files_found)
+    files = file_search(f, count=files_found)
 
-    if (n_files_found eq 0L) then begin
-      self->set_status, 'file pattern not found: ' + f
-      continue
-    endif
+    skip = 1
+    case files_found of
+      0: self->set_status, 'file not found or not regular: ' + f
+      1: skip = 0
+      else: self->load_files, files
+    endcase
+    if (skip) then continue
 
-    self.nfiles += n_files_found
-    self->set_title, self.nfiles eq 1L ? file_basename(files[0]) : 'many files'
-    self->set_status, string(n_files_found, n_files_found eq 1 ? '' : 's', f, $
-                             format='(%"Loading %d FITS file%s: %s")')
-
-    if (n_files_found gt 1L) then begin
-      self->load_files, files
-      continue
-    endif
-
-    fits_open, files[0], fcb
+    fits_open, f, fcb
     fits_read, fcb, data, header, exten_no=0, /header_only
 
     extension_titles = self->extension_title(fcb.nextend, fcb.extname, $
-                                             filename=files[0])
+                                             filename=f)
 
     widget_control, self.tlb, update=0
 
     file_node = widget_tree(self.tree, /folder, /expanded, $
-                            value=self->file_title(files[0], header), $
-                            bitmap=self->file_bitmap(files[0], header), $
-                            uname='fits:file', uvalue=file_expand_path(files[0]))
+                            value=self->file_title(f, header), $
+                            bitmap=self->file_bitmap(f, header), $
+                            uname='fits:file', uvalue=file_expand_path(f))
 
     for i = 1L, fcb.nextend do begin
       fits_read, fcb, ext_data, ext_header, exten_no=i, /header_only
@@ -448,15 +451,16 @@ pro mg_fits_browser::load_files, filenames
                              bitmap=self->extension_bitmap(i, $
                                                            fcb.extname[i], $
                                                            ext_header, $
-                                                           filename=files[0]), $
+                                                           filename=f), $
                              value=extension_titles[i - 1], $
                              uname='fits:extension', uvalue=i)
     endfor
     fits_close, fcb
 
     widget_control, self.tlb, update=1
-    self->set_status, /clear
   endforeach
+
+  self->set_status, /clear
 end
 
 
@@ -656,22 +660,15 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
+
+        ; return just the extension header
+        pos = strpos(header, 'BEGIN EXTENSION HEADER')
+        ind = where(pos ge 0, count)
+        if (count gt 0L) then header = header[ind[0] + 1:*]
+        header = header[0:-2]   ; remove END
       end
   endcase
-
   return, data
-end
-
-
-function mg_fits_browser::_get_ext_header, header
-  compile_opt strictarr
-
-  ; return just the extension header
-  pos = strpos(header, 'BEGIN EXTENSION HEADER')
-  ind = where(pos ge 0, count)
-  if (count gt 0L) then ext_header = header[ind[0] + 1:*]
-  ext_header = ext_header[0:-2]   ; remove END
-  return, ext_header
 end
 
 
@@ -703,7 +700,7 @@ pro mg_fits_browser::_handle_tree_event, event
 
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
-    widget_control, header_widget, set_value=self->_get_ext_header(header)
+    widget_control, header_widget, set_value=header
     self->select_header_text, event
   endif else if (nids eq 2) then begin
     data = self->_data_for_tree_id(event.id, header=header, filename=filename)
@@ -943,7 +940,13 @@ pro mg_fits_browser::handle_events, event
   uname = widget_info(event.id, /uname)
   case uname of
     'open': self->open_files
-    'tlb': self->resize, event.x, event.y
+    'tlb': begin
+        case tag_names(event, /structure_name) of
+          'WIDGET_TLB_MOVE': self.prefs->set, 'location', {x:event.x, y:event.y}
+          'WIDGET_BASE': self->resize, event.x, event.y
+          else:
+        endcase
+      end
     'export_data':
     'export_header':
     'tabs':
@@ -1177,8 +1180,10 @@ pro mg_fits_browser::create_widgets, _extra=e
   tree_xsize = 300
   scr_ysize = 512
 
+  loc = self.prefs->get('location', default={x:0L, y:0L})
   self.tlb = widget_base(title=self.title, /column, uvalue=self, uname='tlb', $
-                         /tlb_size_events, _extra=e)
+                         /tlb_size_events, /tlb_move_events, _extra=e, $
+                         xoffset=loc.x, yoffset=loc.y)
 
   ; toolbar
   bitmapdir = ['resource', 'bitmaps']
@@ -1301,6 +1306,8 @@ end
 pro mg_fits_browser::cleanup
   compile_opt strictarr
 
+  obj_destroy, self.prefs
+
   wdelete, self.backing_store, self.pixmaps[0], self.pixmaps[1]
   
   ptr_free, self.current_data, self.current_header, self.compare_data, self.compare_header
@@ -1324,6 +1331,10 @@ end
 function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   compile_opt strictarr
 
+  self.prefs = obj_new('MGffPrefs', $
+                       author_name='mgalloy', $
+                       app_name='mg_fits_browser')
+
   self.title = 'FITS Browser'
   self.path = ''
   self.annotate = 0B
@@ -1340,8 +1351,6 @@ function mg_fits_browser::init, filenames=filenames, tlb=tlb, _extra=e
   self->start_xmanager
 
   tlb = self.tlb
-
-  self->set_status, /clear
 
   if (n_elements(filenames) gt 0L) then self->load_files, filenames
 
@@ -1360,6 +1369,7 @@ pro mg_fits_browser__define
   compile_opt strictarr
 
   define = { mg_fits_browser, $
+             prefs: obj_new(), $
              tlb: 0L, $
              tree: 0L, $
              draw_id: 0L, $
