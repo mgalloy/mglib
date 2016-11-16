@@ -69,6 +69,9 @@
 ;     p->advance
 ;
 ; :Properties:
+;   label_widget : type=long
+;     widget identifier of a label widget to display progress bar; if present
+;     displays in the label widget instead of the console
 ;   title : type=string
 ;     title to show on the left side of the progress bar display
 ;   total : type=float
