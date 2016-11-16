@@ -152,7 +152,15 @@ function mg_progress::_termcolumns, default=default
     return, n_elements(default) eq 0L ? 80L : default
   endif
 
-  n_cols = mg_termcolumns()
+  if (self.label_widget gt 0L) then begin
+    geo_info = widget_info(self.label_widget, /geometry)
+    test_string = '##########'
+    dims = widget_info(self.label_widget, string_size=test_string)
+    n_cols = geo_info.scr_xsize / dims[0] * strlen(test_string)
+  endif else begin
+    n_cols = mg_termcolumns()
+  endelse
+
   return, n_cols
 end
 
@@ -251,11 +259,15 @@ function mg_progress::_overloadForeach, value, key
                  elapsed_time, est_time, $
                  format=format)
 
-    if (more_elements) then begin
-      mg_statusline, msg
+    if (self.label_widget gt 0L) then begin
+      widget_control, self.label_widget, set_value=msg
     endif else begin
-      mg_statusline, /clear
-      print, msg
+      if (more_elements) then begin
+        mg_statusline, msg
+      endif else begin
+        mg_statusline, /clear
+        print, msg
+      endelse
     endelse
   endif
 
@@ -275,12 +287,16 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable, total=total, title=title, manual=manual, hide=hide
+function mg_progress::init, iterable, total=total, title=title, manual=manual, $
+                            hide=hide, label_widget=label_widget
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
   self.n = n_elements(iterable)
   self.counter = 0L
+
+  self.label_widget = n_elements(label_widget) eq 0L ? -1L : label_widget
+
   self.title = n_elements(title) eq 0L ? '' : (title + ' ')
 
   self.manual = keyword_set(manual)
@@ -304,6 +320,7 @@ pro mg_progress__define
 
   !null = { mg_progress, inherits IDL_Object, $
             iterable: ptr_new(), $
+            label_widget: 0L, $
             manual: 0B, $
             hide: 0B, $
             title: '', $
