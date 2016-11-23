@@ -54,7 +54,7 @@ pro mg_legend, background=background, $
                item_psym=item_psym, item_symsize=item_symsize, $
                item_thick=item_thick, $
                color=color, line_length=line_length, gap=gap, $
-               frame=frame, item_height=item_height, line_bump=line_bump, $
+               frame=frame, line_bump=line_bump, $
                _extra=e
   compile_opt strictarr
 
@@ -62,7 +62,6 @@ pro mg_legend, background=background, $
   _line_bump = n_elements(line_bump) eq 0L ? 0.125 : line_bump
   _gap = n_elements(gap) eq 0L ? 0.2 : gap
   _frame = keyword_set(frame) ? 0B : 4B
-  _item_height = 1.0
 
   n_items = max([n_elements(item_color), n_elements(item_linestyle), $
                  n_elements(item_name), n_elements(item_psym)])
