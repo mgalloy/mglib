@@ -622,6 +622,31 @@ end
 
 ;= event handling
 
+
+;+
+; Filter the primary header out of an extension header and remove END.
+;
+; :Returns:
+;   `strarr`
+;
+; :Params:
+;   header : in, required, type=strarr
+;     FITS header
+;-
+function mg_fits_browser::_filter_header, header
+  compile_opt strictarr
+
+  ; return just the extension header
+  pos = strpos(header, 'BEGIN EXTENSION HEADER')
+  ind = where(pos ge 0, count)
+  if (count gt 0L) then new_header = header[ind[0] + 1:*] else new_header = header
+
+  new_header = new_header[0:-2]   ; remove END
+
+  return, new_header
+end
+
+
 ;+
 ; Retrieves the data corresponding to a tree identifier.
 ;
@@ -648,8 +673,6 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=0
         fits_close, fcb
-
-        header = header[0:-2]   ; remove END
       end
     'fits:extension': begin
         widget_control, id, get_uvalue=e
@@ -660,12 +683,6 @@ function mg_fits_browser::_data_for_tree_id, id, header=header, filename=filenam
         fits_open, filename, fcb
         fits_read, fcb, data, header, exten_no=e
         fits_close, fcb
-
-        ; return just the extension header
-        pos = strpos(header, 'BEGIN EXTENSION HEADER')
-        ind = where(pos ge 0, count)
-        if (count gt 0L) then header = header[ind[0] + 1:*]
-        header = header[0:-2]   ; remove END
       end
   endcase
   return, data
@@ -700,7 +717,7 @@ pro mg_fits_browser::_handle_tree_event, event
 
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
-    widget_control, header_widget, set_value=header
+    widget_control, header_widget, set_value=self->_filter_header(header)
     self->select_header_text, event
   endif else if (nids eq 2) then begin
     data = self->_data_for_tree_id(event.id, header=header, filename=filename)
