@@ -3,8 +3,6 @@
 ;+
 ; Compute normal coordinates for subplot.
 ;
-; .. image:: scatterplot_matrix-example.png
-;
 ; :Private:
 ; 
 ; :Returns:
@@ -52,14 +50,14 @@ end
 ;
 ;   This should produce:
 ;
-;   .. image:: scatterplot_matrix.png
+;   .. image:: scatterplot_matrix-example.png
 ;
 ; :Params:
 ;   data : in, required, type="fltarr(m, n)"
 ;     m data sets of n elements each
 ;
 ; :Keywords:
-;   columns_names : in, optional, type=strarr
+;   column_names : in, optional, type=strarr
 ;     x- and y-titles
 ;   _extra : in, optional, type=keywords
 ;     keywords to `PLOT`, `MG_HISTPLOT`, or `HISTOGRAM` routines
