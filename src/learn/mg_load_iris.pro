@@ -26,7 +26,7 @@ function mg_load_iris
   target_names = tokens[2:*]
   data = fltarr(n_features + 1L, n_samples)
   readf, lun, data
-  target = reform(data[n_features, *])
+  target = long(reform(data[n_features, *]))
   data = data[0:n_features - 1L, *]
   free_lun, lun
 
