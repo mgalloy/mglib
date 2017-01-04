@@ -29,14 +29,23 @@ end
 
 ; main-level example
 
-window, xsize=800, ysize=800, /free, title='Iris data set'
+if (n_elements(ps) eq 0L) then ps = 0
+
+mg_constants
+
+if (keyword_set(ps)) then begin
+  mg_psbegin, /image, /color, filename='iris-dataset.ps'
+  font = 1
+endif else font = -1
+
+mg_window, xsize=8, ysize=8, /inches, title='Iris data set'
+
+device, get_decomposed=odec
+tvlct, rgb, /get
 
 device, decomposed=0
 mg_loadct, 28, /brewer
 tvlct, 0, 0, 0, 0
-;tvlct, 255, 0, 0, 1
-;tvlct, 0, 255, 0, 2
-;tvlct, 0, 0, 255, 3
 tvlct, 255, 255, 255, 255
 
 iris_data = mg_load_iris()
@@ -45,6 +54,15 @@ mg_scatterplot_matrix, iris_data.data, nbins=20, $
                        color=iris_data.target + 1, $
                        bar_color=1, $
                        axis_color=255, charsize=1.0, $
-                       psym=mg_usersym(/circle), symsize=0.5
+                       psym=mg_usersym(/circle), symsize=0.75, font=font
+
+device, decomposed=odec
+tvlct, rgb
+
+if (keyword_set(ps)) then begin
+  mg_psend
+  mg_convert, 'iris-dataset', max_dimension=[800, 800], output=im
+  mg_image, im, /new_window
+endif
 
 end

@@ -18,21 +18,25 @@
 ;   dimension : in, required, type=integer
 ;     number of rows/columns in matrix
 ;-
-function mg_scatterplot_matrix_position, col, row, dimension=dimension
+function mg_scatterplot_matrix_position, col, row, $
+                                         dimension=dimension, $
+                                         position=position
   compile_opt strictarr
+
+  _position = n_elements(position) eq 0L ? [0.1, 0.1, 0.975, 0.975] : position
 
   pos = [float(col) / dimension, $
          1.0 - (row + 1.0) / dimension, $
          (col + 1.0) / dimension, $
          1.0 - float(row) / dimension]
 
-  ; now convert to inside POSITION=[0.1, 0.1, 0.95, 0.95]
+  ; now convert to inside POSITION
   x_range = [0.1, 0.975]
   y_range = [0.1, 0.975]
-  return, [pos[0] * (x_range[1] - x_range[0]) + x_range[0], $
-           pos[1] * (y_range[1] - y_range[0]) + y_range[0], $
-           pos[2] * (x_range[1] - x_range[0]) + x_range[0], $
-           pos[3] * (y_range[1] - y_range[0]) + y_range[0]]
+  return, [pos[0] * (_position[2] - _position[0]) + _position[0], $
+           pos[1] * (_position[3] - _position[1]) + _position[1], $
+           pos[2] * (_position[2] - _position[0]) + _position[0], $
+           pos[3] * (_position[3] - _position[1]) + _position[1]]
 end
 
 
@@ -61,7 +65,8 @@ end
 pro mg_scatterplot_matrix, data, column_names=column_names, $
                            bar_color=bar_color, $
                            psym=psym, symsize=symsize, $
-                           axis_color=axis_color, color=color, _extra=e
+                           axis_color=axis_color, color=color, $
+                           position=position, _extra=e
   compile_opt strictarr
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
@@ -75,12 +80,12 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
     col = row
     h = histogram(data[row, *], locations=bins, _extra=e)
     mg_histplot, bins, h, /fill, axis_color=axis_color, color=bar_color, $
-                 position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+                 position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
                  xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
                  xrange=x_range[*, col], yrange=[0, max(h) * 1.10], $
                  xstyle=1, ystyle=1, $
-                 yticks=1, yminor=1, ytickname=strarr(2) + ' ', $
                  xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+                 yticks=1, yminor=1, ytickname=strarr(2) + ' ', $
                  /noerase, _extra=e
     x_range[*, row] = !x.range
   endfor
@@ -91,7 +96,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
           xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
           ytitle=col eq 0L ? _column_names[row] : '', $
           color=axis_color, $
-          position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+          position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
           xrange=x_range[*, col], $
           xstyle=1, /ynozero, $
           xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
@@ -110,9 +115,9 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
               ytitle=col eq 0L ? _column_names[row] : '', $
               color=axis_color, $
-              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
               xrange=x_range[*, col], yrange=y_range[*, row], $
-              xstyle=1, ystyle=1, $
+              xstyle=5, ystyle=9, $
               xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
               ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
               _extra=e
@@ -122,7 +127,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
               ytitle=col eq 0L ? _column_names[row] : '', $
               color=axis_color, $
-              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
               xrange=x_range[*, col], yrange=y_range[*, row], $
               xstyle=1, ystyle=1, $
               xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
