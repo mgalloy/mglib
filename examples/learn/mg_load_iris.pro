@@ -20,5 +20,31 @@ function mg_load_iris
   feature_names=['sepal length (cm)', 'sepal width (cm)', $
                  'petal length (cm)', 'petal width (cm)']
 
-  return, {data:data, target_names:target_names, feature_names:feature_names}
+  return, {data: data, $
+           target: target, $
+           target_names: target_names, $
+           feature_names: feature_names}
+end
+
+
+; main-level example
+
+window, xsize=800, ysize=800, /free, title='Iris data set'
+
+device, decomposed=0
+mg_loadct, 28, /brewer
+tvlct, 0, 0, 0, 0
+;tvlct, 255, 0, 0, 1
+;tvlct, 0, 255, 0, 2
+;tvlct, 0, 0, 255, 3
+tvlct, 255, 255, 255, 255
+
+iris_data = mg_load_iris()
+mg_scatterplot_matrix, iris_data.data, nbins=20, $
+                       column_names=iris_data.feature_names, $
+                       color=iris_data.target + 1, $
+                       bar_color=1, $
+                       axis_color=255, charsize=1.0, $
+                       psym=mg_usersym(/circle), symsize=0.5
+
 end

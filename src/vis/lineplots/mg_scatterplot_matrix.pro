@@ -1,47 +1,138 @@
 ; docformat = 'rst'
 
 ;+
+; Compute normal coordinates for subplot.
+;
+; :Private:
+; 
+; :Returns:
+;   `fltarr(4)`
+;
+; :Params:
+;   col : in, required, type=integer
+;     column (0 is leftmost)
+;   row : in, required, type=integer
+;     row (0 is topmost)
+;
+; :Keywords:
+;   dimension : in, required, type=integer
+;     number of rows/columns in matrix
+;-
+function mg_scatterplot_matrix_position, col, row, dimension=dimension
+  compile_opt strictarr
+
+  pos = [float(col) / dimension, $
+         1.0 - (row + 1.0) / dimension, $
+         (col + 1.0) / dimension, $
+         1.0 - float(row) / dimension]
+
+  ; now convert to inside POSITION=[0.1, 0.1, 0.95, 0.95]
+  x_range = [0.1, 0.975]
+  y_range = [0.1, 0.975]
+  return, [pos[0] * (x_range[1] - x_range[0]) + x_range[0], $
+           pos[1] * (y_range[1] - y_range[0]) + y_range[0], $
+           pos[2] * (x_range[1] - x_range[0]) + x_range[0], $
+           pos[3] * (y_range[1] - y_range[0]) + y_range[0]]
+end
+
+
+;+
 ; Create a matrix of scatter plots.
 ;
 ; :Examples:
-;    Try the main-level example program at the end of this file::
+;   Try the main-level example program at the end of this file::
 ;
-;       IDL> .run mg_scatterplot_matrix
+;     IDL> .run mg_scatterplot_matrix
 ;
-;    This should produce:
+;   This should produce:
 ;
-;    .. image:: scatterplot_matrix.png
+;   .. image:: scatterplot_matrix.png
 ;
 ; :Params:
-;    data : in, required, type="fltarr(m, n)"
-;       m data sets of n elements each
+;   data : in, required, type="fltarr(m, n)"
+;     m data sets of n elements each
 ;
 ; :Keywords:
-;    _extra : in, optional, type=keywords
-;       keywords to `PLOT`, `MG_HISTPLOT`, or `HISTOGRAM` routines
+;   columns_names : in, optional, type=strarr
+;     x- and y-titles
+;   _extra : in, optional, type=keywords
+;     keywords to `PLOT`, `MG_HISTPLOT`, or `HISTOGRAM` routines
 ;-
-pro mg_scatterplot_matrix, data, column_names=column_names, psym=psym, _extra=e
+pro mg_scatterplot_matrix, data, column_names=column_names, $
+                           bar_color=bar_color, $
+                           psym=psym, symsize=symsize, $
+                           axis_color=axis_color, color=color, _extra=e
   compile_opt strictarr
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
   dims = size(data, /dimensions)
+  _column_names = n_elements(column_names) eq 0L ? strarr(dims[1]) : column_names
 
-  orig_pmulti = !p.multi
-  !p.multi = [0, dims[0], dims[0]]
+  x_range = fltarr(2, dims[0])
+  y_range = fltarr(2, dims[0])
+
+  for row = 0L, dims[0] - 1L do begin
+    col = row
+    h = histogram(data[row, *], locations=bins, _extra=e)
+    mg_histplot, bins, h, /fill, axis_color=axis_color, color=bar_color, $
+                 position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+                 xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
+                 xrange=x_range[*, col], yrange=[0, max(h) * 1.10], $
+                 xstyle=1, ystyle=1, $
+                 yticks=1, yminor=1, ytickname=strarr(2) + ' ', $
+                 xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+                 /noerase, _extra=e
+    x_range[*, row] = !x.range
+  endfor
+
+  for row = 0L, dims[0] - 1L do begin
+    col = (row + dims[0] - 1) mod dims[0]
+    plot, data[col, *], data[row, *], /nodata, /noerase, $
+          xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
+          ytitle=col eq 0L ? _column_names[row] : '', $
+          color=axis_color, $
+          position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+          xrange=x_range[*, col], $
+          xstyle=1, /ynozero, $
+          xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+          ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
+          _extra=e
+    y_range[*, row] = !y.crange
+    mg_plots, reform(data[col, *]), reform(data[row, *]), psym=_psym, $
+              color=color, symsize=symsize, _extra=e
+  endfor
 
   for row = 0L, dims[0] - 1L do begin
     for col = 0L, dims[0] - 1L do begin
-      if (col eq row) then begin
-        mg_histplot, histogram(data[row, *], _extra=e), /fill, _extra=e
-      endif else begin
-        plot, data[row, *], data[col, *], psym=_psym, $
-              xtitle=column_names[col], ytitle=column_names[row], $
+      if (col eq (row + dims[0] - 1) mod dims[0]) then continue
+      if (row eq 0 && col eq 0) then begin
+        plot, data[col, *], data[row, *], /nodata, /noerase, $
+              xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
+              ytitle=col eq 0L ? _column_names[row] : '', $
+              color=axis_color, $
+              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+              xrange=x_range[*, col], yrange=y_range[*, row], $
+              xstyle=1, ystyle=1, $
+              xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+              ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
               _extra=e
-      endelse
+      endif
+      if (col ne row) then begin
+        plot, data[col, *], data[row, *], /nodata, /noerase, $
+              xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
+              ytitle=col eq 0L ? _column_names[row] : '', $
+              color=axis_color, $
+              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0]), $
+              xrange=x_range[*, col], yrange=y_range[*, row], $
+              xstyle=1, ystyle=1, $
+              xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+              ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
+              _extra=e
+        mg_plots, reform(data[col, *]), reform(data[row, *]), psym=_psym, $
+                  color=color, symsize=symsize, _extra=e
+      endif
     endfor
   endfor
-
-  !p.multi = orig_pmulti
 end
 
 
@@ -60,7 +151,7 @@ mg_window, xsize=10, ysize=10, /inches, title='mg_scatterplot_matrix example'
 data = randomu(seed, m, n)
 
 mg_scatterplot_matrix, data, $
-                       psym=!mg.psym.diamond, charsize=2.0, symsize=0.6, $
+                       psym=!mg.psym.diamond, charsize=1.0, symsize=0.6, $
                        nbins=10, $
                        column_names=['A', 'B', 'C', 'D']
 
