@@ -69,7 +69,24 @@ function mg_insert_nan, x, y, values, new_x=new_x, locations=locations, gap=gap
       _new_y = mg_insert_nan(new_x, new_y, gap_values, new_x=_new_x, locations=new_locations)
       new_x = _new_x
       new_y = _new_y
-      locations = where(~finite(new_y))
+
+      ; merge new_locations into locations
+      _locations = lonarr(n_elements(locations) + n_elements(new_locations))
+      i = 0
+      j = 0
+      pos = 0
+      while (i lt n_elements(locations) || j lt n_elements(new_locations)) do begin
+        if (i ge n_elements(locations)) then begin
+          _locations[pos++] = new_locations[j++]
+        endif else if (j ge n_elements(new_locations)) then begin
+          _locations[pos++] = locations[i++] + j
+        endif else if (locations[i] lt new_locations[j]) then begin
+          _locations[pos++] = locations[i++] + j
+        endif else begin
+          _locations[pos++] = new_locations[j++]
+        endelse
+      endwhile
+      locations = _locations
     endif
   endif
 
