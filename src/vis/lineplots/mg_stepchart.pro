@@ -106,7 +106,6 @@ pro mg_stepchart, x, y, overplot=overplot, $
   _riserThick = n_elements(riserThick) gt 0L ? riserThick : 0.5 * _thick
 
   if (n_elements(axisColor) gt 0L) then _axisColor = axisColor
-  if (n_elements(axisColor) eq 0L && n_elements(color) gt 0L) then _axisColor = color
 
   n = n_elements(x)
 
