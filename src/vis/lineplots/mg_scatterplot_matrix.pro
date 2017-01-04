@@ -3,6 +3,8 @@
 ;+
 ; Compute normal coordinates for subplot.
 ;
+; .. image:: scatterplot_matrix-example.png
+;
 ; :Private:
 ; 
 ; :Returns:
@@ -86,8 +88,9 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
                  xstyle=1, ystyle=1, $
                  xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
                  yticks=1, yminor=1, ytickname=strarr(2) + ' ', $
+                 xticklen=0.000001, $  ; bug in IDL? 0.0 doesn't work
                  /noerase, _extra=e
-    x_range[*, row] = !x.range
+    x_range[*, row] = !x.crange
   endfor
 
   for row = 0L, dims[0] - 1L do begin
@@ -143,26 +146,48 @@ end
 
 ; main-level example program
 
-ps = 0
+if (n_elements(demo) eq 0L) then demo = 0
+if (n_elements(ps) eq 0L) then ps = 0
 
 mg_constants
 
 m = 4
 n = 40
 
-if (keyword_set(ps)) then mg_psbegin, filename='scatterplot_matrix.ps'
-mg_window, xsize=10, ysize=10, /inches, title='mg_scatterplot_matrix example'
+size = [10, 10]
+dims = [1000, 1000]
+if (keyword_set(ps)) then begin
+  mg_psbegin, /color, bits_per_pixel=8, filename='scatterplot_matrix.ps'
+  charsize = 0.75
+  symsize = 1.0
+  if (keyword_set(demo)) then begin
+    size = [5.0, 5.0]
+    dims = [400, 400]
+    symsize = 0.5
+  endif
+endif else begin
+  charsize = 1.0
+  symsize = 0.6
+endelse
+
+mg_window, xsize=size[0], ysize=size[1], /inches, title='mg_scatterplot_matrix example'
+
+device, decomposed=0
 
 data = randomu(seed, m, n)
 
 mg_scatterplot_matrix, data, $
-                       psym=!mg.psym.diamond, charsize=1.0, symsize=0.6, $
-                       nbins=10, $
+                       psym=mg_usersym(/circle), $
+                       color=byte(randomu(seed, n) * 255), $
+                       bar_color=175, $
+                       charsize=charsize, symsize=symsize, $
+                       nbins=20, $
                        column_names=['A', 'B', 'C', 'D']
 
 if (keyword_set(ps)) then begin
   mg_psend
-  mg_convert, 'scatterplot_matrix', max_dimension=[1000, 1000], output=im
+  mg_convert, 'scatterplot_matrix', max_dimension=dims, output=im, $
+              keep_output=keyword_set(demo)
   mg_image, im, /new_window
 endif
 
