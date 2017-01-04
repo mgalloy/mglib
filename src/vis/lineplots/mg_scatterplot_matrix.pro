@@ -18,11 +18,12 @@
 ;
 ; :Keywords:
 ;    _extra : in, optional, type=keywords
-;       keywords to PLOT routine
+;       keywords to `PLOT`, `MG_HISTPLOT`, or `HISTOGRAM` routines
 ;-
-pro mg_scatterplot_matrix, data, _extra=e
+pro mg_scatterplot_matrix, data, column_names=column_names, psym=psym, _extra=e
   compile_opt strictarr
 
+  _psym = n_elements(psym) eq 0L ? 3 : psym
   dims = size(data, /dimensions)
 
   orig_pmulti = !p.multi
@@ -30,10 +31,12 @@ pro mg_scatterplot_matrix, data, _extra=e
 
   for row = 0L, dims[0] - 1L do begin
     for col = 0L, dims[0] - 1L do begin
-      if (col ge row) then begin
-        plot, data[row, *], data[col, *], _extra=e
+      if (col eq row) then begin
+        mg_histplot, histogram(data[row, *], _extra=e), /fill, _extra=e
       endif else begin
-        plot, [0, 1], [0, 1], /nodata, xstyle=5, ystyle=5
+        plot, data[row, *], data[col, *], psym=_psym, $
+              xtitle=column_names[col], ytitle=column_names[row], $
+              _extra=e
       endelse
     endfor
   endfor
@@ -44,20 +47,27 @@ end
 
 ; main-level example program
 
+ps = 0
+
 mg_constants
 
 m = 4
-n = 20
+n = 40
 
-mg_psbegin, filename='scatterplot_matrix.ps'
-mg_window, xsize=4, ysize=4, /inches
+if (keyword_set(ps)) then mg_psbegin, filename='scatterplot_matrix.ps'
+mg_window, xsize=10, ysize=10, /inches, title='mg_scatterplot_matrix example'
 
 data = randomu(seed, m, n)
 
-mg_scatterplot_matrix, data, psym=!mg.psym.diamond, charsize=0.6, symsize=0.5
+mg_scatterplot_matrix, data, $
+                       psym=!mg.psym.diamond, charsize=2.0, symsize=0.6, $
+                       nbins=10, $
+                       column_names=['A', 'B', 'C', 'D']
 
-mg_psend
-mg_convert, 'scatterplot_matrix', max_dimension=[500, 500], output=im
-mg_image, im, /new_window
+if (keyword_set(ps)) then begin
+  mg_psend
+  mg_convert, 'scatterplot_matrix', max_dimension=[1000, 1000], output=im
+  mg_image, im, /new_window
+endif
 
 end
