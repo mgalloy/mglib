@@ -5,6 +5,8 @@
 ;+
 ; Use training set of data `x` and targets `y` to train the model.
 ;
+; :Abstract:
+;
 ; :Params:
 ;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to learn on
@@ -13,11 +15,15 @@
 ;-
 pro mg_estimator::fit, x, y
   compile_opt strictarr
+
+  ; not implemented
 end
 
 
 ;+
 ; Use previous training with `fit` method to predict targets for given data `x`.
+;
+; :Abstract:
 ;
 ; :Returns:
 ;   fltarr(n_samples)
@@ -25,20 +31,36 @@ end
 ; :Params:
 ;   x : in, required, type=fltarr(n_features, n_samples)
 ;     data to predict targets for
+;   y : in, optional, type=fltarr(n_samples)
+;     optional y-values; needed to get score
+;
+; :Keywords:
+;   score : out, optional, type=float
+;     set to a named variable to retrieve a score if `y` was specified
 ;-
-function mg_estimator::predict, x
+function mg_estimator::predict, x, y, score=score
   compile_opt strictarr
+
+  ; not implemented
+  return, !null
 end
 
 
 ;+
 ; Predict targets for `x` values and compare to `y`, returning percentage
 ; correct.
+;
+; :Params:
+;   x : in, required, type="fltarr(n_features, n_samples)"
+;     data to score on
+;   y : in, required, type=fltarr(n_samples)
+;     results for `x` data, which will be compared to actual prediction for `x`
 ;-
 function mg_estimator::score, x, y
   compile_opt strictarr
 
-  return, 0.0
+  result = self->predict(x, y, score=score)
+  return, score
 end
 
 
@@ -56,7 +78,7 @@ pro mg_estimator::getProperty, type=type
 end
 
 
-pro mg_estimator::setProperty
+pro mg_estimator::setProperty, _extra=e
   compile_opt strictarr
 
 end
@@ -76,8 +98,10 @@ end
 ; :Returns:
 ;   1 for success, 0 for failure
 ;-
-function mg_estimator::init
+function mg_estimator::init, _extra=e
   compile_opt strictarr
+
+  self->setProperty, _extra=e
 
   return, 1
 end
