@@ -56,7 +56,12 @@ pro mg_train_test_split, data, target, $
   endelse
 
   train_indices = mg_sample(n_samples, _train_size, seed=seed)
+
   test_indices = mg_complement(train_indices, n_samples)
+
+  ; randomize order of sampling indices
+  train_indices = train_indices[sort(randomu(seed, _train_size))]
+  test_indices = test_indices[sort(randomu(seed, n_elements(test_indices)))]
 
   if (arg_present(x_train)) then x_train = data[*, train_indices]
   if (arg_present(y_train)) then y_train = target[train_indices]
@@ -69,10 +74,11 @@ end
 
 iris = mg_load_iris()
 
+seed = 0L
 mg_train_test_split, iris.data, iris.target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test, $
-                     seed=0L
+                     seed=seed
 
 help, x_train, y_train, x_test, y_test
 
