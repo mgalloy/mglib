@@ -1,5 +1,13 @@
 ; docformat = 'rst'
 
+;+
+; Loads the breast cancer dataset.
+;
+; The breast cancer dataset has 569 samples and 30 features.
+;
+; :Returns:
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
+;-
 function mg_load_breast_cancer
   compile_opt strictarr
 

@@ -10,8 +10,7 @@
 ; .. image:: iris-dataset.png
 ;
 ; :Returns:
-;   structure with fields `data`, `target`, `target_names`, and `feature_names`;
-;   `data` has
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
 ;-
 function mg_load_iris
   compile_opt strictarr
