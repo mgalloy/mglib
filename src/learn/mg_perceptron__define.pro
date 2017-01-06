@@ -1,8 +1,20 @@
 ; docformat = 'rst'
 
 ;+
-; binary classifier
-; http://www.jeannicholashould.com/what-i-learned-implementing-a-classifier-from-scratch.html
+; Perceptron binary classifier
+;
+; [1]: http://www.jeannicholashould.com/what-i-learned-implementing-a-classifier-from-scratch.html
+; [2]: https://github.com/rasbt/python-machine-learning-book/blob/master/code/ch02/ch02.ipynb
+;
+; :Properties:
+;   max_iterations : type=long
+;     maximum number of iterations to perform in `fit`
+;   learning_rate : type=float
+;     learning rate from 0.0 to 1.0
+;   weights : type=fltarr
+;     weights[0] is bias; weights[1:*] correspond to weights for each feature
+;   errors : type=lonarr
+;     number of errors in each iteration
 ;-
 
 ;= API
@@ -23,19 +35,21 @@ pro mg_perceptron::fit, x, y
   n_features = dims[0]
   n_samples = dims[1]
 
-  *self.weights = fltarr(n_features + 1)
+  *self.weights = fltarr(n_features)
+  self.bias = 0.0
   *self.errors = lonarr(self.max_iterations)
 
   for i = 0L, self.max_iterations - 1L do begin
     errors = 0L
     for s = 0L, n_samples - 1L do begin
       xi = reform(x[*, s], n_features, 1)
-      update = self.learning_rate * ((y[s])[0] - self->predict(xi))
-      (*self.weights)[1:*] += update * xi
-      (*self.weights)[0]   += update
+      update = (self.learning_rate * (y[s] - self->predict(xi)))[0]
+      *self.weights += update * xi
+      self.bias     += update
       errors += long(update ne 0.0)
     endfor
     (*self.errors)[i] = errors
+    if (errors eq 0L) then break
   endfor
 end
 
@@ -59,7 +73,7 @@ end
 function mg_perceptron::predict, x, y, score=score
   compile_opt strictarr
 
-  y_predict = 2L * (reform((*self.weights)[1:*] # x) + (*self.weights)[0] ge 0.0) - 1L
+  y_predict = 2L * ((reform(*self.weights # x) + self.bias) ge 0.0) - 1L
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = total(y_predict eq y, /integer) / float(n_elements(y))
   endif
@@ -71,11 +85,17 @@ end
 
 pro mg_perceptron::getProperty, max_iterations=max_iterations, $
                                 learning_rate=learning_rate, $
+                                weights=weights, $
+                                bias=bias, $
+                                errors=errors, $
                                 _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(max_iterations)) then max_iterations = self.max_iterations
   if (arg_present(learning_rate)) then learning_rate = self.learning_rate
+  if (arg_present(weights)) then weights = *self.weights
+  if (arg_present(bias)) then bias = self.bias
+  if (arg_present(errors)) then errors = *self.errors
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
@@ -129,6 +149,7 @@ pro mg_perceptron__define
   !null = {mg_perceptron, inherits mg_estimator, $
            max_iterations: 0L, $
            learning_rate: 0.0, $
+           bias: 0.0, $
            weights: ptr_new(), $
            errors: ptr_new() $
           }
@@ -143,16 +164,18 @@ iris = mg_load_iris()
 data = iris.data[*, 0:99]
 target = 2L * iris.target[0:99] - 1L  ; change to -1 and 1
 
-seed = 0L
+;seed = 0L
 mg_train_test_split, data, target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test, $
-                     test_size=0.1, $
+                     test_size=0.15, $
                      seed=seed
 
-p = mg_perceptron()
+p = mg_perceptron(max_iterations=5)
 p->fit, x_train, y_train
 y_results = p->predict(x_test, y_test, score=score)
+
+print, format='(%"# Results\n")'
 
 for s = 0L, n_elements(y_test) - 1L do begin
   if (y_results[s] eq y_test[s]) then begin
@@ -166,5 +189,16 @@ for s = 0L, n_elements(y_test) - 1L do begin
 endfor
 
 print, score * 100.0, format='(%"Prediction score: %0.1f\%")'
+fmt = strjoin(strarr(p.max_iterations) + '%d', ' ')
+print, p.errors, format='(%"Errors per iteration: ' + fmt + '")'
+
+print
+
+print, format='(%"# Fit\n")'
+print, p.bias, format='(%"bias: %0.2f")'
+weights = p.weights
+for w = 0L, n_elements(iris.feature_names) - 1L do begin
+  print, iris.feature_names[w], weights[w], format='(%"%-20s: %0.2f")'
+endfor
 
 end
