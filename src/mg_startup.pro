@@ -9,7 +9,7 @@ last_modified_filename = filepath('modpaths-', root=appdir) + !version.release
 if (file_test(last_modified_filename)) then begin & openr, lun, last_modified_filename, /get_lun & readf, lun, last_modified & free_lun, lun & endif
 
 changed_paths = 0B
-  
+
 ; set IDL_PATH
 idl_path_filename = filepath('.idl_path', root=getenv('HOME'))
 if ((file_info(idl_path_filename)).mtime gt last_modified) then begin & changed_paths = 1B & nPathDirs = file_lines(idl_path_filename) & pathDirs = strarr(nPathDirs) & openr, lun, idl_path_filename, /get_lun & readf, lun, pathDirs & free_lun, lun & commentPos = strpos(pathDirs, ';') & pathDirInds = where(commentPos ne 0, nPathDirs) & if (nPathDirs gt 0) then mg_set_path, pathDirs[pathDirInds] & endif
