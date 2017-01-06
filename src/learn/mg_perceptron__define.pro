@@ -12,7 +12,9 @@
 ;   learning_rate : type=float
 ;     learning rate from 0.0 to 1.0
 ;   weights : type=fltarr
-;     weights[0] is bias; weights[1:*] correspond to weights for each feature
+;     weights for each feature
+;   bias : type=float
+;     bias value
 ;   errors : type=lonarr
 ;     number of misclassifications in each iteration
 ;-
@@ -46,10 +48,19 @@ pro mg_perceptron::fit, x, y
       update = (self.learning_rate * (y[s] - self->predict(xi)))[0]
       *self.weights += update * xi
       self.bias     += update
-      errors += long(update ne 0.0)
+      (*self.errors)[i] += long(update ne 0.0)
     endfor
-    (*self.errors)[i] = errors
-    if (errors eq 0L) then break
+
+    ; can't vectorize the above loop because weights change with each iteration
+    ; of the loop; if you computed update as a matrix, the entire calculation
+    ; would use the same weights/bias
+
+    ; update = self.learning_rate * (y - self.predict(x))
+    ; *self.weights += x # update
+    ; self.bias     += total(update, /preserve_type)
+    ; (*self.errors)[i] = total(update ne 0.0, /integer)
+
+    if ((*self.errors)[i] eq 0L) then break
   endfor
 end
 
@@ -171,8 +182,10 @@ mg_train_test_split, data, target, $
                      test_size=0.15, $
                      seed=seed
 
-p = mg_perceptron(max_iterations=5)
+p = mg_perceptron(max_iterations=10)
+clock_id = tic('mg_perceptron')
 p->fit, x_train, y_train
+t = toc(clock_id)
 y_results = p->predict(x_test, y_test, score=score)
 
 print, format='(%"\n# Results\n")'
@@ -188,6 +201,7 @@ for s = 0L, n_elements(y_test) - 1L do begin
   endelse
 endfor
 
+print, t * 1000.0, format='(%"\nExecution time: %0.1f msec")'
 print, score * 100.0, format='(%"Prediction score: %0.1f\%")'
 fmt = strjoin(strarr(p.max_iterations) + '%d', ' ')
 print, p.errors, format='(%"Errors per iteration: ' + fmt + '")'
