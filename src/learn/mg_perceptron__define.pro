@@ -27,8 +27,8 @@
 ; :Params:
 ;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to learn on
-;   y : in, required, type=fltarr(n_samples)
-;     results for `x` data
+;   y : in, required, type=lonarr(n_samples)
+;     results for `x` data; values must be -1 or 1
 ;-
 pro mg_perceptron::fit, x, y
   compile_opt strictarr
@@ -40,8 +40,10 @@ pro mg_perceptron::fit, x, y
   *self.weights = fltarr(n_features)
   self.bias = 0.0
   *self.errors = lonarr(self.max_iterations)
+  self.n_iterations = 0L
 
   for i = 0L, self.max_iterations - 1L do begin
+    self.n_iterations += 1L
     errors = 0L
     for s = 0L, n_samples - 1L do begin
       xi = reform(x[*, s], n_features, 1)
@@ -69,13 +71,13 @@ end
 ; Use previous training with `fit` method to predict targets for given data `x`.
 ;
 ; :Returns:
-;   fltarr(n_samples)
+;   `lonarr(n_samples)`
 ;
 ; :Params:
 ;   x : in, required, type=fltarr(n_features, n_samples)
 ;     data to predict targets for
-;   y : in, optional, type=fltarr(n_samples)
-;     optional y-values; needed to get score
+;   y : in, optional, type=lonarr(n_samples)
+;     optional y-values; needed to get score; values must be -1 or 1
 ;
 ; :Keywords:
 ;   score : out, optional, type=float
@@ -106,7 +108,7 @@ pro mg_perceptron::getProperty, max_iterations=max_iterations, $
   if (arg_present(learning_rate)) then learning_rate = self.learning_rate
   if (arg_present(weights)) then weights = *self.weights
   if (arg_present(bias)) then bias = self.bias
-  if (arg_present(errors)) then errors = *self.errors
+  if (arg_present(errors)) then errors = (*self.errors)[0:self.n_iterations - 1L]
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
@@ -159,6 +161,7 @@ pro mg_perceptron__define
 
   !null = {mg_perceptron, inherits mg_estimator, $
            max_iterations: 0L, $
+           n_iterations: 0L, $
            learning_rate: 0.0, $
            bias: 0.0, $
            weights: ptr_new(), $
@@ -169,35 +172,48 @@ end
 
 ; main-level example program
 
+; load iris data
 iris = mg_load_iris()
 
-; the first 100 samples have only two target values (categories)
-data = iris.data[*, 0:99]
-target = 2L * iris.target[0:99] - 1L  ; change to -1 and 1
+; pick two of the three species: 0, 1, or 2
+species = [0, 1]
 
+; the 150 samples are equally split 50/50/50 into the different species and
+; the samples are in order by target
+ind = [lindgen(50) + 50 * species[0], lindgen(50) + 50 * species[1]]
+data = iris.data[*, ind]
+target = 2 / (species[1] - species[0]) * (iris.target[ind] - species[0]) - 1L  ; change to -1 and 1
+target_names = iris.target_names[species]
+
+; split the dataset into training and test data
 ;seed = 0L
 mg_train_test_split, data, target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test, $
-                     test_size=0.15, $
+                     test_size=0.2, $
                      seed=seed
 
-p = mg_perceptron(max_iterations=10)
+; instantitate Perceptrion model
+p = mg_perceptron(max_iterations=20)
+
+; train the model using the training data
 clock_id = tic('mg_perceptron')
 p->fit, x_train, y_train
 t = toc(clock_id)
+
+; find results for the test data
 y_results = p->predict(x_test, y_test, score=score)
 
-print, format='(%"\n# Results\n")'
+print, target_names, format='(%"\n# Results for %s vs %s\n")'
 
 for s = 0L, n_elements(y_test) - 1L do begin
   if (y_results[s] eq y_test[s]) then begin
-    print, s, iris.target_names[y_results[s] eq 1], $
+    print, s, target_names[y_results[s] eq 1], $
            format='(%"%3d: results match, both: %s")'
   endif else begin
-    print, s, iris.target_names[y_results[s] eq 1], $
-              iris.target_names[y_test[s] eq 1], $
-              format='(%"%3d: incorrect result: %s, test standard: %s")'
+    print, s, target_names[y_results[s] eq 1], $
+              target_names[y_test[s] eq 1], $
+              format='(%"%3d: incorrect prediction: %s, truth: %s")'
   endelse
 endfor
 
@@ -205,6 +221,17 @@ print, t * 1000.0, format='(%"\nExecution time: %0.1f msec")'
 print, score * 100.0, format='(%"Prediction score: %0.1f\%")'
 fmt = strjoin(strarr(p.max_iterations) + '%d', ' ')
 print, p.errors, format='(%"Errors per iteration: ' + fmt + '")'
+
+cmatrix = mg_confusion_matrix(y_test, y_results, classes=classes)
+c = (classes + 1) / 2
+print, cmatrix[0, 0], target_names[c[0]], $
+       format='(%"true negatives : %d (true id of %s)")'
+print, cmatrix[1, 0], target_names[c[[0, 1]]], $
+       format='(%"false negatives: %d (predicted %s, but was %s)")'
+print, cmatrix[1, 1], target_names[c[1]], $
+       format='(%"true positives : %d (true id of %s)")'
+print, cmatrix[0, 1], target_names[c[[1, 0]]], $
+       format='(%"false positives: %d (predicted %s, but was %s)")'
 
 print
 
