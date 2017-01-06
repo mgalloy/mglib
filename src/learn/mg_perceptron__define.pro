@@ -14,7 +14,7 @@
 ;   weights : type=fltarr
 ;     weights[0] is bias; weights[1:*] correspond to weights for each feature
 ;   errors : type=lonarr
-;     number of errors in each iteration
+;     number of misclassifications in each iteration
 ;-
 
 ;= API
@@ -175,7 +175,7 @@ p = mg_perceptron(max_iterations=5)
 p->fit, x_train, y_train
 y_results = p->predict(x_test, y_test, score=score)
 
-print, format='(%"# Results\n")'
+print, format='(%"\n# Results\n")'
 
 for s = 0L, n_elements(y_test) - 1L do begin
   if (y_results[s] eq y_test[s]) then begin
@@ -194,7 +194,7 @@ print, p.errors, format='(%"Errors per iteration: ' + fmt + '")'
 
 print
 
-print, format='(%"# Fit\n")'
+print, format='(%"\n# Fit\n")'
 print, p.bias, format='(%"bias: %0.2f")'
 weights = p.weights
 for w = 0L, n_elements(iris.feature_names) - 1L do begin
