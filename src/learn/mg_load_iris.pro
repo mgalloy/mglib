@@ -30,8 +30,6 @@ function mg_load_iris
   data = replicate(data_row, n_samples)
 
   readf, lun, data
-  target = (reform(data.target))
-  data = data.features
   free_lun, lun
 
   feature_names=['sepal length (cm)', $
@@ -39,8 +37,8 @@ function mg_load_iris
                  'petal length (cm)', $
                  'petal width (cm)']
 
-  return, {data: data, $
-           target: target, $
+  return, {data: data.features, $
+           target: reform(data.target), $
            target_names: target_names, $
            feature_names: feature_names}
 end
