@@ -30,7 +30,7 @@ function mg_insert_gap, x, y, values, new_x=new_x, locations=locations, $
                         gap_value=gap_value
   compile_opt strictarr
 
-  _gap_value = mg_default(gap_value, !value.f_nan)
+  _gap_value = mg_default(gap_value, !values.f_nan)
 
   if (n_elements(values) gt 0L) then begin
     ind = value_locate(x, values)
@@ -72,7 +72,7 @@ function mg_insert_gap, x, y, values, new_x=new_x, locations=locations, $
     ind = where(abs(diff) gt abs(min_gap_length), count)
     if (count gt 0L) then begin
       gap_values = ((new_x[1:*])[ind] + (new_x[0:-2])[ind]) / 2.0
-      _new_y = mg_insert_nan(new_x, new_y, gap_values, $
+      _new_y = mg_insert_gap(new_x, new_y, gap_values, $
                              new_x=_new_x, $
                              locations=new_locations, $
                              gap_value=_gap_value)
