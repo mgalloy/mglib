@@ -6,6 +6,9 @@
 ; [1]: http://www.jeannicholashould.com/what-i-learned-implementing-a-classifier-from-scratch.html
 ; [2]: https://github.com/rasbt/python-machine-learning-book/blob/master/code/ch02/ch02.ipynb
 ;
+; :Categories:
+;   binary classifier
+;
 ; :Properties:
 ;   max_iterations : type=long
 ;     maximum number of iterations to perform in `fit`

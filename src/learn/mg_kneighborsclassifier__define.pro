@@ -1,5 +1,16 @@
 ; docformat = 'rst'
 
+;+
+; Nearest neighbor classifier.
+;
+; :Categories:
+;   classifier
+;
+; :Properties:
+;   n_neighbors : type=integer, default=1
+;     number of neighbors to find
+;-
+
 ;= API
 
 ;+
