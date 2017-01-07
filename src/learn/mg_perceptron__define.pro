@@ -193,7 +193,7 @@ mg_train_test_split, data, target, $
                      test_size=0.2, $
                      seed=seed
 
-; instantitate Perceptrion model
+; instantitate Perceptron model
 p = mg_perceptron(max_iterations=20)
 
 ; train the model using the training data
