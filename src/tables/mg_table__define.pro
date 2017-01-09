@@ -20,6 +20,39 @@
 
 ;= helper methods
 
+function mg_table::_subset_struct, data, cols, is_range, rows
+  compile_opt strictarr
+
+  tags = tag_names(data)
+  for c = 0L, n_elements(cols) - 1L do begin
+    if (c eq 0L) then begin
+      s = create_struct(tags[c], data[0].(cols[c]))
+    endif else begin
+      s = create_struct(s, tags[c], data[0].(cols[c]))
+    endelse
+  endfor
+
+  if (is_range) then begin
+    _rows = rows
+    if (rows[1] lt 0) then _rows[1] += self.n_rows
+    n_rows = ceil((abs(_rows[1] - _rows[0]) + 1L) / abs(float(_rows[2])))
+  endif else begin
+    n_rows = n_elements(rows)
+  endelse
+  struct = replicate(s, n_rows)
+
+  if (is_range) then begin
+    for c = 0L, n_elements(cols) - 1L do begin
+      struct.(c) = (data.(cols[c]))[rows[0]:rows[1]:rows[2]]
+    endfor
+  endif else begin
+    for c = 0L, n_elements(cols) - 1L do struct.(c) = (data.cols[c])[rows]
+  endelse
+
+  return, struct
+end
+
+
 pro mg_table::_ingest, data
   compile_opt strictarr
 
@@ -68,9 +101,19 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
 
   if (size(*self.data, /type) eq 8) then begin
     if (size(sub1, /type) eq 7) then begin
-      column_indices = where(*self.column_names)
+      n_matches = mg_match(*self.column_names, sub1, $
+                           a_matches=column_indices, $
+                           b_matches=sub_matches)
+      column_indices = column_indices[sort(sub_matches)]
     endif else begin
+      if (is_range[0]) then begin
+        column_indices = (lindgen(self.n_columns))[sub1[0]:sub1[1]:sub1[2]]
+      endif else begin
+        column_indices = sub1
+      endelse
     endelse
+    new_data = self->_subset_struct(*self.data, column_indices, is_range[1], sub2)
+    new_column_names = (*self.column_names)[column_indices]
   endif else begin
     case 1 of
       is_range[0] && is_range[1]: begin
@@ -86,8 +129,9 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
                          : (is_range[0] $
                               ? (*self.column_names)[sub1[0]:sub1[1]:sub1[2]] $
                               : (*self.column_names)[sub1])
-    new_table = mg_table(new_data, column_names=new_column_names)
   endelse
+
+  new_table = mg_table(new_data, column_names=new_column_names)
 
   return, new_table
 end
@@ -232,11 +276,11 @@ print, strjoin(strtrim(size(df), 2), ', '), format='(%"size(df) = [%s]")'
 print, df
 
 print, format='(%"\n# Subtable of array of structures")'
-; new_df = df[['price', 'rooms'], *]
-; help, new_df
-; print, n_elements(new_df), format='(%"n_elements(new_df) = %d")'
-; print, strjoin(strtrim(size(new_df), 2), ', '), format='(%"size(new_df) = [%s]")'
-; print, df
+new_df = df[['neighborhood', 'price'], *]
+help, new_df
+print, n_elements(new_df), format='(%"n_elements(new_df) = %d")'
+print, strjoin(strtrim(size(new_df), 2), ', '), format='(%"size(new_df) = [%s]")'
+print, new_df
 
 obj_destroy, df
 
