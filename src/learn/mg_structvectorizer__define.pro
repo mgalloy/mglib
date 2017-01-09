@@ -22,14 +22,7 @@ function mg_structvectorizer::_expandCategories, column, column_name, $
 
   n_samples = n_elements(column)
 
-  h = hash()
-  for t = 0L, n_elements(column) - 1L do begin
-    if (h->haskey(column[t])) then begin
-      h[column[t]] += 1
-    endif else begin
-      h[column[t]] = 1
-    endelse
-  endfor
+  h = mg_word_count(column)
 
   n_keys = h->count()
   keys_list = h->keys()
