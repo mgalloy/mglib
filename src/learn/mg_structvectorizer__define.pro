@@ -1,5 +1,18 @@
 ; docformat = 'rst'
 
+;+
+; The `mg_structvectorizer` turns an array of structures into a 2-dimensional
+; numerical array, suitable for the `fit`/predict methods of one of the
+; `mg_estimator` subclasses.
+;
+; Numerical data is promoted to a suitable class to contain the data of all the
+; fields: byte > int > long > long64 > float > double.
+;
+; String data is assumed to be string category names. String fields are
+; expanded to a set of binary columns (one for each unique string) where each
+; column represents the presence of one of the strings in the original field.
+;-
+
 
 ;= helper methods
 
@@ -143,7 +156,10 @@ data = [{price: 850000, rooms: 4, neighborhood: 'Queen Anne'}, $
         {price: 600000, rooms: 2, neighborhood: 'Fremont'}]
 
 svec = mg_structvectorizer()
-print, svec->fit_transform(data)
+
+transformed_data = svec->fit_transform(data)
+help, transformed_data
+print, transformed_data
 print, svec.feature_names
 
 end
