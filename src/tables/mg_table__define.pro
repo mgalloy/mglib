@@ -45,22 +45,10 @@ end
 function mg_table::_default_formats
   compile_opt strictarr
 
-  return, ['', $
-           'd', $
-           'd', $
-           'd', $
-           '.6g', $
-           '.8g', $
-           '(%13.6g,%13.6g)', $
-           's', $
-           '', $
-           '(%16.8g,%16.8g)', $
-           'lu', $
-           'lu', $
-           'u', $
-           'u', $
-           'lld', $
-           'llu']
+  return, ['', 'd', 'd', 'd', $
+           '.6g', '.8g', '(%13.6g,%13.6g)', 's', $
+           '', '(%16.8g,%16.8g)', 'lu', 'lu', $
+           'u', 'u', 'lld', 'llu']
 end
 
 
@@ -72,6 +60,47 @@ end
 
 
 ;= overload methods
+
+;+
+;-
+function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
+  compile_opt strictarr
+
+  if (size(*self.data, /type) eq 8) then begin
+    if (size(sub1, /type) eq 7) then begin
+      column_indices = where(*self.column_names)
+    endif else begin
+    endelse
+  endif else begin
+    case 1 of
+      is_range[0] && is_range[1]: begin
+          new_data = (*self.data)[sub1[0]:sub1[1]:sub1[2], $
+                                  sub2[0]:sub2[1]:sub2[2]]
+        end
+      is_range[0]: new_data = (*self.data)[sub1[0]:sub1[1]:sub1[2], sub2]
+      is_range[1]: new_data = (*self.data)[sub1, sub2[0]:sub2[1]:sub2[2]]
+      else: new_data = (*self.data)[sub1, sub2]
+    endcase
+    new_column_names = n_elements(*self.column_names) eq 0L $
+                         ? !null $
+                         : (is_range[0] $
+                              ? (*self.column_names)[sub1[0]:sub1[1]:sub1[2]] $
+                              : (*self.column_names)[sub1])
+    new_table = mg_table(new_data, column_names=new_column_names)
+  endelse
+
+  return, new_table
+end
+
+
+function mg_table::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'MG_TABLE'
+  _specs = string(self.n_columns, self.n_rows, format='(%"<%d columns, %d rows>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
+end
+
 
 function mg_table::_overloadPrint
   compile_opt strictarr
@@ -90,7 +119,10 @@ function mg_table::_overloadPrint
   endif
 
   print_ellipses = 0B
+
+  ; TODO: handle complex types
   data_format = '(%"' + strjoin('%' + strtrim(format_lengths, 2) + formats, ' ') + '")'
+
   if (self.n_rows gt self.n_printable_rows) then begin
     print_ellipses = 1B
     ellipses_format = '(%"' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
@@ -111,6 +143,13 @@ function mg_table::_overloadPrint
   endelse
   if (print_ellipses) then result[-1] = string(ellipses, format=ellipses_format)
   return, transpose(result)
+end
+
+
+function mg_table::_overloadSize
+  compile_opt strictarr
+
+  return, [self.n_columns, self.n_rows]
 end
 
 
@@ -163,21 +202,42 @@ end
 
 ; main-level example program
 
-df = mg_table(findgen(3, 5), column_names=['A', 'B', 'C'])
-print, df
-obj_destroy, df
-
+print, format='(%"# Simple array")'
 iris = mg_load_iris()
 df = mg_table(iris.data, column_names=iris.feature_names)
+help, df
+print, n_elements(df), format='(%"n_elements(df) = %d")'
+print, strjoin(strtrim(size(df), 2), ', '), format='(%"size(df) = [%s]")'
 print, df
+
+print, format='(%"\n# Subtable of simple array")'
+new_df = df[[0, 3], 0:49]
+help, new_df
+print, n_elements(new_df), format='(%"n_elements(new_df) = %d")'
+print, strjoin(strtrim(size(new_df), 2), ', '), format='(%"size(new_df) = [%s]")'
+print, new_df
+obj_destroy, new_df
+
 obj_destroy, df
 
+print, format='(%"\n# Array of structures")'
 data = [{price: 850000, rooms: 4, neighborhood: 'Queen Anne'}, $
         {price: 700000, rooms: 3, neighborhood: 'Fremont'}, $
         {price: 650000, rooms: 3, neighborhood: 'Wallingford'}, $
         {price: 600000, rooms: 2, neighborhood: 'Fremont'}]
 df = mg_table(data, column_names=['price', 'rooms', 'neighborhood'])
+help, df
+print, n_elements(df), format='(%"n_elements(df) = %d")'
+print, strjoin(strtrim(size(df), 2), ', '), format='(%"size(df) = [%s]")'
 print, df
+
+print, format='(%"\n# Subtable of array of structures")'
+; new_df = df[['price', 'rooms'], *]
+; help, new_df
+; print, n_elements(new_df), format='(%"n_elements(new_df) = %d")'
+; print, strjoin(strtrim(size(new_df), 2), ', '), format='(%"size(new_df) = [%s]")'
+; print, df
+
 obj_destroy, df
 
 venus_filename = filepath('VenusCraterData.csv', subdir=['examples', 'data'])
