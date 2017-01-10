@@ -53,7 +53,7 @@ end
 ;   .. image:: scatterplot_matrix-example.png
 ;
 ; :Params:
-;   data : in, required, type="fltarr(m, n)"
+;   data : in, required, type="fltarr(m, n) or array of n structures with m fields"
 ;     m data sets of n elements each
 ;
 ; :Keywords:
@@ -70,7 +70,13 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
   compile_opt strictarr
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
-  dims = size(data, /dimensions)
+  if (size(data, /type) eq 8) then begin
+    is_struct = 1B
+    dims = [n_tags(data[0]), n_elements(data)]
+  endif else begin
+    is_struct = 0B
+    dims = size(data, /dimensions)
+  endelse
   _column_names = n_elements(column_names) eq 0L ? strarr(dims[1]) : column_names
 
   x_range = fltarr(2, dims[0])
@@ -78,7 +84,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
 
   for row = 0L, dims[0] - 1L do begin
     col = row
-    h = histogram(data[row, *], locations=bins, _extra=e)
+    h = histogram(is_struct ? data.(row) : data[row, *], locations=bins, _extra=e)
     mg_histplot, bins, h, /fill, axis_color=axis_color, color=bar_color, $
                  position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
                  xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
@@ -93,7 +99,8 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
 
   for row = 0L, dims[0] - 1L do begin
     col = (row + dims[0] - 1) mod dims[0]
-    plot, data[col, *], data[row, *], /nodata, /noerase, $
+    plot, is_struct ? data.(col) : data[col, *], is_struct ? data.(row) : data[row, *], $
+          /nodata, /noerase, $
           xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
           ytitle=col eq 0L ? _column_names[row] : '', $
           color=axis_color, $
@@ -104,15 +111,18 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
           ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
           _extra=e
     y_range[*, row] = !y.crange
-    mg_plots, reform(data[col, *]), reform(data[row, *]), psym=_psym, $
-              color=color, symsize=symsize, _extra=e
+    mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
+              is_struct ? data.(row) : reform(data[row, *]), $
+              psym=_psym, color=color, symsize=symsize, _extra=e
   endfor
 
   for row = 0L, dims[0] - 1L do begin
     for col = 0L, dims[0] - 1L do begin
       if (col eq (row + dims[0] - 1) mod dims[0]) then continue
       if (row eq 0 && col eq 0) then begin
-        plot, data[col, *], data[row, *], /nodata, /noerase, $
+        plot, is_struct ? data.(col) : data[col, *], $
+              is_struct ? data.(row) : data[row, *], $
+              /nodata, /noerase, $
               xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
               ytitle=col eq 0L ? _column_names[row] : '', $
               color=axis_color, $
@@ -124,7 +134,9 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               _extra=e
       endif
       if (col ne row) then begin
-        plot, data[col, *], data[row, *], /nodata, /noerase, $
+        plot, is_struct ? data.(col) : data[col, *], $
+              is_struct ? data.(row) : data[row, *], $
+              /nodata, /noerase, $
               xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
               ytitle=col eq 0L ? _column_names[row] : '', $
               color=axis_color, $
@@ -134,8 +146,9 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
               ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
               _extra=e
-        mg_plots, reform(data[col, *]), reform(data[row, *]), psym=_psym, $
-                  color=color, symsize=symsize, _extra=e
+        mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
+                  is_struct ? data.(row) : reform(data[row, *]), $
+                  psym=_psym, color=color, symsize=symsize, _extra=e
       endif
     endfor
   endfor
