@@ -384,7 +384,7 @@ end
 ;   _extra : in, optional, type=keywords
 ;     keywords accepted by `setProperty`
 ;-
-function mg_table::init, data, _extra=e
+function mg_table::init, data, column_names=column_names, _extra=e
   compile_opt strictarr
 
   self.n_printable_rows = 20
@@ -402,7 +402,10 @@ function mg_table::init, data, _extra=e
 
   self->_ingest, data
 
-  self->setProperty, _extra=e
+  _column_names = mg_default(column_names, strtrim(sindgen(self.n_columns), 2))
+
+  self->setProperty, column_names=_column_names, _extra=e
+
   return, 1
 end
 
