@@ -147,7 +147,7 @@ print
 
 ; this file is in the "canonical form": the first line has the column names and
 ; there is no other header to skip, making this the simplest calling sequence
-df = mg_read_table('ascii.csv')
+df = mg_read_table(filepath('ascii.csv', root=mg_src_root()))
 print, df[*, 0:4]
 
 end
