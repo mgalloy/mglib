@@ -139,8 +139,12 @@ end
 ; :Params:
 ;   name : in, required, type=string
 ;     name of dataset to load: boston, breast_cancer, iris, wave
+;
+; :Keywords:
+;   n_samples : in, optional, type=integer
+;     number of samples for the synthetic datasets, i.e., wave
 ;-
-function mg_learn_dataset, name
+function mg_learn_dataset, name, n_samples=n_samples
   compile_opt strictarr
 
   case name of
@@ -148,10 +152,10 @@ function mg_learn_dataset, name
     'breast_cancer': return, mg_load_breast_cancer()
     'boston': return, mg_load_boston()
     'wave': begin
-        n = 100
-        x = 6.0 * randomu(42, n) - 3.0
-        y = (sin(4 * x) + x + randomn(seed, n)) / 2.0
-        return, {data: reform(x, 1, n), target: y, $
+        _n_samples = n_elements(n_samples) eq 0L ? 100 : n_samples
+        x = 6.0 * randomu(42, _n_samples) - 3.0
+        y = (sin(4 * x) + x + randomn(seed, _n_samples)) / 2.0
+        return, {data: reform(x, 1, _n_samples), target: y, $
                  target_names: ['y'], feature_names: ['x']}
       end
     else: message, 'unknown dataset ' + name

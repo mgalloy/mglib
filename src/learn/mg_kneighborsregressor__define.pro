@@ -112,7 +112,7 @@ end
 
 ; main-level example program
 
-wave = mg_learn_dataset('wave')
+wave = mg_learn_dataset('wave', n_samples=75)
 mg_train_test_split, wave.data, wave.target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test
