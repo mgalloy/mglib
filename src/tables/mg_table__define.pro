@@ -413,7 +413,7 @@ end
 ; main-level example program
 
 print, format='(%"# Simple array")'
-iris = mg_load_iris()
+iris = mg_learn_dataset('iris')
 df = mg_table(iris.data, column_names=iris.feature_names)
 help, df
 print, n_elements(df), format='(%"n_elements(df) = %d")'
