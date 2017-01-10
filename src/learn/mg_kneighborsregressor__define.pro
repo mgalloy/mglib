@@ -1,10 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Nearest neighbor classifier.
+; Nearest neighbor regressor.
 ;
 ; :Categories:
-;   classifier
+;   regressor
 ;
 ; :Properties:
 ;   n_neighbors : type=integer, default=1
