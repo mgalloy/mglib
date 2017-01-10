@@ -48,7 +48,7 @@ function mg_structvectorizer::_typeOrder, type1, type2
 end
 
 
-; API
+;= API
 
 ;+
 ; Transforms an array of structures into a 2-dimensional array. String fields
