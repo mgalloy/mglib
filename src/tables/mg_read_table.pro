@@ -1,5 +1,19 @@
 ; docformat = 'rst'
 
+pro mg_read_table_read, data, lun, column_types
+  compile_opt strictarr
+
+  n_rows = n_elements(data)
+  n_columns = n_tags(data[0])
+  line = ''
+  for r = 0L, n_rows - 1L do begin
+    readf, lun, line
+    tokens = strtrim(strsplit(line, ',', /extract), 2)
+    for c = 0L, n_columns - 1L do data[r].(c) = fix(tokens[c], type=column_types[c])
+  endfor
+end
+
+
 ;+
 ; Guess the type of a value represented as a string.
 ;
@@ -124,14 +138,21 @@ function mg_read_table, filename, $
 
   for c = 0L, n_elements(_column_types) - 1L do begin
     if (c eq 0L) then begin
-      s = create_struct(idl_validname(_column_names[c]), fix(0, type=_column_types[c]))
+      s = create_struct(idl_validname(_column_names[c], /convert_all), fix(0, type=_column_types[c]))
     endif else begin
-      s = create_struct(s, idl_validname(_column_names[c]), fix(0, type=_column_types[c]))
+      s = create_struct(s, idl_validname(_column_names[c], /convert_all), fix(0, type=_column_types[c]))
     endelse
   endfor
 
   data = replicate(s, n_lines)
-  readf, lun, data
+
+  ; need to read line by line if any string column types
+  if (mg_any(_column_types eq 7)) then begin
+    mg_read_table_read, data, lun, _column_types
+  endif else begin
+    readf, lun, data
+  endelse
+
   free_lun, lun
   return, mg_table(data, column_names=_column_names)
 end
@@ -142,6 +163,7 @@ end
 col_names = ['lon', 'lat', 'elev', 'temp', 'dewpt', 'wind_speed', 'wind_dir']
 df = mg_read_table(file_which('ascii.txt'), skip=5, column_names=col_names)
 print, df
+obj_destroy, df
 
 print
 
@@ -149,5 +171,13 @@ print
 ; there is no other header to skip, making this the simplest calling sequence
 df = mg_read_table(filepath('ascii.csv', root=mg_src_root()))
 print, df[*, 0:4]
+obj_destroy, df
+
+print
+
+; read a file with a string column
+df = mg_read_table(filepath('test.csv', root=mg_src_root()))
+print, df
+obj_destroy, df
 
 end
