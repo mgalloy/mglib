@@ -285,7 +285,7 @@ function mg_table::_overloadPrint
   print_header = n_elements(*self.column_names) gt 0L
   if (print_header) then begin
     format_lengths >= (strlen(*self.column_names) + 1)
-    header_format = '(%"' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
+    header_format = '(%"   ' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
     line = strarr(self.n_columns)
     for c = 0L, self.n_columns - 1L do begin
       line[c] = strjoin(strarr(format_lengths[c]) + '=')
@@ -295,25 +295,34 @@ function mg_table::_overloadPrint
   print_ellipses = 0B
 
   ; TODO: handle complex types
-  data_format = '(%"' + strjoin('%' + strtrim(format_lengths, 2) + formats, ' ') + '")'
+  data_format = '(%"%2d ' + strjoin('%' + strtrim(format_lengths, 2) + formats, ' ') + '")'
+  is_struct = size(*self.data, /type) eq 8
 
   if (self.n_rows gt self.n_printable_rows) then begin
     print_ellipses = 1B
-    ellipses_format = '(%"' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
+    ellipses_format = '(%"   ' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
     ellipses = strarr(self.n_columns) + '...'
-    if (size(*self.data, /type) eq 8) then begin
+    if (is_struct) then begin
       data_subset = (*self.data)[0:self.n_printable_rows - 1]
     endif else begin
       data_subset = (*self.data)[*, 0:self.n_printable_rows - 1]
     endelse
   endif else data_subset = *self.data
-  result = strarr(2 * print_header + (self.n_rows < self.n_printable_rows) + print_ellipses)
+
+  n_printed_rows = (self.n_rows < self.n_printable_rows)
+  result = strarr(2 * print_header + n_printed_rows + print_ellipses)
   if (print_header) then begin
     result[0:1] = [string(*self.column_names, format=header_format), $
                    string(line, format=header_format)]
-    result[2] = string(data_subset, format=data_format)
+    for i = 0L, n_printed_rows - 1L do begin
+      result[2 + i] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
+                             format=data_format)
+    endfor
   endif else begin
-    result[0] = string(data_subset, format=data_format)
+    for i = 0L, n_printed_rows - 1L do begin
+      result[i] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
+                         format=data_format)
+    endfor
   endelse
   if (print_ellipses) then result[-1] = string(ellipses, format=ellipses_format)
   return, transpose(result)
