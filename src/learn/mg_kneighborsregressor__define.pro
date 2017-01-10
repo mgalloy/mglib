@@ -112,9 +112,15 @@ end
 
 ; main-level example program
 
-; TODO: find example...
+wave = mg_learn_dataset('wave')
+mg_train_test_split, wave.data, wave.target, $
+                     x_train=x_train, y_train=y_train, $
+                     x_test=x_test, y_test=y_test
 
 knr = mg_kneighborsegressor(n_neighbors=3)
+knr->fit, x_train, y_train
+y_predict = knr->predict(x_test, y_test, score=r2)
+print, r2, format='(%"r^2: %f")'
 obj_destroy, knr
 
 end

@@ -151,7 +151,8 @@ function mg_learn_dataset, name
         n = 100
         x = 6.0 * randomu(42, n) - 3.0
         y = (sin(4 * x) + x + randomn(seed, n)) / 2.0
-        return, {data: x, target: y, target_names: ['y'], feature_names: ['x']}
+        return, {data: reform(x, 1, n), target: y, $
+                 target_names: ['y'], feature_names: ['x']}
       end
     else: message, 'unknown dataset ' + name
   endcase
