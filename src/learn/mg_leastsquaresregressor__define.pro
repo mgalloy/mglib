@@ -68,10 +68,13 @@ end
 
 ;= property access
 
-pro mg_leastsquaresregressor::getProperty, weights=weights, _ref_extra=e
+pro mg_leastsquaresregressor::getProperty, intercept=intercept, $
+                                           coefficients=coefficients, $
+                                           _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(weights)) then weights = *self.weights
+  if (arg_present(intercept)) then intercept = (*self.weights)[0]
+  if (arg_present(coefficients)) then coefficients = (*self.weights)[1:*]
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
 
@@ -116,7 +119,20 @@ mg_train_test_split, wave.data, wave.target, $
 lsr = mg_leastsquaresregressor()
 lsr->fit, x_train, y_train
 y_predict = lsr->predict(x_test, y_test, score=r2)
+
 print, r2, format='(%"r^2: %f")'
-;obj_destroy, lsr
+print, lsr.intercept, format='(%"intercept:    %f")'
+print, strjoin(strtrim(lsr.coefficients, 2), ', '), $
+       format='(%"coefficients: %s")'
+
+plot, wave.data, wave.target, psym=mg_usersym(/circle)
+;r = mg_range(wave.data)
+r = !x.crange
+n = 100
+x = (r[1] - r[0]) * findgen(100) / (n - 1) + r[0]
+y = lsr.intercept + (lsr.coefficients)[0] * x
+oplot, x, y
+
+obj_destroy, lsr
 
 end
