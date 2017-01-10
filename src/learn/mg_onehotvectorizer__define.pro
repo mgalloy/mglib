@@ -2,7 +2,7 @@
 
 ;= helper methods
 
-function mg_categoricalvectorizer::_expand_column, column, values, n_values
+function mg_onehotvectorizer::_expand_column, column, values, n_values
   compile_opt strictarr
 
   n_rows = n_elements(column)
@@ -30,7 +30,7 @@ end
 ;   data : in, required, type=array of structures
 ;     array of structures to transform
 ;-
-function mg_categoricalvectorizer::fit_transform, data, $
+function mg_onehotvectorizer::fit_transform, data, $
                                                   feature_names=feature_names, $
                                                   new_feature_names=new_feature_names
   compile_opt strictarr
@@ -88,14 +88,14 @@ end
 
 ;= property access
 
-pro mg_categoricalvectorizer::getProperty, feature_names=feature_names
+pro mg_onehotvectorizer::getProperty, feature_names=feature_names
   compile_opt strictarr
 
   if (arg_present(feature_names)) then feature_names = *self.feature_names
 end
 
 
-pro mg_categoricalvectorizer::setProperty, categorical_columns=categorical_columns, $ 
+pro mg_onehotvectorizer::setProperty, categorical_columns=categorical_columns, $ 
                                            feature_names=feature_names
   compile_opt strictarr
 
@@ -108,14 +108,14 @@ end
 
 ;= lifecyle methods
 
-pro mg_categoricalvectorizer::cleanup
+pro mg_onehotvectorizer::cleanup
   compile_opt strictarr
 
   ptr_free, self.feature_names
 end
 
 
-function mg_categoricalvectorizer::init, _extra=e
+function mg_onehotvectorizer::init, _extra=e
   compile_opt strictarr
 
   self.categorical_columns = ptr_new(/allocate_heap)
@@ -127,10 +127,10 @@ function mg_categoricalvectorizer::init, _extra=e
 end
 
 
-pro mg_categoricalvectorizer__define
+pro mg_onehotvectorizer__define
   compile_opt strictarr
 
-  !null = {mg_categoricalvectorizer, inherits IDL_Object, $
+  !null = {mg_onehotvectorizer, inherits IDL_Object, $
            categorical_columns: ptr_new(), $
            feature_names: ptr_new()}
 end
@@ -139,7 +139,7 @@ end
 ; main-level example program
 
 data = bindgen(3, 5)
-cv = mg_categoricalvectorizer(categorical_columns=[0, 1, 2])
+cv = mg_onehotvectorizer(categorical_columns=[0, 2])
 feature_names = ['A', 'B', 'C']
 new_data = cv->fit_transform(data, $
                              feature_names=feature_names, $
