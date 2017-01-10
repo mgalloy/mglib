@@ -72,7 +72,7 @@ end
 
 ; main-level example program
 
-iris = mg_load_iris()
+iris = mg_learn_dataset('iris')
 
 seed = 0L
 mg_train_test_split, iris.data, iris.target, $
