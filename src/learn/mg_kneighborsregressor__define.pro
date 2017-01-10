@@ -54,7 +54,7 @@ function mg_kneighborsegressor::predict, x, y, score=score
   neighbor_indices = mg_kneighbors(*self.x, x, self.n_neighbors)
 
   ; ...then average neighbors together for each y_predict element
-  y_predict = mean(y[neighbor_indices], dimension=1)
+  y_predict = mean((*self.y)[neighbor_indices], dimension=1)
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = self->_r2_score(y, y_predict)
