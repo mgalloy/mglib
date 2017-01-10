@@ -173,7 +173,8 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
     _sub2 = sub2
   endelse
 
-  if (size(*self.data, /type) eq 8) then begin
+  is_struct = size(*self.data, /type) eq 8
+  if (is_struct) then begin
     if (size(sub1, /type) eq 7) then begin
       n_matches = mg_match(*self.column_names, sub1, $
                            a_matches=column_indices, $
@@ -189,31 +190,45 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
     new_data = self->_subset_struct(*self.data, column_indices, _is_range[1], _sub2)
     new_column_names = (*self.column_names)[column_indices]
   endif else begin
-    case 1 of
-      _is_range[0] && _is_range[1]: begin
+    if (size(sub1, /type) eq 7) then begin
+      n_matches = mg_match(*self.column_names, sub1, $
+                           a_matches=column_indices, $
+                           b_matches=sub_matches)
+      column_indices = column_indices[sort(sub_matches)]
+      if (_is_range[1]) then begin
+        new_data = (*self.data)[column_indices, _sub2[0]:_sub2[1]:_sub2[2]]
+      endif else begin
+        new_data = (*self.data)[column_indices, _sub2]
+      endelse
+
+      new_column_names = (*self.column_names)[column_indices]
+    endif else begin
+      case 1 of
+        _is_range[0] && _is_range[1]: begin
           new_data = (*self.data)[sub1[0]:sub1[1]:sub1[2], $
                                   _sub2[0]:_sub2[1]:_sub2[2]]
-        end
-      _is_range[0]: new_data = (*self.data)[sub1[0]:sub1[1]:sub1[2], _sub2]
-      _is_range[1]: new_data = (*self.data)[sub1, _sub2[0]:_sub2[1]:_sub2[2]]
-      else: new_data = (*self.data)[sub1, _sub2]
-    endcase
-    new_column_names = n_elements(*self.column_names) eq 0L $
-                         ? !null $
-                         : (_is_range[0] $
-                              ? (*self.column_names)[sub1[0]:sub1[1]:sub1[2]] $
-                              : (*self.column_names)[sub1])
+          end
+        _is_range[0]: new_data = (*self.data)[sub1[0]:sub1[1]:sub1[2], _sub2]
+        _is_range[1]: new_data = (*self.data)[sub1, _sub2[0]:_sub2[1]:_sub2[2]]
+        else: new_data = (*self.data)[sub1, _sub2]
+      endcase
+      new_column_names = n_elements(*self.column_names) eq 0L $
+                           ? !null $
+                           : (_is_range[0] $
+                                ? (*self.column_names)[sub1[0]:sub1[1]:sub1[2]] $
+                                : (*self.column_names)[sub1])
+    endelse
   endelse
 
   if (n_elements(sub2) eq 0L) then begin
     if (n_elements(new_column_names) eq 1L) then begin
-      return, new_data.(0)
+      return, is_struct ? new_data.(0) : reform(new_data[0, *])
     endif else return, new_data
   endif else begin
     single_element = (n_elements(new_data) eq 1) $
-                        && (size(new_data, /type) ne 8 || n_elements(new_data.(0)) eq 1)
+                        && (is_struct || n_elements(new_data.(0)) eq 1)
     if (single_element) then begin
-      return, size(new_data, /type) eq 8 ? new_data[0].(0) : new_data[0, 0]
+      return, is_struct ? new_data[0].(0) : new_data[0, 0]
     endif else begin
       new_table = mg_table(new_data, column_names=new_column_names)
       return, new_table
