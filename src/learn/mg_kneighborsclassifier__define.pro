@@ -120,7 +120,7 @@ end
 ; main-level example program
 
 ; load iris data
-iris = mg_load_iris()
+iris = mg_learn_dataset('iris')
 
 ; split the dataset into training and test data
 seed = 0L

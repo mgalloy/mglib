@@ -176,7 +176,7 @@ end
 ; main-level example program
 
 ; load iris data
-iris = mg_load_iris()
+iris = mg_learn_dataset('iris')
 
 ; pick two of the three species: 0, 1, or 2
 species = [0, 1]
