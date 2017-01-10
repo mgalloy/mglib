@@ -54,6 +54,7 @@ function mg_leastsquaresregressor::predict, x, y, score=score
   dims = size(x, /dimensions)
   type = size(x, /type)
   _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
+  _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
   _x[1, 0] = x
 
   y_predict = reform(*self.weights # _x)
@@ -126,12 +127,29 @@ print, strjoin(strtrim(lsr.coefficients, 2), ', '), $
        format='(%"coefficients: %s")'
 
 plot, wave.data, wave.target, psym=mg_usersym(/circle)
-;r = mg_range(wave.data)
 r = !x.crange
 n = 100
 x = (r[1] - r[0]) * findgen(100) / (n - 1) + r[0]
 y = lsr.intercept + (lsr.coefficients)[0] * x
 oplot, x, y
+
+obj_destroy, lsr
+
+
+boston = mg_learn_dataset('boston')
+
+mg_train_test_split, boston.data, boston.target, $
+                     x_train=x_train, y_train=y_train, $
+                     x_test=x_test, y_test=y_test
+
+lsr = mg_leastsquaresregressor()
+lsr->fit, x_train, y_train
+y_predict = lsr->predict(x_test, y_test, score=r2)
+
+print, r2, format='(%"r^2: %f")'
+print, lsr.intercept, format='(%"intercept:    %f")'
+print, strjoin(strtrim(lsr.coefficients, 2), ', '), $
+       format='(%"coefficients: %s")'
 
 obj_destroy, lsr
 
