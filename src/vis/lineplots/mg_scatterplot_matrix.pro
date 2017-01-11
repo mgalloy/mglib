@@ -66,7 +66,8 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
                            bar_color=bar_color, $
                            psym=psym, symsize=symsize, $
                            axis_color=axis_color, color=color, $
-                           position=position, _extra=e
+                           position=position, $
+                           n_bins=n_bins, _extra=e
   compile_opt strictarr
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
@@ -82,9 +83,11 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
   x_range = fltarr(2, dims[0])
   y_range = fltarr(2, dims[0])
 
+  _n_bins = mg_default(n_bins, 20)
   for row = 0L, dims[0] - 1L do begin
     col = row
-    h = histogram(is_struct ? data.(row) : data[row, *], locations=bins, _extra=e)
+    h = histogram(is_struct ? data.(row) : data[row, *], $
+                  locations=bins, nbins=_n_bins, _extra=e)
     mg_histplot, bins, h, /fill, axis_color=axis_color, color=bar_color, $
                  position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
                  xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
