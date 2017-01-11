@@ -27,7 +27,7 @@ pro mg_ridgeregressor::fit, x, y
   _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
   _x[1, 0] = x
 
-  *self.weights = la_least_squares(transpose(_x) ## _x + identity(dims[0] + 1), $
+  *self.weights = la_least_squares(transpose(_x) ## _x + sqrt(self.alpha) * identity(dims[0] + 1), $
                                    transpose(_x) ## y)
 end
 
@@ -71,13 +71,23 @@ end
 ;= property access
 
 pro mg_ridgeregressor::getProperty, intercept=intercept, $
-                                           coefficients=coefficients, $
-                                           _ref_extra=e
+                                    coefficients=coefficients, $
+                                    alpha=alpha, $
+                                    _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(intercept)) then intercept = (*self.weights)[0]
   if (arg_present(coefficients)) then coefficients = (*self.weights)[1:*]
+  if (arg_present(alpha)) then alpha = self.alpha
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
+end
+
+
+pro mg_ridgeregressor::setProperty, alpha=alpha, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(alpha) gt 0L) then self.alpha = alpha
+  if (n_elements(e) gt 0L) then self->mg_regressor::setProperty, _extra=e
 end
 
 
@@ -91,12 +101,14 @@ pro mg_ridgeregressor::cleanup
 end
 
 
-function mg_ridgeregressor::init, _extra=e
+function mg_ridgeregressor::init, alpha=alpha, _extra=e
   compile_opt strictarr
 
   if (~self->mg_regressor::init(_extra=e)) then return, 0
 
   self.weights = ptr_new(/allocate_heap)
+
+  self->setProperty, alpha=mg_default(alpha, 1.0), _extra=e
 
   return, 1
 end
@@ -106,6 +118,7 @@ pro mg_ridgeregressor__define
   compile_opt strictarr
 
   !null = {mg_ridgeregressor, inherits mg_regressor, $
+           alpha: 0.0, $
            weights: ptr_new() $
           }
 end
@@ -118,7 +131,7 @@ mg_train_test_split, wave.data, wave.target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test
 
-lsr = mg_ridgeregressor()
+lsr = mg_ridgeregressor(alpha=0.1)
 lsr->fit, x_train, y_train
 y_predict = lsr->predict(x_test, y_test, score=r2_test)
 y_predict = lsr->predict(x_train, y_train, score=r2_train)
