@@ -21,6 +21,13 @@
 
 ;= helper methods
 
+;+
+; Find the width of the terminal. If `MG_TERMCOLUMNS` is not available, returns
+; 80.
+;
+; :Returns:
+;   long
+;-
 function mg_table::_termcolumns
   compile_opt strictarr
 
@@ -331,12 +338,20 @@ function mg_table::_overloadPrint
       ellipses_format = '(%"   ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
       ellipses = strarr(partitions[p]) + '...'
       if (is_struct) then begin
-        data_subset = (*self.data)[0:self.n_printable_rows - 1] ; TODO: subset
+        column_indices = lindgen(end_partitions[p] - start_partitions[p] + 1L) + start_partitions[p]
+        data_subset = self->_subset_struct(*self.data, column_indices, 1B, [0, self.n_printable_rows - 1, 1])
       endif else begin
         data_subset = (*self.data)[start_partitions[p]:end_partitions[p], $
                                    0:self.n_printable_rows - 1]
       endelse
-    endif else data_subset = *self.data  ; TODO: subset
+    endif else begin
+      if (is_struct) then begin
+        column_indices = lindgen(end_partitions[p] - start_partitions[p] + 1L) + start_partitions[p]
+        data_subset = self->_subset_struct(*self.data, column_indices, 1B, [0, -1, 1])
+      endif else begin
+        data_subset = (*self.data)[start_partitions[p]:end_partitions[p], *]
+      endelse
+    endelse
 
     if (print_header) then begin
       result[n_partition_rows * p + p] = [string((*self.column_names)[start_partitions[p]:end_partitions[p]], format=header_format), $
@@ -378,7 +393,7 @@ end
 ; Get properties.
 ;-
 pro mg_table::getProperty, data=data, types=types, column_names=column_names, $
-                           n_columns=n_columns, n_rows=n_rows
+                           n_columns=n_columns, n_rows=n_rows, n_printable_rows=n_printable_rows
   compile_opt strictarr
 
   if (arg_present(data)) then data = *self.data
@@ -386,17 +401,19 @@ pro mg_table::getProperty, data=data, types=types, column_names=column_names, $
   if (arg_present(column_names)) then column_names = *self.column_names
   if (arg_present(n_columns)) then n_columns = self.n_columns
   if (arg_present(n_rows)) then n_rows = self.n_rows
+  if (arg_present(n_printable_rows)) then n_printable_rows = self.n_printable_rows
 end
 
 
 ;+
 ; Set properties.
 ;-
-pro mg_table::setProperty, data=data, column_names=column_names
+pro mg_table::setProperty, data=data, column_names=column_names, n_printable_rows=n_printable_rows
   compile_opt strictarr
 
   if (n_elements(data) gt 0L) then self->_ingest, data
   if (n_elements(column_names) gt 0L) then *self.column_names = column_names
+  if (n_elements(n_printable_rows) gt 0L) then self.n_printable_rows = n_printable_rows
 end
 
 
@@ -423,10 +440,13 @@ end
 ;   _extra : in, optional, type=keywords
 ;     keywords accepted by `setProperty`
 ;-
-function mg_table::init, data, column_names=column_names, _extra=e
+function mg_table::init, data, $
+                         column_names=column_names, $
+                         n_printable_rows=n_printable_rows, $
+                         _extra=e
   compile_opt strictarr
 
-  self.n_printable_rows = 20
+  _n_printable_rows = mg_default(n_printable_rows, 20)
 
   self._default_formats = ['', 'd', 'd', 'd', $
                            '.6g', '.8g', '(%13.6g,%13.6g)', 's', $
@@ -443,7 +463,9 @@ function mg_table::init, data, column_names=column_names, _extra=e
 
   _column_names = mg_default(column_names, strtrim(sindgen(self.n_columns), 2))
 
-  self->setProperty, column_names=_column_names, _extra=e
+  self->setProperty, column_names=_column_names, $
+                     n_printable_rows=_n_printable_rows, $
+                     _extra=e
 
   return, 1
 end
