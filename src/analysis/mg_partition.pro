@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Determine the size of partitions of `x` where each sum of each partition is
+; Determine the size of partitions of `x` where the sum of each partition is
 ; less than `max_size`.
 ;
 ; :Returns:
