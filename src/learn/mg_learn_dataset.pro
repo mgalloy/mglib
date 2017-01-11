@@ -1,5 +1,34 @@
 ; docformat = 'rst'
 
+
+;+
+; Loads the adult dataset.
+;
+; The adult dataset has 32561 samples and 14 features
+;
+; :Returns:
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
+;-
+function mg_load_adult
+  compile_opt strictarr
+
+  filename = filepath('adult.csv', root=mg_src_root())
+
+  column_names=['age', 'workclass', 'fnlwgt', 'education', $
+                'education-num', 'marital-status', 'occupation', 'relationship', $
+                'race', 'gender', 'capital-gain', 'capital-loss', $
+                'hours-per-week', 'native-country', 'income']
+  df = mg_read_table(filename, column_names=column_names)
+  data = df[column_names[0:-2]]
+  target = df['income']
+  obj_destroy, df
+  return, {data: data, $
+           target: target, $
+           target_names: column_names[-1], $
+           feature_names: column_names[0:-2]}
+end
+
+
 ;+
 ; Loads the Boston house prices dataset.
 ;
@@ -148,6 +177,7 @@ function mg_learn_dataset, name, n_samples=n_samples
   compile_opt strictarr
 
   case name of
+    'adult': return, mg_load_adult()
     'iris': return, mg_load_iris()
     'breast_cancer': return, mg_load_breast_cancer()
     'boston': return, mg_load_boston()
