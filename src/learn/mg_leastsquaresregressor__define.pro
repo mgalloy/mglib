@@ -57,7 +57,7 @@ function mg_leastsquaresregressor::predict, x, y, score=score
   _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
   _x[1, 0] = x
 
-  y_predict = reform(*self.weights # _x)
+  y_predict = reform(_x ## *self.weights)
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = self->_r2_score(y, y_predict)
@@ -119,9 +119,11 @@ mg_train_test_split, wave.data, wave.target, $
 
 lsr = mg_leastsquaresregressor()
 lsr->fit, x_train, y_train
-y_predict = lsr->predict(x_test, y_test, score=r2)
+y_predict = lsr->predict(x_test, y_test, score=r2_test)
+y_predict = lsr->predict(x_train, y_train, score=r2_train)
 
-print, r2, format='(%"r^2: %f")'
+print, r2_train, format='(%"train r^2: %f")'
+print, r2_test, format='(%"test r^2: %f")'
 print, lsr.intercept, format='(%"intercept:    %f")'
 print, strjoin(strtrim(lsr.coefficients, 2), ', '), $
        format='(%"coefficients: %s")'
@@ -144,9 +146,11 @@ mg_train_test_split, boston.data, boston.target, $
 
 lsr = mg_leastsquaresregressor()
 lsr->fit, x_train, y_train
-y_predict = lsr->predict(x_test, y_test, score=r2)
+y_predict = lsr->predict(x_test, y_test, score=r2_test)
+y_predict = lsr->predict(x_train, y_train, score=r2_train)
 
-print, r2, format='(%"r^2: %f")'
+print, r2_train, format='(%"train r^2: %f")'
+print, r2_test, format='(%"test r^2: %f")'
 print, lsr.intercept, format='(%"intercept:    %f")'
 print, strjoin(strtrim(lsr.coefficients, 2), ', '), $
        format='(%"coefficients: %s")'
