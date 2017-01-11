@@ -8,7 +8,8 @@ pro mg_read_table_read, data, lun, column_types
   line = ''
   for r = 0L, n_rows - 1L do begin
     readf, lun, line
-    tokens = strtrim(strsplit(line, ',', /extract), 2)
+    tokens = strtrim(strsplit(line, ',', /extract, count=n_tokens), 2)
+    if (n_tokens eq 0L) then continue
     for c = 0L, n_columns - 1L do data[r].(c) = fix(tokens[c], type=column_types[c])
   endfor
 end

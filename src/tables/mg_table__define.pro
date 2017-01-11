@@ -4,16 +4,26 @@
 ; 2-dimensional table of heterogeneous columns.
 ;
 ; Should have:
-;   * basic read/write capability from/to CSV, Markdown, reStructured Text
+;   * read/write capability
+;     + read from CSV
+;     - write to CSV
+;     - write to Markdown
+;     - write to reStructured Text
 ;   * print to screen nicely (including using ... for too many rows, etc.)
+;     - head/tail methods
 ;   * create new tables by indexing
+;     - allow ranges with string column names
 ;   * easily get underlying data
+;     + data property
+;     - toArray method
 ;   * allow each column to be a different type
+;     - each column should be an mg_series object
 ;
 ; :Properties:
 ;   data : type=2d array or array of structures
 ;     data to present
 ;   types : type=lonarr(n_columns)
+;     `SIZE`-based data types for each column
 ;   column_names : type=strarr
 ;     names of columns of the table
 ;-
@@ -127,7 +137,23 @@ pro mg_table::_ingest, data
 end
 
 
-;= API
+;= display
+
+pro mg_table::head, n
+  compile_opt strictarr
+
+  ; TODO: implement
+end
+
+
+pro mg_table::tail, n
+  compile_opt strictarr
+
+  ; TODO: implement
+end
+
+
+;= plotting
 
 ;+
 ; Produce a scatter plot between column `x` and column `y`. If `x` and `y` are
@@ -341,7 +367,7 @@ function mg_table::_overloadPrint
   print_header = n_elements(*self.column_names) gt 0L
   is_struct = size(*self.data, /type) eq 8
 
-  partitions = mg_partition(format_lengths, width - 3)   ; 3 spaces for indices
+  partitions = mg_partition(format_lengths + 1, width - 3)   ; 3 spaces for indices
   n_partitions = n_elements(partitions)
   start_partitions = [0, total(partitions, /preserve_type, /cumulative)]
   end_partitions = [start_partitions[1:*] - 1]
