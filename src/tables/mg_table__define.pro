@@ -127,6 +127,39 @@ pro mg_table::_ingest, data
 end
 
 
+;= API
+
+;+
+; Produce a scatter plot between column `x` and column `y`. If `x` and `y` are
+; not specified, then produces a scatter plot matrix.
+;
+; :Params:
+;   x : in, optional, type=string/integer
+;     column name or index for `x` values of scatter plot
+;   y : in, optional, type=string/integer
+;     column name or index for `y` values of scatter plot
+;-
+pro mg_table::scatter, x, y, psym=psym, _extra=e
+  compile_opt strictarr
+  on_error, 2
+
+  case n_params() of
+    0: mg_scatterplot_matrix, *self.data, column_names=*self.column_names, psym=psym, _extra=e
+    1: message, 'only one column specified'
+    2: begin
+        mg_plot, self->_overloadBracketsRightSide([0], x), $
+                 self->_overloadBracketsRightSide([0], y), $
+                 /nodata, $
+                 xtitle=size(x, /type) eq 7 ? x : (*self.column_names)[x], $
+                 ytitle=size(y, /type) eq 7 ? y : (*self.column_names)[y]
+        mg_plots, self->_overloadBracketsRightSide([0], x), $
+                  self->_overloadBracketsRightSide([0], y), $
+                  psym=mg_default(psym, 3), _extra=e
+      end
+  endcase
+end
+
+
 ;= overload methods
 
 ;+
@@ -529,6 +562,16 @@ print, strjoin(strtrim(size(new_df), 2), ', '), format='(%"size(new_df) = [%s]")
 print, new_df
 
 obj_destroy, df
+
+print, format='(%"\n# Scatter plot between two columns")'
+device, decomposed=0
+loadct, 5
+b = mg_learn_dataset('boston')
+df = mg_table(b.data, column=b.feature_names)
+df->scatter, 'NOX', 'AGE', $
+             psym=mg_usersym(/circle, /fill), $
+             symsize=0.5, $
+             color=bytscl(df['RAD'])
 
 venus_filename = filepath('VenusCraterData.csv', subdir=['examples', 'data'])
 
