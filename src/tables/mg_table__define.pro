@@ -21,6 +21,20 @@
 
 ;= helper methods
 
+function mg_table::_termcolumns
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, 80L
+  endif
+
+  n_cols = mg_termcolumns()
+  return, n_cols
+end
+
+
 ;+
 ; Helper method to subset an array of structures because some array indexing
 ; methods don't work on the columns.
@@ -279,52 +293,68 @@ end
 function mg_table::_overloadPrint
   compile_opt strictarr
 
+  width = self->_termcolumns()
+
   formats = (self._default_formats)[*self.types]
   format_lengths = (self._default_format_lengths)[*self.types]
 
   print_header = n_elements(*self.column_names) gt 0L
-  if (print_header) then begin
-    format_lengths >= (strlen(*self.column_names) + 1)
-    header_format = '(%"   ' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
-    line = strarr(self.n_columns)
-    for c = 0L, self.n_columns - 1L do begin
-      line[c] = strjoin(strarr(format_lengths[c]) + '=')
-    endfor
-  endif
-
-  print_ellipses = 0B
-
-  ; TODO: handle complex types
-  data_format = '(%"%2d ' + strjoin('%' + strtrim(format_lengths, 2) + formats, ' ') + '")'
   is_struct = size(*self.data, /type) eq 8
 
-  if (self.n_rows gt self.n_printable_rows) then begin
-    print_ellipses = 1B
-    ellipses_format = '(%"   ' + strjoin('%' + strtrim(format_lengths, 2) + 's', ' ') + '")'
-    ellipses = strarr(self.n_columns) + '...'
-    if (is_struct) then begin
-      data_subset = (*self.data)[0:self.n_printable_rows - 1]
-    endif else begin
-      data_subset = (*self.data)[*, 0:self.n_printable_rows - 1]
-    endelse
-  endif else data_subset = *self.data
+  partitions = mg_partition(format_lengths, width - 3)   ; 3 spaces for indices
+  n_partitions = n_elements(partitions)
+  start_partitions = [0, total(partitions, /preserve_type, /cumulative)]
+  end_partitions = [start_partitions[1:*] - 1]
 
-  n_printed_rows = (self.n_rows < self.n_printable_rows)
-  result = strarr(2 * print_header + n_printed_rows + print_ellipses)
-  if (print_header) then begin
-    result[0:1] = [string(*self.column_names, format=header_format), $
-                   string(line, format=header_format)]
-    for i = 0L, n_printed_rows - 1L do begin
-      result[2 + i] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
-                             format=data_format)
-    endfor
-  endif else begin
-    for i = 0L, n_printed_rows - 1L do begin
-      result[i] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
-                         format=data_format)
-    endfor
-  endelse
-  if (print_ellipses) then result[-1] = string(ellipses, format=ellipses_format)
+  n_printed_rows = self.n_rows < self.n_printable_rows
+  print_ellipses = self.n_rows gt self.n_printable_rows
+
+  n_partition_rows = 2 * print_header + n_printed_rows + print_ellipses
+  result = strarr(n_partitions * (n_partition_rows) + n_partitions - 1L)
+
+  for p = 0L, n_partitions - 1L do begin
+    _format_lengths = format_lengths[start_partitions[p]:end_partitions[p]]
+    _formats = formats[start_partitions[p]:end_partitions[p]]
+
+    if (print_header) then begin
+      format_lengths[start_partitions[p]:end_partitions[p]] >= (strlen((*self.column_names)[start_partitions[p]:end_partitions[p]]) + 1)
+      header_format = '(%"   ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+      line = strarr(partitions[p])
+      for c = 0L, partitions[p] - 1L do begin
+        line[c] = strjoin(strarr(_format_lengths[c]) + '=')
+      endfor
+    endif
+
+    ; TODO: handle complex types
+    data_format = '(%"%2d ' + strjoin('%' + strtrim(_format_lengths, 2) + _formats, ' ') + '")'
+    if (self.n_rows gt self.n_printable_rows) then begin
+      ellipses_format = '(%"   ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+      ellipses = strarr(partitions[p]) + '...'
+      if (is_struct) then begin
+        data_subset = (*self.data)[0:self.n_printable_rows - 1] ; TODO: subset
+      endif else begin
+        data_subset = (*self.data)[start_partitions[p]:end_partitions[p], $
+                                   0:self.n_printable_rows - 1]
+      endelse
+    endif else data_subset = *self.data  ; TODO: subset
+
+    if (print_header) then begin
+      result[n_partition_rows * p + p] = [string((*self.column_names)[start_partitions[p]:end_partitions[p]], format=header_format), $
+                                      string(line, format=header_format)]
+
+      for i = 0L, n_printed_rows - 1L do begin
+        result[2 + i + n_partition_rows * p + p] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
+                                                      format=data_format)
+      endfor
+    endif else begin
+      for i = 0L, n_printed_rows - 1L do begin
+        result[i + p * n_partition_rows + p] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
+                                                  format=data_format)
+      endfor
+    endelse
+    if (print_ellipses) then result[(p + 1) * n_partition_rows - 1 + p] = string(ellipses, format=ellipses_format)
+  endfor
+
   return, transpose(result)
 end
 
