@@ -10,8 +10,8 @@
 ;     - write to Markdown
 ;     - write to reStructured Text
 ;   * print to screen nicely (including using ... for too many rows, etc.)
-;     - display method
-;     - head/tail methods (calls display method)
+;     + print method that can take a start/stop row
+;     + head/tail methods (calls print method)
 ;   * create new tables by indexing
 ;     - allow ranges with string column names
 ;   - manipulate tables easily
@@ -141,16 +141,29 @@ pro mg_table::_ingest, data
 end
 
 
+;+
+; Return a string for the printed output, with rows optionally specified.
+;
+; :Returns:
+;   `strarr(1, rows)`
+;
+; :Params:
+;   start_row : in, optional, type=integer, default=0
+;     index of first row to print
+;   end_row : in, optional, type=integer, default=start_row + N_PRINTABLE_ROWS
+;     index of last row to print; default is the `start_row` plus the
+;     `N_PRINTABLE_ROWS` property
+;-
 function mg_table::_output, start_row, end_row
   compile_opt strictarr
 
   ; define the start and end rows
-  _start_row = mg_default(start_row, 0L)
+  _start_row = mg_default(start_row, 0L) > 0L
   _end_row = mg_default(end_row, _start_row + self.n_printable_rows) < (self.n_rows - 1L)
   n_printed_rows = _end_row - _start_row + 1L
 
   ; define the size for the space for the index column
-  n_index_spaces = floor(alog10(_end_row)) + 1L
+  n_index_spaces = floor(alog10(_end_row > 1L)) + 1L
 
   is_struct = size(*self.data, /type) eq 8
 
@@ -162,6 +175,7 @@ function mg_table::_output, start_row, end_row
   ; define the format codes and their lengths for our columns
   formats = (self._default_formats)[*self.types]
   format_lengths = (self._default_format_lengths)[*self.types]
+  format_lengths >= strlen(*self.column_names)
 
   ; determine how many columns can fit on a screen and the number of sections
   width = self->_termcolumns()
@@ -180,26 +194,38 @@ function mg_table::_output, start_row, end_row
     _format_lengths = format_lengths[si[s]:si[s + 1] - 1]
     _formats = formats[si[s]:si[s + 1] - 1]
 
-    if (print_header) then begin
-      _format_lengths >= (strlen((*self.column_names)[si[s]:si[s + 1] - 1]) + 1)
-      header_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
-                        + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') $
-                        + '")'
+    header_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
+                      + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') $
+                      + '")'
 
+    if (print_header) then begin
       line = strarr(sections[s])
       for c = 0L, sections[s] - 1L do begin
         line[c] = strjoin(strarr(_format_lengths[c]) + '=')
       endfor
     endif
 
+    ellipses = strarr(sections[s]) + '...'
+
+    ; header
+    if (print_header) then begin
+      i = n_section_rows * s + s
+      result[i] = [string('', (*self.column_names)[si[s]:si[s + 1] - 1], $
+                          format=header_format), $
+                   string('', line, format=header_format)]
+    endif
+
+    ; head ellipses
+    if (print_head_ellipses) then begin
+      i = 2 * print_header + n_section_rows * s + s
+      result[i] = string('', ellipses, format=header_format)
+    endif
+
+    ; data
     ; TODO: handle complex types
     data_format = '(%"%' + strtrim(n_index_spaces, 2) + 'd ' $
                     + strjoin('%' + strtrim(_format_lengths, 2) + _formats, ' ') $
                     + '")'
-    ellipses_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
-                        + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') $
-                        + '")'
-    ellipses = strarr(sections[s]) + '...'
     if (is_struct) then begin
       column_indices = lindgen(si[s + 1] - si[s]) + si[s]
       data_subset = self->_subset_struct(*self.data, $
@@ -210,18 +236,6 @@ function mg_table::_output, start_row, end_row
       data_subset = (*self.data)[si[s]:si[s + 1] - 1, _start_row:_end_row]
     endelse
 
-    if (print_header) then begin
-      i = n_section_rows * s + s
-      result[i] = [string('', (*self.column_names)[si[s]:si[s + 1] - 1], $
-                          format=header_format), $
-                   string('', line, format=header_format)]
-    endif
-
-    if (print_head_ellipses) then begin
-      i = 2 * print_header + n_section_rows * s + s
-      result[i] = string('', ellipses, format=ellipses_format)
-    endif
-
     i = 2 * print_header + print_head_ellipses + n_section_rows * s + s
     for r = 0L, n_printed_rows - 1L do begin
       result[i + r] = string(r + _start_row, $
@@ -229,9 +243,10 @@ function mg_table::_output, start_row, end_row
                              format=data_format)
     endfor
 
+    ; tail ellipses
     if (print_tail_ellipses) then begin
       i = (s + 1) * n_section_rows - 1 + s
-      result[i] = string('', ellipses, format=ellipses_format)
+      result[i] = string('', ellipses, format=header_format)
     endif
   endfor
 
@@ -266,7 +281,7 @@ end
 pro mg_table::head, n
   compile_opt strictarr
 
-  self->print, 0, mg_default(n, 10) - 1L
+  self->print, 0L, mg_default(n, 10L) - 1L
 end
 
 
@@ -279,7 +294,7 @@ end
 pro mg_table::tail, n
   compile_opt strictarr
 
-  self->print, self.n_rows - 1L - mg_default(n, 10), self.n_rows - 1L
+  self->print, self.n_rows - mg_default(n, 10), self.n_rows - 1L
 end
 
 
