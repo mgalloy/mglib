@@ -144,36 +144,41 @@ end
 function mg_table::_output, start_row, end_row
   compile_opt strictarr
 
+  ; define the start and end rows
+  _start_row = mg_default(start_row, 0L)
+  _end_row = mg_default(end_row, _start_row + self.n_printable_rows) < (self.n_rows - 1L)
+  n_printed_rows = _end_row - _start_row + 1L
+
   ; define the size for the space for the index column
-  n_index_spaces = floor(alog10(end_row)) + 1L
+  n_index_spaces = floor(alog10(_end_row)) + 1L
 
-  n_printed_rows = self.n_rows < self.n_printable_rows
-  print_ellipses = self.n_rows gt self.n_printable_rows
+  is_struct = size(*self.data, /type) eq 8
 
-  width = self->_termcolumns()
+  ; define whether to print some elements of the output
+  print_header = n_elements(*self.column_names) gt 0L
+  print_head_ellipses = _start_row gt 0L
+  print_tail_ellipses = _end_row lt (self.n_rows - 1L)
 
+  ; define the format codes and their lengths for our columns
   formats = (self._default_formats)[*self.types]
   format_lengths = (self._default_format_lengths)[*self.types]
 
-  print_header = n_elements(*self.column_names) gt 0L
-  is_struct = size(*self.data, /type) eq 8
-
+  ; determine how many columns can fit on a screen and the number of sections
+  width = self->_termcolumns()
   sections = mg_partition(format_lengths + 1, width - n_index_spaces - 1, $
-                          count=n_sections)
+                          count=n_sections, indices=si)
 
-  start_sections = [0, total(sections, /preserve_type, /cumulative)]
-  end_sections = [start_sections[1:*] - 1]
-
-  n_section_rows = 2 * print_header + n_printed_rows + print_ellipses
+  n_section_rows = 2 * print_header + n_printed_rows + print_tail_ellipses
   result = strarr(1, n_sections * (n_section_rows) + n_sections - 1L)
 
   for s = 0L, n_sections - 1L do begin
-    _format_lengths = format_lengths[start_sections[s]:end_sections[s]]
-    _formats = formats[start_sections[s]:end_sections[s]]
+    _format_lengths = format_lengths[si[s]:si[s + 1] - 1]
+    _formats = formats[si[s]:si[s + 1] - 1]
 
     if (print_header) then begin
-      format_lengths[start_sections[s]:end_sections[s]] >= (strlen((*self.column_names)[start_sections[s]:end_sections[s]]) + 1)
+      _format_lengths >= (strlen((*self.column_names)[si[s]:si[s + 1] - 1]) + 1)
       header_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+
       line = strarr(sections[s])
       for c = 0L, sections[s] - 1L do begin
         line[c] = strjoin(strarr(_format_lengths[c]) + '=')
@@ -182,40 +187,31 @@ function mg_table::_output, start_row, end_row
 
     ; TODO: handle complex types
     data_format = '(%"%' + strtrim(n_index_spaces, 2) + 'd ' + strjoin('%' + strtrim(_format_lengths, 2) + _formats, ' ') + '")'
-    if (self.n_rows gt self.n_printable_rows) then begin
-      ellipses_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
-      ellipses = strarr(sections[s]) + '...'
-      if (is_struct) then begin
-        column_indices = lindgen(end_sections[s] - start_sections[s] + 1L) + start_sections[s]
-        data_subset = self->_subset_struct(*self.data, column_indices, 1B, [0, self.n_printable_rows - 1, 1])
-      endif else begin
-        data_subset = (*self.data)[start_sections[s]:end_sections[s], $
-                                   0:self.n_printable_rows - 1]
-      endelse
+    ellipses_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+    ellipses = strarr(sections[s]) + '...'
+    if (is_struct) then begin
+      column_indices = lindgen(si[s + 1] - si[s]) + si[s]
+      data_subset = self->_subset_struct(*self.data, $
+                                         column_indices, $
+                                         1B, $
+                                         [_start_row, _end_row, 1L])
     endif else begin
-      if (is_struct) then begin
-        column_indices = lindgen(end_sections[s] - start_sections[s] + 1L) + start_sections[s]
-        data_subset = self->_subset_struct(*self.data, column_indices, 1B, [0, -1, 1])
-      endif else begin
-        data_subset = (*self.data)[start_sections[s]:end_sections[s], *]
-      endelse
+      data_subset = (*self.data)[si[s]:si[s + 1] - 1, _start_row:_end_row]
     endelse
 
     if (print_header) then begin
-      result[n_section_rows * s + s] = [string('', (*self.column_names)[start_sections[s]:end_sections[s]], format=header_format), $
-                                      string('', line, format=header_format)]
+      result[n_section_rows * s + s] = [string('', (*self.column_names)[si[s]:si[s + 1] - 1], format=header_format), $
+                                        string('', line, format=header_format)]
+    endif
+    for i = 0L, n_printed_rows - 1L do begin
+      result[2 * print_header + i + n_section_rows * s + s] = string(i + _start_row, $
+                                                                     is_struct $
+                                                                     ? data_subset[i] $
+                                                                     : data_subset[*, i], $
+                                                                     format=data_format)
+    endfor
 
-      for i = 0L, n_printed_rows - 1L do begin
-        result[2 + i + n_section_rows * s + s] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
-                                                      format=data_format)
-      endfor
-    endif else begin
-      for i = 0L, n_printed_rows - 1L do begin
-        result[i + s * n_section_rows + s] = string(i, is_struct ? data_subset[i] : data_subset[*, i], $
-                                                  format=data_format)
-      endfor
-    endelse
-    if (print_ellipses) then result[(s + 1) * n_section_rows - 1 + s] = string('', ellipses, format=ellipses_format)
+    if (print_tail_ellipses) then result[(s + 1) * n_section_rows - 1 + s] = string('', ellipses, format=ellipses_format)
   endfor
 
   return, result
@@ -236,7 +232,7 @@ end
 pro mg_table::print, start_row, end_row
   compile_opt strictarr
 
-  print, transpose(self->_output(start_row, end_row))
+  print, self->_output(start_row, end_row)
 end
 
 
@@ -249,7 +245,7 @@ end
 pro mg_table::head, n
   compile_opt strictarr
 
-  self->display, 0, mg_default(n, 10) - 1L
+  self->print, 0, mg_default(n, 10) - 1L
 end
 
 
@@ -262,7 +258,7 @@ end
 pro mg_table::tail, n
   compile_opt strictarr
 
-  self->display, self.n_rows - 1L - mg_default(n, 10), self.n_rows - 1L
+  self->print, self.n_rows - 1L - mg_default(n, 10), self.n_rows - 1L
 end
 
 
@@ -283,7 +279,10 @@ pro mg_table::scatter, x, y, psym=psym, _extra=e
   on_error, 2
 
   case n_params() of
-    0: mg_scatterplot_matrix, *self.data, column_names=*self.column_names, psym=psym, _extra=e
+    0: mg_scatterplot_matrix, *self.data, $
+                              column_names=*self.column_names, $
+                              psym=psym, $
+                              _extra=e
     1: message, 'only one column specified'
     2: begin
         mg_plot, self->_overloadBracketsRightSide([0], x), $
