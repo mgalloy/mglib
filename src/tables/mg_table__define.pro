@@ -168,16 +168,23 @@ function mg_table::_output, start_row, end_row
   sections = mg_partition(format_lengths + 1, width - n_index_spaces - 1, $
                           count=n_sections, indices=si)
 
-  n_section_rows = 2 * print_header + n_printed_rows + print_tail_ellipses
+  ; find size of result
+  n_section_rows = 2 * print_header + print_head_ellipses $
+                     + n_printed_rows $
+                     + print_tail_ellipses
   result = strarr(1, n_sections * (n_section_rows) + n_sections - 1L)
 
+  ; loop through the sections
   for s = 0L, n_sections - 1L do begin
+    ; format and their lengths for this section
     _format_lengths = format_lengths[si[s]:si[s + 1] - 1]
     _formats = formats[si[s]:si[s + 1] - 1]
 
     if (print_header) then begin
       _format_lengths >= (strlen((*self.column_names)[si[s]:si[s + 1] - 1]) + 1)
-      header_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+      header_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
+                        + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') $
+                        + '")'
 
       line = strarr(sections[s])
       for c = 0L, sections[s] - 1L do begin
@@ -186,8 +193,12 @@ function mg_table::_output, start_row, end_row
     endif
 
     ; TODO: handle complex types
-    data_format = '(%"%' + strtrim(n_index_spaces, 2) + 'd ' + strjoin('%' + strtrim(_format_lengths, 2) + _formats, ' ') + '")'
-    ellipses_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') + '")'
+    data_format = '(%"%' + strtrim(n_index_spaces, 2) + 'd ' $
+                    + strjoin('%' + strtrim(_format_lengths, 2) + _formats, ' ') $
+                    + '")'
+    ellipses_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
+                        + strjoin('%' + strtrim(_format_lengths, 2) + 's', ' ') $
+                        + '")'
     ellipses = strarr(sections[s]) + '...'
     if (is_struct) then begin
       column_indices = lindgen(si[s + 1] - si[s]) + si[s]
@@ -200,18 +211,28 @@ function mg_table::_output, start_row, end_row
     endelse
 
     if (print_header) then begin
-      result[n_section_rows * s + s] = [string('', (*self.column_names)[si[s]:si[s + 1] - 1], format=header_format), $
-                                        string('', line, format=header_format)]
+      i = n_section_rows * s + s
+      result[i] = [string('', (*self.column_names)[si[s]:si[s + 1] - 1], $
+                          format=header_format), $
+                   string('', line, format=header_format)]
     endif
-    for i = 0L, n_printed_rows - 1L do begin
-      result[2 * print_header + i + n_section_rows * s + s] = string(i + _start_row, $
-                                                                     is_struct $
-                                                                     ? data_subset[i] $
-                                                                     : data_subset[*, i], $
-                                                                     format=data_format)
+
+    if (print_head_ellipses) then begin
+      i = 2 * print_header + n_section_rows * s + s
+      result[i] = string('', ellipses, format=ellipses_format)
+    endif
+
+    i = 2 * print_header + print_head_ellipses + n_section_rows * s + s
+    for r = 0L, n_printed_rows - 1L do begin
+      result[i + r] = string(r + _start_row, $
+                             is_struct ? data_subset[r] : data_subset[*, r], $
+                             format=data_format)
     endfor
 
-    if (print_tail_ellipses) then result[(s + 1) * n_section_rows - 1 + s] = string('', ellipses, format=ellipses_format)
+    if (print_tail_ellipses) then begin
+      i = (s + 1) * n_section_rows - 1 + s
+      result[i] = string('', ellipses, format=ellipses_format)
+    endif
   endfor
 
   return, result
