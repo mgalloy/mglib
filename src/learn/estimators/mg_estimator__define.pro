@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-; API
+;= API
 
 ;+
 ; Use training set of data `x` and targets `y` to train the model.
@@ -66,8 +66,6 @@ end
 
 ;= property access
 
-;= lifecycle methods
-
 ;+
 ; Get property values.
 ;-
@@ -78,11 +76,16 @@ pro mg_estimator::getProperty, type=type
 end
 
 
+;+
+; Set property values.
+;-
 pro mg_estimator::setProperty, _extra=e
   compile_opt strictarr
 
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources
