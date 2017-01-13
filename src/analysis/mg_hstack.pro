@@ -18,10 +18,10 @@
 ;   y : in, required, type=array
 ;     second input array
 ;-
-function mg_hstack, array1, array2
+function mg_hstack, x, y
   compile_opt strictarr
 
-  return, mg_concatenate(array1, array2, dimension=1)
+  return, mg_concatenate(x, y, dimension=1)
 end
 
 

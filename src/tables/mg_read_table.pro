@@ -1,5 +1,20 @@
 ; docformat = 'rst'
 
+
+;+
+; If there are string elements in the structure, each line must be read and
+; parsed individually.
+;
+; :Private:
+;
+; :Params:
+;   data : in, required, type=array of structures
+;     array of structures to read data into
+;   lun : in, required, type=integer
+;     logical unit number to read from
+;   column_types : in, required, type=lonarr
+;     `SIZE` type codes for each column of the structure
+;-
 pro mg_read_table_read, data, lun, column_types
   compile_opt strictarr
 
@@ -56,7 +71,7 @@ end
 ;     logical unit number to get line from
 ;
 ; :Keywords:
-;   tokens : out, optional, type=strarr
+;   names : out, optional, type=strarr
 ;     set to a named variable to retrieve the string values of the tokens on
 ;     the line
 ;-

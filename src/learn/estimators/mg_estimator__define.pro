@@ -29,7 +29,7 @@ end
 ;   fltarr(n_samples)
 ;
 ; :Params:
-;   x : in, required, type=fltarr(n_features, n_samples)
+;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to predict targets for
 ;   y : in, optional, type=fltarr(n_samples)
 ;     optional y-values; needed to get score

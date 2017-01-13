@@ -106,5 +106,5 @@ end
 pro mg_transformer__define
   compile_opt strictarr
 
-  !null = {mg_transformer, inherits mg_estimator}
+  !null = {mg_transformer, inherits IDL_Object}
 end

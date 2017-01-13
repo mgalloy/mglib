@@ -102,7 +102,7 @@ end
 pro mg_tfidftransformer__define
   compile_opt strictarr
 
-  !null = {mg_tfidftransformer, inherits mg_tansformer, $
+  !null = {mg_tfidftransformer, inherits mg_transformer, $
            feature_names: ptr_new()}
 end
 

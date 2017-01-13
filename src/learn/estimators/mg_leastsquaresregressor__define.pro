@@ -38,7 +38,7 @@ end
 ;   `lonarr(n_samples)`
 ;
 ; :Params:
-;   x : in, required, type=fltarr(n_features, n_samples)
+;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to predict targets for
 ;   y : in, optional, type=lonarr(n_samples)
 ;     optional y-values; needed to get score; values must be -1 or 1
