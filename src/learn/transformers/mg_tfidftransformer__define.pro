@@ -24,8 +24,10 @@
 ;   data : in, required, type=strarr
 ;     array of strings to transform
 ;-
-function mg_tfidfvectorizer::fit_transform, data
+function mg_tfidftransformer::fit_transform, data
   compile_opt strictarr
+
+  ; TODO: split this into fit and transform
 
   n_samples = n_elements(data)
   word_counts = objarr(n_samples)   ; word frequency by document
@@ -72,7 +74,7 @@ end
 
 ;= property access
 
-pro mg_tfidfvectorizer::getProperty, feature_names=feature_names
+pro mg_tfidftransformer::getProperty, feature_names=feature_names
   compile_opt strictarr
 
   if (arg_present(feature_names)) then feature_names = *self.feature_names
@@ -81,14 +83,14 @@ end
 
 ;= lifecyle methods
 
-pro mg_tfidfvectorizer::cleanup
+pro mg_tfidftransformer::cleanup
   compile_opt strictarr
 
   ptr_free, self.feature_names
 end
 
 
-function mg_tfidfvectorizer::init
+function mg_tfidftransformer::init
   compile_opt strictarr
 
   self.feature_names = ptr_new(/allocate_heap)
@@ -97,10 +99,10 @@ function mg_tfidfvectorizer::init
 end
 
 
-pro mg_tfidfvectorizer__define
+pro mg_tfidftransformer__define
   compile_opt strictarr
 
-  !null = {mg_tfidfvectorizer, inherits IDL_Object, $
+  !null = {mg_tfidftransformer, inherits mg_tansformer, $
            feature_names: ptr_new()}
 end
 
@@ -110,7 +112,7 @@ end
 sample = ['problem of evil', $
           'evil queen', $
           'horizon problem']
-tfidf = mg_tfidfvectorizer()
+tfidf = mg_tfidftransformer()
 transformed_data = tfidf->fit_transform(sample)
 column_width = 18
 print, tfidf.feature_names, format='(5A' + strtrim(column_width) + ')'

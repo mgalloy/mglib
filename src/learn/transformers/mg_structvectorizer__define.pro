@@ -64,6 +64,8 @@ end
 function mg_structvectorizer::fit_transform, data
   compile_opt strictarr
 
+  ; TODO: split this into fit and transform
+
   n_samples = n_elements(data)
   n_columns = 0L
   columns = list()
@@ -136,7 +138,7 @@ end
 pro mg_structvectorizer__define
   compile_opt strictarr
 
-  !null = {mg_structvectorizer, inherits IDL_Object, $
+  !null = {mg_structvectorizer, inherits mg_transformer, $
            feature_names: ptr_new()}
 end
 
