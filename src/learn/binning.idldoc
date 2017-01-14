@@ -1,21 +1,20 @@
 n = 100
 wave = mg_learn_dataset('wave', n_samples=n)
+
 mg_train_test_split, wave.data, wave.target, $
-		     x_train=x_train, y_train=y_train, $
-		     x_test=x_test, y_test=y_test, seed=2
+                     x_train=x_train, y_train=y_train, $
+                     x_test=x_test, y_test=y_test, seed=2
+
 h_train = mg_histogram(x_train, bin_indices=train_bins, nbins=10)
 h_test = mg_histogram(x_test, bin_indices=test_bins, nbins=10)
 
 train_bins = reform(train_bins, 1, n_elements(train_bins))
 test_bins = reform(test_bins, 1, n_elements(test_bins))
 
-ohv = mg_onehotvectorizer(categorical_columns=[0])
+ohv = mg_onehotencoder(categorical_columns=[0])
 x_train_binned = ohv->fit_transform(train_bins, $
-	       	 		    feature_names=['bins'], $
-			            new_feature_names=new_train_feature_names)
-x_test_binned = ohv->fit_transform(test_bins, $
-         	 		   feature_names=['bins'], $
-			           new_feature_names=new_test_feature_names)
+                                    feature_names=['bins'])
+x_test_binned = ohv->transform(test_bins)
 
 lsr = mg_leastsquaresregressor()
 lsr->fit, x_train_binned, y_train

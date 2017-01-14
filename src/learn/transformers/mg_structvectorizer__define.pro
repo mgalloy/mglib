@@ -16,24 +16,28 @@
 
 ;= helper methods
 
-function mg_structvectorizer::_expandCategories, column, column_name, $
-                                                 feature_names=feature_names
+function mg_structvectorizer::_fitCategories, column, column_index, column_name
+  compile_opt strictarr
+
+  h = mg_word_count(column)
+
+  n_categories = h->count()
+  categories_list = h->keys()
+  categories = categories_list->toArray()
+  obj_destroy, [h, categories_list]
+
+  return, {index: column_index, n_categories: n_categories, categories: categories}
+end
+
+
+function mg_structvectorizer::_expandCategories, column, fit
   compile_opt strictarr
 
   n_samples = n_elements(column)
 
-  h = mg_word_count(column)
+  result = lonarr(fit.n_categories, n_samples)
+  for c = 0L, fit.n_categories - 1L do result[c, *] = column eq fit.categories[c]
 
-  n_keys = h->count()
-  keys_list = h->keys()
-  keys = keys_list->toArray()
-  obj_destroy, [h, keys_list]
-
-  result = lonarr(n_keys, n_samples)
-  feature_names = column_name + '=' + keys
-  for k = 0L, n_keys - 1L do begin
-    result[k, *] = column eq keys[k]
-  endfor
   return, result
 end
 
@@ -50,6 +54,40 @@ end
 
 ;= API
 
+pro mg_structvectorizer::fit, x, _extra=e
+  compile_opt strictarr
+
+  self->mg_transformer::fit, _extra=e
+
+  n_samples = n_elements(x)
+  self.n_columns = 0L
+  feature_names = list()
+  self.result_type = 0L
+  field_names = tag_names(x)
+  self.columns->remove, /all
+
+  for c = 0L, n_tags(x) - 1L do begin
+    type = size(x.(c), /type)
+
+    if (type eq 7) then begin
+      self.result_type = self->_typeOrder(3, self.result_type)
+      column_fit = self->_fitCategories(x.(c), c, field_names[c])
+      feature_names->add, field_names[c] + '=' + column_fit.categories, /extract
+      self.n_columns += column_fit.n_categories
+      self.columns->add, column_fit
+    endif else begin
+      self.result_type = self->_typeOrder(type, self.result_type)
+      feature_names->add, field_names[c]
+      self.n_columns += 1
+      self.columns->add, {index: c, n_categories: 0}
+    endelse
+  endfor
+
+  *self.feature_names = feature_names->toArray()
+  obj_destroy, feature_names
+end
+
+
 ;+
 ; Transforms an array of structures into a 2-dimensional array. String fields
 ; in the structures will get expanded into a set of columns.
@@ -58,62 +96,43 @@ end
 ;   fltarr
 ;
 ; :Params:
-;   data : in, required, type=array of structures
+;   x : in, required, type=array of structures
 ;     array of structures to transform
 ;-
-function mg_structvectorizer::fit_transform, data
+function mg_structvectorizer::transform, x
   compile_opt strictarr
 
-  ; TODO: split this into fit and transform
+  n_samples = n_elements(x)
 
-  n_samples = n_elements(data)
-  n_columns = 0L
-  columns = list()
-  feature_names = list()
-  result_type = 0L
-  field_names = tag_names(data)
-  for c = 0L, n_tags(data) - 1L do begin
-    type = size(data.(c), /type)
-
-    if (type eq 7) then begin
-      result_type = self->_typeOrder(3, result_type)
-      expanded_column = self->_expandCategories(data.(c), field_names[c], feature_names=column_feature_names)
-      feature_names->add, column_feature_names, /extract
-      n_columns += (size(expanded_column, /dimensions))[0]
-      columns->add, expanded_column
+  new_x = make_array(dimension=[self.n_columns, n_samples], $
+                     type=self.result_type)
+  current_new_x_column = 0L
+  foreach fit, self.columns, c do begin
+    if (fit.n_categories eq 0L) then begin
+      new_x[current_new_x_column++, *] = x.(fit.index)
     endif else begin
-      result_type = self->_typeOrder(type, result_type)
-      feature_names->add, field_names[c]
-      n_columns += 1
-      columns->add, data.(c)
-    endelse
-  endfor
-
-  result = make_array(dimension=[n_columns, n_samples], type=result_type)
-  current_column = 0L
-  foreach col, columns do begin
-    if (size(col, /n_dimensions) eq 2) then begin
-      result[current_column, 0] = col
-      current_column += (size(col, /dimensions))[0]
-    endif else begin
-      result[current_column, *] = col
-      current_column += 1
+      new_x[current_new_x_column, 0] = self->_expandCategories(x.(fit.index), fit)
+      current_new_x_column += fit.n_categories
     endelse
   endforeach
 
-  *self.feature_names = feature_names->toArray()
-
-  obj_destroy, [columns, feature_names]
-  return, result
+  return, new_x
 end
 
 
 ;= property access
 
-pro mg_structvectorizer::getProperty, feature_names=feature_names
+pro mg_structvectorizer::getProperty, _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(feature_names)) then feature_names = *self.feature_names
+  if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
+end
+
+
+pro mg_structvectorizer::setProperty, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end
 
 
@@ -122,14 +141,19 @@ end
 pro mg_structvectorizer::cleanup
   compile_opt strictarr
 
-  ptr_free, self.feature_names
+  obj_destroy, self.columns
+
+  self->mg_transform::cleanup
 end
 
 
-function mg_structvectorizer::init
+function mg_structvectorizer::init, _extra=e
   compile_opt strictarr
 
-  self.feature_names = ptr_new(/allocate_heap)
+  if (~self->mg_transformer::init(_extra=e)) then return, 0
+
+  self.columns = list()
+  self.n_columns = 0L
 
   return, 1
 end
@@ -139,7 +163,9 @@ pro mg_structvectorizer__define
   compile_opt strictarr
 
   !null = {mg_structvectorizer, inherits mg_transformer, $
-           feature_names: ptr_new()}
+           columns: obj_new(), $
+           n_columns: 0L, $
+           result_type: 0L}
 end
 
 
