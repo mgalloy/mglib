@@ -146,6 +146,8 @@ pro mg_onehotencoder::cleanup
 
   ptr_free, self.n_categories
   obj_destroy, self.categories
+
+  self->mg_transformer::cleanup
 end
 
 
@@ -187,7 +189,7 @@ print, data_df
 
 print
 
-new_data_df = mg_table(new_data, column_names=new_feature_names)
+new_data_df = mg_table(new_data, column_names=cv.feature_names)
 print, new_data_df
 
 obj_destroy, [data_df, new_data_df]
