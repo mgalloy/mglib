@@ -29,7 +29,7 @@ pro mg_transformer::fit, x, feature_names=feature_names
   compile_opt strictarr
 
   if (n_elements(feature_names) eq 0L) then begin
-    if (*self.feature_names eq 0L) then begin
+    if (n_elements(*self.feature_names) eq 0L) then begin
       dims = size(x, /dimensions)
       self->setProperty, feature_names=strtrim(lindgen(dims[0]), 2)
     endif
