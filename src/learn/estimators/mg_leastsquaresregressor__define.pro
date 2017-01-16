@@ -34,9 +34,9 @@ pro mg_leastsquaresregressor::fit, x, y
     _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
     _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
     _x[1, 0] = x
-    *self.weights = la_least_squares(_x, y)
+    *self._weights = la_least_squares(_x, y)
   endif else begin
-    *self.weights = la_least_squares(x, y)
+    *self._weights = la_least_squares(x, y)
   endelse
 end
 
@@ -68,9 +68,9 @@ function mg_leastsquaresregressor::predict, x, y, score=score
     _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
     _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
     _x[1, 0] = x
-    y_predict = reform(_x ## *self.weights)
+    y_predict = reform(_x ## *self._weights)
   endif else begin
-    y_predict = reform(x ## *self.weights)
+    y_predict = reform(x ## *self._weights)
   endelse
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
@@ -78,6 +78,17 @@ function mg_leastsquaresregressor::predict, x, y, score=score
   endif
 
   return, y_predict
+end
+
+
+;= overload methods
+
+function mg_leastsquaresregressor::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'LSR'
+  _specs = string(self.fit_intercept ? 'True' : 'False', format='(%"<fit intercept: %s>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -91,9 +102,9 @@ pro mg_leastsquaresregressor::getProperty, fit_intecept=fit_intercept, $
 
   if (arg_present(fit_intercept)) then fit_intercept = self.fit_intercept
   if (arg_present(intercept)) then begin
-    intercept = self.fit_intercept ? (*self.weights)[0] : 0.0
+    intercept = self.fit_intercept ? (*self._weights)[0] : 0.0
   endif
-  if (arg_present(coefficients)) then coefficients = (*self.weights)[1:*]
+  if (arg_present(coefficients)) then coefficients = (*self._weights)[1:*]
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
 
@@ -112,7 +123,7 @@ end
 pro mg_leastsquaresregressor::cleanup
   compile_opt strictarr
 
-  ptr_free, self.weights
+  ptr_free, self._weights
   self->mg_regressor::cleanup
 end
 
@@ -123,7 +134,7 @@ function mg_leastsquaresregressor::init, _extra=e
   if (~self->mg_regressor::init(_extra=e)) then return, 0
 
   self.fit_intercept = 1B
-  self.weights = ptr_new(/allocate_heap)
+  self._weights = ptr_new(/allocate_heap)
 
   self->setProperty, _extra=e
 
@@ -135,8 +146,8 @@ pro mg_leastsquaresregressor__define
   compile_opt strictarr
 
   !null = {mg_leastsquaresregressor, inherits mg_regressor, $
-           weights: ptr_new(), $
            fit_intercept: 0B, $
+           _weights: ptr_new() $
           }
 end
 

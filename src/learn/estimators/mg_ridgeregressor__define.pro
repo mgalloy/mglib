@@ -27,7 +27,7 @@ pro mg_ridgeregressor::fit, x, y
   _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
   _x[1, 0] = x
 
-  *self.weights = la_least_squares(transpose(_x) ## _x + sqrt(self.alpha) * identity(dims[0] + 1), $
+  *self._weights = la_least_squares(transpose(_x) ## _x + sqrt(self.alpha) * identity(dims[0] + 1), $
                                    transpose(_x) ## y)
 end
 
@@ -58,13 +58,24 @@ function mg_ridgeregressor::predict, x, y, score=score
   _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
   _x[1, 0] = x
 
-  y_predict = reform(*self.weights # _x)
+  y_predict = reform(*self._weights # _x)
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = self->_r2_score(y, y_predict)
   endif
 
   return, y_predict
+end
+
+
+;= overload methods
+
+function mg_ridgeregressor::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'RR'
+  _specs = string(self.alpha, format='(%"<alpha: %0.2f>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -76,8 +87,8 @@ pro mg_ridgeregressor::getProperty, intercept=intercept, $
                                     _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(intercept)) then intercept = (*self.weights)[0]
-  if (arg_present(coefficients)) then coefficients = (*self.weights)[1:*]
+  if (arg_present(intercept)) then intercept = (*self._weights)[0]
+  if (arg_present(coefficients)) then coefficients = (*self._weights)[1:*]
   if (arg_present(alpha)) then alpha = self.alpha
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
@@ -96,7 +107,7 @@ end
 pro mg_ridgeregressor::cleanup
   compile_opt strictarr
 
-  ptr_free, self.weights
+  ptr_free, self._weights
   self->mg_regressor::cleanup
 end
 
@@ -106,7 +117,7 @@ function mg_ridgeregressor::init, alpha=alpha, _extra=e
 
   if (~self->mg_regressor::init(_extra=e)) then return, 0
 
-  self.weights = ptr_new(/allocate_heap)
+  self._weights = ptr_new(/allocate_heap)
 
   self->setProperty, alpha=mg_default(alpha, 1.0), _extra=e
 
@@ -119,7 +130,7 @@ pro mg_ridgeregressor__define
 
   !null = {mg_ridgeregressor, inherits mg_regressor, $
            alpha: 0.0, $
-           weights: ptr_new() $
+           _weights: ptr_new() $
           }
 end
 

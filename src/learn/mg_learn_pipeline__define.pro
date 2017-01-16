@@ -39,9 +39,11 @@ end
 
 ;= property access
 
-pro mg_learn_pipeline::getProperty
+pro mg_learn_pipeline::getProperty, steps=steps, n_steps=n_steps
   compile_opt strictarr
 
+  if (arg_present(steps)) then steps = *self.steps
+  if (arg_present(n_steps)) then n_steps = n_elements(*self.steps)
 end
 
 

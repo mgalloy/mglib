@@ -64,6 +64,17 @@ function mg_estimator::score, x, y
 end
 
 
+;= overload methods
+
+function mg_estimator::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = self.type
+  _specs = string(format='(%"<>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
+end
+
+
 ;= property access
 
 ;+
