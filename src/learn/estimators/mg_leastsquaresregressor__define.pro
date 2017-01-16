@@ -5,6 +5,12 @@
 ;
 ; :Categories:
 ;   regressor
+;
+; :Properties:
+;   fit_intercept : type=boolean
+;     whether to calculate the intercept for this model. If set to false, no
+;     intercept will be used in calculations (e.g. data is expected to be
+;     already centered).
 ;-
 
 ;= API
@@ -23,11 +29,15 @@ pro mg_leastsquaresregressor::fit, x, y
 
   dims = size(x, /dimensions)
   type = size(x, /type)
-  _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
-  _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
-  _x[1, 0] = x
 
-  *self.weights = la_least_squares(_x, y)
+  if (self.fit_intercept) then begin
+    _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
+    _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
+    _x[1, 0] = x
+    *self.weights = la_least_squares(_x, y)
+  endif else begin
+    *self.weights = la_least_squares(x, y)
+  endelse
 end
 
 
@@ -53,11 +63,15 @@ function mg_leastsquaresregressor::predict, x, y, score=score
 
   dims = size(x, /dimensions)
   type = size(x, /type)
-  _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
-  _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
-  _x[1, 0] = x
 
-  y_predict = reform(_x ## *self.weights)
+  if (self.fit_intercept) then
+    _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
+    _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
+    _x[1, 0] = x
+    y_predict = reform(_x ## *self.weights)
+  endif else begin
+    y_predict = reform(x ## *self.weights)
+  endelse
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = self->_r2_score(y, y_predict)
@@ -69,14 +83,27 @@ end
 
 ;= property access
 
-pro mg_leastsquaresregressor::getProperty, intercept=intercept, $
+pro mg_leastsquaresregressor::getProperty, fit_intecept=fit_intercept, $
+                                           intercept=intercept, $
                                            coefficients=coefficients, $
                                            _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(intercept)) then intercept = (*self.weights)[0]
+  if (arg_present(fit_intercept)) then fit_intercept = self.fit_intercept
+  if (arg_present(intercept)) then begin
+    intercept = self.fit_intercept ? (*self.weights)[0] : 0.0
+  endif
   if (arg_present(coefficients)) then coefficients = (*self.weights)[1:*]
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
+end
+
+
+pro mg_leastsquaresregressor::setProperty, fit_intercept=fit_intercept, $
+                                           _extra=e
+  compile_opt strictarr
+
+  if (n_elements(fit_intercept) gt 0L) then self.fit_intercept = keyword_set(fit_intercept)
+  if (n_elements(e) gt 0L) then self->mg_regressor::setProperty, _extra=e
 end
 
 
@@ -95,7 +122,10 @@ function mg_leastsquaresregressor::init, _extra=e
 
   if (~self->mg_regressor::init(_extra=e)) then return, 0
 
+  self.fit_intercept = 1B
   self.weights = ptr_new(/allocate_heap)
+
+  self->setProperty, _extra=e
 
   return, 1
 end
@@ -105,7 +135,8 @@ pro mg_leastsquaresregressor__define
   compile_opt strictarr
 
   !null = {mg_leastsquaresregressor, inherits mg_regressor, $
-           weights: ptr_new() $
+           weights: ptr_new(), $
+           fit_intercept: 0B, $
           }
 end
 
