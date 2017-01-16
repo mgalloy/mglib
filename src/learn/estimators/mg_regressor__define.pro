@@ -29,7 +29,7 @@ function mg_regressor::_overloadHelp, varname
   compile_opt strictarr
 
   _type = self.type
-  _specs = string(format='(%"<>")')
+  _specs = '<>'
   return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 

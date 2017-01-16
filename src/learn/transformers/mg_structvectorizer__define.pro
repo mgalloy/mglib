@@ -54,32 +54,32 @@ end
 
 ;= API
 
-pro mg_structvectorizer::fit, x, _extra=e
+pro mg_structvectorizer::fit, x, y, _extra=e
   compile_opt strictarr
 
   self->mg_transformer::fit, _extra=e
 
   n_samples = n_elements(x)
-  self.n_columns = 0L
+  self._n_columns = 0L
   feature_names = list()
-  self.result_type = 0L
+  self._result_type = 0L
   field_names = tag_names(x)
-  self.columns->remove, /all
+  self._columns->remove, /all
 
   for c = 0L, n_tags(x) - 1L do begin
     type = size(x.(c), /type)
 
     if (type eq 7) then begin
-      self.result_type = self->_typeOrder(3, self.result_type)
+      self._result_type = self->_typeOrder(3, self._result_type)
       column_fit = self->_fitCategories(x.(c), c, field_names[c])
       feature_names->add, field_names[c] + '=' + column_fit.categories, /extract
-      self.n_columns += column_fit.n_categories
-      self.columns->add, column_fit
+      self._n_columns += column_fit.n_categories
+      self._columns->add, column_fit
     endif else begin
-      self.result_type = self->_typeOrder(type, self.result_type)
+      self._result_type = self->_typeOrder(type, self._result_type)
       feature_names->add, field_names[c]
-      self.n_columns += 1
-      self.columns->add, {index: c, n_categories: 0}
+      self._n_columns += 1
+      self._columns->add, {index: c, n_categories: 0}
     endelse
   endfor
 
@@ -104,10 +104,10 @@ function mg_structvectorizer::transform, x
 
   n_samples = n_elements(x)
 
-  new_x = make_array(dimension=[self.n_columns, n_samples], $
-                     type=self.result_type)
+  new_x = make_array(dimension=[self._n_columns, n_samples], $
+                     type=self._result_type)
   current_new_x_column = 0L
-  foreach fit, self.columns, c do begin
+  foreach fit, self._columns, c do begin
     if (fit.n_categories eq 0L) then begin
       new_x[current_new_x_column++, *] = x.(fit.index)
     endif else begin
@@ -117,6 +117,17 @@ function mg_structvectorizer::transform, x
   endforeach
 
   return, new_x
+end
+
+
+;= overload methods
+
+function mg_structvectorizer::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'SVEC'
+  _specs = '<>'
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -141,7 +152,7 @@ end
 pro mg_structvectorizer::cleanup
   compile_opt strictarr
 
-  obj_destroy, self.columns
+  obj_destroy, self._columns
 
   self->mg_transform::cleanup
 end
@@ -152,8 +163,8 @@ function mg_structvectorizer::init, _extra=e
 
   if (~self->mg_transformer::init(_extra=e)) then return, 0
 
-  self.columns = list()
-  self.n_columns = 0L
+  self._columns = list()
+  self._n_columns = 0L
 
   return, 1
 end
@@ -163,9 +174,9 @@ pro mg_structvectorizer__define
   compile_opt strictarr
 
   !null = {mg_structvectorizer, inherits mg_transformer, $
-           columns: obj_new(), $
-           n_columns: 0L, $
-           result_type: 0L}
+           _columns: obj_new(), $
+           _n_columns: 0L, $
+           _result_type: 0L}
 end
 
 

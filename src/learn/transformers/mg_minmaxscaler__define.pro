@@ -3,7 +3,7 @@
 
 ;= API
 
-pro mg_minmaxscaler::fit, x, _extra=e
+pro mg_minmaxscaler::fit, x, y, _extra=e
   compile_opt strictarr
 
   self->mg_transformer::fit, _extra=e
@@ -11,10 +11,10 @@ pro mg_minmaxscaler::fit, x, _extra=e
   dims = size(x, /dimensions)
   n_features = dims[0]
 
-  *self.ranges = make_array(dimension=[n_features, 2], type=size(x, /type))
+  *self_ranges = make_array(dimension=[n_features, 2], type=size(x, /type))
   x_min = min(x, dimension=2, max=x_max)
-  (*self.ranges)[*, 0] = x_min
-  (*self.ranges)[*, 1] = x_max
+  (*self_ranges)[*, 0] = x_min
+  (*self_ranges)[*, 1] = x_max
 end
 
 
@@ -25,12 +25,23 @@ function mg_minmaxscaler::transform, x
   new_x = make_array(dimension=dims, type=size(x, /type), /nozero)
   n_features = dims[0]
 
-  slopes = 1.0 / ((*self.ranges)[*, 1] - (*self.ranges)[*, 0])
+  slopes = 1.0 / ((*self_ranges)[*, 1] - (*self_ranges)[*, 0])
   for f = 0L, n_features - 1L do begin
-    new_x[f, *] = slopes[f] * (x[f, *] - (*self.ranges)[f, 0])
+    new_x[f, *] = slopes[f] * (x[f, *] - (*self_ranges)[f, 0])
   endfor
 
   return, new_x
+end
+
+
+;= overload methods
+
+function mg_minmaxscaler::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'MINMAX'
+  _specs = '<>'
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -55,7 +66,7 @@ end
 pro mg_minmaxscaler::cleanup
   compile_opt strictarr
 
-  ptr_free, self.ranges
+  ptr_free, self_ranges
   self->mg_transformer::cleanup
 end
 
@@ -65,7 +76,7 @@ function mg_minmaxscaler::init, _extra=e
 
   if (~self->mg_transformer::init(_extra=e)) then return, 0
 
-  self.ranges = ptr_new(/allocate_heap)
+  self_ranges = ptr_new(/allocate_heap)
 
   return, 1
 end
@@ -75,7 +86,7 @@ pro mg_minmaxscaler__define
   compile_opt strictarr
 
   !null = {mg_minmaxscaler, inherits mg_transformer, $
-           ranges: ptr_new()}
+           _ranges: ptr_new()}
 end
 
 

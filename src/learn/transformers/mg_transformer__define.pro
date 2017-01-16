@@ -68,11 +68,22 @@ end
 ;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to fit and transform
 ;-
-function mg_transformer::fit_transform, x, _extra=e
+function mg_transformer::fit_transform, x, y, _extra=e
   compile_opt strictarr
 
-  self->fit, x, _extra=e
+  self->fit, x, y, _extra=e
   return, self->transform(x)
+end
+
+
+;= overload methods
+
+function mg_transformer::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'TRANS'
+  _specs = '<>'
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 

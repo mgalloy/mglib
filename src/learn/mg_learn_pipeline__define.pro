@@ -2,14 +2,18 @@
 
 ;= API
 
-pro mg_learn_pipeline::fit, x, y
+pro mg_learn_pipeline::fit, x, y, feature_names=feature_names, _extra=e
   compile_opt strictarr
 
   new_x = x
-  for s = 0L, n_elements(*self.steps) - 1L do begin
+  _feature_names = mg_default(feature_names, ((*self.steps)[0]).feature_names)
+  for s = 0L, n_elements(*self.steps) - 2L do begin
     step = (*self.steps)[s]
-    new_x = step->fit_transform(new_x, y)
+    help, step
+    new_x = step->fit_transform(new_x, y, feature_names=_feature_names)
   endfor
+  last_step = (*self.steps)[-1]
+  new_x = last_step->fit(new_x, y, feature_names=_feature_names)
 end
 
 
@@ -39,11 +43,17 @@ end
 
 ;= property access
 
-pro mg_learn_pipeline::getProperty, steps=steps, n_steps=n_steps
+pro mg_learn_pipeline::getProperty, steps=steps, $
+                                    n_steps=n_steps, $
+                                    feature_names=feature_names
   compile_opt strictarr
 
   if (arg_present(steps)) then steps = *self.steps
   if (arg_present(n_steps)) then n_steps = n_elements(*self.steps)
+  if (arg_present(feature_names)) then begin
+    last_step = (*self.steps)[-1]
+    feature_names = last_step.feature_names
+  endif
 end
 
 
@@ -77,4 +87,23 @@ pro mg_learn_pipeline__define
 
   !null = {mg_learn_pipeline, inherits IDL_Object, $
            steps: ptr_new()}
+end
+
+
+; main-level program
+
+data = [{rooms: 4, neighborhood: 'Queen Anne'}, $
+        {rooms: 3, neighborhood: 'Fremont'}, $
+        {rooms: 3, neighborhood: 'Wallingford'}, $
+        {rooms: 2, neighborhood: 'Fremont'}]
+prices = [850000, 700000, 650000, 600000]
+
+pipeline = mg_learn_pipeline([mg_structvectorizer(), $
+                              mg_polynomialfeatures(degree=2), $
+                              mg_leastsquaresregressor()])
+pipeline->fit, data, prices
+prices_predict = pipeline->predict(data, prices, score=score)
+
+obj_destroy, pipeline
+
 end

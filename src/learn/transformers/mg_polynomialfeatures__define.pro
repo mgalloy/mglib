@@ -46,7 +46,7 @@ end
 
 ;= API
 
-pro mg_polynomialfeatures::fit, x, _extra=e
+pro mg_polynomialfeatures::fit, x, y, _extra=e
   compile_opt strictarr
 
   self->mg_transformer::fit, _extra=e
@@ -54,12 +54,12 @@ pro mg_polynomialfeatures::fit, x, _extra=e
   dims = size(x, /dimensions)
   n_features = dims[0]
 
-  *self.combinations = mg_find_combinations(n_features + 1, $
+  *self._combinations = mg_find_combinations(n_features + 1, $
                                            self.degree, $
                                            /with_replacement, $
                                            count=n_combinations)
 
-  *self.feature_names = self->_find_feature_names(*self.combinations, $
+  *self.feature_names = self->_find_feature_names(*self._combinations, $
                                                   ['1', *self.feature_names])
 end
 
@@ -72,15 +72,26 @@ function mg_polynomialfeatures::transform, x
   n_features = dims[0]
   n_samples = dims[1]
 
-  cdims = size(*self.combinations, /dimensions)
+  cdims = size(*self._combinations, /dimensions)
   new_x = make_array(dimension=[cdims[1], n_samples], type=type, value=fix(1, type=type))
   for i = 1L, cdims[1] - 1L do begin
     for d = 0L, self.degree - 1 do begin
-      col = (*self.combinations)[d, i]
+      col = (*self._combinations)[d, i]
       if (col ne 0L) then new_x[i, *] *= x[col - 1, *]
     endfor
   endfor
   return, new_x
+end
+
+
+;= overload methods
+
+function mg_polynomialfeatures::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'POLYF'
+  _specs = string(self.degree, format='(%"<degree: %d>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -107,7 +118,7 @@ end
 pro mg_polynomialfeatures::cleanup
   compile_opt strictarr
 
-  ptr_free, self.combinations
+  ptr_free, self._combinations
   self->mg_transformer::cleanup
 end
 
@@ -117,7 +128,7 @@ function mg_polynomialfeatures::init, _extra=e
 
   if (~self->mg_transformer::init(_extra=e)) then return, 0
 
-  self.combinations = ptr_new(/allocate_heap)
+  self._combinations = ptr_new(/allocate_heap)
 
   self.degree = 2L
   self->setProperty, _extra=e
@@ -131,7 +142,7 @@ pro mg_polynomialfeatures__define
 
   !null = {mg_polynomialfeatures, inherits mg_transformer, $
            degree: 0L, $
-           combinations: ptr_new()}
+           _combinations: ptr_new()}
 end
 
 

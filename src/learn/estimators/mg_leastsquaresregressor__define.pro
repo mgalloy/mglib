@@ -64,7 +64,7 @@ function mg_leastsquaresregressor::predict, x, y, score=score
   dims = size(x, /dimensions)
   type = size(x, /type)
 
-  if (self.fit_intercept) then
+  if (self.fit_intercept) then begin
     _x = make_array(dimension=[dims[0] + 1, dims[1]], type=type)
     _x[0, *] = fltarr(dims[1]) + fix(1.0, type=type)
     _x[1, 0] = x

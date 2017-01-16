@@ -20,27 +20,27 @@ end
 
 ;= API
 
-pro mg_onehotencoder::fit, x, _extra=e
+pro mg_onehotencoder::fit, x, y, _extra=e
   compile_opt strictarr
 
   self->mg_transformer::fit, _extra=e
 
   n_cat_columns = n_elements(*self.categorical_columns)
 
-  *self.n_categories = lonarr(n_cat_columns)
-  self.categories->remove, /all
+  *self._n_categories = lonarr(n_cat_columns)
+  self._categories->remove, /all
 
   for c = 0L, n_cat_columns - 1L do begin
     col = x[(*self.categorical_columns)[c], *]
     col_categories = col[uniq(col, sort(col))]
 
-    (*self.n_categories)[c] = n_elements(col_categories)
-    self.categories->add, col_categories
+    (*self._n_categories)[c] = n_elements(col_categories)
+    self._categories->add, col_categories
   endfor
 
   dims = size(x, /dimensions)
   type = size(x, /type)
-  new_n_columns = dims[0] - n_cat_columns + total(*self.n_categories, /preserve_type)
+  new_n_columns = dims[0] - n_cat_columns + total(*self._n_categories, /preserve_type)
 
   new_feature_names = strarr(new_n_columns)
 
@@ -59,10 +59,10 @@ pro mg_onehotencoder::fit, x, _extra=e
       c = last_col + 1
     endif else begin
       ; expand next categorical column
-      new_names = type eq 1 ? fix((self.categories)[next_cat_column]) : (self.categories)[next_cat_column]
+      new_names = type eq 1 ? fix((self._categories)[next_cat_column]) : (self._categories)[next_cat_column]
       new_feature_names[new_c] = (*self.feature_names)[c] + '=' + strtrim(new_names, 2)
       c += 1
-      new_c += (*self.n_categories)[next_cat_column]
+      new_c += (*self._n_categories)[next_cat_column]
       next_cat_column += 1
     endelse
   endwhile
@@ -88,7 +88,7 @@ function mg_onehotencoder::transform, x
 
   dims = size(x, /dimensions)
   type = size(x, /type)
-  new_n_columns = dims[0] - n_cat_columns + total(*self.n_categories, /preserve_type)
+  new_n_columns = dims[0] - n_cat_columns + total(*self._n_categories, /preserve_type)
   new_x = make_array(dimension=[new_n_columns, dims[1]], type=type)
 
   c = 0L
@@ -107,15 +107,26 @@ function mg_onehotencoder::transform, x
     endif else begin
       ; expand next categorical column
       new_x[new_c, 0] = self->_expand_column(x[c, *], $
-                                             (self.categories)[next_cat_column], $
-                                             (*self.n_categories)[next_cat_column])
+                                             (self._categories)[next_cat_column], $
+                                             (*self._n_categories)[next_cat_column])
       c += 1
-      new_c += (*self.n_categories)[next_cat_column]
+      new_c += (*self._n_categories)[next_cat_column]
       next_cat_column += 1
     endelse
   endwhile
 
   return, new_x
+end
+
+
+;= overload methods
+
+function mg_onehotencoder::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'ONEHOT'
+  _specs = '<>'
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -144,8 +155,8 @@ end
 pro mg_onehotencoder::cleanup
   compile_opt strictarr
 
-  ptr_free, self.n_categories
-  obj_destroy, self.categories
+  ptr_free, self._n_categories
+  obj_destroy, self._categories
 
   self->mg_transformer::cleanup
 end
@@ -158,8 +169,8 @@ function mg_onehotencoder::init, _extra=e
 
   if (~self->mg_transformer::init(_extra=e)) then return, 0
 
-  self.categories = list()
-  self.n_categories = ptr_new(/allocate_heap)
+  self._categories = list()
+  self._n_categories = ptr_new(/allocate_heap)
 
   self->setProperty, _extra=e
 
@@ -172,8 +183,8 @@ pro mg_onehotencoder__define
 
   !null = {mg_onehotencoder, inherits mg_transformer, $
            categorical_columns: ptr_new(), $
-           categories: obj_new(), $
-           n_categories: ptr_new()}
+           _categories: obj_new(), $
+           _n_categories: ptr_new()}
 end
 
 
