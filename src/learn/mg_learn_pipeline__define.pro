@@ -92,18 +92,30 @@ end
 
 ; main-level program
 
-data = [{rooms: 4, neighborhood: 'Queen Anne'}, $
-        {rooms: 3, neighborhood: 'Fremont'}, $
-        {rooms: 3, neighborhood: 'Wallingford'}, $
-        {rooms: 2, neighborhood: 'Fremont'}]
-prices = [850000, 700000, 650000, 600000]
+; data = [{rooms: 4, neighborhood: 'Queen Anne'}, $
+;         {rooms: 3, neighborhood: 'Fremont'}, $
+;         {rooms: 3, neighborhood: 'Wallingford'}, $
+;         {rooms: 2, neighborhood: 'Fremont'}]
+; prices = [850000, 700000, 650000, 600000]
+;
+; pipeline = mg_learn_pipeline([mg_structvectorizer(), $
+;                               mg_polynomialfeatures(degree=2), $
+;                               mg_leastsquaresregressor()])
+; pipeline->fit, data, prices
+; prices_predict = pipeline->predict(data, prices, score=score)
+;
+; obj_destroy, pipeline
 
-pipeline = mg_learn_pipeline([mg_structvectorizer(), $
-                              mg_polynomialfeatures(degree=2), $
-                              mg_leastsquaresregressor()])
-pipeline->fit, data, prices
-prices_predict = pipeline->predict(data, prices, score=score)
+boston = mg_learn_dataset('boston')
+mg_train_test_split, boston.data, boston.target, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test
+scaler = mg_minmaxscaler()
+x_train_scaled = scaler->fit_transform(x_train, feature_names=boston.feature_names)
+x_test_scaled = scaler->transform(x_test)
 
-obj_destroy, pipeline
+poly = mg_polynomialfeatures(degree=2)
+x_train_poly = poly->fit_transform(x_train_scaled, feature_names=scaler.feature_names)
+x_test_poly = poly->transform(x_test_scaled)
+
+help, x_train_poly, x_test_poly
 
 end
