@@ -296,7 +296,7 @@ endfor
 
 rdata = pcomp(digits.data, nvariables=3, coefficients=c, variances=v, eigenvalues=e, /covariance)
 help, rdata, c, v, e
-eigenvectors = c / rebin(reform(e, 64, 1), 64, 3)
+eigenvectors = c / rebin(reform(e, xsize * ysize, 1), xsize * ysize, 3)
 reconstruct = rdata ## eigenvectors
 
 window, xsize=scale * n_digits * xsize, ysize=scale * n * ysize, /free, title='Digits'
