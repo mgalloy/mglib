@@ -154,7 +154,7 @@ pro mg_structvectorizer::cleanup
 
   obj_destroy, self._columns
 
-  self->mg_transform::cleanup
+  self->mg_transformer::cleanup
 end
 
 
