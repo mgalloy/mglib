@@ -11,10 +11,10 @@ pro mg_minmaxscaler::fit, x, y, _extra=e
   dims = size(x, /dimensions)
   n_features = dims[0]
 
-  *self_ranges = make_array(dimension=[n_features, 2], type=size(x, /type))
+  *self._ranges = make_array(dimension=[n_features, 2], type=size(x, /type))
   x_min = min(x, dimension=2, max=x_max)
-  (*self_ranges)[*, 0] = x_min
-  (*self_ranges)[*, 1] = x_max
+  (*self._ranges)[*, 0] = x_min
+  (*self._ranges)[*, 1] = x_max
 end
 
 
@@ -25,9 +25,9 @@ function mg_minmaxscaler::transform, x
   new_x = make_array(dimension=dims, type=size(x, /type), /nozero)
   n_features = dims[0]
 
-  slopes = 1.0 / ((*self_ranges)[*, 1] - (*self_ranges)[*, 0])
+  slopes = 1.0 / ((*self._ranges)[*, 1] - (*self._ranges)[*, 0])
   for f = 0L, n_features - 1L do begin
-    new_x[f, *] = slopes[f] * (x[f, *] - (*self_ranges)[f, 0])
+    new_x[f, *] = slopes[f] * (x[f, *] - (*self._ranges)[f, 0])
   endfor
 
   return, new_x
@@ -66,7 +66,7 @@ end
 pro mg_minmaxscaler::cleanup
   compile_opt strictarr
 
-  ptr_free, self_ranges
+  ptr_free, self._ranges
   self->mg_transformer::cleanup
 end
 
@@ -76,7 +76,7 @@ function mg_minmaxscaler::init, _extra=e
 
   if (~self->mg_transformer::init(_extra=e)) then return, 0
 
-  self_ranges = ptr_new(/allocate_heap)
+  self._ranges = ptr_new(/allocate_heap)
 
   return, 1
 end
