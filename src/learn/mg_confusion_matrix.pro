@@ -12,7 +12,7 @@
 ; :Params:
 ;   y_true : in, required, type=lonarr(n_samples)
 ;     truth (correct) target values
-;   y_predicted : in, required, type=lonarr(n_samples)
+;   y_predict : in, required, type=lonarr(n_samples)
 ;     predicted target values as returned by a classifier
 ;
 ; :Keywords:

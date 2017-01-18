@@ -1,6 +1,6 @@
 ; docformat = 'rst'
 
-; API
+;= API
 
 ;+
 ; Use training set of data `x` and targets `y` to train the model.
@@ -29,7 +29,7 @@ end
 ;   fltarr(n_samples)
 ;
 ; :Params:
-;   x : in, required, type=fltarr(n_features, n_samples)
+;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to predict targets for
 ;   y : in, optional, type=fltarr(n_samples)
 ;     optional y-values; needed to get score
@@ -64,9 +64,18 @@ function mg_estimator::score, x, y
 end
 
 
-;= property access
+;= overload methods
 
-;= lifecycle methods
+function mg_estimator::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = self.type
+  _specs = '<>'
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
+end
+
+
+;= property access
 
 ;+
 ; Get property values.
@@ -78,11 +87,16 @@ pro mg_estimator::getProperty, type=type
 end
 
 
+;+
+; Set property values.
+;-
 pro mg_estimator::setProperty, _extra=e
   compile_opt strictarr
 
 end
 
+
+;= lifecycle methods
 
 ;+
 ; Free resources

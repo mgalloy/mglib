@@ -118,6 +118,32 @@ end
 
 
 ;+
+; Loads the digits dataset.
+;
+; The digits dataset has 1797 samples and 64 features, each a pixel value 0-15.
+;
+; :Returns:
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
+;-
+function mg_load_digits
+  compile_opt strictarr
+
+  filename = filepath('digits.csv', root=mg_src_root())
+  n_samples = file_lines(filename)
+  n_features = 64
+  data = bytarr(n_features + 1, n_samples)
+  openr, lun, filename, /get_lun
+  readf, lun, data
+  free_lun, lun
+
+  return, {data: data[0:63, *], $
+           target: reform(data[64, *]), $
+           target_names: [''], $
+           feature_names: strtrim(indgen(64), 2)}
+end
+
+
+;+
 ; Loads the iris dataset.
 ;
 ; The iris dataset has 4 features: sepal length (cm), sepal width (cm), petal
@@ -181,6 +207,7 @@ function mg_learn_dataset, name, n_samples=n_samples
     'iris': return, mg_load_iris()
     'breast_cancer': return, mg_load_breast_cancer()
     'boston': return, mg_load_boston()
+    'digits': return, mg_load_digits()
     'wave': begin
         _n_samples = n_elements(n_samples) eq 0L ? 100 : n_samples
         x = 6.0 * randomu(42, _n_samples) - 3.0
@@ -199,6 +226,8 @@ if (n_elements(ps) eq 0L) then ps = 0
 if (n_elements(demo) eq 0L) then demo = 0
 
 mg_constants
+
+; === breast cancer dataset
 
 dims = [800, 800]
 size = [8, 8]
@@ -246,6 +275,43 @@ if (keyword_set(ps)) then begin
 endif
 
 
+; === digits dataset
+
+digits = mg_learn_dataset('digits')
+
+n = 3
+scale = 10
+n_digits = 10
+xsize = 8
+ysize = 8
+window, xsize=scale * n_digits * xsize, ysize=scale * n * ysize, /free, title='Digits'
+for i = 0L, n - 1L do begin
+  for d = 0L, n_digits - 1L do begin
+    im = reform(digits.data[*, d + i * n_digits], xsize, ysize)
+    im = bytscl(im, min=0, max=15)
+    im = rotate(im, 7)
+    tv, rebin(im, xsize * scale, ysize * scale), d + i * n_digits
+  endfor
+endfor
+
+rdata = pcomp(digits.data, nvariables=3, coefficients=c, variances=v, eigenvalues=e, /covariance)
+help, rdata, c, v, e
+eigenvectors = c / rebin(reform(e, xsize * ysize, 1), xsize * ysize, 3)
+reconstruct = rdata ## eigenvectors
+
+window, xsize=scale * n_digits * xsize, ysize=scale * n * ysize, /free, title='Digits'
+for i = 0L, n - 1L do begin
+  for d = 0L, n_digits - 1L do begin
+    im = reform(reconstruct[*, d + i * n_digits], xsize, ysize)
+    im = bytscl(im, min=0, max=15)
+    im = rotate(im, 7)
+    tv, rebin(im, xsize * scale, ysize * scale), d + i * n_digits
+  endfor
+endfor
+
+
+; === iris dataset
+
 dims = [800, 800]
 size = [8, 8]
 symsize = 0.75
@@ -285,6 +351,9 @@ if (keyword_set(ps)) then begin
   mg_convert, 'iris-dataset', max_dimension=dims, output=im, keep_output=demo
   mg_image, im, /new_window
 endif
+
+
+; === wave dataset
 
 mg_window, xsize=4, ysize=4, /inches, /free, title='Wave'
 wave = mg_learn_dataset('wave')

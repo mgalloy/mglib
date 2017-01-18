@@ -40,20 +40,20 @@ pro mg_perceptron::fit, x, y
   n_features = dims[0]
   n_samples = dims[1]
 
-  *self.weights = fltarr(n_features)
-  self.bias = 0.0
-  *self.errors = lonarr(self.max_iterations)
-  self.n_iterations = 0L
+  *self._weights = fltarr(n_features)
+  self._bias = 0.0
+  *self._errors = lonarr(self.max_iterations)
+  self._n_iterations = 0L
 
   for i = 0L, self.max_iterations - 1L do begin
-    self.n_iterations += 1L
+    self._n_iterations += 1L
     errors = 0L
     for s = 0L, n_samples - 1L do begin
       xi = reform(x[*, s], n_features, 1)
       update = (self.learning_rate * (y[s] - self->predict(xi)))[0]
-      *self.weights += update * xi
-      self.bias     += update
-      (*self.errors)[i] += long(update ne 0.0)
+      *self._weights += update * xi
+      self._bias     += update
+      (*self._errors)[i] += long(update ne 0.0)
     endfor
 
     ; can't vectorize the above loop because weights change with each iteration
@@ -61,11 +61,11 @@ pro mg_perceptron::fit, x, y
     ; would use the same weights/bias
 
     ; update = self.learning_rate * (y - self.predict(x))
-    ; *self.weights += x # update
-    ; self.bias     += total(update, /preserve_type)
-    ; (*self.errors)[i] = total(update ne 0.0, /integer)
+    ; *self._weights += x # update
+    ; self._bias     += total(update, /preserve_type)
+    ; (*self._errors)[i] = total(update ne 0.0, /integer)
 
-    if ((*self.errors)[i] eq 0L) then break
+    if ((*self._errors)[i] eq 0L) then break
   endfor
 end
 
@@ -77,7 +77,7 @@ end
 ;   `lonarr(n_samples)`
 ;
 ; :Params:
-;   x : in, required, type=fltarr(n_features, n_samples)
+;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to predict targets for
 ;   y : in, optional, type=lonarr(n_samples)
 ;     optional y-values; needed to get score; values must be -1 or 1
@@ -89,11 +89,23 @@ end
 function mg_perceptron::predict, x, y, score=score
   compile_opt strictarr
 
-  y_predict = 2L * ((reform(*self.weights # x) + self.bias) ge 0.0) - 1L
+  y_predict = 2L * ((reform(*self._weights # x) + self._bias) ge 0.0) - 1L
   if (arg_present(score) && n_elements(y) gt 0) then begin
     score = total(y_predict eq y, /integer) / float(n_elements(y))
   endif
   return, y_predict
+end
+
+
+;= overload methods
+
+function mg_perceptron::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'PER'
+  _specs = string(self.max_iterations, self.learning_rate, $
+                  format='(%"<max interations: %d, learning rate: %0.2f>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -109,9 +121,9 @@ pro mg_perceptron::getProperty, max_iterations=max_iterations, $
 
   if (arg_present(max_iterations)) then max_iterations = self.max_iterations
   if (arg_present(learning_rate)) then learning_rate = self.learning_rate
-  if (arg_present(weights)) then weights = *self.weights
-  if (arg_present(bias)) then bias = self.bias
-  if (arg_present(errors)) then errors = (*self.errors)[0:self.n_iterations - 1L]
+  if (arg_present(weights)) then weights = *self._weights
+  if (arg_present(bias)) then bias = self._bias
+  if (arg_present(errors)) then errors = (*self._errors)[0:self._n_iterations - 1L]
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
@@ -132,7 +144,7 @@ end
 pro mg_perceptron::cleanup
   compile_opt strictarr
 
-  ptr_free, self.weights, self.errors
+  ptr_free, self._weights, self._errors
   self->mg_estimator::cleanup
 end
 
@@ -146,8 +158,8 @@ function mg_perceptron::init, max_iterations=max_iterations, $
 
   self.type = 'binary classifier'
 
-  self.weights = ptr_new(/allocate_heap)
-  self.errors = ptr_new(/allocate_heap)
+  self._weights = ptr_new(/allocate_heap)
+  self._errors = ptr_new(/allocate_heap)
 
   _max_iterations = mg_default(max_iterations, 10L)
   _learning_rate = mg_default(learning_rate, 0.01)
@@ -164,11 +176,11 @@ pro mg_perceptron__define
 
   !null = {mg_perceptron, inherits mg_estimator, $
            max_iterations: 0L, $
-           n_iterations: 0L, $
            learning_rate: 0.0, $
-           bias: 0.0, $
-           weights: ptr_new(), $
-           errors: ptr_new() $
+           _n_iterations: 0L, $
+           _bias: 0.0, $
+           _weights: ptr_new(), $
+           _errors: ptr_new() $
           }
 end
 

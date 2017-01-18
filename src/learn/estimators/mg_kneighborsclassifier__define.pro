@@ -7,8 +7,8 @@
 ;   classifier
 ;
 ; :Properties:
-;   n_neighbors : type=integer, default=1
-;     number of neighbors to find
+;   n_neighbors : type=integer
+;     number of neighbors to find, defaults to 1
 ;-
 
 ;= API
@@ -25,8 +25,8 @@
 pro mg_kneighborsclassifier::fit, x, y
   compile_opt strictarr
 
-  *self.x = x
-  *self.y = y
+  *self._x = x
+  *self._y = y
 end
 
 
@@ -37,7 +37,7 @@ end
 ;   `lonarr(n_samples)`
 ;
 ; :Params:
-;   x : in, required, type=fltarr(n_features, n_samples)
+;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to predict targets for
 ;   y : in, optional, type=lonarr(n_samples)
 ;     optional y-values; needed to get score; values must be -1 or 1
@@ -53,12 +53,12 @@ function mg_kneighborsclassifier::predict, x, y, score=score
   n_samples_predict = dims[1]
   y_predict = lonarr(n_samples_predict)
 
-  ; find indices of nearest self.n_neighbors neighbors in *self.x...
-  neighbor_indices = mg_kneighbors(*self.x, x, self.n_neighbors)
+  ; find indices of nearest self.n_neighbors neighbors in *self._x...
+  neighbor_indices = mg_kneighbors(*self._x, x, self.n_neighbors)
 
   for s = 0L, dims[1] - 1L do begin
-    ; ...and look up the *self.y values for them, selecting the most common
-    y_predict[s] = mg_mode((*self.y)[neighbor_indices[*, s]])
+    ; ...and look up the *self._y values for them, selecting the most common
+    y_predict[s] = mg_mode((*self._y)[neighbor_indices[*, s]])
   endfor
 
   if (arg_present(score) && n_elements(y) gt 0) then begin
@@ -66,6 +66,17 @@ function mg_kneighborsclassifier::predict, x, y, score=score
   endif
 
   return, y_predict
+end
+
+
+;= overload methods
+
+function mg_kneighborsclassifier::_overloadHelp, varname
+  compile_opt strictarr
+
+  _type = 'KNC'
+  _specs = string(self.n_neighbors, format='(%"<%d neighbors>")')
+  return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
 
@@ -86,7 +97,7 @@ end
 pro mg_kneighborsclassifier::cleanup
   compile_opt strictarr
 
-  ptr_free, self.x, self.y
+  ptr_free, self._x, self._y
   self->mg_estimator::cleanup
 end
 
@@ -99,8 +110,8 @@ function mg_kneighborsclassifier::init, n_neighbors=n_neighbors, _extra=e
   self.type = 'classifier'
 
   self.n_neighbors = mg_default(n_neighbors, 1)
-  self.x = ptr_new(/allocate_heap)
-  self.y = ptr_new(/allocate_heap)
+  self._x = ptr_new(/allocate_heap)
+  self._y = ptr_new(/allocate_heap)
 
   return, 1
 end
@@ -111,8 +122,8 @@ pro mg_kneighborsclassifier__define
 
   !null = {mg_kneighborsclassifier, inherits mg_estimator, $
            n_neighbors: 0L, $
-           x: ptr_new(), $
-           y: ptr_new() $
+           _x: ptr_new(), $
+           _y: ptr_new() $
           }
 end
 
@@ -132,6 +143,7 @@ mg_train_test_split, iris.data, iris.target, $
 
 ; instantitate K-nearest neighbors model
 p = mg_kneighborsclassifier(n_neighbors=3)
+help, p
 
 ; train the model using the training data
 clock_id = tic('mg_kneighborsclassifier')

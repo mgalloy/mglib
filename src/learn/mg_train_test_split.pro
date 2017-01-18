@@ -12,7 +12,7 @@
 ; :Keywords:
 ;   x_test : out, optional, type="fltarr(n_features, test_size)"
 ;     testing data set
-;   y_testing : out, optional, type="fltarr(test_size)"
+;   y_test : out, optional, type="fltarr(test_size)"
 ;     test target set
 ;   x_train : out, optional, type="fltarr(n_features, train_size)"
 ;     training data set

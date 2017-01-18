@@ -4,4 +4,4 @@ The classes are broken into two main categories:
 
 1. estimators (regressors and classifiers): These classes have a `fit` method that is called first, and then a `predict` method called afterwards. Regressors predict a continuous quantity, while classifiers predict categories.
 
-2. vectorizers: These classes have a `fit_transform` method which transforms data to a suitable form for applying an estimator.
+2. transformer: These classes have a `fit` method that is called first and then a `transform` method called afterwards (or use the convenicene `fit_transform` method) which transforms data to a suitable form for applying an estimator.
