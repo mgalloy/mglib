@@ -15,10 +15,11 @@ function mg_polynomialfeatures::_combine, combos, names
     indices = combos[start_index:*]
 
     name_array = []
-    h = histogram(indices)
+    i_min = min(indices)
+    h = histogram(indices, min=i_min)
     for i = 0L, n_elements(h) - 1L do begin
       if (h[i] gt 0L) then begin
-        _name = names[indices[i]] + (h[i] eq 1L ? '' : ('^' + strtrim(h[i], 2)))
+        _name = names[i + i_min] + (h[i] eq 1L ? '' : ('^' + strtrim(h[i], 2)))
         name_array = [name_array, _name]
       endif
     endfor
