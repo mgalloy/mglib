@@ -25,13 +25,13 @@
 ;   x : in, required, type="fltarr(n_features, n_samples)"
 ;     data to learn on
 ;-
-pro mg_transformer::fit, x, feature_names=feature_names
+pro mg_transformer::fit, x, y, feature_names=feature_names
   compile_opt strictarr
 
   if (n_elements(feature_names) eq 0L) then begin
     if (n_elements(*self.feature_names) eq 0L) then begin
       dims = size(x, /dimensions)
-      self->setProperty, feature_names=strtrim(lindgen(dims[0]), 2)
+      self->setProperty, feature_names='x' + strtrim(lindgen(dims[0]), 2)
     endif
   endif else self->setProperty, feature_names=feature_names
 

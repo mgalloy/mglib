@@ -50,7 +50,7 @@ end
 pro mg_polynomialfeatures::fit, x, y, _extra=e
   compile_opt strictarr
 
-  self->mg_transformer::fit, _extra=e
+  self->mg_transformer::fit, x, y, _extra=e
 
   dims = size(x, /dimensions)
   n_features = dims[0]
