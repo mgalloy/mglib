@@ -746,7 +746,7 @@ pro mg_fits_browser::_handle_tree_event, event
 
   ; set annotation button sensitivity
   annotate_button = widget_info(self.tlb, find_by_uname='annotate')
-  widget_control, annotate_button, sensitive=self->annotate_available(data, header)
+  widget_control, annotate_button, sensitive=self->annotate_available(data, header, filename=self.current_filename)
 
   self->display
 end
