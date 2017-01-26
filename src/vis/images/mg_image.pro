@@ -258,7 +258,6 @@ pro mg_image, im, x, y, $
   if (~keyword_set(axes)) then begin
     plot, _x, _y, xstyle=5, ystyle=5, /nodata, position=_position, $
           xmargin=xmargin, ymargin=ymargin, _extra=e
-
   endif else begin
     plot, _x, _y, $
           /nodata, $
