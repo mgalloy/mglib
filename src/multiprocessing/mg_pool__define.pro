@@ -620,7 +620,9 @@ function mg_pool::init, n_processes=n_processes, $
   for p = 0L, self.n_processes - 1L do begin
     if (n_elements(output) gt 0L) then _output = mg_subs(output, {p: p})
     (*self.processes)[p] = obj_new('MG_Process', name=strtrim(p, 2), output=_output, _extra=e)
-    (*self.processes)[p].setvar, '!path', !path
+    if keyword_set(inheritPath) then begin
+        (*self.processes)[p].setvar, '!path', !path
+    endif
   endfor
 
   self.polling_cycle = n_elements(polling_cycle) eq 0 ? 0.5 : polling_cycle
