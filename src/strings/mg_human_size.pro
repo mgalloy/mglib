@@ -40,7 +40,7 @@ function mg_human_size, sizes, $
                         decimal_places=decimal_places, $
                         long=long, $
                         bits=bits
-  compile_opt strictarr, hidden
+  compile_opt strictarr
 
   if (n_elements(decimal_places) eq 0L || decimal_places eq 0) then begin
     round_to = 1
@@ -75,5 +75,5 @@ function mg_human_size, sizes, $
     results[i] = string(mg_round(s, round_to), units[level], format=format)
   endfor
 
-  return, results
+  return, size(sizes, /n_dimensions) eq 0L ? results[0] : results
 end
