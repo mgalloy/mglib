@@ -421,35 +421,264 @@ pro mgdbmysql::execute, sql_query, $
                         arg6, arg7, arg8, arg9, arg10, $
                         arg11, arg12, arg13, arg14, arg15, $
                         arg16, arg17, arg18, arg19, arg20, $
+                        arg21, arg22, arg23, arg24, arg25, $
+                        arg26, arg27, arg28, arg29, arg30, $
+                        arg31, arg32, arg33, arg34, arg35, $
+                        arg36, arg37, arg38, arg39, arg40, $
+                        arg41, arg42, arg43, arg44, arg45, $
+                        arg46, arg47, arg48, arg49, arg50, $
                         sql_statement=_sql_query, $
                         status=status, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
 
+  sql_query_fmt = '(%"' + sql_query + '")'
   case n_params() of
      0: _sql_query = ''
      1: _sql_query = sql_query
-     2: _sql_query = string(arg1, format='(%"' + sql_query + '")')
-     3: _sql_query = string(arg1, arg2, format='(%"' + sql_query + '")')
-     4: _sql_query = string(arg1, arg2, arg3, format='(%"' + sql_query + '")')
-     5: _sql_query = string(arg1, arg2, arg3, arg4, format='(%"' + sql_query + '")')
-     6: _sql_query = string(arg1, arg2, arg3, arg4, arg5, format='(%"' + sql_query + '")')
-     7: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, format='(%"' + sql_query + '")')
-     8: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, format='(%"' + sql_query + '")')
-     9: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, format='(%"' + sql_query + '")')
-    10: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, format='(%"' + sql_query + '")')
-    11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, format='(%"' + sql_query + '")')
-    12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, format='(%"' + sql_query + '")')
-    13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, format='(%"' + sql_query + '")')
-    14: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, format='(%"' + sql_query + '")')
-    15: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, format='(%"' + sql_query + '")')
-    16: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, format='(%"' + sql_query + '")')
-    17: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, format='(%"' + sql_query + '")')
-    18: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, format='(%"' + sql_query + '")')
-    19: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, format='(%"' + sql_query + '")')
-    20: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, format='(%"' + sql_query + '")')
-    21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
+     2: _sql_query = string(arg1, format=sql_query_fmt)
+     3: _sql_query = string(arg1, arg2, format=sql_query_fmt)
+     4: _sql_query = string(arg1, arg2, arg3, format=sql_query_fmt)
+     5: _sql_query = string(arg1, arg2, arg3, arg4, format=sql_query_fmt)
+     6: _sql_query = string(arg1, arg2, arg3, arg4, arg5, format=sql_query_fmt)
+     7: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, $
+                            format=sql_query_fmt)
+     8: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, $
+                            format=sql_query_fmt)
+     9: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            format=sql_query_fmt)
+    10: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, $
+                            format=sql_query_fmt)
+    11: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, $
+                            format=sql_query_fmt)
+    12: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, $
+                            format=sql_query_fmt)
+    13: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, $
+                            format=sql_query_fmt)
+    14: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, $
+                            format=sql_query_fmt)
+    15: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, $
+                            format=sql_query_fmt)
+    16: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            format=sql_query_fmt)
+    17: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, $
+                            format=sql_query_fmt)
+    18: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, $
+                            format=sql_query_fmt)
+    19: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, $
+                            format=sql_query_fmt)
+    20: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, $
+                            format=sql_query_fmt)
+    21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, $
+                            format=sql_query_fmt)
+    22: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, $
+                            format=sql_query_fmt)
+    23: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            format=sql_query_fmt)
+    24: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, $
+                            format=sql_query_fmt)
+    25: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, $
+                            format=sql_query_fmt)
+    26: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, $
+                            format=sql_query_fmt)
+    27: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, $
+                            format=sql_query_fmt)
+    28: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, $
+                            format=sql_query_fmt)
+    29: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, $
+                            format=sql_query_fmt)
+    30: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            format=sql_query_fmt)
+    31: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, $
+                            format=sql_query_fmt)
+    32: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, $
+                            format=sql_query_fmt)
+    33: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, $
+                            format=sql_query_fmt)
+    34: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, $
+                            format=sql_query_fmt)
+    35: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, $
+                            format=sql_query_fmt)
+    36: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, $
+                            format=sql_query_fmt)
+    37: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            format=sql_query_fmt)
+    38: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, $
+                            format=sql_query_fmt)
+    39: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, $
+                            format=sql_query_fmt)
+    40: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, $
+                            format=sql_query_fmt)
+    41: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, $
+                            format=sql_query_fmt)
+    42: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, $
+                            format=sql_query_fmt)
+    43: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, $
+                            format=sql_query_fmt)
+    44: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            format=sql_query_fmt)
+    45: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, $
+                            format=sql_query_fmt)
+    46: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, $
+                            format=sql_query_fmt)
+    47: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, arg46, $
+                            format=sql_query_fmt)
+    48: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, arg46, arg47, $
+                            format=sql_query_fmt)
+    49: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, arg46, arg47, arg48, $
+                            format=sql_query_fmt)
+    50: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, arg46, arg47, arg48, arg49, $
+                            format=sql_query_fmt)
+    51: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
+                            arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
+                            arg16, arg17, arg18, arg19, arg20, arg21, arg22, $
+                            arg23, arg24, arg25, arg26, arg27, arg28, arg29, $
+                            arg30, arg31, arg32, arg33, arg34, arg35, arg36, $
+                            arg37, arg38, arg39, arg40, arg41, arg42, arg43, $
+                            arg44, arg45, arg46, arg47, arg48, arg49, arg50, $
+                            format=sql_query_fmt)
   endcase
 
   status = mg_mysql_query(self.connection, _sql_query)
