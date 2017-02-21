@@ -539,6 +539,11 @@ function mgffoptions::get, option, $
                       unresolved_keys=unresolved_keys, $
                       use_environment=self.use_environment)
     endif
+    if (_section ne '' && self.sections->hasKey('DEFAULT')) then begin
+      value = mg_subs(value, (self.sections)['DEFAULT'], $
+                      unresolved_keys=unresolved_keys, $
+                      use_environment=self.use_environment)
+    endif
   endelse
 
   if (keyword_set(extract)) then begin
