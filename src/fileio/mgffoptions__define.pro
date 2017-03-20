@@ -41,6 +41,57 @@ function mgffoptions::_hash
   return, h
 end
 
+
+;+
+; Create a string representation of the config file.
+;
+; :Returns:
+;   `strarr`
+;
+; :Keywords:
+;   substitute : in, optional, type=boolean
+;     set to perform substitutions
+;-
+function mgffoptions::_toString, substitute=substitute
+  compile_opt strictarr
+
+  first_line = 1B
+  output_list = list()
+
+  max_width = 0L
+  foreach sec, self.sections do begin
+    foreach option, sec, o do begin
+      max_width >= strlen(o)
+    endforeach
+  endforeach
+
+  format = string(max_width, format='(%"(\%\"\%-%ds \%s \%s\"\)")')
+
+  if (self.sections->hasKey('')) then begin
+    default_sec = (self.sections)['']
+    foreach option, default_sec, o do begin
+      first_line = 0B
+      output_list->add, string(o, self.output_separator, option, format=format)
+    endforeach
+  endif
+
+  foreach sec, self.sections, s do begin
+    if (s eq '') then continue
+    if (~first_line) then output_list->add, '' else first_line = 0B
+
+    output_list->add, string(s, format='(%"[%s]")')
+    foreach option, sec, o do begin
+      option_value = keyword_set(substitute) ? self->get(o, section=s) : option
+      output_list->add, string(o, self.output_separator, option_value, format=format)
+    endforeach
+  endforeach
+
+  output = transpose(output_list->toArray())
+  obj_destroy, output_list
+  return, output
+end
+
+
 ;= overload methods
 
 
@@ -244,39 +295,7 @@ end
 function mgffoptions::_overloadPrint
   compile_opt strictarr
 
-  first_line = 1B
-  output_list = list()
-
-  max_width = 0L
-  foreach sec, self.sections do begin
-    foreach option, sec, o do begin
-      max_width >= strlen(o)
-    endforeach
-  endforeach
-
-  format = string(max_width + 2L, format='(%"(\%\"\%-%ds \%s\"\)")')
-
-  if (self.sections->hasKey('')) then begin
-    default_sec = (self.sections)['']
-    foreach option, default_sec, o do begin
-      first_line = 0B
-      output_list->add, string(o + self.output_separator, option, format=format)
-    endforeach
-  endif
-
-  foreach sec, self.sections, s do begin
-    if (s eq '') then continue
-    if (~first_line) then output_list->add, '' else first_line = 0B
-
-    output_list->add, string(s, format='(%"[%s]")')
-    foreach option, sec, o do begin
-      output_list->add, string(o + self.output_separator, option, format=format)
-    endforeach
-  endforeach
-
-  output = transpose(output_list->toArray())
-  obj_destroy, output_list
-  return, output
+  return, self->_toString()
 end
 
 
