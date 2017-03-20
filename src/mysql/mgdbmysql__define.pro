@@ -195,7 +195,9 @@ function mgdbmysql::_get_type, field
     2: return, 0S     ; MYSQL_TYPE_SHORT
     3: return, 0L     ; MYSQL_TYPE_LONG
     4: return, 0.0    ; MYSQL_TYPE_FLOAT
+    5: return, 0.0D   ; MYSQL_TYPE_DOUBLE
     8: return, 0ULL   ; MYSQL_TYPE_LONGLONG
+    9: return, 0L     ; MYSQL_TYPE_INT24
     10: return, ''    ; MYSQL_TYPE_DATE
     12: return, ''    ; MYSQL_TYPE_DATETIME
     252: begin        ; MYSQL_TYPE_BLOB
