@@ -204,7 +204,7 @@ function mgdbmysql::_get_type, field
         if (field.charsetnr eq 33) then begin
           return, ''
         endif else begin
-          return, ptr_new(/allocate_heap)
+          return, ptr_new()
         endelse
       end
     253: return, ''   ; MYSQL_TYPE_VARSTRING
@@ -263,6 +263,15 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
   endfor
 
   query_result = replicate(row_result, n_rows)
+
+  ; must allocate ptr columns
+  for f = 0L, n_fields - 1L do begin
+    if (size(self->_get_type(fields[f]), /type) eq 10) then begin
+      query_result.(f) = ptrarr(n_rows, /allocate_heap)
+    endif
+  endfor
+
+  ; populate result
   for r = 0L, n_rows - 1L do begin
     row = mg_mysql_fetch_row(result)
     lengths = mg_mysql_fetch_lengths(result)
@@ -290,6 +299,26 @@ end
 
 
 ;= API
+
+;+
+; Creates a properly escaped string from any numeric array.
+;
+; :Returns:
+;   string
+;
+; :Params:
+;   from : in, required, type=numeric/string
+;     variable
+;-
+function mgdbmysql::escape_string, from
+  compile_opt strictarr
+
+  n_bytes = mg_typesize(size(from, /type)) * n_elements(from)
+  to = bytarr(2 * n_bytes + 1)
+  n_bytes_to = mg_mysql_real_escape_string(self.connection, to, from, n_bytes)
+  return, string(to[0:n_bytes_to - 1])
+end
+
 
 ;+
 ; Returns the error message for the last failed MySQL API routine.
@@ -1003,7 +1032,8 @@ pro mgdbmysql::getProperty, quiet=quiet, $
                             server_version=server_version, $
                             last_command_info=last_command_info, $
                             database=database, $
-                            host_name=host_name
+                            host_name=host_name, $
+                            connection=connection
   compile_opt strictarr
 
   quiet = self.quiet
@@ -1017,6 +1047,7 @@ pro mgdbmysql::getProperty, quiet=quiet, $
   if (arg_present(last_command_info)) then last_command_info = mg_mysql_info(self.connection)
   database = self.database
   host_name = self.host
+  connection = self.connection
 end
 
 
