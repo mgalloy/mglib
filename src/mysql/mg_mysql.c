@@ -409,6 +409,13 @@ static IDL_VPTR IDL_mg_mysql_fetch_lengths(int argc, IDL_VPTR *argv) {
 }
 
 
+#pragma mark --- lifecycle ---
+
+// handle any cleanup required
+static void mg_mysql_exit_handler(void) {
+  mysql_library_end();
+}
+
 int IDL_Load(void) {
   IDL_StructDefPtr mg_mysql_field_sdef;
 
@@ -455,6 +462,13 @@ int IDL_Load(void) {
   };
 
   mg_mysql_field_sdef = IDL_MakeStruct("MG_MYSQL_FIELD", mg_mysql_field);
+
+  if (mysql_library_init(0, NULL, NULL)) {
+    // initialization failed
+    return 0;
+  }
+
+  IDL_ExitRegister(mg_mysql_exit_handler);
 
   /*
      Register our routines. The routines must be specified exactly the same
