@@ -32,14 +32,25 @@
 ;
 ; :Keywords:
 ;   center : in, optional, type=boolean
-;     set to 
+;     set to find distance from center of array
+;   theta : out, optional, type="fltarr(n, n)"
+;     set to a named variable to retrieve the angle, in radians, from a location
+;     to the fixed location
+;   degrees : in, optional, type=boolean
+;     set to retrieve `THETA` in degrees
 ;-
-function mg_dist, n, center=center
+function mg_dist, n, center=center, theta=theta, degrees=degrees
   compile_opt strictarr
 
-  x = findgen(n) + (n mod 2 eq 0 ? 0.5 : 0.0)
-  if (keyword_set(center)) then x = shift(x, n / 2)
-  x <= n - x
+  x = findgen(n) + (n mod 2 eq 0 ? 0.5 : 0.0) - n / 2
+  if (~keyword_set(center)) then x = shift(x, n / 2)
   x = rebin(x, n, n)
-  return, sqrt(x^2 + (transpose(x))^2)
+  y = transpose(x)
+
+  if (arg_present(theta)) then begin
+    theta = (2.0 * !pi - atan(y, x)) mod (2.0 * !pi)
+    if (keyword_set(degrees)) then theta *= !radeg
+  endif
+
+  return, sqrt(x^2 + y^2)
 end
