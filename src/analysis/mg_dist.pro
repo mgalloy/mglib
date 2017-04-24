@@ -48,7 +48,7 @@ function mg_dist, n, center=center, theta=theta, degrees=degrees
   y = transpose(x)
 
   if (arg_present(theta)) then begin
-    theta = (2.0 * !pi - atan(y, x)) mod (2.0 * !pi)
+    theta = (2.0 * !pi + atan(y, x)) mod (2.0 * !pi)
     if (keyword_set(degrees)) then theta *= !radeg
   endif
 
