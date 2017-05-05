@@ -8,6 +8,9 @@
 ;
 ; Code follows most of the same logic as `SXPAR`.
 ;
+; :Uses:
+;   mg_strtoken
+;
 ; :Examples:
 ;   For example, try for some FITS file `f`:
 ;
