@@ -1,7 +1,8 @@
 ; docformat = 'rst'
 
 ;+
-;	Routine to match values between two arrays.
+; Routine to match values between two arrays. Note: does not find multiple
+; matches.
 ;
 ; :Returns:
 ;   long, number of matches found
@@ -26,7 +27,7 @@ function mg_match, a, b, a_matches=a_matches, b_matches=b_matches
   compile_opt strictarr
 
   na = n_elements(a)
-  nb = N_elements(b)
+  nb = n_elements(b)
 
   both = [a, b]
   ind = [lindgen(na), lindgen(nb)]

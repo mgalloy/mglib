@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Create an array ranging from the `startValue` and stopping before the
+; Create an array ranging from the `startValue` and stopping at or before the
 ; `stopValue`.
 ;
 ; :Examples:
@@ -41,7 +41,9 @@
 ;   increment : in, optional, type=float, default=1.0
 ;     if `N` is not set, then `INCREMENT` is used to compute `N`
 ;-
-function mg_makerange, startValue, stopValue, increment=increment, n=n, $
+function mg_makerange, startValue, stopValue, $
+                       increment=increment, $
+                       n=n, $
                        count=count
   compile_opt strictarr
 
@@ -49,7 +51,7 @@ function mg_makerange, startValue, stopValue, increment=increment, n=n, $
 
   if (n_elements(n) gt 0L) then begin
     count = long(n)
-    return, startValue + findgen(n) / (n - 1L) * (stopValue - startValue)
+    return, startValue + findgen(count) / _increment
   endif else begin
     count = long((stopValue - startValue) / _increment + 1L)
     return, startValue + findgen(count) * _increment
@@ -62,6 +64,6 @@ end
 print, mg_makerange(0, 10)
 print, mg_makerange(0, 10, n=5)
 print, mg_makerange(0, 10, increment=0.5)
-print, mg_makerange(0., 10., increment=0.1, count=count)
+print, mg_makerange(0., 10., increment=0.1, count=count), count
 
 end
