@@ -6,7 +6,7 @@
 pro mg_minmaxscaler::fit, x, y, _extra=e
   compile_opt strictarr
 
-  self->mg_transformer::fit, _extra=e
+  self->mg_transformer::fit, x, y, _extra=e
 
   dims = size(x, /dimensions)
   n_features = dims[0]
@@ -39,8 +39,13 @@ end
 function mg_minmaxscaler::_overloadHelp, varname
   compile_opt strictarr
 
-  _type = 'MINMAX'
-  _specs = '<>'
+  _type = 'MINMAXSCL'
+  if (n_elements(*self.feature_names) gt 0L) then begin
+    _specs = string(n_elements(*self.feature_names), $
+                    format='(%"<fit to %d features>")')
+  endif else begin
+    _specs = '<not fit>'
+  endelse
   return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
@@ -92,18 +97,23 @@ end
 
 ; main-level example program
 
-n_features = 5
-n_samples = 10
-x_train = transpose(findgen(n_samples, n_features))
+n_features = 2L
+n_samples = 1000L
+x_train = randomu(seed, n_features, n_samples)
+x_train[0, *] = 3.0 * x_train[0, *] - 1
+x_train[1, *] = 2.0 * x_train[1, *] + 1
 minmax = mg_minmaxscaler()
+help, minmax
 new_x_train = minmax->fit_transform(x_train)
-x_test = fltarr(n_features, 15)
-for f = 0L, n_features - 1L do x_test[f, *] = 10.0 * f + (10.0  - 1.0) * randomu(seed, 15)
-new_x_test = minmax->transform(x_test)
+help, minmax
 
-print, x_test
-print
-print, new_x_test
+window, xsize=800, ysize=400, title='min-max transform', /free
+!p.multi = [0, 2, 1]
+plot, x_train[0, *], x_train[1, *], psym=3, $
+      xrange=[-3, 3], yrange=[-3, 3], xstyle=1, ystyle=1
+plot, new_x_train[0, *], new_x_train[1, *], psym=3, $
+      xrange=[-3, 3], yrange=[-3, 3], xstyle=1, ystyle=1
+!p.multi = 0
 
 obj_destroy, minmax
 
