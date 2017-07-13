@@ -23,14 +23,19 @@
 ;     data to learn on
 ;   y : in, required, type=lonarr(n_samples)
 ;     unused
+;
+; :Keywords:
+;   seed : in, out, optional, type=integer
+;     random number generator seed
 ;-
-pro mg_kmeans::fit, x, y
+pro mg_kmeans::fit, x, y, seed=seed
   compile_opt strictarr
 
-  *self._centers = clust_wts(x, $
-                             n_clusters=self.n_clusters, $
-                             n_iterations=self.n_iterations, $
-                             double=self.double)
+  *self._centers = mg_kmeans_centers(x, $
+                                     n_clusters=self.n_clusters, $
+                                     n_iterations=self.n_iterations, $
+                                     double=self.double, $
+                                     seed=seed)
 end
 
 
@@ -130,6 +135,8 @@ end
 
 ; main-level example program
 
+;seed = 1L
+
 n = 50
 
 c1 = 0.5 * randomn(seed, 2, n)
@@ -145,7 +152,7 @@ x = [[c1], [c2], [c3]] / 10.0
 
 kmeans = mg_kmeans(n_clusters=3, n_iterations=50, /double)
 
-kmeans->fit, x
+kmeans->fit, x, seed=seed
 
 colors = ['404040'x, '707070'x, 'a0a0a0'x]
 symbols = [1, 4, 5]
