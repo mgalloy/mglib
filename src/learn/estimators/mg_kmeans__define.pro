@@ -7,10 +7,14 @@
 ;   unsupervised
 ;
 ; :Properties:
-;   n_clusters : type=integer
+;   n_clusters : type=integer, default=8
 ;     number of clusters to find
-;   n_iterations : type=integer
+;   n_iterations : type=integer, default=20
 ;     number of interations to perform
+;   n_initializations : type=integer, default=10
+;     number of times to fit the data with new random initialization, choosing
+;     the best of the fits, i.e., the one which minimizes the sum of the
+;     variances of distances of the points in a cluster to their center
 ;-
 
 ;= API
@@ -34,6 +38,7 @@ pro mg_kmeans::fit, x, y, seed=seed
   *self._centers = mg_kmeans_centers(x, $
                                      n_clusters=self.n_clusters, $
                                      n_iterations=self.n_iterations, $
+                                     n_initializations=self.n_initializations, $
                                      double=self.double, $
                                      seed=seed)
 end
@@ -77,6 +82,7 @@ end
 
 pro mg_kmeans::getProperty, n_clusters=n_clusters, $
                             n_iterations=n_iterations, $
+                            n_initializations=n_initializations, $
                             double=double, $
                             centers=centers, $
                             _ref_extra=e
@@ -84,6 +90,7 @@ pro mg_kmeans::getProperty, n_clusters=n_clusters, $
 
   if (arg_present(n_clusters)) then n_clusters = self.n_clusters
   if (arg_present(n_iterations)) then n_iterations = self.n_iterations
+  if (arg_present(n_initializations)) then n_initializations = self.n_initializations
   if (arg_present(double)) then double = self.double
   if (arg_present(centers)) then centers = *self._centers
 
@@ -103,6 +110,7 @@ end
 
 function mg_kmeans::init, n_clusters=n_clusters, $
                           n_iterations=n_iterations, $
+                          n_initializations=n_initializations, $
                           double=double, $
                           _extra=e
   compile_opt strictarr
@@ -113,6 +121,7 @@ function mg_kmeans::init, n_clusters=n_clusters, $
 
   self.n_clusters = mg_default(n_clusters, 8)
   self.n_iterations = mg_default(n_iterations, 20)
+  self.n_initializations = mg_default(n_initializations, 10)
   self.double = keyword_set(double)
 
   self._centers = ptr_new(/allocate_heap)
@@ -127,6 +136,7 @@ pro mg_kmeans__define
   !null = {mg_kmeans, inherits mg_estimator, $
            n_clusters: 0L, $
            n_iterations: 0L, $
+           n_initializations: 0L, $
            double: 0B, $
            _centers: ptr_new() $
           }
@@ -137,25 +147,19 @@ end
 
 ;seed = 1L
 
-n = 50
-
-c1 = 0.5 * randomn(seed, 2, n)
-c1 += rebin(reform([7.5, 8.0], 2, 1), 2, n)
-
-c2 = 0.5 * randomn(seed, 2, n)
-c2 += rebin(reform([3.0, 6.0], 2, 1), 2, n)
-
-c3 = 0.5 * randomn(seed, 2, n)
-c3 += rebin(reform([5.5, 3.0], 2, 1), 2, n)
-
-x = [[c1], [c2], [c3]] / 10.0
+x = mg_make_blobs(3, $
+                  sizes=50, $
+                  scales=0.075, $
+                  centers=[[0.75, 0.80], [0.30, 0.60], [0.55, 0.30]], $
+                  seed=seed)
 
 kmeans = mg_kmeans(n_clusters=3, n_iterations=50, /double)
 
 kmeans->fit, x, seed=seed
 
-colors = ['404040'x, '707070'x, 'a0a0a0'x]
-symbols = [1, 4, 5]
+colors = mg_rgb2index(rebin(reform(lindgen(kmeans.n_clusters) * (255 / kmeans.n_clusters), kmeans.n_clusters, 1), kmeans.n_clusters, 3))
+all_symbols = [1, 4, 5, 6, 7]
+symbols = all_symbols[lindgen(kmeans.n_clusters) mod n_elements(all_symbols)]
 
 window, xsize=800, ysize=400, title='Clustering', /free
 !p.multi = [0, 2, 1]
@@ -174,6 +178,7 @@ plot, x[0, *], x[1, *], psym=4, /nodata, $
 for c = 0L, kmeans.n_clusters - 1L do begin
   ind = where(labels eq c, count)
 
+  print, c, count, format='(%"class %d: %d points")'
   plots, kmeans.centers[0, c], kmeans.centers[1, c], $
          psym=1, color=colors[c], symsize=3.0, thick=3.0
   if (count gt 0L) then begin
