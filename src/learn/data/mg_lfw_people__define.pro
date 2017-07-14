@@ -16,15 +16,27 @@ function mg_lfw_people::_overloadBracketsRightSide, is_range, ss1
   endelse
   n_files = n_elements(filenames)
 
-  result = fltarr(n_files, 3, self.size[0], self.size[1])
+  if (self.color) then begin
+    faces = bytarr(n_files, 3, self.size[0], self.size[1])
+  endif else begin
+    faces = bytarr(n_files, self.size[0], self.size[1])
+  endelse
+
   for f = 0L, n_files - 1L do begin
     read_jpeg, filenames[f], im, true=1
     im = im[*, self.xslice[0]:self.xslice[1], self.yslice[0]:self.yslice[1]]
-    im = congrid(im, 3, self.size[0], self.size[1])
-    result[f, 0, 0, 0] = reform(im, 1, 3, self.size[0], self.size[1])
+
+    if (self.color) then begin
+      im = congrid(im, 3, self.size[0], self.size[1])
+      faces[f, 0, 0, 0] = reform(im, 1, 3, self.size[0], self.size[1])
+    endif else begin
+      im = mean(im, dimension=1)
+      im = congrid(im, self.size[0], self.size[1])
+      faces[f, 0, 0] = reform(im, 1, self.size[0], self.size[1])
+    endelse
   endfor
 
-  return, reform(result)
+  return, reform(faces)
 end
 
 
@@ -37,11 +49,13 @@ pro mg_lfw_people::cleanup
 end
 
 
-function mg_lfw_people::init, size=size, seed=seed
+function mg_lfw_people::init, size=size, seed=seed, color=color
   compile_opt strictarr
 
-  self.xslice = [70L, 195L]
-  self.yslice = [78L, 172L]
+  self.color = keyword_set(color)
+
+  self.xslice = [78L, 172L]
+  self.yslice = [70L, 195L]
 
   nx = self.xslice[1] - self.xslice[0] + 1
   ny = self.yslice[1] - self.yslice[0] + 1
@@ -85,6 +99,7 @@ pro mg_lfw_people__define
   compile_opt strictarr
 
   !null = { mg_lfw_people, inherits IDL_Object, $
+            color:  0B, $
             size:   lonarr(2), $
             xslice: lonarr(2), $
             yslice: lonarr(2), $
