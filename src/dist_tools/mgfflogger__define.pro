@@ -25,8 +25,8 @@
 ;         '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 ;
 ;       where the possible names to include are: "time", "levelname",
-;       "levelshortname", "routine", "stacktrace", "name", "fullname" and
-;       "message".
+;       "levelshortname", "routine", "line", "stacktrace", "name", "fullname"
+;       and "message".
 ;
 ;       Note that the "time" argument will first be formatted using the
 ;       `TIME_FORMAT` specification
@@ -300,6 +300,7 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
                levelname: strupcase(self.levelNames[msg_level - 1L]), $
                levelshortname: strupcase(self.levelShortNames[msg_level - 1L]), $
                routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
+               line: stack[n_elements(stack) - 2L - _back_levels].line, $
                stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
                                    '->'), $
                name: self.name, $
