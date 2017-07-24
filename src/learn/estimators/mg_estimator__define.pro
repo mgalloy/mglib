@@ -80,19 +80,21 @@ end
 ;+
 ; Get property values.
 ;-
-pro mg_estimator::getProperty, type=type
+pro mg_estimator::getProperty, type=type, name=name
   compile_opt strictarr
 
   if (arg_present(type)) then type = self.type
+  if (arg_present(name)) then name = self.name
 end
 
 
 ;+
 ; Set property values.
 ;-
-pro mg_estimator::setProperty, _extra=e
+pro mg_estimator::setProperty, name=name, _extra=e
   compile_opt strictarr
 
+  if (n_elements(name) gt 0L) then self.name = name
 end
 
 
@@ -128,5 +130,6 @@ pro mg_estimator__define
   compile_opt strictarr
 
   !null = {mg_estimator, inherits IDL_Object, $
-           type:''}
+           type:'', $
+           name: ''}
 end
