@@ -49,18 +49,28 @@ end
 
 ;= property access
 
-pro mg_standardscaler::getProperty, _means=_means, _stddevs=_stddevs, _ref_extra=e
+pro mg_standardscaler::getProperty, _means=_means, _stddevs=_stddevs, $
+                                    fit_parameters=fit_parameters, $
+                                    _ref_extra=e
   compile_opt strictarr
-
-  if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 
   if (arg_present(_means)) then _means = *self._means
   if (arg_present(_stddevs)) then _stddevs = *self._stddevs
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {means: *self._means, stddevs: *self._stddevs}
+  endif
+
+  if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_standardscaler::setProperty, _extra=e
+pro mg_standardscaler::setProperty, fit_parameters=fit_parameters, _extra=e
   compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._means = fit_parameters.means
+    *self._stddevs = fit_parameters.stddevs
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end

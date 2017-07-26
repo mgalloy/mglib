@@ -98,18 +98,32 @@ end
 
 ;= property access
 
-pro mg_polynomialfeatures::getProperty, degree=degree, _ref_extra=e
+pro mg_polynomialfeatures::getProperty, degree=degree, $
+                                        fit_parameters=fit_parameters, $
+                                        _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(degree)) then degree = self.degree
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {combinations: *self._combinations, $
+                      feature_names: *self.feature_names}
+  endif
+
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_polynomialfeatures::setProperty, degree=degree, _extra=e
+pro mg_polynomialfeatures::setProperty, degree=degree, $
+                                        fit_parameters=fit_parameters, $
+                                        _extra=e
   compile_opt strictarr
 
   if (n_elements(degree) gt 0L) then self.degree = degree
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._combinations = fit_parameters.combinations
+    *self.feature_names = fit_parameters.feature_names
+  endif
+
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end
 

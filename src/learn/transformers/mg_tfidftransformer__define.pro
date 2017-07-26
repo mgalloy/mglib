@@ -103,15 +103,25 @@ end
 
 ;= property access
 
-pro mg_tfidftransformer::getProperty, _ref_extra=e
+pro mg_tfidftransformer::getProperty, fit_parameters=fit_parameters, $
+                                      _ref_extra=e
   compile_opt strictarr
+  on_error, 2
+
+  if (arg_present(fit_parameters)) then begin
+    message, 'FIT_PARAMETERS not implemented for mg_tfidftransformer'
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_tfidftransformer::setProperty, _extra=e
+pro mg_tfidftransformer::setProperty, fit_parameters=fit_parameters, _extra=e
   compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    message, 'FIT_PARAMETERS not implemented for mg_tfidftransformer'
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end

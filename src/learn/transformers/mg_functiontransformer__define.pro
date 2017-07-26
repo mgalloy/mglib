@@ -30,18 +30,25 @@ end
 
 ;= property access
 
-pro mg_functiontransformer::getProperty, function_name=function_name, _ref_extra=e
+pro mg_functiontransformer::getProperty, function_name=function_name, $
+                                         fit_parameters=fit_parameters, $
+                                         _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(function_name)) then function_name = self.function_name
+  if (arg_present(fit_parameters)) then fit_parameters = 1
+
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_functiontransformer::setProperty, function_name=function_name, _extra=e
+pro mg_functiontransformer::setProperty, function_name=function_name, $
+                                         fit_parameters=fit_parameters, $
+                                         _extra=e
   compile_opt strictarr
 
   if (n_elements(function_name) gt 0L) then self.function_name = function_name
+  ; don't need to do anything for FIT_PARAMETERS, it's just here for consistency
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end
 

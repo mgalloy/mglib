@@ -46,7 +46,9 @@ end
 
 pro mg_pipeline::getProperty, steps=steps, $
                               n_steps=n_steps, $
-                              feature_names=feature_names
+                              feature_names=feature_names, $
+                              fit_parameters=fit_parameters, $
+                              _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(steps)) then steps = *self.steps
@@ -55,11 +57,28 @@ pro mg_pipeline::getProperty, steps=steps, $
     last_step = (*self.steps)[-1]
     feature_names = last_step.feature_names
   endif
+
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {}
+    for s = 0L, n_elements(*self.steps) - 1L do begin
+      fit_parameters = create_struct(fit_parameters, $
+                                     string(s, format='(%"_%d")'), $
+                                     ((*self.steps)[s]).fit_parameters)
+    endfor
+  endif
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
 
 
-pro mg_pipeline::setProperty, _extra=e
+pro mg_pipeline::setProperty, fit_parameters=fit_parameters, _extra=e
   compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    for s = 0L, n_tags(fit_parameters) - 1L do begin
+      ((*self.steps)[s]).fit_parameters = fit_parameters.(s)
+    endif
+  endif
 
   self->mg_estimator::setProperty, _extra=e
 end

@@ -84,20 +84,25 @@ end
 pro mg_ridgeregressor::getProperty, intercept=intercept, $
                                     coefficients=coefficients, $
                                     alpha=alpha, $
+                                    fit_parameters=fit_parameters, $
                                     _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(intercept)) then intercept = (*self._weights)[0]
   if (arg_present(coefficients)) then coefficients = (*self._weights)[1:*]
   if (arg_present(alpha)) then alpha = self.alpha
+  if (arg_present(fit_parameters)) then fit_parameters = *self.weights
+
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
 
 
-pro mg_ridgeregressor::setProperty, alpha=alpha, _extra=e
+pro mg_ridgeregressor::setProperty, alpha=alpha, fit_parameters=fit_parameters, _extra=e
   compile_opt strictarr
 
   if (n_elements(alpha) gt 0L) then self.alpha = alpha
+  if (n_elements(fit_parameters) gt 0L) then *self._weights = fit_parameters
+
   if (n_elements(e) gt 0L) then self->mg_regressor::setProperty, _extra=e
 end
 

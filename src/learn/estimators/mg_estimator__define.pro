@@ -80,21 +80,29 @@ end
 ;+
 ; Get property values.
 ;-
-pro mg_estimator::getProperty, type=type, name=name
+pro mg_estimator::getProperty, type=type, name=name, $
+                               fit_parameters=fit_parameters
   compile_opt strictarr
 
   if (arg_present(type)) then type = self.type
   if (arg_present(name)) then name = self.name
+
+  ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
+  ; case
 end
 
 
 ;+
 ; Set property values.
 ;-
-pro mg_estimator::setProperty, name=name, _extra=e
+pro mg_estimator::setProperty, name=name, fit_parameters=fit_parameters, $
+                               _extra=e
   compile_opt strictarr
 
   if (n_elements(name) gt 0L) then self.name = name
+
+  ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
+  ; case
 end
 
 

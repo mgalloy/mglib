@@ -85,6 +85,7 @@ pro mg_kmeans::getProperty, n_clusters=n_clusters, $
                             n_initializations=n_initializations, $
                             double=double, $
                             centers=centers, $
+                            fit_parameters=fit_parameters, $
                             _ref_extra=e
   compile_opt strictarr
 
@@ -92,9 +93,19 @@ pro mg_kmeans::getProperty, n_clusters=n_clusters, $
   if (arg_present(n_iterations)) then n_iterations = self.n_iterations
   if (arg_present(n_initializations)) then n_initializations = self.n_initializations
   if (arg_present(double)) then double = self.double
-  if (arg_present(centers)) then centers = *self._centers
+  if (arg_present(centers)) then centers = *self._center
+  if (arg_present(fit_parameters)) then fit_parameters = *self._centers
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+end
+
+
+pro mg_kmeans::setProperty, fit_parameters=fit_parameters, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then *self._centers = fit_parameters
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
 end
 
 

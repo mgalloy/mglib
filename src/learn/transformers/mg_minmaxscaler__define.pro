@@ -52,15 +52,21 @@ end
 
 ;= property access
 
-pro mg_minmaxscaler::getProperty, _ref_extra=e
+pro mg_minmaxscaler::getProperty, fit_parameters=fit_parameters, _ref_extra=e
   compile_opt strictarr
+
+  if (arg_present(fit_parameters)) then fit_parameters = *self._ranges
 
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_minmaxscaler::setProperty, _extra=e
+pro mg_minmaxscaler::setProperty, fit_parameters=fit_parameters, _extra=e
   compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._ranges = fit_parameters
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end

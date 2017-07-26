@@ -83,12 +83,28 @@ end
 ;= property access
 
 pro mg_kneighborsclassifier::getProperty, n_neighbors=n_neighbors, $
+                                          fit_parameters=fit_parameters, $
                                           _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(n_neighbors)) then n_neighbors = self.n_neighbors
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {x: *self._x, y: *self._y}
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+end
+
+
+pro mg_kneighborsclassifier::setProperty, fit_parameters=fit_parameters, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._x = fit_parameters.x
+    *self._y = fit_parameters.y
+  endif
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
 end
 
 

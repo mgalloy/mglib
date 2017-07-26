@@ -116,6 +116,7 @@ pro mg_perceptron::getProperty, max_iterations=max_iterations, $
                                 weights=weights, $
                                 bias=bias, $
                                 errors=errors, $
+                                fit_parameters=fit_parameters, $
                                 _ref_extra=e
   compile_opt strictarr
 
@@ -124,6 +125,11 @@ pro mg_perceptron::getProperty, max_iterations=max_iterations, $
   if (arg_present(weights)) then weights = *self._weights
   if (arg_present(bias)) then bias = self._bias
   if (arg_present(errors)) then errors = (*self._errors)[0:self._n_iterations - 1L]
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {weights: *self._weights, $
+                      bias: self._bias, $
+                      errors: (*self._errors)[0:self._n_iterations - 1L]}
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
@@ -131,11 +137,19 @@ end
 
 pro mg_perceptron::setProperty, max_iterations=max_iterations, $
                                 learning_rate=learning_rate, $
+                                fit_parameters=fit_parameters, $
                                 _extra=e
   compile_opt strictarr
 
   if (n_elements(max_iterations) gt 0L) then self.max_iterations = max_iterations
   if (n_elements(learning_rate) gt 0L) then self.learning_rate = learning_rate
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._weights = fit_parameters.weights
+    self._bias = fit_parameters.bias
+    (*self._errors)[0:n_elements(fit_parameters.errors) - 1L] = fit_parameters.errors
+  endif
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
 end
 
 

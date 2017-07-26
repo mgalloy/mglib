@@ -18,7 +18,25 @@
 pro mg_gridsearchcv::fit, x, y, seed=seed
   compile_opt strictarr
 
-  ; TODO: implement
+  first_try = 1B
+  foreach pset, self, key do begin
+    ; set parameters on self.estimator to pset
+    self.estimator->setProperty, _extra=pset
+
+    ; fit
+    self.estimator->fit, x, y
+
+    ; score
+    score = self.estimator->score(x, y)
+
+    ; save score and parameters if best score so far
+    if (first_try || score gt self.best_score) then begin
+      self.best_score = score
+      *self.best_parameters = pset
+      *self.best_fit_parameters = self.estimator.fit_parameters
+    endif
+    first_try = 0B
+  endforeach
 end
 
 
@@ -41,7 +59,9 @@ end
 function mg_gridsearchcv::predict, x, y, score=score
   compile_opt strictarr
 
-  ; TODO: implement
+  self.estimator->setProperty, _extra=*self.best_parameters
+  self.estimator.fit_parameters = *self.best_fit_parameters
+  return, self.estimator->predict(x, y, score=score)
 end
 
 
@@ -63,12 +83,56 @@ pro mg_gridsearchcv::getProperty, parameter_grid=parameter_grid, $
 end
 
 
+;= overload methods
+
+function mg_gridsearchcv::_overloadForeach, value, key
+  compile_opt strictarr
+
+  n_params = n_tags(*self.parameter_grid)
+
+  if (n_elements(key) eq 0L) then begin
+    key = lonarr(n_params)
+  endif else begin
+    increment_next = 1B
+    for p = 0L, n_params - 1L do begin
+      if (increment_next) then begin
+        if (++key[p] eq n_elements((*self.parameter_grid).(p))) then begin
+          key[p] = 0L
+          increment_next = 1B
+        endif else increment_next = 0B
+      endif
+    endfor
+
+    if (increment_next) then return, 0
+  endelse
+
+  tnames = tag_names(*self.parameter_grid)
+
+  value = {}
+  for p = 0L, n_params - 1L do begin
+    value = create_struct(value, tnames[p], (*self.parameter_grid).(p)[key[p]])
+  endfor
+
+  return, 1
+end
+
+
+function mg_gridsearchcv::_overloadSize
+  compile_opt strictarr
+
+  n_params = n_tags(*self.parameter_grid)
+  dims = lonarr(n_params)
+  for p = 0L, n_params - 1L do dims[p] = n_elements((*self.parameter_grid).(p))
+  return, dims
+end
+
+
 ;= lifecycle methods
 
 pro mg_gridsearchcv::cleanup
   compile_opt strictarr
 
-  ptr_free, self.parameter_grid, self.best_paramaters
+  ptr_free, self.parameter_grid, self.best_parameters, self.best_fit_parameters
   self->mg_estimator::cleanup
 end
 
@@ -94,6 +158,7 @@ function mg_gridsearchcv::init, estimator, $
 
   self.best_score = 0.0
   self.best_parameters = ptr_new(/allocate_heap)
+  self.best_fit_parameters = ptr_new(/allocate_heap)
 
   return, 1
 end
@@ -107,7 +172,8 @@ pro mg_gridsearchcv__define
            parameter_grid: ptr_new(), $
            cross_validation: obj_new(), $
            best_score: 0.0, $
-           best_parameters: ptr_new()}
+           best_parameters: ptr_new(), $
+           best_fit_parameters: ptr_new()}
 end
 
 
@@ -123,7 +189,8 @@ species = [0, 1]
 ; the samples are in order by target
 ind = [lindgen(50) + 50 * species[0], lindgen(50) + 50 * species[1]]
 data = iris.data[*, ind]
-target = 2 / (species[1] - species[0]) * (iris.target[ind] - species[0]) - 1L  ; change to -1 and 1
+; change to -1 and 1
+target = 2 / (species[1] - species[0]) * (iris.target[ind] - species[0]) - 1L
 target_names = iris.target_names[species]
 
 ; split the dataset into training and test data
@@ -137,10 +204,14 @@ mg_train_test_split, data, target, $
 ; instantiate Perceptron model
 p = mg_perceptron(max_iterations=20)
 
-param_grid = {bias: [], $
-              learning_rate: []}
+param_grid = {bias: [0.0, 0.01], $
+              learning_rate: [0.1, 0.05, 0.02, 0.01, 0.001]}
 grid_search = mg_gridsearchcv(p, parameter_grid=param_grid, cross_validation=5)
 grid_search->fit, x_train, y_train
+
+print, grid_search.best_score
+help, grid_search.best_parameters
+
 y_results = grid_search->predict(x_test, y_test, score=score)
 
 obj_destroy, grid_search
