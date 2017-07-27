@@ -183,7 +183,7 @@ end
 iris = mg_learn_dataset('iris')
 
 ; pick two of the three species: 0, 1, or 2
-species = [0, 1]
+species = [1, 2]
 
 ; the 150 samples are equally split 50/50/50 into the different species and
 ; the samples are in order by target
@@ -194,7 +194,7 @@ target = 2 / (species[1] - species[0]) * (iris.target[ind] - species[0]) - 1L
 target_names = iris.target_names[species]
 
 ; split the dataset into training and test data
-;seed = 0L
+seed = 0L
 mg_train_test_split, data, target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test, $
@@ -204,15 +204,17 @@ mg_train_test_split, data, target, $
 ; instantiate Perceptron model
 p = mg_perceptron(max_iterations=20)
 
-param_grid = {bias: [0.0, 0.01], $
-              learning_rate: [0.1, 0.05, 0.02, 0.01, 0.001]}
+param_grid = {max_iterations:[1, 2], learning_rate: [0.005, 0.01, 0.02]}
 grid_search = mg_gridsearchcv(p, parameter_grid=param_grid, cross_validation=5)
 grid_search->fit, x_train, y_train
 
-print, grid_search.best_score
+print, grid_search.best_score, format='(%"Best training score: %0.2f")'
+print, 'Best parameters:'
 help, grid_search.best_parameters
 
 y_results = grid_search->predict(x_test, y_test, score=score)
+
+print, score, format='(%"Test score with best estimator: %0.2f")'
 
 obj_destroy, grid_search
 
