@@ -140,6 +140,8 @@ end
 function mg_transformer::init, _extra=e
   compile_opt strictarr
 
+  self.name = strlowcase(obj_class(self))
+
   self.feature_names = ptr_new(/allocate_heap)
 
   self->setProperty, _extra=e

@@ -125,6 +125,8 @@ end
 function mg_estimator::init, _extra=e
   compile_opt strictarr
 
+  self.name = strlowcase(obj_class(self))
+
   self->setProperty, _extra=e
 
   return, 1
