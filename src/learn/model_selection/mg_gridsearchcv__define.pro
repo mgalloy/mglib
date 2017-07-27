@@ -27,7 +27,10 @@ pro mg_gridsearchcv::fit, x, y, seed=seed
     self.estimator->fit, x, y
 
     ; score
-    score = self.estimator->score(x, y)
+    scores = mg_cross_val_score(self.estimator, x, y, $
+                                cross_validation=self.cross_validation)
+    score = mean(scores)
+    ;score = self.estimator->score(x, y)
 
     ; save score and parameters if best score so far
     if (first_try || score gt self.best_score) then begin

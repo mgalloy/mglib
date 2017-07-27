@@ -21,7 +21,11 @@ function mg_cross_val_score, estimator, x, y, $
     scores[s] = estimator->score(x[*, test_indices], y[test_indices])
   endfor
 
-  if (~obj_valid(cross_validation)) then obj_destroy, _cross_validation
+  if (~obj_valid(cross_validation)) then begin
+    obj_destroy, _cross_validation
+  endif else begin
+    _cross_validation->reset
+  endelse
 
   return, scores
 end

@@ -9,7 +9,7 @@ pro mg_kfoldcv::split, x, y, $
                        training_indices=training_indices, $
                        test_indices=test_indices
   compile_opt strictarr
-  on_error, 2
+  ;on_error, 2
 
   if (self.i eq self.n_splits) then message, 'no more indices'
 
@@ -27,13 +27,22 @@ pro mg_kfoldcv::split, x, y, $
   endif
 
   fold_sizes = lonarr(self.n_splits) + n_samples / self.n_splits
-  fold_sizes[0:(n_samples mod self.n_splits) - 1] += 1
+  if (n_samples mod self.n_splits gt 0L) then begin
+    fold_sizes[0:(n_samples mod self.n_splits) - 1] += 1
+  endif
   c_fold_sizes = [0L, total(fold_sizes, /integer, /cumulative)]
 
   test_indices = (*self.indices)[c_fold_sizes[self.i]:c_fold_sizes[self.i + 1L] - 1L]
   training_indices = mg_complement(test_indices, n_samples)
 
   self.i += 1
+end
+
+
+pro mg_kfoldcv::reset
+  compile_opt strictarr
+
+  self.i = 0L
 end
 
 
