@@ -96,13 +96,13 @@ endif else begin
   window, xsize=400, ysize=400, /free, title='Blobs'
 endelse
 
-plot, blobs[0, *], blobs[1, *], psym=1, $
+plot, blobs[0, *], blobs[1, *], psym=1, symsize=0.5, $
       xrange=[0.0, 10.0], xstyle=1, $
       yrange=[0.0, 10.0], ystyle=1
 
 if (ps) then begin
   mg_psend
-  mg_convert, 'blobs', max_dimensions=[400, 400], output=im, /to_png, /keep
+  mg_convert, 'blobs', max_dimensions=[400, 400], output=im, /to_png
   mg_image, im, /new_window
 endif
 

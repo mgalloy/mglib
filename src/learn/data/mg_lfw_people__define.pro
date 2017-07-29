@@ -1,11 +1,35 @@
 ; docformat = 'rst'
 
 ;+
-; .. image: lfw.png
+; Access the LFW face dataset.
+;
+; .. image:: lfw.png
+;
+; :Properties:
+;   color : type=boolean
+;     set to return RGB (`TRUE=1`) images, instead of single channel images
+;   seed
+;     seed for random number generator
+;   size : type=float/long/fltarr(2)/lonarr(2)
+;     size of images; if a float between 0.0 and 1.0, it represents a fraction
+;     of the full size; single values are used for both height and width
 ;-
 
 ;= overload methods
 
+;+
+; Access the given faces.
+;
+; :Returns:
+;   `bytarr(n_faces, nx, ny)` or `bytarr(n_faces, 3, nx, ny)` if `COLOR` is set
+;
+; :Params:
+;   is_range : in, required, type=lonarr(1)
+;     whether the corresponding subscripts are a range or a list of indices
+;   ss1 : in, required, type=lonarr
+;     subscripts; either `[start, stop, stride]` if `is_range[0]` is true or an
+;     array of indices if not
+;-
 function mg_lfw_people::_overloadBracketsRightSide, is_range, ss1
   compile_opt strictarr
 
@@ -42,6 +66,9 @@ end
 
 ;= lifecycle methods
 
+;+
+; Free resources of the LFW faces dataset.
+;-
 pro mg_lfw_people::cleanup
   compile_opt strictarr
 
@@ -49,6 +76,12 @@ pro mg_lfw_people::cleanup
 end
 
 
+;+
+; Initialize the LFW face dataset.
+;
+; :Returns:
+;   1 if succeeds, 0 if not
+;-
 function mg_lfw_people::init, size=size, seed=seed, color=color
   compile_opt strictarr
 
@@ -95,6 +128,9 @@ function mg_lfw_people::init, size=size, seed=seed, color=color
 end
 
 
+;+
+; Define LFW dataset class.
+;-
 pro mg_lfw_people__define
   compile_opt strictarr
 
