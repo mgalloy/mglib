@@ -77,7 +77,7 @@ pro mg_pipeline::setProperty, fit_parameters=fit_parameters, _extra=e
   if (n_elements(fit_parameters) gt 0L) then begin
     for s = 0L, n_tags(fit_parameters) - 1L do begin
       ((*self.steps)[s]).fit_parameters = fit_parameters.(s)
-    endif
+    endfor
   endif
 
   self->mg_estimator::setProperty, _extra=e

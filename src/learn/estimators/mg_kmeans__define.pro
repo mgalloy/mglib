@@ -7,14 +7,15 @@
 ;   unsupervised
 ;
 ; :Properties:
-;   n_clusters : type=integer, default=8
-;     number of clusters to find
-;   n_iterations : type=integer, default=20
-;     number of interations to perform
-;   n_initializations : type=integer, default=10
+;   n_clusters : type=integer
+;     number of clusters to find, default=8
+;   n_iterations : type=integer
+;     number of interations to perform, default=20
+;   n_initializations : type=integer
 ;     number of times to fit the data with new random initialization, choosing
 ;     the best of the fits, i.e., the one which minimizes the sum of the
-;     variances of distances of the points in a cluster to their center
+;     variances of distances of the points in a cluster to their center;
+;     default=10
 ;-
 
 ;= API
