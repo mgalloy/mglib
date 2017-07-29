@@ -3,6 +3,21 @@
 ;+
 ; Create a set of data points that cluster into `n` blobs.
 ;
+; :Examples:
+;   For example, try::
+;
+;     blobs = mg_make_blobs(3, $
+;                           sizes=50, $
+;                           scales=0.5, $
+;                           centers=[[7.5, 8.0], [3.0, 6.0], [5.5, 3.0]])
+;     plot, blobs[0, *], blobs[1, *], psym=1, $
+;           xrange=[0.0, 10.0], xstyle=1, $
+;           yrange=[0.0, 10.0], ystyle=1
+;
+;   This produces:
+;
+;   .. image:: blobs-example.png
+;
 ; :Returns:
 ;   fltarr(n_dimensions, total(sizes))
 ;
@@ -73,9 +88,22 @@ blobs = mg_make_blobs(3, $
                       scales=0.5, $
                       centers=[[7.5, 8.0], [3.0, 6.0], [5.5, 3.0]])
 
-window, xsize=400, ysize=400, /free, title='Blobs'
+if (n_elements(ps) eq 0L) then ps = 0B
+
+if (ps) then begin
+  mg_psbegin, filename='blobs.ps', xsize=4, ysize=4, /inches
+endif else begin
+  window, xsize=400, ysize=400, /free, title='Blobs'
+endelse
+
 plot, blobs[0, *], blobs[1, *], psym=1, $
       xrange=[0.0, 10.0], xstyle=1, $
       yrange=[0.0, 10.0], ystyle=1
+
+if (ps) then begin
+  mg_psend
+  mg_convert, 'blobs', max_dimensions=[400, 400], output=im, /to_png, /keep
+  mg_image, im, /new_window
+endif
 
 end
