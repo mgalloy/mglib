@@ -4,41 +4,44 @@
 ; Logger object to control logging.
 ;
 ; :Properties:
-;    name : type=string
-;       name of the logger
-;    parent : private
-;       parent logger
-;    level : type=long
-;       current level of logging: 0 (not set), 1 (critical), 2 (error),
-;       3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
-;       which will be cascaded up to the parents of the logger with the logger
-;       taking the last level and passing the previous ones up to its parent;
-;       only messages with levels greater than or equal to than the logger
-;       level will be logged
-;    time_format : type=string
-;       Fortran style format code to specify the format of the time in the
-;       `FORMAT` property; the default value formats the time/date like
-;       "2003-07-08 16:49:45.891"
-;    format : type=string
-;       format string for messages, default value for format is::
+;   name : type=string
+;     name of the logger
+;   parent : private
+;     parent logger
+;   level : type=long
+;     current level of logging: 0 (not set), 1 (critical), 2 (error),
+;     3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
+;     which will be cascaded up to the parents of the logger with the logger
+;     taking the last level and passing the previous ones up to its parent;
+;     only messages with levels greater than or equal to than the logger
+;     level will be logged
+;   time_format : type=string
+;     Fortran style format code to specify the format of the time in the
+;     `FORMAT` property; the default value formats the time/date like
+;     "2003-07-08 16:49:45.891"
+;   format : type=string
+;     format string for messages, default value for format is::
 ;
-;         '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
+;       '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 ;
-;       where the possible names to include are: "time", "levelname",
-;       "levelshortname", "routine", "line", "stacktrace", "name", "fullname"
-;       and "message".
+;     where the possible names to include are: "time", "levelname",
+;     "levelshortname", "routine", "stacktrace", "name", "fullname" and
+;     "message".
 ;
-;       Note that the "time" argument will first be formatted using the
-;       `TIME_FORMAT` specification
-;    filename : type=string
-;       filename to send append output to; set to empty string to send output
-;       to `stderr`
-;    clobber : type=boolean
-;       set, along with filename, to clobber pre-existing file
-;    output : type=strarr
-;        output sent to the logger already
-;    _extra : type=keywords
-;       any keyword accepted by `MGffLogger::setProperty`
+;     Note that the "time" argument will first be formatted using the
+;     `TIME_FORMAT` specification
+;   filename : type=string
+;     filename to send append output to; set to empty string to send output
+;     to `stderr`
+;   widget_identifier : type=long
+;     if set to a positive integer, append output to the corresponding
+;     WIDGET_TEXT
+;   clobber : type=boolean
+;     set, along with filename, to clobber pre-existing file
+;   output : type=strarr
+;     output sent to the logger already
+;   _extra : type=keywords
+;     any keyword accepted by `MGffLogger::setProperty`
 ;-
 
 
@@ -183,7 +186,9 @@ end
 ;-
 pro mgfflogger::setProperty, level=level, $
                              format=format, time_format=time_format, $
-                             filename=filename, clobber=clobber
+                             filename=filename, $
+                             widget_identifier=widget_identifier, $
+                             clobber=clobber
   compile_opt strictarr
 
   case n_elements(level) of
@@ -200,6 +205,9 @@ pro mgfflogger::setProperty, level=level, $
   if (n_elements(format) gt 0L) then self.format = format
   if (n_elements(time_format) gt 0L) then self.time_format = time_format
   if (n_elements(filename) gt 0L) then self.filename = filename
+  if (n_elements(widget_identifier) gt 0L) then begin
+    self.widget_identifier = widget_identifier
+  endif
   if (keyword_set(clobber) && n_elements(filename) gt 0L) then begin
     if (file_test(filename)) then file_delete, filename
   endif
@@ -309,7 +317,12 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
              }
       s = mg_subs(self.format, vars)
     endelse
-    printf, lun, s
+
+    if (self.widget_identifier gt 0L) then begin
+      widget_control, self.widget_identifier, set_value=s, /append
+    endif else begin
+      printf, lun, s
+    endelse
     was_logged = 1B
   endif
 
@@ -393,6 +406,7 @@ pro mgfflogger__define
              levelNames: strarr(5), $
              levelShortNames: strarr(5), $
              filename: '', $
+             widget_identifier: 0L, $
              time_format: '', $
              format: '' $
            }
