@@ -398,7 +398,7 @@ end
 pro mgfflogger__define
   compile_opt strictarr
 
-  define = { MGffLogger, $
+  define = { MGffLogger, inherits IDL_object, $
              parent: obj_new(), $
              name: '', $
              children: obj_new(), $
