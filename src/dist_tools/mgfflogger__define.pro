@@ -156,10 +156,11 @@ pro mgfflogger::getProperty, level=level, $
                              name=name, $
                              fullname=fullname, $
                              filename=filename, $
-                             output=output
+                             output=output, children=children
   compile_opt strictarr
 
   if (arg_present(level)) then level = self.level
+  if (arg_present(children)) then children = self.children
   if (arg_present(format)) then format = self.format
   if (arg_present(time_format)) then time_format = self.time_format
   if (arg_present(name)) then name = self.name
