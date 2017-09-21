@@ -164,7 +164,7 @@ end
 function mg_fits_browser::file_extensions
   compile_opt strictarr
 
-  return, [['*.fits;*.fts;*.FTS', '*.*'], $
+  return, [['*.fits;*.fts;*.fts.gz;*.FTS', '*.*'], $
            ['FITS files', 'All files']]
 end
 
