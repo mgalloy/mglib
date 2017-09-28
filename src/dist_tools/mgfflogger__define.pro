@@ -4,42 +4,77 @@
 ; Logger object to control logging.
 ;
 ; :Properties:
-;    name : type=string
-;       name of the logger
-;    parent : private
-;       parent logger
-;    level : type=long
-;       current level of logging: 0 (not set), 1 (critical), 2 (error),
-;       3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
-;       which will be cascaded up to the parents of the logger with the logger
-;       taking the last level and passing the previous ones up to its parent;
-;       only messages with levels greater than or equal to than the logger
-;       level will be logged
-;    time_format : type=string
+;   name : type=string
+;     name of the logger
+;   parent : private
+;     parent logger
+;   level : type=long
+;     current level of logging: 0 (not set), 1 (critical), 2 (error),
+;     3 (warning), 4 (info), or 5 (debug); can be set to an array of levels
+;     which will be cascaded up to the parents of the logger with the logger
+;     taking the last level and passing the previous ones up to its parent;
+;     only messages with levels greater than or equal to than the logger
+;     level will be logged
+;   debug : type=boolean
+;     convenience keyword to set level as debug (5)
+;   informational : type=boolean 
+;     convenience keyword to set level as informational (4)
+;   warning : type=boolean
+;     convenience keyword to set level as warning (3)
+;   error : type=boolean
+;     convenience keyword to set level as error (2)
+;   critical : type=boolean
+;     convenience keyword to set level as critical (1)
+;   color : type=boolean
+;     set to use color for logging to TTY
+;   time_format : type=string
 ;       Fortran style format code to specify the format of the time in the
 ;       `FORMAT` property; the default value formats the time/date like
 ;       "2003-07-08 16:49:45.891"
-;    format : type=string
-;       format string for messages, default value for format is::
+;   format : type=string
+;     format string for messages, default value for format is::
 ;
-;         '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
+;       '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 ;
-;       where the possible names to include are: "time", "levelname",
-;       "levelshortname", "routine", "stacktrace", "name", "fullname" and
-;       "message".
+;     where the possible names to include are: "time", "levelname",
+;     "levelshortname", "routine", "stacktrace", "name", "fullname" and
+;     "message".
 ;
-;       Note that the "time" argument will first be formatted using the
-;       `TIME_FORMAT` specification
-;    filename : type=string
-;       filename to send append output to; set to empty string to send output
-;       to `stderr`
-;    clobber : type=boolean
-;       set, along with filename, to clobber pre-existing file
-;    output : type=strarr
-;        output sent to the logger already
-;    _extra : type=keywords
-;       any keyword accepted by `MGffLogger::setProperty`
+;     Note that the "time" argument will first be formatted using the
+;     `TIME_FORMAT` specification
+;   filename : type=string
+;     filename to send append output to; set to empty string to send output
+;     to `stderr`
+;   clobber : type=boolean
+;     set, along with filename, to clobber pre-existing file
+;   output : type=strarr
+;      output sent to the logger already
+;   _extra : type=keywords
+;     any keyword accepted by `MGffLogger::setProperty`
 ;-
+
+
+
+;+
+; Determines if the current terminal is a TTY, calling `MG_TERMISTTY` safely
+; even if `mglib` is not installed.
+;
+; :Private:
+;
+; :Returns:
+;   1 if current term is a TTY, 0 if not (or not sure)
+;-
+function mgfflogger::_is_tty
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, 0
+  endif
+
+  return, mg_termIsTty()
+end
 
 
 ;+
@@ -149,6 +184,7 @@ end
 ; Set properties.
 ;-
 pro mgfflogger::getProperty, level=level, $
+                             color=color, $
                              format=format, time_format=time_format, $
                              name=name, $
                              fullname=fullname, $
@@ -157,6 +193,7 @@ pro mgfflogger::getProperty, level=level, $
   compile_opt strictarr
 
   if (arg_present(level)) then level = self.level
+  if (arg_present(color)) then color = self.color
   if (arg_present(format)) then format = self.format
   if (arg_present(time_format)) then time_format = self.time_format
   if (arg_present(name)) then name = self.name
@@ -182,6 +219,12 @@ end
 ; Get properties.
 ;-
 pro mgfflogger::setProperty, level=level, $
+                             debug=debug, $
+                             informational=informational, $
+                             warning=warning, $
+                             error=error, $
+                             critical=critical, $
+                             color=color, $
                              format=format, time_format=time_format, $
                              filename=filename, clobber=clobber
   compile_opt strictarr
@@ -196,6 +239,17 @@ pro mgfflogger::setProperty, level=level, $
         endif
       end
   endcase
+
+  if (keyword_set(debug)) then self.level = 5
+  if (keyword_set(informational)) then self.level = 4
+  if (keyword_set(warning)) then self.level = 3
+  if (keyword_set(error)) then self.level = 2
+  if (keyword_set(critical)) then self.level = 1
+
+  if (n_elements(color) gt 0L) then begin
+    self.color = color
+    self.color_set = 1B
+  endif
 
   if (n_elements(format) gt 0L) then self.format = format
   if (n_elements(time_format) gt 0L) then self.time_format = time_format
@@ -308,6 +362,18 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
              }
       s = mg_subs(self.format, vars)
     endelse
+
+    ; use color if set or display to stdout
+    if ((self.color_set && self.color) || (~self.color_set && self.is_tty && lun lt 0)) then begin
+      case msg_level of
+        1: s = mg_ansicode(s, /red)
+        2: s = mg_ansicode(s, /magenta)
+        3: s = mg_ansicode(s, /yellow)
+        4: s = mg_ansicode(s, /cyan)
+        5:
+      endcase
+    endif
+
     printf, lun, s
     was_logged = 1B
   endif
@@ -345,6 +411,11 @@ function mgfflogger::init, parent=parent, name=name, _extra=e
 
   self.time_format = 'C(CYI4.4, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2)'
   self.format = '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
+
+  ; settings to determine whether to use color
+  self.is_tty = self->_is_tty()
+  self.color = 0B
+  self.color_set = 0B
 
   self.level = 0L
   self.levelNames = ['Critical', 'Error', 'Warning',  'Informational', 'Debug']
@@ -391,6 +462,9 @@ pro mgfflogger__define
              level: 0L, $
              levelNames: strarr(5), $
              levelShortNames: strarr(5), $
+             color: 0B, $
+             color_set: 0B, $
+             is_tty: 0B, $
              filename: '', $
              time_format: '', $
              format: '' $

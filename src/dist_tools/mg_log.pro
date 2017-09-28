@@ -201,46 +201,32 @@ end
 
 mg_log, logger=logger
 
-logger->setProperty, level=3
+print, 'Top level logger @ LEVEL=5 (DEBUG):'
+mg_log, 'Debugging message', /debug
+mg_log, 'Informational message', /informational
+mg_log, 'Warning message', /warning
+mg_log, 'Error message', /error
+mg_log, 'Critical message', /critical
 
-print, 'Top level logger @ LEVEL=3:'
+logger->setProperty, /warning
+
+print
+print, 'Top level logger @ LEVEL=3 (WARNING):'
 mg_log, 'Debugging message', /debug              ; won't show up since LEVEL=3
 mg_log, 'Informational message', /informational  ; won't show up since LEVEL=3
 mg_log, 'Warning message', /warning
 mg_log, 'Error message', /error
 mg_log, 'Critical message', /critical
 
-mg_log, name='mg_log', logger=mgLogLogger
-mgLogLogger->setProperty, level=1
+logger->setProperty, /critical
 
 print
-print, 'mg_log logger @ LEVEL=1:'
-mg_log, 'Debugging message', name='mg_log', /debug
-mg_log, 'Informational message', name='mg_log', /informational
-mg_log, 'Warning message', name='mg_log', /warning
-mg_log, 'Error message', name='mg_log', /error
-mg_log, 'Critical message', name='mg_log', /critical
-
-mg_log, name='mg_log/example', logger=mgLogExampleLogger
-mgLogExampleLogger->setProperty, level=2
-
-print
-print, 'mg_log/example logger @ LEVEL=2, mg_log logger @ LEVEL=1:'
-mg_log, 'Debugging message', name='mg_log/example', /debug
-mg_log, 'Informational message', name='mg_log/example', /informational
-mg_log, 'Warning message', name='mg_log/example', /warning
-mg_log, 'Error message', name='mg_log/example', /error
-mg_log, 'Critical message', name='mg_log/example', /critical
-
-mgLogLogger->setProperty, level=2
-
-print
-print, 'mg_log/example logger @ LEVEL=2, mg_log logger @ LEVEL=2:'
-mg_log, 'Debugging message', name='mg_log/example', /debug
-mg_log, 'Informational message', name='mg_log/example', /informational
-mg_log, 'Warning message', name='mg_log/example', /warning
-mg_log, 'Error message', name='mg_log/example', /error
-mg_log, 'Critical message', name='mg_log/example', /critical
+print, 'mg_log logger @ LEVEL=1 (CRITICAL):'
+mg_log, 'Debugging message', /debug      ; won't show up since LEVEL=1
+mg_log, 'Informational message', /info   ; won't show up since LEVEL=1
+mg_log, 'Warning message', /warning      ; won't show up since LEVEL=1
+mg_log, 'Error message', /error          ; won't show up since LEVEL=1
+mg_log, 'Critical message', /critical
 
 mg_log, /quit
 
