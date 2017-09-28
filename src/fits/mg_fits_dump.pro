@@ -32,9 +32,12 @@
 ; :Keywords:
 ;   exten_no : in, optional, type=integer
 ;     if present, `MG_FITS_DUMP` prints information about the extension given
+;   header : in, optional, type=boolean
+;     set to print headers
 ;-
-pro mg_fits_dump, filename, exten_no=exten_no
+pro mg_fits_dump, filename, exten_no=exten_no, header=print_header
   compile_opt strictarr
+  on_error, 2
 
   if (n_elements(filename) eq 0L) then begin
     message, 'filename argument is required'
@@ -56,12 +59,17 @@ pro mg_fits_dump, filename, exten_no=exten_no
   for e = 0L, fcb.nextend do begin
     if (n_elements(exten_no) gt 0 && exten_no ne e) then continue
     fits_read, fcb, data, header, exten_no=e
-    name = (fcb.extname[e] eq '' && e eq 0L) ? 'primary' : fcb.extname[e]
+
+    if (e eq 0L) then begin
+      name = fcb.extname[e] eq '' ? 'primary' : fcb.extname[e]
+    endif else begin
+      name = fcb.extname[e] eq '' ? mg_fits_getkeyword(header, 'XTENSION') : fcb.extname[e]
+    endelse
+
     output = [output, $
               string(e, name, mg_variable_declaration(data), format='(%"%d: [%s] %s")')]
 
-    if (n_elements(exten_no) gt 0L && exten_no eq e) then begin
-
+    if (keyword_set(print_header) && ((fcb.nextend eq 0 && e eq 0L) || (n_elements(exten_no) gt 0L && exten_no eq e))) then begin
       if (e ne 0) then begin
         pos = strpos(header, 'BEGIN EXTENSION HEADER')
         ind = where(pos ge 0, count)

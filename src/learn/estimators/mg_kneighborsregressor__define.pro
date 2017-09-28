@@ -22,7 +22,7 @@
 ;   y : in, required, type=lonarr(n_samples)
 ;     results for `x` data; values must be -1 or 1
 ;-
-pro mg_kneighborsegressor::fit, x, y
+pro mg_kneighborsregressor::fit, x, y
   compile_opt strictarr
 
   *self._x = x
@@ -47,7 +47,7 @@ end
 ;     if `y` was specified, set to a named variable to retrieve a coefficient
 ;     of determination, r^2,
 ;-
-function mg_kneighborsegressor::predict, x, y, score=score
+function mg_kneighborsregressor::predict, x, y, score=score
   compile_opt strictarr
 
   ; find indices of nearest self.n_neighbors neighbors in *self._x...
@@ -66,7 +66,7 @@ end
 
 ;= overload methods
 
-function mg_kneighborsegressor::_overloadHelp, varname
+function mg_kneighborsregressor::_overloadHelp, varname
   compile_opt strictarr
 
   _type = 'KNR'
@@ -77,19 +77,35 @@ end
 
 ;= property access
 
-pro mg_kneighborsegressor::getProperty, n_neighbors=n_neighbors, $
+pro mg_kneighborsregressor::getProperty, n_neighbors=n_neighbors, $
+                                        fit_parameters=fit_parameters, $
                                         _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(n_neighbors)) then n_neighbors = self.n_neighbors
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {x: *self._x, y: *self._y}
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
 
 
+pro mg_kneighborsregressor::setProperty, fit_parameters=fit_parameters, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._x = fit_parameters.x
+    *self._y = fit_parameters.y
+  endif
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
+end
+
+
 ;= lifecycle methods
 
-pro mg_kneighborsegressor::cleanup
+pro mg_kneighborsregressor::cleanup
   compile_opt strictarr
 
   ptr_free, self._x, self._y
@@ -97,7 +113,7 @@ pro mg_kneighborsegressor::cleanup
 end
 
 
-function mg_kneighborsegressor::init, n_neighbors=n_neighbors, _extra=e
+function mg_kneighborsregressor::init, n_neighbors=n_neighbors, _extra=e
   compile_opt strictarr
 
   if (~self->mg_regressor::init(_extra=e)) then return, 0
@@ -110,10 +126,10 @@ function mg_kneighborsegressor::init, n_neighbors=n_neighbors, _extra=e
 end
 
 
-pro mg_kneighborsegressor__define
+pro mg_kneighborsregressor__define
   compile_opt strictarr
 
-  !null = {mg_kneighborsegressor, inherits mg_regressor, $
+  !null = {mg_kneighborsregressor, inherits mg_regressor, $
            n_neighbors: 0L, $
            _x: ptr_new(), $
            _y: ptr_new() $
@@ -128,7 +144,7 @@ mg_train_test_split, wave.data, wave.target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test
 
-knr = mg_kneighborsegressor(n_neighbors=3)
+knr = mg_kneighborsregressor(n_neighbors=3)
 knr->fit, x_train, y_train
 y_predict = knr->predict(x_test, y_test, score=r2)
 print, r2, format='(%"r^2: %f")'

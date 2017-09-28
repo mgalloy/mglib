@@ -124,8 +124,8 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
     if (count eq 0L) then continue
 
     key = keywords1[k]
-    v1 = sxpar(header1, key)
-    v2 = sxpar(header2, key)
+    v1 = mg_fits_getkeyword(header1, key)
+    v2 = mg_fits_getkeyword(header2, key)
     if (v1 ne v2) then begin
       if (obj_valid(differences)) then begin
         fmt = '(%"value for keyword %s not the same, %s ne %s%s")'
@@ -201,7 +201,7 @@ end
 ; Determine if two FITS files are equivalent (given some conditions on what to
 ; check and a numeric tolerance).
 ;
-; Uses `FITS_OPEN`, `FITS_READ`, `FITS_CLOSE`, and `SXPAR` from IDL Astronomy
+; Uses `FITS_OPEN`, `FITS_READ`, and `FITS_CLOSE` from IDL Astronomy
 ; User's library.
 ;
 ; :Examples:

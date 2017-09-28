@@ -13,7 +13,7 @@
 ;     + print method that can take a start/stop row
 ;     + head/tail methods (calls print method)
 ;   * create new tables by indexing
-;     - allow ranges with string column names
+;     - allow ranges with string column names (I don't think this is possible)
 ;   - manipulate tables easily
 ;     - add vectors, arrays to table with + (_overloadPlus)
 ;     - remove columns
@@ -30,6 +30,8 @@
 ;     `SIZE`-based data types for each column
 ;   column_names : type=strarr
 ;     names of columns of the table
+;   inherit_row_indices : type=boolean
+;     set to use the row indices of parent table for indexed subtables
 ;-
 
 
@@ -163,7 +165,7 @@ function mg_table::_output, start_row, end_row
   n_printed_rows = _end_row - _start_row + 1L
 
   ; define the size for the space for the index column
-  n_index_spaces = floor(alog10(_end_row > 1L)) + 1L
+  n_index_spaces = floor(alog10((*self.row_indices)[_end_row] > 1L)) + 1L
 
   is_struct = size(*self.data, /type) eq 8
 
@@ -238,7 +240,7 @@ function mg_table::_output, start_row, end_row
 
     i = 2 * print_header + print_head_ellipses + n_section_rows * s + s
     for r = 0L, n_printed_rows - 1L do begin
-      result[i + r] = string(r + _start_row, $
+      result[i + r] = string((*self.row_indices)[r + _start_row], $
                              is_struct ? data_subset[r] : data_subset[*, r], $
                              format=data_format)
     endfor
@@ -394,11 +396,22 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
   compile_opt strictarr
 
   if (n_elements(sub2) eq 0L) then begin
-    _is_range = [is_range[0], 1L]
-    _sub2 = [0L, self.n_rows - 1L, 1L]
+    if (self.inherit_row_indices) then begin
+      _is_range = [is_range[0], 0L]
+      _sub2 = *self.row_indices
+    endif else begin
+      _is_range = [is_range[0], 1L]
+      _sub2 = [0L, self.n_rows - 1L, 1L]
+    endelse
   endif else begin
     _is_range = is_range
     _sub2 = sub2
+    if (self.inherit_row_indices) then begin
+      for i = 0L, n_elements(_sub2) - 2L do begin
+        ind = where(_sub2[i] eq *self.row_indices, count)
+        _sub2[i] = ind[0]
+      endfor
+    endif
   endelse
 
   is_struct = size(*self.data, /type) eq 8
@@ -458,7 +471,19 @@ function mg_table::_overloadBracketsRightSide, is_range, sub1, sub2
     if (single_element) then begin
       return, is_struct ? new_data[0].(0) : new_data[0, 0]
     endif else begin
-      new_table = mg_table(new_data, column_names=new_column_names)
+      if (self.inherit_row_indices) then begin
+        if (_is_range[1]) then begin
+          new_row_indices = _sub2[2] * lindgen(ceil((_sub2[1] - _sub2[0] + 1.0) / _sub2[2])) + _sub2[0]
+        endif else begin
+          new_row_indices = _sub2
+        endelse
+        new_row_indices = (*self.row_indices)[new_row_indices]
+      endif
+
+      new_table = mg_table(new_data, $
+                           column_names=new_column_names, $
+                           row_indices=new_row_indices, $
+                           inherit_row_indices=self.inherit_row_indices)
       return, new_table
     endelse
   endelse
@@ -531,12 +556,14 @@ end
 ; Get properties.
 ;-
 pro mg_table::getProperty, data=data, types=types, column_names=column_names, $
+                           row_indices=row_indices, $
                            n_columns=n_columns, n_rows=n_rows, n_printable_rows=n_printable_rows
   compile_opt strictarr
 
   if (arg_present(data)) then data = *self.data
   if (arg_present(types)) then types = *self.types
   if (arg_present(column_names)) then column_names = *self.column_names
+  if (arg_present(row_indices)) then row_indices = *self.row_indices
   if (arg_present(n_columns)) then n_columns = self.n_columns
   if (arg_present(n_rows)) then n_rows = self.n_rows
   if (arg_present(n_printable_rows)) then n_printable_rows = self.n_printable_rows
@@ -546,11 +573,19 @@ end
 ;+
 ; Set properties.
 ;-
-pro mg_table::setProperty, data=data, column_names=column_names, n_printable_rows=n_printable_rows
+pro mg_table::setProperty, data=data, $
+                           column_names=column_names, $
+                           row_indices=row_indices, $
+                           inherit_row_indices=inherit_row_indices, $
+                           n_printable_rows=n_printable_rows
   compile_opt strictarr
 
   if (n_elements(data) gt 0L) then self->_ingest, data
   if (n_elements(column_names) gt 0L) then *self.column_names = column_names
+  if (n_elements(row_indices) gt 0L) then *self.row_indices = row_indices
+  if (n_elements(inherit_row_indices) gt 0L) then begin
+    self.inherit_row_indices = inherit_row_indices
+  endif
   if (n_elements(n_printable_rows) gt 0L) then self.n_printable_rows = n_printable_rows
 end
 
@@ -563,7 +598,7 @@ end
 pro mg_table::cleanup
   compile_opt strictarr
 
-  ptr_free, self.data, self.types, self.column_names
+  ptr_free, self.data, self.types, self.column_names, self.row_indices
 end
 
 
@@ -580,6 +615,8 @@ end
 ;-
 function mg_table::init, data, $
                          column_names=column_names, $
+                         row_indices=row_indices, $
+                         inherit_row_indices=inherit_row_indices, $
                          n_printable_rows=n_printable_rows, $
                          _extra=e
   compile_opt strictarr
@@ -596,12 +633,16 @@ function mg_table::init, data, $
   self.data = ptr_new(/allocate_heap)
   self.types = ptr_new(/allocate_heap)
   self.column_names = ptr_new(/allocate_heap)
+  self.row_indices = ptr_new(/allocate_heap)
+  self.inherit_row_indices = keyword_set(inherit_row_indices)
 
   self->_ingest, data
 
   _column_names = mg_default(column_names, strtrim(sindgen(self.n_columns), 2))
+  _row_indices = mg_default(row_indices, lindgen(self.n_rows))
 
   self->setProperty, column_names=_column_names, $
+                     row_indices=_row_indices, $
                      n_printable_rows=_n_printable_rows, $
                      _extra=e
 
@@ -623,7 +664,9 @@ pro mg_table__define
            n_columns: 0L, $
            n_rows: 0L, $
            types: ptr_new(), $
-           column_names: ptr_new()}
+           column_names: ptr_new(), $
+           row_indices: ptr_new(), $
+           inherit_row_indices: 0B}
 end
 
 

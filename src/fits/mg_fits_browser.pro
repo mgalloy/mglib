@@ -164,7 +164,7 @@ end
 function mg_fits_browser::file_extensions
   compile_opt strictarr
 
-  return, [['*.fits;*.fts;*.FTS', '*.*'], $
+  return, [['*.fits;*.fts;*.fts.gz;*.FTS', '*.*'], $
            ['FITS files', 'All files']]
 end
 
@@ -1034,7 +1034,8 @@ pro mg_fits_browser::handle_events, event
               widget_control, parent_id, get_uvalue=f
             end
           else: begin
-              ; this should never happen, but this message will make debugging easier
+              ; this should never happen, but this message will make debugging
+              ; easier if it does
               ok = dialog_message(string(current_uname, format='(%"unknown uname: %s")'), $
                                   dialog_parent=self.tlb)
               return

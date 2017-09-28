@@ -370,6 +370,7 @@ function mgdbmysql::query, sql_query, $
                            error_message=error_message
   compile_opt strictarr
   on_error, 2
+  on_ioerror, bad_fmt
 
   case n_params() of
      0: _sql_query = ''
@@ -422,6 +423,13 @@ function mgdbmysql::query, sql_query, $
   mg_mysql_free_result, result
 
   return, query_result
+
+  bad_fmt:
+  status = 1
+  error_message = !error_state.msg
+  _sql_query = '<undefined>'
+  fields = !null
+  return, !null
 end
 
 
@@ -464,6 +472,7 @@ pro mgdbmysql::execute, sql_query, $
                         error_message=error_message
   compile_opt strictarr
   on_error, 2
+  on_ioerror, bad_fmt
 
   sql_query_fmt = '(%"' + sql_query + '")'
   case n_params() of
@@ -721,7 +730,16 @@ pro mgdbmysql::execute, sql_query, $
     endif else begin
       message, error_message
     endelse
-  endif else error_message = 'Success'
+  endif else begin
+    error_message = 'Success'
+  endelse
+
+  return
+
+  bad_fmt:
+  status = 1
+  error_message = !error_state.msg
+  _sql_query = '<undefined>'
 end
 
 

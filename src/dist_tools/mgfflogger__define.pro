@@ -45,10 +45,13 @@
 ;   filename : type=string
 ;     filename to send append output to; set to empty string to send output
 ;     to `stderr`
+;   widget_identifier : type=long
+;     if set to a positive integer, append output to the corresponding
+;     WIDGET_TEXT
 ;   clobber : type=boolean
 ;     set, along with filename, to clobber pre-existing file
 ;   output : type=strarr
-;      output sent to the logger already
+;     output sent to the logger already
 ;   _extra : type=keywords
 ;     any keyword accepted by `MGffLogger::setProperty`
 ;-
@@ -189,11 +192,12 @@ pro mgfflogger::getProperty, level=level, $
                              name=name, $
                              fullname=fullname, $
                              filename=filename, $
-                             output=output
+                             output=output, children=children
   compile_opt strictarr
 
   if (arg_present(level)) then level = self.level
   if (arg_present(color)) then color = self.color
+  if (arg_present(children)) then children = self.children
   if (arg_present(format)) then format = self.format
   if (arg_present(time_format)) then time_format = self.time_format
   if (arg_present(name)) then name = self.name
@@ -226,7 +230,9 @@ pro mgfflogger::setProperty, level=level, $
                              critical=critical, $
                              color=color, $
                              format=format, time_format=time_format, $
-                             filename=filename, clobber=clobber
+                             filename=filename, $
+                             widget_identifier=widget_identifier, $
+                             clobber=clobber
   compile_opt strictarr
 
   case n_elements(level) of
@@ -254,6 +260,9 @@ pro mgfflogger::setProperty, level=level, $
   if (n_elements(format) gt 0L) then self.format = format
   if (n_elements(time_format) gt 0L) then self.time_format = time_format
   if (n_elements(filename) gt 0L) then self.filename = filename
+  if (n_elements(widget_identifier) gt 0L) then begin
+    self.widget_identifier = widget_identifier
+  endif
   if (keyword_set(clobber) && n_elements(filename) gt 0L) then begin
     if (file_test(filename)) then file_delete, filename
   endif
@@ -354,6 +363,7 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
                levelname: strupcase(self.levelNames[msg_level - 1L]), $
                levelshortname: strupcase(self.levelShortNames[msg_level - 1L]), $
                routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
+               line: stack[n_elements(stack) - 2L - _back_levels].line, $
                stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
                                    '->'), $
                name: self.name, $
@@ -363,18 +373,23 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
       s = mg_subs(self.format, vars)
     endelse
 
-    ; use color if set or display to stdout
-    if ((self.color_set && self.color) || (~self.color_set && self.is_tty && lun lt 0)) then begin
-      case msg_level of
-        1: s = mg_ansicode(s, /red)
-        2: s = mg_ansicode(s, /magenta)
-        3: s = mg_ansicode(s, /yellow)
-        4: s = mg_ansicode(s, /cyan)
-        5:
-      endcase
-    endif
+    if (self.widget_identifier gt 0L) then begin
+      widget_control, self.widget_identifier, set_value=s, /append
+    endif else begin
+      ; use color if set or display to stdout
+      if ((self.color_set && self.color) || (~self.color_set && self.is_tty && lun lt 0)) then begin
+        case msg_level of
+          1: s = mg_ansicode(s, /red)
+          2: s = mg_ansicode(s, /magenta)
+          3: s = mg_ansicode(s, /yellow)
+          4: s = mg_ansicode(s, /cyan)
+          5:
+        endcase
+      endif
 
-    printf, lun, s
+      printf, lun, s
+    endelse
+
     was_logged = 1B
   endif
 
@@ -455,7 +470,7 @@ end
 pro mgfflogger__define
   compile_opt strictarr
 
-  define = { MGffLogger, $
+  define = { MGffLogger, inherits IDL_object, $
              parent: obj_new(), $
              name: '', $
              children: obj_new(), $
@@ -466,6 +481,7 @@ pro mgfflogger__define
              color_set: 0B, $
              is_tty: 0B, $
              filename: '', $
+             widget_identifier: 0L, $
              time_format: '', $
              format: '' $
            }

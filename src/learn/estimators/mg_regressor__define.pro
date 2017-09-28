@@ -18,8 +18,14 @@ end
 pro mg_regressor::getProperty, _ref_extra=e
   compile_opt strictarr
 
-
   if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+end
+
+
+pro mg_regressor::setProperty, _extra=e
+  compile_opt strictarr
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
 end
 
 

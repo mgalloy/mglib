@@ -132,16 +132,25 @@ end
 
 ;= property access
 
-pro mg_onehotencoder::getProperty, _ref_extra=e
+pro mg_onehotencoder::getProperty, fit_parameters=fit_parameters, _ref_extra=e
   compile_opt strictarr
+
+  if (arg_present(fit_parameters)) then begin
+    message, 'FIT_PARAMETERS not implemented for mg_tfidftransformer'
+  endif
 
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
 pro mg_onehotencoder::setProperty, categorical_columns=categorical_columns, $
+                                   fit_parameters=fit_parameters, $
                                    _extra=e
   compile_opt strictarr
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    message, 'FIT_PARAMETERS not implemented for mg_tfidftransformer'
+  endif
 
   if (n_elements(categorical_columns) gt 0L) then begin
     *self.categorical_columns = categorical_columns[sort(categorical_columns)]

@@ -23,7 +23,7 @@ function mg_fits_hastag, header, tags, count=count
 
   hastag = bytarr(n_elements(tags))
   for t = 0L, n_elements(tags) - 1L do begin
-    !null = sxpar(header, tags[t], count=n_parameters)
+    !null = mg_fits_getkeyword(header, tags[t], count=n_parameters)
     hastag[t] = n_parameters gt 0L
   endfor
 

@@ -97,6 +97,7 @@ end
 pro mg_leastsquaresregressor::getProperty, fit_intecept=fit_intercept, $
                                            intercept=intercept, $
                                            coefficients=coefficients, $
+                                           fit_parameters=fit_parameters, $
                                            _ref_extra=e
   compile_opt strictarr
 
@@ -105,15 +106,20 @@ pro mg_leastsquaresregressor::getProperty, fit_intecept=fit_intercept, $
     intercept = self.fit_intercept ? (*self._weights)[0] : 0.0
   endif
   if (arg_present(coefficients)) then coefficients = (*self._weights)[1:*]
+  if (arg_present(fit_parameters)) then fit_parameters = *self._weights
+
   if (n_elements(e) gt 0L) then self->mg_regressor::getProperty, _extra=e
 end
 
 
 pro mg_leastsquaresregressor::setProperty, fit_intercept=fit_intercept, $
+                                           fit_parameters=fit_parameters, $
                                            _extra=e
   compile_opt strictarr
 
   if (n_elements(fit_intercept) gt 0L) then self.fit_intercept = keyword_set(fit_intercept)
+  if (n_elements(fit_parameters) gt 0L) then *self._weights = fit_parameters
+
   if (n_elements(e) gt 0L) then self->mg_regressor::setProperty, _extra=e
 end
 

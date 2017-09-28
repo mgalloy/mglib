@@ -76,17 +76,26 @@ end
 pro mg_pcatransformer::getProperty, n_components=n_components, $
                                     components=components, $
                                     variance=variance, $
+                                    fit_parameters=fit_parameters, $
                                     _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(n_components)) then n_components = self.n_components
   if (arg_present(components)) then components = *self._eigenvectors
   if (arg_present(variance)) then variance = *self._variance
+  if (arg_present(fit_parameters)) then begin
+    fit_parameters = {variance: *self._variance, $
+                      eigenvectors: *self._eigenvectors, $
+                      feature_names: *self.feature_names}
+  endif
+
   if (n_elements(e) gt 0L) then self->mg_transformer::getProperty, _extra=e
 end
 
 
-pro mg_pcatransformer::setProperty, n_components=n_components, _extra=e
+pro mg_pcatransformer::setProperty, n_components=n_components, $
+                                    fit_parameters=fit_parameters, $
+                                    _extra=e
   compile_opt strictarr
 
   if (n_elements(n_components) gt 0L) then begin
@@ -97,6 +106,13 @@ pro mg_pcatransformer::setProperty, n_components=n_components, _extra=e
       self.n_components = n_components
     endelse
   endif
+
+  if (n_elements(fit_parameters) gt 0L) then begin
+    *self._variance = fit_parameters.variance
+    *self._eigenvectors = fit_parameters.eigenvectors
+    *self.feature_names = fit_parameters.feature_names
+  endif
+
   if (n_elements(e) gt 0L) then self->mg_transformer::setProperty, _extra=e
 end
 
