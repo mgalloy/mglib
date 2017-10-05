@@ -358,6 +358,9 @@ end
 ;     query, 0 for success
 ;   error_message : out, optional, type=string
 ;     MySQL error message; "Success" if not error
+;   n_affected_rows : out, optional, type=ulong64
+;     set to a named variable to retrieve the number of rows affected by the
+;     operation
 ;-
 function mgdbmysql::query, sql_query, $
                            arg1, arg2, arg3, arg4, arg5, $
@@ -367,7 +370,8 @@ function mgdbmysql::query, sql_query, $
                            sql_statement=_sql_query, $
                            fields=fields, $
                            status=status, $
-                           error_message=error_message
+                           error_message=error_message, $
+                           n_affected_rows=n_affected_rows
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -422,6 +426,10 @@ function mgdbmysql::query, sql_query, $
 
   mg_mysql_free_result, result
 
+  if (arg_present(n_affected_rows)) then begin
+    n_affected_rows = mg_mysql_affected_rows(self.connection)
+  endif
+
   return, query_result
 
   bad_fmt:
@@ -429,6 +437,7 @@ function mgdbmysql::query, sql_query, $
   error_message = !error_state.msg
   _sql_query = '<undefined>'
   fields = !null
+  n_affected_rows = 0ULL
   return, !null
 end
 
@@ -455,6 +464,9 @@ end
 ;     query, 0 for success
 ;   error_message : out, optional, type=string
 ;     MySQL error message; "Success" if not error
+;   n_affected_rows : out, optional, type=ulong64
+;     set to a named variable to retrieve the number of rows affected by the
+;     operation
 ;-
 pro mgdbmysql::execute, sql_query, $
                         arg1, arg2, arg3, arg4, arg5, $
@@ -469,7 +481,8 @@ pro mgdbmysql::execute, sql_query, $
                         arg46, arg47, arg48, arg49, arg50, $
                         sql_statement=_sql_query, $
                         status=status, $
-                        error_message=error_message
+                        error_message=error_message, $
+                        n_affected_rows=n_affected_rows
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -734,12 +747,17 @@ pro mgdbmysql::execute, sql_query, $
     error_message = 'Success'
   endelse
 
+  if (arg_present(n_affected_rows)) then begin
+    n_affected_rows = mg_mysql_affected_rows(self.connection)
+  endif
+
   return
 
   bad_fmt:
   status = 1
   error_message = !error_state.msg
   _sql_query = '<undefined>'
+  n_affected_rows = 0ULL
 end
 
 
