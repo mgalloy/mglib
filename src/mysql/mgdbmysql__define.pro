@@ -361,6 +361,9 @@ end
 ;   n_affected_rows : out, optional, type=ulong64
 ;     set to a named variable to retrieve the number of rows affected by the
 ;     operation
+;   n_warnings : out, optional, type=ulong
+;     set to a named variable to retrieve the number of warnings generated
+;     during the query
 ;-
 function mgdbmysql::query, sql_query, $
                            arg1, arg2, arg3, arg4, arg5, $
@@ -371,7 +374,8 @@ function mgdbmysql::query, sql_query, $
                            fields=fields, $
                            status=status, $
                            error_message=error_message, $
-                           n_affected_rows=n_affected_rows
+                           n_affected_rows=n_affected_rows, $
+                           n_warnings=n_warnings
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -430,6 +434,10 @@ function mgdbmysql::query, sql_query, $
     n_affected_rows = mg_mysql_affected_rows(self.connection)
   endif
 
+  if (arg_present(n_warnings)) then begin
+    n_warnings = mg_mysql_warning_count(self.connection)
+  endif
+
   return, query_result
 
   bad_fmt:
@@ -438,6 +446,7 @@ function mgdbmysql::query, sql_query, $
   _sql_query = '<undefined>'
   fields = !null
   n_affected_rows = 0ULL
+  n_warnings = 0UL
   return, !null
 end
 
@@ -467,6 +476,9 @@ end
 ;   n_affected_rows : out, optional, type=ulong64
 ;     set to a named variable to retrieve the number of rows affected by the
 ;     operation
+;   n_warnings : out, optional, type=ulong
+;     set to a named variable to retrieve the number of warnings generated
+;     during the query
 ;-
 pro mgdbmysql::execute, sql_query, $
                         arg1, arg2, arg3, arg4, arg5, $
@@ -482,7 +494,8 @@ pro mgdbmysql::execute, sql_query, $
                         sql_statement=_sql_query, $
                         status=status, $
                         error_message=error_message, $
-                        n_affected_rows=n_affected_rows
+                        n_affected_rows=n_affected_rows, $
+                        n_warnings=n_warnings
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -751,6 +764,10 @@ pro mgdbmysql::execute, sql_query, $
     n_affected_rows = mg_mysql_affected_rows(self.connection)
   endif
 
+  if (arg_present(n_warnings)) then begin
+    n_warnings = mg_mysql_warning_count(self.connection)
+  endif
+
   return
 
   bad_fmt:
@@ -758,6 +775,7 @@ pro mgdbmysql::execute, sql_query, $
   error_message = !error_state.msg
   _sql_query = '<undefined>'
   n_affected_rows = 0ULL
+  n_warnings = 0UL
 end
 
 
