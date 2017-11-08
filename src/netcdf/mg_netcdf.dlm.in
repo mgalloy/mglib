@@ -6,3 +6,4 @@ BUILD_DATE    ${mglib_BUILD_DATE}
 
 
 FUNCTION MG_NC_ISNCDF                              1   1
+FUNCTION MG_NC_INQ_FORMAT                          1   1
