@@ -118,6 +118,50 @@ end
 
 
 ;+
+; Load the diabetes data.
+;
+; The digits dataset has 442 samples and 10 feature, each which has been
+; centered to have mean 0.0 and normalized, i.e., the sum of the squares of each
+; column is 1.
+;
+; Source URL: http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
+;
+; For more information see: Bradley Efron, Trevor Hastie, Iain Johnstone and
+; Robert Tibshirani (2004) "Least Angle Regression," Annals of Statistics (with
+; discussion), 407-499. (http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf)
+;
+; :Returns:
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
+;-
+function mg_load_diabetes
+  compile_opt strictarr
+
+  data_filename = filepath('diabetes_data.csv', root=mg_src_root())
+  target_filename = filepath('diabetes_target.csv', root=mg_src_root())
+
+  n_samples = file_lines(target_filename)
+  feature_names = ['age', 'sex', 'body mass index', 'Average blood pressure', $
+                   'S1', 'S2', 'S3', 'S4', 'S5', 'S6']
+  n_features = n_elements(feature_names)
+
+  data = fltarr(n_features, n_samples)
+  openr, lun, data_filename, /get_lun
+  readf, lun, data
+  free_lun, lun
+
+  target = fltarr(1, n_samples)
+  openr, lun, target_filename, /get_lun
+  readf, lun, target
+  free_lun, lun
+
+  return, {data: data, $
+           target: reform(target), $
+           target_names: '', $
+           feature_names: feature_names}
+end
+
+
+;+
 ; Loads the digits dataset.
 ;
 ; The digits dataset has 1797 samples and 64 features, each a pixel value 0-15.
@@ -204,10 +248,11 @@ function mg_learn_dataset, name, n_samples=n_samples
 
   case name of
     'adult': return, mg_load_adult()
-    'iris': return, mg_load_iris()
     'breast_cancer': return, mg_load_breast_cancer()
     'boston': return, mg_load_boston()
+    'diabetes': return, mg_load_diabetes()
     'digits': return, mg_load_digits()
+    'iris': return, mg_load_iris()
     'wave': begin
         _n_samples = n_elements(n_samples) eq 0L ? 100 : n_samples
         x = 6.0 * randomu(42, _n_samples) - 3.0
