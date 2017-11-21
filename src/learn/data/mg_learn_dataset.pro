@@ -72,6 +72,8 @@ end
 ;
 ; The breast cancer dataset has 569 samples and 30 features.
 ;
+; .. image:: breastcancer-dataset.png
+;
 ; :Returns:
 ;   structure with fields `data`, `target`, `target_names`, and `feature_names`
 ;-
@@ -129,6 +131,9 @@ end
 ; For more information see: Bradley Efron, Trevor Hastie, Iain Johnstone and
 ; Robert Tibshirani (2004) "Least Angle Regression," Annals of Statistics (with
 ; discussion), 407-499. (http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf)
+;
+;
+; .. image:: diabetes-dataset.png
 ;
 ; :Returns:
 ;   structure with fields `data`, `target`, `target_names`, and `feature_names`
