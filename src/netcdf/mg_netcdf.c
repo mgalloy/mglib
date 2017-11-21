@@ -14,6 +14,14 @@ static IDL_VPTR IDL_CDECL IDL_mg_nc_isncdf(int argc, IDL_VPTR *argv) {
   return IDL_GettmpByte(status == NC_ENOTNC ? 0 : 1);
 }
 
+static IDL_VPTR IDL_CDECL IDL_mg_nc_inq_format(int argc, IDL_VPTR *argv) {
+  IDL_VPTR ncid_vptr = argv[0];
+  int status, ncid, formatp;
+  ncid = IDL_LongScalar(ncid_vptr);
+  status = nc_inq_format(ncid, &formatp);
+  return IDL_GettmpLong(formatp);
+}
+
 int IDL_Load(void) {
   /*
    * These tables contain information on the functions and procedures
@@ -21,7 +29,8 @@ int IDL_Load(void) {
    * tables must be identical to that contained in mg_analysis.dlm.
    */
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { IDL_mg_nc_isncdf, "MG_NC_ISNCDF", 1, 1, 0, 0 },
+    { IDL_mg_nc_isncdf,     "MG_NC_ISNCDF",     1, 1, 0, 0 },
+    { IDL_mg_nc_inq_format, "MG_NC_INQ_FORMAT", 1, 1, 0, 0 },
   };
 
   /*

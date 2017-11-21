@@ -1049,8 +1049,16 @@ pro mg_fits_browser::handle_events, event
         tabs = widget_info(self.tlb, find_by_uname='tabs')
         tab_index = widget_info(tabs, /tab_current)
         case tab_index of
-          0: (scope_varfetch('data', /enter, level=1)) = data
-          1: (scope_varfetch('header', /enter, level=1)) = header
+          0: begin
+              (scope_varfetch('data', /enter, level=1)) = data
+              self->set_status, string(exten_no, $
+                                       format='(%"Data from extension %d exported to command line in variable ''data''")')
+            end
+          1: begin
+              (scope_varfetch('header', /enter, level=1)) = header
+              self->set_status, string(exten_no, $
+                                       format='(%"Header from extension %d exported to command line in variable ''header''")')
+            end
           else: begin
             ; this should never happen, but this message will make debugging easier
             ok = dialog_message(string(tab_index, format='(%"unknown tab: %d")'), $

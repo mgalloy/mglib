@@ -37,7 +37,7 @@ function mg_float2str, f, $
                        n_places=n_places, n_digits=n_digits, $
                        places_sep=places_sep, decimal_sep=decimal_sep
   compile_opt strictarr
-  ;on_error, 2
+  on_error, 2
 
   if (n_elements(f) gt 1L) then begin
     result = strarr(n_elements(f))
