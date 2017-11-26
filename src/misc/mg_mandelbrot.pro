@@ -22,19 +22,19 @@ function mg_mandelbrot_iterate, c
   compile_opt strictarr
 
   maxiter = 256
-  z_max = 2.0
+  z_max = 2.0D
 
-  z = complex(0.0, 0.0)
+  z = dcomplex(0.0, 0.0)
 
   for i = 1, maxiter do begin
      z = z^2 + c
      if (abs(z) gt z_max) then begin
-         i += 1.0 - alog(alog(abs(z))) / alog(2.0)
+         i += 1.0D - alog(alog(abs(z))) / alog(2.0)
          break
      endif
   endfor
-  if (i ge maxiter + 1.0) then i = 0.0
-  return, float(i)
+  if (i ge maxiter + 1.0D) then i = 0.0D
+  return, double(i)
 end
 
 
@@ -49,7 +49,8 @@ end
 ;   png_filename : in, optional, type=string
 ;     if present, save display to a PNG file given by `png_filename`
 ;-
-pro mg_mandelbrot, color_table=ctable, png_filename=png_filename
+pro mg_mandelbrot, r_range=r_range, i_range=i_range, $
+                   color_table=ctable, png_filename=png_filename
   compile_opt strictarr
 
   _ctable = mg_default(ctable, 39)
@@ -58,31 +59,27 @@ pro mg_mandelbrot, color_table=ctable, png_filename=png_filename
   ; plane, and the image intensity (output)
 
   n = 600
-  c = complexarr(n, n)
-  z = fltarr(n, n)
-
-  ; define the centre and ranges of image to plot
-
-  pos = complex(0.0, 0.0)
-  range = complex(4.0, 4.0)
+  c = dcomplexarr(n, n)
+  z = dblarr(n, n)
 
   ; use these to define the upper/lower X,Y ranges of the image
-
-  xmin = real_part(pos - range / 2.0)
-  xmax = real_part(pos + range / 2.0)
-  ymin = imaginary(pos - range / 2.0)
-  ymax = imaginary(pos + range / 2.0)
+  _r_range = mg_default(r_range, [-2.0D, 2.0D])
+  _i_range = mg_default(i_range, [-2.0D, 2.0D])
+  xmin = _r_range[0]
+  xmax = _r_range[1]
+  ymin = _i_range[0]
+  ymax = _i_range[1]
 
   ; set up the X,Y ranges as row,column vectors
 
-  x = indgen(n) / float(n - 1) * (xmax - xmin) + xmin
-  y = indgen(n) / float(n - 1) * (ymax - ymin) + ymin
+  x = indgen(n) / double(n - 1) * (xmax - xmin) + xmin
+  y = indgen(n) / double(n - 1) * (ymax - ymin) + ymin
   y = reform(y, 1, n)
 
   ; the complex n*n array 'c' defines points on the complex plane
   c_r = rebin(x, n, n, /sample)
   c_i = rebin(y, n, n, /sample)
-  c = complex(c_r, c_i)
+  c = dcomplex(c_r, c_i)
 
   ; for each pixel position apply the iteration formula
   for i = 0L, n_elements(c) - 1 do begin
@@ -90,7 +87,8 @@ pro mg_mandelbrot, color_table=ctable, png_filename=png_filename
   endfor
 
   ; plot
-  window, 0, xsize=n, ysize=n, retain=2
+  window, xsize=n, ysize=n, retain=2, /free, $
+          title=string(_r_range, _i_range, format='(%"Mandelbrot with R %f:%f and I %f:%f")')
   device, get_decomposed=odec
   device, decomposed=0
   tvlct, rgb, /get
@@ -109,4 +107,11 @@ pro mg_mandelbrot, color_table=ctable, png_filename=png_filename
     im = tvrd()
     write_png, png_filename, im, r, g, b
   endif
+end
+
+
+; main-level example program
+
+mg_mandelbrot, r_range=[-0.5, 0.0], i_range=[0.5, 1.0]
+
 end
