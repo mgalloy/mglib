@@ -170,6 +170,7 @@ lsr->fit, x_train, y_train
 y_predict = lsr->predict(x_test, y_test, score=r2_test)
 y_predict = lsr->predict(x_train, y_train, score=r2_train)
 
+print, '# Wave dataset'
 print, r2_train, format='(%"train r^2: %f")'
 print, r2_test, format='(%"test r^2: %f")'
 print, lsr.intercept, format='(%"intercept:    %f")'
@@ -184,7 +185,7 @@ y = lsr.intercept + (lsr.coefficients)[0] * x
 oplot, x, y
 
 obj_destroy, lsr
-
+print
 
 boston = mg_learn_dataset('boston')
 
@@ -197,6 +198,7 @@ lsr->fit, x_train, y_train
 y_predict = lsr->predict(x_test, y_test, score=r2_test)
 y_predict = lsr->predict(x_train, y_train, score=r2_train)
 
+print, '# Boston dataset'
 print, r2_train, format='(%"train r^2: %f")'
 print, r2_test, format='(%"test r^2: %f")'
 print, lsr.intercept, format='(%"intercept:    %f")'
