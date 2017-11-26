@@ -72,6 +72,8 @@ end
 ;
 ; The breast cancer dataset has 569 samples and 30 features.
 ;
+; .. image:: breastcancer-dataset.png
+;
 ; :Returns:
 ;   structure with fields `data`, `target`, `target_names`, and `feature_names`
 ;-
@@ -130,6 +132,9 @@ end
 ; Robert Tibshirani (2004) "Least Angle Regression," Annals of Statistics (with
 ; discussion), 407-499. (http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf)
 ;
+;
+; .. image:: diabetes-dataset.png
+;
 ; :Returns:
 ;   structure with fields `data`, `target`, `target_names`, and `feature_names`
 ;-
@@ -140,7 +145,7 @@ function mg_load_diabetes
   target_filename = filepath('diabetes_target.csv', root=mg_src_root())
 
   n_samples = file_lines(target_filename)
-  feature_names = ['age', 'sex', 'body mass index', 'Average blood pressure', $
+  feature_names = ['age', 'sex', 'BMI', 'blood pressure', $
                    'S1', 'S2', 'S3', 'S4', 'S5', 'S6']
   n_features = n_elements(feature_names)
 
@@ -329,7 +334,7 @@ if (keyword_set(ps)) then begin
   mg_psbegin, /color, bits_per_pixel=8, filename='diabetes-dataset.ps'
   if (keyword_set(demo)) then begin
     size = [5.0, 5.0]
-    dims = [400, 400]
+    dims = [600, 600]
     symsize = 0.5
   endif
   font = 1
@@ -354,7 +359,8 @@ mg_scatterplot_matrix, diabetes.data, nbins=20, $
                        column_names=diabetes.feature_names, $
                        color=bytscl(diabetes.target, top=254), $
                        bar_color=150, axis_color=axis_color, $
-                       charsize=1.0, $
+                       charsize=0.75, $
+                       xticks=1, yticks=4, $
                        psym=mg_usersym(/circle), symsize=symsize, font=font
 
 device, decomposed=odec
@@ -362,7 +368,7 @@ tvlct, rgb
 
 if (keyword_set(ps)) then begin
   mg_psend
-  mg_convert, 'iris-dataset', max_dimension=dims, output=im, keep_output=demo
+  mg_convert, 'diabetes-dataset', max_dimension=dims, output=im, keep_output=demo
   mg_image, im, /new_window
 endif
 

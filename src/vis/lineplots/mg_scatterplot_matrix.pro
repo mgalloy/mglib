@@ -67,7 +67,8 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
                            psym=psym, symsize=symsize, $
                            axis_color=axis_color, color=color, $
                            position=position, $
-                           n_bins=n_bins, _extra=e
+                           n_bins=n_bins, $
+                           xticks=xticks, yticks=yticks, _extra=e
   compile_opt strictarr
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
@@ -112,6 +113,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
           xstyle=1, /ynozero, $
           xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
           ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
+          xticks=xticks, yticks=yticks, $
           _extra=e
     y_range[*, row] = !y.crange
     mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
@@ -134,6 +136,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               xstyle=5, ystyle=9, $
               xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
               ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
+              xticks=xticks, yticks=yticks, $
               _extra=e
       endif
       if (col ne row) then begin
@@ -148,6 +151,7 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               xstyle=1, ystyle=1, $
               xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
               ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
+              xticks=xticks, yticks=yticks, $
               _extra=e
         mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
                   is_struct ? data.(row) : reform(data[row, *]), $
