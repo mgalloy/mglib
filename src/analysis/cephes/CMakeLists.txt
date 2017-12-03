@@ -1,8 +1,10 @@
 get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 set(DLM_NAME mg_${DIRNAME})
 
+file(GLOB C_FILES "*.c")
+
 configure_file("${DLM_NAME}.dlm.in" "${DLM_NAME}.dlm")
-add_library("${DLM_NAME}" SHARED "${DLM_NAME}.c")
+add_library("${DLM_NAME}" SHARED "${C_FILES}")
 
 if (UNIX)
   set_target_properties("${DLM_NAME}"
@@ -18,14 +20,11 @@ set_target_properties("${DLM_NAME}"
 
 target_link_libraries("${DLM_NAME}" ${IDL_LIBRARY})
 
-add_subdirectory(cephes)
-
 install(TARGETS ${DLM_NAME}
-  RUNTIME DESTINATION lib/${DIRNAME}
-  LIBRARY DESTINATION lib/${DIRNAME}
+  RUNTIME DESTINATION lib/analysis/${DIRNAME}
+  LIBRARY DESTINATION lib/analysis/${DIRNAME}
 )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/${DIRNAME})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DLM_NAME}.dlm" DESTINATION lib/analysis/${DIRNAME})
 
-file(GLOB PRO_FILES "*.pro")
-install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
-install(FILES .idldoc DESTINATION lib/${DIRNAME})
+#file(GLOB PRO_FILES "*.pro")
+#install(FILES ${PRO_FILES} DESTINATION lib/analysis/${DIRNAME})

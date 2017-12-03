@@ -1,0 +1,10 @@
+module        mg_cephes
+description   IDL bindings for Cephes library
+version       ${VERSION}
+source        mgalloy
+build_date    ${mglib_BUILD_DATE}
+
+
+function mg_fdtr    3 3
+function mg_fdtrc   3 3
+function mg_fdtri   3 3
