@@ -26,6 +26,8 @@
 ;     set to a fraction between 0.0 and 1.0 to represent a fraction of
 ;     `n_samples` or to a integer value; if not set, uses complement of
 ;     `test_size`; if `test_size` not set, uses 0.75
+;   stratify_by : in, optional, type=integer/string array
+;     class labels to make sure split matches
 ;   seed : in, out, optional, type=long/lonarr
 ;     random number seed to pass to `RANDOMU`
 ;-
@@ -34,6 +36,7 @@ pro mg_train_test_split, data, target, $
                          x_train=x_train, y_train=y_train, $
                          test_size=test_size, $
                          train_size=train_size, $
+                         stratify_by=stratify_by, $
                          seed=seed
   compile_opt strictarr
 
@@ -55,7 +58,25 @@ pro mg_train_test_split, data, target, $
     _train_size = n_samples - test_size
   endelse
 
-  train_indices = mg_sample(n_samples, _train_size, seed=seed)
+  if (n_elements(stratify_by) gt 0L) then begin
+    counts = mg_frequency(stratify_by)
+    n_classes = n_elements(counts)
+    train_indices = lonarr(_train_size)
+    class_sizes = counts.count * _train_size / n_samples
+    n_extra = _train_size - total(class_sizes, /preserve_type)
+    if (n_extra gt 0L) then begin
+      extra_ind = mg_sample(n_classes, n_extra, seed=seed)
+      class_sizes[extra_ind] += 1
+    endif
+    cc_sizes = [0L, total(class_sizes, /cumulative, /preserve_type)]
+    for c = 0L, n_classes - 1L do begin
+      ind1 = where(stratify_by eq counts[c].value)
+      ind2 = mg_sample(counts[c].count, class_sizes[c], seed=seed)
+      train_indices[cc_sizes[c]:cc_sizes[c + 1] - 1] = ind1[ind2]
+    endfor
+  endif else begin
+    train_indices = mg_sample(n_samples, _train_size, seed=seed)
+  endelse
 
   test_indices = mg_complement(train_indices, n_samples)
 
@@ -74,12 +95,28 @@ end
 
 iris = mg_learn_dataset('iris')
 
-seed = 0L
+;seed = 0L
 mg_train_test_split, iris.data, iris.target, $
                      x_train=x_train, y_train=y_train, $
                      x_test=x_test, y_test=y_test, $
                      seed=seed
 
 help, x_train, y_train, x_test, y_test
+
+cnames = ['Target', '#']
+print, 'Targets for entire dataset'
+print, mg_table(mg_frequency(iris.target), column_names=cnames)
+print
+print, 'Test targets'
+print, mg_table(mg_frequency(y_test), column_names=cnames)
+
+mg_train_test_split, iris.data, iris.target, $
+                     x_train=x_train, y_train=y_train, $
+                     x_test=x_test, y_test=y_test, $
+                     stratify_by=iris.target, $
+                     seed=seed
+print
+print, 'Test targets stratified by target'
+print, mg_table(mg_frequency(y_test), column_names=cnames)
 
 end
