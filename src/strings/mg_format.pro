@@ -66,6 +66,8 @@ function mg_format, format, args
     if (locs[3] ne -1L) then begin
       precision = strmid(_format, locs[3], len[3])
       if (precision eq '*') then begin
+        if (a ge n_elements(args)) then message, 'invalid format: not enough arguments'
+
         result += string(args[a], format='(%"%d")')
         a += 1L
       endif else begin
