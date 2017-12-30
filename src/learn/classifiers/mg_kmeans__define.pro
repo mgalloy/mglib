@@ -96,7 +96,7 @@ pro mg_kmeans::getProperty, n_clusters=n_clusters, $
   if (arg_present(n_iterations)) then n_iterations = self.n_iterations
   if (arg_present(n_initializations)) then n_initializations = self.n_initializations
   if (arg_present(double)) then double = self.double
-  if (arg_present(centers)) then centers = *self._center
+  if (arg_present(centers)) then centers = *self._centers
   if (arg_present(fit_parameters)) then fit_parameters = *self._centers
 
   if (n_elements(e) gt 0L) then self->mg_classifier::getProperty, _extra=e
