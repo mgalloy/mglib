@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Combine the feature matrices of multiple pipelines.
+; Combine the result matrices of multiple transformers.
 ;-
 
 ;= API
