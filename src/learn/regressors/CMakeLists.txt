@@ -3,4 +3,3 @@ set(DLM_NAME mg_${DIRNAME})
 
 file(GLOB PRO_FILES "*.pro")
 install(FILES ${PRO_FILES} DESTINATION lib/learn/${DIRNAME})
-install(FILES .idldoc DESTINATION lib/learn/${DIRNAME})
