@@ -48,9 +48,11 @@ end
 function mg_regressor::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_predictor::init(_extra=e)) then return, 0
+  if (~self->mg_predictor::init()) then return, 0
 
   self.type = 'regressor'
+
+  self->setProperty, _extra=e
 
   return, 1
 end

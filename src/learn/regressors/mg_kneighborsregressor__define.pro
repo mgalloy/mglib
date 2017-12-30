@@ -118,11 +118,13 @@ end
 function mg_kneighborsregressor::init, n_neighbors=n_neighbors, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_regressor::init(_extra=e)) then return, 0
+  if (~self->mg_regressor::init()) then return, 0
 
   self.n_neighbors = mg_default(n_neighbors, 1)
   self._x = ptr_new(/allocate_heap)
   self._y = ptr_new(/allocate_heap)
+
+  self->setProperty, _extra=e
 
   return, 1
 end

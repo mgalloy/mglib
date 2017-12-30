@@ -120,7 +120,7 @@ end
 function mg_ridgeregressor::init, alpha=alpha, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_regressor::init(_extra=e)) then return, 0
+  if (~self->mg_regressor::init()) then return, 0
 
   self._weights = ptr_new(/allocate_heap)
 

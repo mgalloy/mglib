@@ -113,12 +113,15 @@ function mg_imputer::init, dimension=dimension, $
                            strategy=strategy
   compile_opt strictarr
 
-  if (~self->mg_transformer::init(_extra=e)) then return, 0
+  if (~self->mg_transformer::init()) then return, 0
 
   self.dimension = mg_default(dimension, 2)
   self.missing_value = ptr_new(mg_default(missing_value, !values.f_nan))
   self.strategy = mg_default(strategy, 'mean')
   self._replacement_values = ptr_new(/allocate_heap)
+
+  self->setProperty, _extra=e
+
   return, 1
 end
 

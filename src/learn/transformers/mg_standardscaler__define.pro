@@ -89,7 +89,7 @@ end
 function mg_standardscaler::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_transformer::init(_extra=e)) then return, 0
+  if (~self->mg_transformer::init()) then return, 0
 
   self._means = ptr_new(/allocate_heap)
   self._stddevs = ptr_new(/allocate_heap)

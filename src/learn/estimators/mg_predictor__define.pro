@@ -80,7 +80,7 @@ end
 function mg_predictor::init, _extra=e
   compile_opt strictarr
 
-  if (self->mg_estimator::init(_extra=e) eq 0L) then return, 0
+  if (self->mg_estimator::init() eq 0L) then return, 0
 
   self->setProperty, _extra=e
 

@@ -149,10 +149,9 @@ end
 function mg_transformer::init, _extra=e
   compile_opt strictarr
 
-  if (self->mg_estimator::init(_extra=e) eq 0L) then return, 0
+  if (self->mg_estimator::init() eq 0L) then return, 0
 
   self.feature_names = ptr_new(/allocate_heap)
-
   self->setProperty, _extra=e
 
   return, 1
@@ -166,6 +165,6 @@ pro mg_transformer__define
   compile_opt strictarr
 
   !null = {mg_transformer, inherits mg_estimator, $
-           feature_names: ptr_new(), $
+           feature_names: ptr_new() $
           }
 end
