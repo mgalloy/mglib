@@ -25,6 +25,8 @@
 pro mg_kneighborsclassifier::fit, x, y
   compile_opt strictarr
 
+  self->mg_classifier::fit, x, y
+
   *self._x = x
   *self._y = y
 end
@@ -92,7 +94,7 @@ pro mg_kneighborsclassifier::getProperty, n_neighbors=n_neighbors, $
     fit_parameters = {x: *self._x, y: *self._y}
   endif
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::getProperty, _extra=e
 end
 
 
@@ -104,7 +106,7 @@ pro mg_kneighborsclassifier::setProperty, fit_parameters=fit_parameters, _extra=
     *self._y = fit_parameters.y
   endif
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::setProperty, _extra=e
 end
 
 
@@ -114,16 +116,17 @@ pro mg_kneighborsclassifier::cleanup
   compile_opt strictarr
 
   ptr_free, self._x, self._y
-  self->mg_estimator::cleanup
+  self->mg_classifier::cleanup
 end
 
 
 function mg_kneighborsclassifier::init, n_neighbors=n_neighbors, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_estimator::init(_extra=e)) then return, 0
+  if (~self->mg_classifier::init(_extra=e)) then return, 0
 
   self.type = 'classifier'
+  self.name = 'KNeighborsClassifier'
 
   self.n_neighbors = mg_default(n_neighbors, 1)
   self._x = ptr_new(/allocate_heap)
@@ -136,7 +139,7 @@ end
 pro mg_kneighborsclassifier__define
   compile_opt strictarr
 
-  !null = {mg_kneighborsclassifier, inherits mg_estimator, $
+  !null = {mg_kneighborsclassifier, inherits mg_classifier, $
            n_neighbors: 0L, $
            _x: ptr_new(), $
            _y: ptr_new() $

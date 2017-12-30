@@ -36,6 +36,8 @@
 pro mg_kmeans::fit, x, y, seed=seed
   compile_opt strictarr
 
+  self->mg_classifier::fit, x, y
+
   *self._centers = mg_kmeans_centers(x, $
                                      n_clusters=self.n_clusters, $
                                      n_iterations=self.n_iterations, $
@@ -97,7 +99,7 @@ pro mg_kmeans::getProperty, n_clusters=n_clusters, $
   if (arg_present(centers)) then centers = *self._center
   if (arg_present(fit_parameters)) then fit_parameters = *self._centers
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::getProperty, _extra=e
 end
 
 
@@ -106,7 +108,7 @@ pro mg_kmeans::setProperty, fit_parameters=fit_parameters, _extra=e
 
   if (n_elements(fit_parameters) gt 0L) then *self._centers = fit_parameters
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::setProperty, _extra=e
 end
 
 
@@ -116,7 +118,7 @@ pro mg_kmeans::cleanup
   compile_opt strictarr
 
   ptr_free, self._centers
-  self->mg_estimator::cleanup
+  self->mg_classifier::cleanup
 end
 
 
@@ -127,9 +129,10 @@ function mg_kmeans::init, n_clusters=n_clusters, $
                           _extra=e
   compile_opt strictarr
 
-  if (~self->mg_estimator::init(_extra=e)) then return, 0
+  if (~self->mg_classifier::init(_extra=e)) then return, 0
 
   self.type = 'unsupervised'
+  self.name = 'KMeans'
 
   self.n_clusters = mg_default(n_clusters, 8)
   self.n_iterations = mg_default(n_iterations, 20)
@@ -145,7 +148,7 @@ end
 pro mg_kmeans__define
   compile_opt strictarr
 
-  !null = {mg_kmeans, inherits mg_estimator, $
+  !null = {mg_kmeans, inherits mg_classifier, $
            n_clusters: 0L, $
            n_iterations: 0L, $
            n_initializations: 0L, $

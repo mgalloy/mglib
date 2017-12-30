@@ -25,6 +25,8 @@
 pro mg_kneighborsregressor::fit, x, y
   compile_opt strictarr
 
+  self->mg_regressor::fit, x, y
+
   *self._x = x
   *self._y = y
 end
@@ -34,7 +36,7 @@ end
 ; Use previous training with `fit` method to predict targets for given data `x`.
 ;
 ; :Returns:
-;   `lonarr(n_samples)`
+;   `fltarr(n_samples)`
 ;
 ; :Params:
 ;   x : in, required, type="fltarr(n_features, n_samples)"

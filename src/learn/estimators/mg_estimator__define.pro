@@ -20,57 +20,13 @@ pro mg_estimator::fit, x, y
 end
 
 
-;+
-; Use previous training with `fit` method to predict targets for given data `x`.
-;
-; :Abstract:
-;
-; :Returns:
-;   fltarr(n_samples)
-;
-; :Params:
-;   x : in, required, type="fltarr(n_features, n_samples)"
-;     data to predict targets for
-;   y : in, optional, type=fltarr(n_samples)
-;     optional y-values; needed to get score
-;
-; :Keywords:
-;   score : out, optional, type=float
-;     set to a named variable to retrieve a score if `y` was specified
-;-
-function mg_estimator::predict, x, y, score=score
-  compile_opt strictarr
-
-  ; not implemented
-  return, !null
-end
-
-
-;+
-; Predict targets for `x` values and compare to `y`, returning percentage
-; correct.
-;
-; :Params:
-;   x : in, required, type="fltarr(n_features, n_samples)"
-;     data to score on
-;   y : in, required, type=fltarr(n_samples)
-;     results for `x` data, which will be compared to actual prediction for `x`
-;-
-function mg_estimator::score, x, y
-  compile_opt strictarr
-
-  result = self->predict(x, y, score=score)
-  return, score
-end
-
-
 ;= overload methods
 
 function mg_estimator::_overloadHelp, varname
   compile_opt strictarr
 
-  _type = self.type
-  _specs = '<>'
+  _type = self.type eq '' ? 'ESTIM' : self.type
+  _specs = '<None>'
   return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
@@ -80,12 +36,12 @@ end
 ;+
 ; Get property values.
 ;-
-pro mg_estimator::getProperty, type=type, name=name, $
+pro mg_estimator::getProperty, name=name, type=type, $
                                fit_parameters=fit_parameters
   compile_opt strictarr
 
-  if (arg_present(type)) then type = self.type
   if (arg_present(name)) then name = self.name
+  if (arg_present(type)) then type = self.type
 
   ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
   ; case
@@ -95,11 +51,13 @@ end
 ;+
 ; Set property values.
 ;-
-pro mg_estimator::setProperty, name=name, fit_parameters=fit_parameters, $
+pro mg_estimator::setProperty, name=name, type=type, $
+                               fit_parameters=fit_parameters, $
                                _extra=e
   compile_opt strictarr
 
   if (n_elements(name) gt 0L) then self.name = name
+  if (n_elements(type) gt 0L) then self.type = type
 
   ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
   ; case
@@ -115,6 +73,7 @@ pro mg_estimator::cleanup
   compile_opt strictarr
 
 end
+
 
 ;+
 ; Create estimator object.
