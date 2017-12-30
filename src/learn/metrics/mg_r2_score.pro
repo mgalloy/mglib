@@ -7,7 +7,10 @@
 ;   float/double same as `y` and `y_predict`
 ;
 ; :Params:
-;   y : in, required, type=
+;   y : in, required, type=fltarr(n_samples)
+;     known `y` values
+;   y_predict : in, required, type=fltarr(n_samples)
+;     predicted `y` values
 ;-
 function mg_r2_score, y, y_predict
   compile_opt strictarr
