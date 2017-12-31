@@ -15,7 +15,7 @@
 ;   seed : in, out, optional, type=integer
 ;     random number generator seed
 ;-
-pro mg_gridsearchcv::fit, x, y, seed=seed
+pro mg_randomizedsearchcv::fit, x, y, seed=seed
   compile_opt strictarr
 
   first_try = 1B
@@ -58,7 +58,7 @@ end
 ;   score : out, optional, type=float
 ;     set to a named variable to retrieve a score if `y` was specified
 ;-
-function mg_gridsearchcv::predict, x, y, score=score
+function mg_randomizedsearchcv::predict, x, y, score=score
   compile_opt strictarr
 
   self.predictor->setProperty, _extra=*self.best_parameters
@@ -69,14 +69,14 @@ end
 
 ;= property access
 
-pro mg_gridsearchcv::getProperty, parameter_grid=parameter_grid, $
-                                  cross_validation=cross_validation, $
-                                  best_score=best_score, $
-                                  best_parameters=best_parameters, $
-                                  _ref_extra=e
+pro mg_randomizedsearchcv::getProperty, parameter_distributions=parameter_distributions, $
+                                        cross_validation=cross_validation, $
+                                        best_score=best_score, $
+                                        best_parameters=best_parameters, $
+                                        _ref_extra=e
   compile_opt strictarr
 
-  if (arg_present(parameter_grid)) then parameter_grid = *self.parameter_grid
+  if (arg_present(parameter_distributions)) then parameter_distributions = *self.parameter_distributions
   if (arg_present(cross_validation)) then cross_validation = self.cross_validation
   if (arg_present(best_score)) then best_score = self.best_score
   if (arg_present(best_parameters)) then best_parameters = *self.best_parameters
@@ -87,62 +87,52 @@ end
 
 ;= overload methods
 
-function mg_gridsearchcv::_overloadForeach, value, key
+function mg_randomizedsearchcv::_overloadForeach, value, key
   compile_opt strictarr
 
-  n_params = n_tags(*self.parameter_grid)
+  n_parameters = n_tags(*self.parameter_distributions)
 
   if (n_elements(key) eq 0L) then begin
-    key = lonarr(n_params)
+    key = 0L
   endif else begin
-    increment_next = 1B
-    for p = 0L, n_params - 1L do begin
-      if (increment_next) then begin
-        if (++key[p] eq n_elements((*self.parameter_grid).(p))) then begin
-          key[p] = 0L
-          increment_next = 1B
-        endif else increment_next = 0B
-      endif
-    endfor
-
-    if (increment_next) then return, 0
+    key += 1
+    if (key ge self.n_iterations) then return, 0
   endelse
 
-  tnames = tag_names(*self.parameter_grid)
+  tnames = tag_names(*self.parameter_distributions)
 
   value = {}
-  for p = 0L, n_params - 1L do begin
-    value = create_struct(value, tnames[p], (*self.parameter_grid).(p)[key[p]])
+  for p = 0L, n_parameters - 1L do begin
+    distribution = (*self.parameter_distributions).(p)
+    value = create_struct(value, tnames[p], (distribution->select(1))[0])
   endfor
 
   return, 1
 end
 
 
-function mg_gridsearchcv::_overloadSize
+function mg_randomizedsearchcv::_overloadSize
   compile_opt strictarr
 
-  n_params = n_tags(*self.parameter_grid)
-  dims = lonarr(n_params)
-  for p = 0L, n_params - 1L do dims[p] = n_elements((*self.parameter_grid).(p))
-  return, dims
+  return, [self.n_iterations]
 end
 
 
 ;= lifecycle methods
 
-pro mg_gridsearchcv::cleanup
+pro mg_randomizedsearchcv::cleanup
   compile_opt strictarr
 
-  ptr_free, self.parameter_grid, self.best_parameters, self.best_fit_parameters
+  ptr_free, self.parameter_distributions, self.best_parameters, self.best_fit_parameters
   self->mg_predictor::cleanup
 end
 
 
-function mg_gridsearchcv::init, predictor, $
-                                parameter_grid=parameter_grid, $
-                                cross_validation=cross_validation, $
-                                _extra=e
+function mg_randomizedsearchcv::init, predictor, $
+                                      n_iterations=n_iterations, $
+                                      parameter_distributions=parameter_distributions, $
+                                      cross_validation=cross_validation, $
+                                      _extra=e
   compile_opt strictarr
 
   if (~self->mg_predictor::init()) then return, 0
@@ -152,7 +142,9 @@ function mg_gridsearchcv::init, predictor, $
   self.type = 'gridsearch'
 
   self.predictor = predictor
-  self.parameter_grid = ptr_new(parameter_grid)
+  self.n_iterations = mg_default(n_iterations, 10L)
+
+  self.parameter_distributions = ptr_new(parameter_distributions)
   if (n_elements(cross_validation) eq 0L) then begin
     self.cross_validation = mg_kfoldcv()
   endif else if (obj_valid(cross_validation)) then begin
@@ -169,12 +161,13 @@ function mg_gridsearchcv::init, predictor, $
 end
 
 
-pro mg_gridsearchcv__define
+pro mg_randomizedsearchcv__define
   compile_opt strictarr
 
-  !null = {mg_gridsearchcv, inherits mg_predictor, $
+  !null = {mg_randomizedsearchcv, inherits mg_predictor, $
            predictor: obj_new(), $
-           parameter_grid: ptr_new(), $
+           n_iterations: 0L, $
+           parameter_distributions: ptr_new(), $
            cross_validation: obj_new(), $
            best_score: 0.0, $
            best_parameters: ptr_new(), $
@@ -209,18 +202,22 @@ mg_train_test_split, data, target, $
 ; instantiate Perceptron model
 p = mg_perceptron(max_iterations=20)
 
-param_grid = {max_iterations:[1, 2], learning_rate: [0.005, 0.01, 0.02]}
-grid_search = mg_gridsearchcv(p, parameter_grid=param_grid, cross_validation=5)
-grid_search->fit, x_train, y_train
+param_dists = {max_iterations:mg_uniform_dist([1, 2], type=3L), $
+               learning_rate:mg_normal_dist(0.01, 0.005)}
+random_search = mg_randomizedsearchcv(p, $
+                                      n_iterations=100, $
+                                      parameter_distributions=param_dists, $
+                                      cross_validation=5)
+random_search->fit, x_train, y_train
 
-print, grid_search.best_score, format='(%"Best training score: %0.2f")'
+print, random_search.best_score, format='(%"Best training score: %0.2f")'
 print, 'Best parameters:'
-help, grid_search.best_parameters
+help, random_search.best_parameters
 
-y_results = grid_search->predict(x_test, y_test, score=score)
+y_results = random_search->predict(x_test, y_test, score=score)
 
 print, score, format='(%"Test score with best predictor: %0.2f")'
 
-obj_destroy, grid_search
+obj_destroy, random_search
 
 end
