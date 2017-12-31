@@ -141,7 +141,10 @@ pro mg_perceptron::setProperty, max_iterations=max_iterations, $
                                 _extra=e
   compile_opt strictarr
 
-  if (n_elements(max_iterations) gt 0L) then self.max_iterations = max_iterations
+  if (n_elements(max_iterations) gt 0L) then begin
+    self.max_iterations = max_iterations
+    *self._errors = lonarr(self.max_iterations)
+  endif
   if (n_elements(learning_rate) gt 0L) then self.learning_rate = learning_rate
   if (n_elements(fit_parameters) gt 0L) then begin
     *self._weights = fit_parameters.weights
