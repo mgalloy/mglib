@@ -222,6 +222,35 @@ function mg_table::_output, first_row, last_row
 end
 
 
+;+
+; Helper routine to convert an array of column names to column indices.
+;
+; :Returns:
+;   long/lonarr
+;
+; :Params:
+;   names : in, required, type=string/strarr
+;    string or array of strings representing column names
+;-
+function mg_table::_names2indices, names
+  compile_opt strictarr
+  on_error, 2
+
+  self->getProperty, column_names=column_names
+  n_names = n_elements(names)
+  indices = lonarr(n_names)
+  for n = 0L, n_names - 1L do begin
+    ind = where(column_names eq names[n], count)
+    if (count eq 0L) then begin
+      message, string(names[n], format='(%"column name %s not found")')
+    endif
+    indices[n] = ind[0]
+  endfor
+
+  return, size(names, /dimensions) eq 0 ? indices[0] : indices
+end
+
+
 ;= display methods
 
 ;+
@@ -276,6 +305,13 @@ end
 
 ;= column methods
 
+function mg_table::has_column, name
+  compile_opt strictarr
+
+  return, self.columns->hasKey(name)
+end
+
+
 pro mg_table::move, src, dst
   compile_opt strictarr
 
@@ -286,17 +322,46 @@ end
 
 ;= overload methods
 
-pro mg_table::_overloadPlus, left, right
+function mg_table::_overloadPlus, left, right
   compile_opt strictarr
+  ;on_error, 2
 
-  ; TODO: implement concatenation
+  if (left.n_rows ne right.n_rows) then begin
+    message, 'can only concatenate tables with the same number of rows'
+  endif
+
+  new_table = mg_table()
+
+  foreach col, left.columns, key do begin
+    print, key, format='(%"adding %s from left table")'
+    new_table[key] = col.data
+  endforeach
+
+  foreach col, right.columns, key do begin
+    print, key, format='(%"adding %s from right table")'
+    new_key = key
+    while (new_table->has_column(new_key)) do new_key += '_'
+    new_table[new_key] = col.data
+  endforeach
+
+  print, new_table.columns->count(), format='(%"%d columns in new table")'
+
+  return, new_table
 end
 
 
 pro mg_table::_overloadBracketsLeftSide, table, value, is_range, ss1, ss2
   compile_opt strictarr
+  ;on_error, 2
 
   ; TODO: implement both column creation and reassignment to existing columns
+
+  ; TODO: this only handles the special case of t[new_name] = data
+  col = size(value, /type) eq 11 ? value : mg_column(value)
+  if (self.n_rows ne 0L && col.n_rows ne self.n_rows) then begin
+    message, 'new column must have the same number of rows as table'
+  endif else self.n_rows = col.n_rows
+  (self.columns)[ss1] = col
 end
 
 
@@ -387,8 +452,9 @@ pro mg_table::_append_array, array, column_names=names
   compile_opt strictarr
 
   dims = size(array, /dimensions)
+  if (dims[0] eq 0L) then return
   self.n_rows = dims[1]
-  if (n_elements(names) eq 0L) then names = 'c' + strtrim(lindgen(dims[0]), 2)
+  if (n_elements(names) eq 0L) then names = 'c' + strtrim(lindgen(dims[0]) + 1L, 2)
   for c = 0L, dims[0] - 1L do (self.columns)[names[c]] = mg_column(reform(array[c, *]))
 end
 
@@ -428,10 +494,12 @@ end
 
 
 pro mg_table::getProperty, column_names=column_names, $
-                            data=data, $
-                            format=format, $
-                            types=types, $
-                            widths=widths
+                           columns=columns, $
+                           data=data, $
+                           format=format, $
+                           n_rows=n_rows, $
+                           types=types, $
+                           widths=widths
   compile_opt strictarr
 
   if (arg_present(column_names)) then begin
@@ -439,6 +507,8 @@ pro mg_table::getProperty, column_names=column_names, $
     column_names = keys->toArray()
     obj_destroy, keys
   endif
+
+  if (arg_present(columns)) then columns = self.columns
 
   if (arg_present(data)) then begin
     data = self->_subset([1B, 1B], [0L, -1L, 1L], [0L, -1L, 1L])
@@ -450,6 +520,8 @@ pro mg_table::getProperty, column_names=column_names, $
     foreach col, self.columns do formats[c++] = col.format
     format = strjoin(formats, ', ')
   endif
+
+  if (arg_present(n_rows)) then n_rows = self.n_rows
 
   if (arg_present(types)) then begin
     types = strarr(self.columns->count())
