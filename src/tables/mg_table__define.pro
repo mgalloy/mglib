@@ -9,7 +9,7 @@
 ; :Returns:
 ;   long
 ;-
-function mg_table2::_termcolumns
+function mg_table::_termcolumns
   compile_opt strictarr
 
   catch, error
@@ -44,7 +44,7 @@ end
 ;   column_names : out, optional, type=strarr
 ;     column names of the columns in the result
 ;-
-function mg_table2::_subset, is_range, ss1, ss2, column_names=column_names
+function mg_table::_subset, is_range, ss1, ss2, column_names=column_names
   compile_opt strictarr
 
   self->getProperty, column_names=column_names
@@ -80,6 +80,30 @@ function mg_table2::_subset, is_range, ss1, ss2, column_names=column_names
 end
 
 
+pro mg_table::_fix_widths, subset, widths
+  compile_opt strictarr
+
+  n_columns = n_tags(subset)
+  for c = 0L, n_columns - 1L do begin
+    type = size(subset.(c), /type)
+    if (type eq 7L) then begin
+      col = subset.(c)
+      n_rows = n_elements(subset.(c))
+      for r = 0L, n_rows - 1L do begin
+        if (strlen(col[r]) gt widths[c]) then begin
+          row_width = widths[r] - 3L
+          ellipses = '...'
+        endif else begin
+          row_width = widths[r]
+          ellipses = ''
+        endelse
+        col[r] = string(col[r], ellipses, format=mg_format('%*s%s', - row_width))
+      endfor
+      subset.(c) = col
+    endif
+  endfor
+end
+
 
 ;+
 ; Return a string for the printed output, with rows optionally specified.
@@ -94,7 +118,7 @@ end
 ;     index of last row to print; default is the `first_row` plus the
 ;     `N_ROWS_TO_PRINT` property
 ;-
-function mg_table2::_output, first_row, last_row
+function mg_table::_output, first_row, last_row
   compile_opt strictarr
 
   ; define the start and end rows
@@ -182,6 +206,7 @@ function mg_table2::_output, first_row, last_row
       subset = self->_subset([0B, 1B], $
                              column_indices, $
                              [lonarr(2) + r + _first_row, 1])
+      self->_fix_widths, subset, section_widths
       result[i + r] = string(row_indices[r + _first_row], subset, $
                              format=data_format)
     endfor
@@ -206,7 +231,7 @@ end
 ;   n : in, optional, type=integer, default=10
 ;     number of rows of data to display
 ;-
-pro mg_table2::head, n
+pro mg_table::head, n
   compile_opt strictarr
 
   print, self->_output(0, mg_default(n, 10))
@@ -220,7 +245,7 @@ end
 ;   n : in, optional, type=integer, default=10
 ;     number of rows of data to display
 ;-
-pro mg_table2::tail, n
+pro mg_table::tail, n
   compile_opt strictarr
 
   print, self->_output(self.n_rows - mg_default(n, 10), self.n_rows - 1L)
@@ -239,7 +264,7 @@ end
 ;   y : in, optional, type=string/integer
 ;     column name or index for `y` values of scatter plot
 ;-
-pro mg_table2::scatter, x, y, psym=psym, _extra=e
+pro mg_table::scatter, x, y, psym=psym, _extra=e
   compile_opt strictarr
 
   ; TODO: implement
@@ -251,7 +276,7 @@ end
 
 ;= column methods
 
-pro mg_table2::move, src, dst
+pro mg_table::move, src, dst
   compile_opt strictarr
 
   ; TODO: handle column names instead of just indices
@@ -261,14 +286,14 @@ end
 
 ;= overload methods
 
-pro mg_table2::_overloadPlus, left, right
+pro mg_table::_overloadPlus, left, right
   compile_opt strictarr
 
   ; TODO: implement concatenation
 end
 
 
-pro mg_table2::_overloadBracketsLeftSide, table, value, is_range, ss1, ss2
+pro mg_table::_overloadBracketsLeftSide, table, value, is_range, ss1, ss2
   compile_opt strictarr
 
   ; TODO: implement both column creation and reassignment to existing columns
@@ -279,7 +304,7 @@ end
 ; Subset a table returning a new table.
 ;
 ; :Returns:
-;   `mg_table2`
+;   `mg_table`
 ;
 ; :Params:
 ;   is_range : in, required, type=bytarr(2)
@@ -292,12 +317,12 @@ end
 ;     if `is_range[1] eq 0` then index array, else it should be a 3-element
 ;     array of the form `[start, stop, stride]`
 ;-
-function mg_table2::_overloadBracketsRightSide, is_range, ss1, ss2
+function mg_table::_overloadBracketsRightSide, is_range, ss1, ss2
   compile_opt strictarr
 
   ; TODO: handle column names instead of indices
   subset = self->_subset(is_range, ss1, ss2, column_names=column_names)
-  return, mg_table2(subset, column_names=column_names)
+  return, mg_table(subset, column_names=column_names)
 end
 
 
@@ -317,7 +342,7 @@ end
 ;   varname : in, required, type=string
 ;     name of variable to retrieve `HELP` for
 ;-
-function mg_table2::_overloadHelp, varname
+function mg_table::_overloadHelp, varname
   compile_opt strictarr
 
   _type = 'MG_TABLE'
@@ -330,7 +355,7 @@ end
 ;+
 ; Returns string used by implied print.
 ;-
-function mg_table2::_overloadImpliedPrint, varname
+function mg_table::_overloadImpliedPrint, varname
   compile_opt strictarr
 
   last_row = (self.n_rows < self.n_rows_to_print) - 1L
@@ -341,7 +366,7 @@ end
 ;+
 ; Returns string used by `PRINT`.
 ;-
-function mg_table2::_overloadPrint
+function mg_table::_overloadPrint
   compile_opt strictarr
 
   last_row = (self.n_rows < self.n_rows_to_print) - 1L
@@ -349,7 +374,7 @@ function mg_table2::_overloadPrint
 end
 
 
-function mg_table2::_overloadSize
+function mg_table::_overloadSize
   compile_opt strictarr
 
   return, [self.columns->count(), self.n_rows]
@@ -358,7 +383,7 @@ end
 
 ;= creation methods
 
-pro mg_table2::_append_array, array, column_names=names
+pro mg_table::_append_array, array, column_names=names
   compile_opt strictarr
 
   dims = size(array, /dimensions)
@@ -368,7 +393,7 @@ pro mg_table2::_append_array, array, column_names=names
 end
 
 
-pro mg_table2::_append_structarr, structarr, column_names=names
+pro mg_table::_append_structarr, structarr, column_names=names
   compile_opt strictarr
   on_error, 2
 
@@ -384,7 +409,7 @@ pro mg_table2::_append_structarr, structarr, column_names=names
 end
 
 
-pro mg_table2::_append_arrstruct, arrstruct, column_names=names
+pro mg_table::_append_arrstruct, arrstruct, column_names=names
   compile_opt strictarr
 
   n_columns = n_tags(arrstruct)
@@ -396,13 +421,13 @@ end
 
 ;= property access methods
 
-pro mg_table2::setProperty
+pro mg_table::setProperty
   compile_opt strictarr
 
 end
 
 
-pro mg_table2::getProperty, column_names=column_names, $
+pro mg_table::getProperty, column_names=column_names, $
                             data=data, $
                             format=format, $
                             types=types, $
@@ -442,7 +467,7 @@ end
 
 ;= lifecycle methods
 
-pro mg_table2::cleanup
+pro mg_table::cleanup
   compile_opt strictarr
 
   foreach col, self.columns do obj_destroy, col
@@ -451,12 +476,12 @@ end
 
 
 ;+
-; Instantiate an mg_table2 object.
+; Instantiate an mg_table object.
 ;
 ; :Returns:
 ;   1 for succcess, 0 for failure
 ;-
-function mg_table2::init, data, $
+function mg_table::init, data, $
                           column_names=column_names, $
                           n_rows_to_print=n_rows_to_print
   compile_opt strictarr
@@ -482,12 +507,12 @@ end
 
 
 ;+
-; Define mg_table2 class.
+; Define mg_table class.
 ;-
-pro mg_table2__define
+pro mg_table__define
   compile_opt strictarr
 
-  !null = {mg_table2, inherits IDL_Object, $
+  !null = {mg_table, inherits IDL_Object, $
            n_rows: 0L, $
            n_rows_to_print: 0L, $
            columns: obj_new()}
@@ -498,7 +523,7 @@ end
 
 print, format='(%"# Simple array")'
 iris = mg_learn_dataset('iris')
-df = mg_table2(iris.data, column_names=iris.feature_names)
+df = mg_table(iris.data, column_names=iris.feature_names)
 help, df
 print, n_elements(df), format='(%"n_elements(df) = %d")'
 print, strjoin(strtrim(size(df), 2), ', '), format='(%"size(df) = [%s]")'
@@ -519,13 +544,11 @@ data = [{price: 850000.0, rooms: 4, neighborhood: 'Queen Anne'}, $
         {price: 700000.0, rooms: 3, neighborhood: 'Fremont'}, $
         {price: 650000.0, rooms: 3, neighborhood: 'Wallingford'}, $
         {price: 600000.0, rooms: 2, neighborhood: 'Fremont'}]
-df = mg_table2(data, column_names=['price', 'rooms', 'neighborhood'])
+df = mg_table(data, column_names=['price', 'rooms', 'neighborhood'])
 help, df
 print, n_elements(df), format='(%"n_elements(df) = %d")'
 print, strjoin(strtrim(size(df), 2), ', '), format='(%"size(df) = [%s]")'
 print, df
-
-stop
 
 print, format='(%"\n# Subtable of array of structures")'
 print, strjoin(df['neighborhood'], ', '), format='(%"Neighborhoods: %s")'
@@ -541,7 +564,7 @@ print, format='(%"\n# Scatter plot between two columns")'
 device, decomposed=0
 loadct, 5
 b = mg_learn_dataset('boston')
-df = mg_table2(b.data, column=b.feature_names)
+df = mg_table(b.data, column=b.feature_names)
 df->scatter, 'NOX', 'AGE', $
              psym=mg_usersym(/circle, /fill), $
              symsize=0.5, $
