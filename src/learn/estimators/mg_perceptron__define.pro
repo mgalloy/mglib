@@ -178,8 +178,7 @@ function mg_perceptron::init, max_iterations=max_iterations, $
   _max_iterations = mg_default(max_iterations, 10L)
   _learning_rate = mg_default(learning_rate, 0.01)
   self->setProperty, max_iterations=_max_iterations, $
-                     learning_rate=_learning_rate, $
-                     _extra=e
+                     learning_rate=_learning_rate
 
   return, 1
 end
