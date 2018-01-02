@@ -68,12 +68,13 @@ pro mg_column::setProperty, format=format
 end
 
 
-pro mg_column::getProperty, data=data, type=type, format=format, width=width
+pro mg_column::getProperty, data=data, type=type, format=format, n_rows=n_rows, width=width
   compile_opt strictarr
 
   if (arg_present(data)) then data = *self.data
   if (arg_present(type)) then type = self.type
   if (arg_present(format)) then format = self.format
+  if (arg_present(n_rows)) then n_rows = n_elements(*self.data)
   if (arg_present(width)) then width = self.width
 end
 
