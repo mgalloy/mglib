@@ -43,9 +43,13 @@ end
 ; :Keywords:
 ;   column_names : out, optional, type=strarr
 ;     column names of the columns in the result
+;   array : in, optional, type=boolean
+;     set to return a 2-dimensional array instead of an array of structures
 ;-
-function mg_table::_subset, is_range, ss1, ss2, column_names=column_names
+function mg_table::_subset, is_range, ss1, ss2, $
+                            column_names=column_names, array=array
   compile_opt strictarr
+  on_error, 2
 
   self->getProperty, column_names=column_names
   if (is_range[0] eq 0) then begin
@@ -62,19 +66,33 @@ function mg_table::_subset, is_range, ss1, ss2, column_names=column_names
     n_rows = ceil((last_index - ss2[0] + 1L) / float(ss2[2]))
   endelse
 
-  result = {}
-  for c = 0L, n_columns - 1L do begin
-    col = (self.columns)[column_names[c]]
-    result = create_struct(result, $
-                           idl_validname(column_names[c], /convert_all), $
-                           fix(0, type=col.type))
-  endfor
-  result = replicate(result, n_rows)
+  if (keyword_set(array)) then begin
+    self->getProperty, types=types
+    type = types[0]
+    for t = 0L, n_elements(types) - 1L do begin
+      type = mg_promote_type(type, types[t])
+      if (type lt 0L) then message, 'no valid type for output array'
+    endfor
+    result = make_array(dimension=[n_columns, n_rows], type=type)
+    for c = 0L, n_columns - 1L do begin
+      col = (self.columns)[column_names[c]]
+      result[c, *] = col->_overloadBracketsRightSide([is_range[1]], ss2)
+    endfor
+  endif else begin
+    result = {}
+    for c = 0L, n_columns - 1L do begin
+      col = (self.columns)[column_names[c]]
+      result = create_struct(result, $
+                             idl_validname(column_names[c], /convert_all), $
+                             fix(0, type=col.type))
+    endfor
+    result = replicate(result, n_rows)
 
-  for c = 0L, n_columns - 1L do begin
-    col = (self.columns)[column_names[c]]
-    result.(c) = col->_overloadBracketsRightSide([is_range[1]], ss2)
-  endfor
+    for c = 0L, n_columns - 1L do begin
+      col = (self.columns)[column_names[c]]
+      result.(c) = col->_overloadBracketsRightSide([is_range[1]], ss2)
+    endfor
+  endelse
 
   return, result
 end
@@ -181,7 +199,7 @@ function mg_table::_output, first_row, last_row
     if (print_header) then begin
       line = strarr(sections[s])
       for c = 0L, sections[s] - 1L do begin
-        line[c] = strjoin(strarr(widths[c]) + '=')
+        line[c] = strjoin(strarr(section_widths[c]) + '=')
       endfor
 
       i = n_section_rows * s + s
@@ -281,6 +299,16 @@ pro mg_table::tail, n
 end
 
 
+;+
+; Page through entire output of the table.
+;-
+pro mg_table::page
+  compile_opt strictarr
+
+  more, self->_output(0L, self.n_rows - 1L)
+end
+
+
 ;= plotting methods
 
 ;+
@@ -295,8 +323,25 @@ end
 ;-
 pro mg_table::scatter, x, y, psym=psym, _extra=e
   compile_opt strictarr
+;  on_error, 2
 
-  ; TODO: implement
+  self->getProperty, column_names=column_names
+  case n_params() of
+    0: begin
+        self->getProperty, data=data
+        mg_scatterplot_matrix, data, column_names=column_names, $
+                               psym=psym, _extra=e
+      end
+    1: message, 'only one column specified'
+    2: begin
+        xdata = self[x]
+        ydata = self[y]
+        xtitle = size(x, /type) eq 7 ? x : column_names[x]
+        ytitle = size(y, /type) eq 7 ? y : column_names[y]
+        mg_plot, xdata, ydata, xtitle=xtitle, ytitle=ytitle, /nodata
+        mg_plots, xdata, ydata, psym=mg_default(psym, 3), _extra=e
+      end
+  endcase
 end
 
 
@@ -305,6 +350,13 @@ end
 
 ;= column methods
 
+pro mg_table::drop_column, name
+  compile_opt strictarr
+
+  self.columns->remove, name
+end
+
+
 function mg_table::has_column, name
   compile_opt strictarr
 
@@ -312,11 +364,12 @@ function mg_table::has_column, name
 end
 
 
-pro mg_table::move, src, dst
+pro mg_table::move_column, src, dst
   compile_opt strictarr
 
-  ; TODO: handle column names instead of just indices
-  self.columns->move, src, dst
+  _src = size(src, /type) eq 7 ? self->_names2indices(src) : src
+  _dst = size(dst, /type) eq 7 ? self->_names2indices(dst) : dst
+  self.columns->move, _src, _dst
 end
 
 
@@ -386,7 +439,15 @@ function mg_table::_overloadBracketsRightSide, is_range, ss1, ss2
   compile_opt strictarr
 
   ; TODO: handle column names instead of indices
-  subset = self->_subset(is_range, ss1, ss2, column_names=column_names)
+  _ss1 = size(ss1, /type) eq 7 ? self->_names2indices(ss1) : ss1
+  if (n_elements(is_range) eq 1L) then begin
+    is_range = [is_range[0], 1]
+    _ss2 = [0, self.n_rows - 1L, 1]
+  endif else _ss2 = ss2
+
+  subset = self->_subset(is_range, _ss1, _ss2, column_names=column_names)
+  if (n_tags(subset) eq 1L) then return, subset.(0)
+
   return, mg_table(subset, column_names=column_names)
 end
 
@@ -493,7 +554,8 @@ pro mg_table::setProperty
 end
 
 
-pro mg_table::getProperty, column_names=column_names, $
+pro mg_table::getProperty, array=array, $
+                           column_names=column_names, $
                            columns=columns, $
                            data=data, $
                            format=format, $
@@ -501,6 +563,10 @@ pro mg_table::getProperty, column_names=column_names, $
                            types=types, $
                            widths=widths
   compile_opt strictarr
+
+  if (arg_present(array)) then begin
+    array = self->_subset([1B, 1B], [0L, -1L, 1L], [0L, -1L, 1L], /array)
+  endif
 
   if (arg_present(column_names)) then begin
     keys = self.columns->keys()
@@ -512,6 +578,7 @@ pro mg_table::getProperty, column_names=column_names, $
 
   if (arg_present(data)) then begin
     data = self->_subset([1B, 1B], [0L, -1L, 1L], [0L, -1L, 1L])
+    if (n_tags(data) eq 1L) then data = data.(0)
   endif
 
   if (arg_present(format)) then begin
@@ -634,14 +701,24 @@ obj_destroy, df
 
 print, format='(%"\n# Scatter plot between two columns")'
 device, decomposed=0
-loadct, 5
+loadct, 55
+tvlct, 255, 255, 255, 0
+tvlct, 0, 0, 0, 255
+
 b = mg_learn_dataset('boston')
 df = mg_table(b.data, column=b.feature_names)
 df->scatter, 'NOX', 'AGE', $
              psym=mg_usersym(/circle, /fill), $
              symsize=0.5, $
-             color=bytscl(df['RAD'])
+             color=bytscl(df['RAD'], top=253) + 1B
+df->scatter
+
+print, df
+obj_destroy, df
 
 venus_filename = filepath('VenusCraterData.csv', subdir=['examples', 'data'])
+venus_table = mg_read_table(venus_filename)
+print, venus_table
+obj_destroy, venus_table
 
 end
