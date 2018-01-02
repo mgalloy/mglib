@@ -130,7 +130,7 @@ end
 function mg_pcatransformer::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_transformer::init(_extra=e)) then return, 0
+  if (~self->mg_transformer::init()) then return, 0
 
   self.n_components = 0L
   self.required_variance = -1.0

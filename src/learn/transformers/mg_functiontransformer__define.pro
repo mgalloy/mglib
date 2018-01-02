@@ -65,7 +65,9 @@ end
 function mg_functiontransformer::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_transformer::init(_extra=e)) then return, 0
+  if (~self->mg_transformer::init()) then return, 0
+
+  self->setProperty, _extra=e
 
   return, 1
 end

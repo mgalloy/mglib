@@ -131,7 +131,7 @@ pro mg_perceptron::getProperty, max_iterations=max_iterations, $
                       errors: (*self._errors)[0:self._n_iterations - 1L]}
   endif
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::getProperty, _extra=e
 end
 
 
@@ -141,7 +141,10 @@ pro mg_perceptron::setProperty, max_iterations=max_iterations, $
                                 _extra=e
   compile_opt strictarr
 
-  if (n_elements(max_iterations) gt 0L) then self.max_iterations = max_iterations
+  if (n_elements(max_iterations) gt 0L) then begin
+    self.max_iterations = max_iterations
+    *self._errors = lonarr(self.max_iterations)
+  endif
   if (n_elements(learning_rate) gt 0L) then self.learning_rate = learning_rate
   if (n_elements(fit_parameters) gt 0L) then begin
     *self._weights = fit_parameters.weights
@@ -149,7 +152,7 @@ pro mg_perceptron::setProperty, max_iterations=max_iterations, $
     (*self._errors)[0:n_elements(fit_parameters.errors) - 1L] = fit_parameters.errors
   endif
 
-  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
+  if (n_elements(e) gt 0L) then self->mg_classifier::setProperty, _extra=e
 end
 
 
@@ -159,7 +162,7 @@ pro mg_perceptron::cleanup
   compile_opt strictarr
 
   ptr_free, self._weights, self._errors
-  self->mg_estimator::cleanup
+  self->mg_classifier::cleanup
 end
 
 
@@ -168,7 +171,7 @@ function mg_perceptron::init, max_iterations=max_iterations, $
                               _extra=e
   compile_opt strictarr
 
-  if (~self->mg_estimator::init(_extra=e)) then return, 0
+  if (~self->mg_classifier::init(_extra=e)) then return, 0
 
   self.type = 'binary classifier'
 
@@ -187,7 +190,7 @@ end
 pro mg_perceptron__define
   compile_opt strictarr
 
-  !null = {mg_perceptron, inherits mg_estimator, $
+  !null = {mg_perceptron, inherits mg_classifier, $
            max_iterations: 0L, $
            learning_rate: 0.0, $
            _n_iterations: 0L, $

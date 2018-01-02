@@ -20,7 +20,7 @@
 pro mg_tfidftransformer::fit, x, y, _extra=e
   compile_opt strictarr
 
-  self->mg_transformer::fit, _extra=e
+  self->mg_transformer::fit, x, y, _extra=e
 
   n_samples = n_elements(x)
   self._all_words_hash->remove, /all
@@ -142,10 +142,12 @@ end
 function mg_tfidftransformer::init, _extra=e
   compile_opt strictarr
 
-  if (~self->mg_transformer::init(_extra=e)) then return, 0
+  if (~self->mg_transformer::init()) then return, 0
 
   self._all_words = ptr_new(/allocate_heap)
   self._all_words_hash = hash()
+
+  self->setProperty, _extra=e
 
   return, 1
 end

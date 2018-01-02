@@ -19,7 +19,7 @@
 ;   weights : in, optional, type=fltarr(n_samples)
 ;     weights to use for each sample
 ;-
-function mg_accuracy, y_true, y_predict, normalize=normalize, weights=weights
+function mg_accuracy_score, y_true, y_predict, normalize=normalize, weights=weights
   compile_opt strictarr
 
   if (n_elements(weights) eq 0L) then begin

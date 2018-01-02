@@ -1,10 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Transformers prepare data for an estimator.
+; Transformers are estimators that prepare data for an predictor.
 ;
-; Transformers have two main methods, `fit` and `transform`, along with the
-; convenience method `fit_transform` that simply calls them both in sequence.
+; Transformers have two main methods, `fit` (from being an estimator) and
+; `transform`, along with the convenience method `fit_transform` that simply
+; calls them both in sequence.
 ;
 ; A typical workflow is to fit and transform the training data, then transform
 ; test data::
@@ -27,6 +28,8 @@
 ;-
 pro mg_transformer::fit, x, y, feature_names=feature_names
   compile_opt strictarr
+
+  self->mg_estimator::fit, x, y
 
   if (n_elements(feature_names) eq 0L) then begin
     if (n_elements(*self.feature_names) eq 0L) then begin
@@ -81,8 +84,8 @@ end
 function mg_transformer::_overloadHelp, varname
   compile_opt strictarr
 
-  _type = 'TRANS'
-  _specs = '<>'
+  _type = self.type eq '' ? 'TRANS' : self.type
+  _specs = '<None>'
   return, string(varname, _type, _specs, format='(%"%-15s %-9s = %s")')
 end
 
@@ -92,30 +95,34 @@ end
 ;+
 ; Get property values.
 ;-
-pro mg_transformer::getProperty, feature_names=feature_names, name=name, $
-                                 fit_parameters=fit_parameters
+pro mg_transformer::getProperty, feature_names=feature_names, $
+                                 fit_parameters=fit_parameters, $
+                                 _ref_extra=e
   compile_opt strictarr
 
   if (arg_present(feature_names)) then feature_names = *self.feature_names
-  if (arg_present(name)) then name = self.name
 
   ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
   ; case
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::getProperty, _extra=e
 end
 
 
 ;+
 ; Set property values.
 ;-
-pro mg_transformer::setProperty, feature_names=feature_names, name=name, $
-                                 fit_parameters=fit_parameters
+pro mg_transformer::setProperty, feature_names=feature_names, $
+                                 fit_parameters=fit_parameters, $
+                                 _extra=e
   compile_opt strictarr
 
   if (n_elements(feature_names) gt 0L) then *self.feature_names = feature_names
-  if (n_elements(name) gt 0L) then self.name = name
 
   ; FIT_PARAMETERS is here for the interface, but nothing to give in the general
   ; case
+
+  if (n_elements(e) gt 0L) then self->mg_estimator::setProperty, _extra=e
 end
 
 
@@ -126,6 +133,8 @@ end
 ;-
 pro mg_transformer::cleanup
   compile_opt strictarr
+
+  self->mg_estimator::cleanup
 
   ptr_free, self.feature_names
 end
@@ -140,10 +149,9 @@ end
 function mg_transformer::init, _extra=e
   compile_opt strictarr
 
-  self.name = strlowcase(obj_class(self))
+  if (self->mg_estimator::init() eq 0L) then return, 0
 
   self.feature_names = ptr_new(/allocate_heap)
-
   self->setProperty, _extra=e
 
   return, 1
@@ -156,8 +164,7 @@ end
 pro mg_transformer__define
   compile_opt strictarr
 
-  !null = {mg_transformer, inherits IDL_Object, $
-           feature_names: ptr_new(), $
-           name: '' $
+  !null = {mg_transformer, inherits mg_estimator, $
+           feature_names: ptr_new() $
           }
 end

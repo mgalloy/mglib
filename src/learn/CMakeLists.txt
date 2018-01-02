@@ -4,9 +4,12 @@ set(DLM_NAME mg_${DIRNAME})
 file(GLOB PRO_FILES "*.pro")
 
 add_subdirectory(data)
+add_subdirectory(classifiers)
 add_subdirectory(estimators)
 add_subdirectory(metrics)
 add_subdirectory(model_selection)
+add_subdirectory(pipeline)
+add_subdirectory(regressors)
 add_subdirectory(transformers)
 
 install(FILES ${PRO_FILES} DESTINATION lib/${DIRNAME})
