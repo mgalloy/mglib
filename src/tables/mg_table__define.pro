@@ -145,7 +145,14 @@ function mg_table::_output, first_row, last_row
   n_printed_rows = _last_row - _first_row + 1L
 
   ; define the size for the space for the index column
-  n_index_spaces = ceil(alog10((self.n_rows - 1L) > 1L))
+  has_row_names = n_elements(*self.row_names) gt 0L
+  if (has_row_names) then begin
+    n_index_spaces = max(strlen(*self.row_names))
+    row_names = *self.row_names
+  endif else begin
+    n_index_spaces = ceil(alog10((self.n_rows - 1L) > 1L))
+    row_names = strtrim(sindgen(self.n_rows), 2)
+  endelse
 
   ; define whether to print some elements of the output
   print_header = 1B
@@ -182,8 +189,6 @@ function mg_table::_output, first_row, last_row
                      + print_tail_ellipses
   result = strarr(1, n_sections * (n_section_rows) + n_sections - 1L)
 
-  row_indices = lindgen(self.n_rows)
-
   ; loop through the sections
   for s = 0L, n_sections - 1L do begin
     ; format and their lengths for this section
@@ -197,15 +202,16 @@ function mg_table::_output, first_row, last_row
     ellipses = strarr(sections[s]) + '...'
 
     if (print_header) then begin
-      line = strarr(sections[s])
+      line = strarr(sections[s] + 1L)
+      line[0] = strjoin(strarr(n_index_spaces) + '=')
       for c = 0L, sections[s] - 1L do begin
-        line[c] = strjoin(strarr(section_widths[c]) + '=')
+        line[c + 1L] = strjoin(strarr(section_widths[c]) + '=')
       endfor
 
       i = n_section_rows * s + s
       result[i] = [string('', column_names[si[s]:si[s + 1] - 1], $
                           format=header_format), $
-                   string('', line, format=header_format)]
+                   string(line, format=header_format)]
     endif
 
     ; head ellipses
@@ -215,7 +221,7 @@ function mg_table::_output, first_row, last_row
     endif
 
     ; data
-    data_format = '(%"%' + strtrim(n_index_spaces, 2) + 'd ' $
+    data_format = '(%"%' + strtrim(n_index_spaces, 2) + 's ' $
                     + strjoin(section_formats, ' ') + '")'
 
     i = 2 * print_header + print_head_ellipses + n_section_rows * s + s
@@ -225,7 +231,7 @@ function mg_table::_output, first_row, last_row
                              column_indices, $
                              [lonarr(2) + r + _first_row, 1])
       self->_fix_widths, subset, section_widths
-      result[i + r] = string(row_indices[r + _first_row], subset, $
+      result[i + r] = string(row_names[r + _first_row], subset, $
                              format=data_format)
     endfor
 
@@ -309,6 +315,18 @@ pro mg_table::page
 end
 
 
+;= export methods
+
+;+
+; Export HTML representing the table.
+;-
+pro mg_table::to_html
+  compile_opt strictarr
+
+  ; TODO: implement
+end
+
+
 ;= plotting methods
 
 ;+
@@ -346,6 +364,29 @@ end
 
 
 ;= stats methods
+
+pro mg_table::describe, percentiles=percentiles
+  compile_opt strictarr
+
+  _percentiles = mg_default(percentiles, [0.25, 0.50, 0.75])
+  n_columns = self.columns->count()
+  n_rows = n_elements(_percentiles) + 4L  ; mean, stddev, min, max
+  result = fltarr(n_columns, n_rows)
+  c = 0L
+  foreach col, self.columns, key do begin
+    d = col.data
+    range = mg_range(d)
+    per = mg_percentiles(d, percentiles=_percentiles)
+    result[c, *] = [mean(d), stddev(d), range[0], per, range[1]]
+    c += 1L
+  endforeach
+
+  self->getProperty, column_names=column_names
+  row_names = ['mean', 'std dev', 'min', string(100.0 * _percentiles, format='(F0.1)') + '%', 'max']
+  description = mg_table(result, column_names=column_names, row_names=row_names)
+  print, description
+  obj_destroy, description
+end
 
 
 ;= column methods
@@ -610,6 +651,7 @@ pro mg_table::cleanup
   compile_opt strictarr
 
   foreach col, self.columns do obj_destroy, col
+  ptr_free, self.row_names
   obj_destroy, self.columns
 end
 
@@ -621,8 +663,9 @@ end
 ;   1 for succcess, 0 for failure
 ;-
 function mg_table::init, data, $
-                          column_names=column_names, $
-                          n_rows_to_print=n_rows_to_print
+                         column_names=column_names, $
+                         n_rows_to_print=n_rows_to_print, $
+                         row_names=row_names
   compile_opt strictarr
   on_error, 2
 
@@ -641,6 +684,8 @@ function mg_table::init, data, $
     self->_append_array, data, column_names=column_names
   endelse
 
+  self.row_names = ptr_new(row_names)
+
   return, 1
 end
 
@@ -654,6 +699,7 @@ pro mg_table__define
   !null = {mg_table, inherits IDL_Object, $
            n_rows: 0L, $
            n_rows_to_print: 0L, $
+           row_names: ptr_new(), $
            columns: obj_new()}
 end
 
