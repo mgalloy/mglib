@@ -589,9 +589,12 @@ end
 
 ;= property access methods
 
-pro mg_table::setProperty
+pro mg_table::setProperty, column=column, _extra=e
   compile_opt strictarr
 
+  if (n_elements(column) gt 0L) then begin
+    (self.columns[column])->setProperty, _extra=e
+  endif
 end
 
 
