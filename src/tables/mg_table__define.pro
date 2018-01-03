@@ -264,7 +264,7 @@ function mg_table::_names2indices, names
   n_names = n_elements(names)
   indices = lonarr(n_names)
   for n = 0L, n_names - 1L do begin
-    ind = where(column_names eq names[n], count)
+    ind = where(strmatch(column_names, names[n], fold_case=self.fold_case), count)
     if (count eq 0L) then begin
       message, string(names[n], format='(%"column name %s not found")')
     endif
@@ -664,12 +664,14 @@ end
 ;-
 function mg_table::init, data, $
                          column_names=column_names, $
+                         fold_case=fold_case, $
                          n_rows_to_print=n_rows_to_print, $
                          row_names=row_names
   compile_opt strictarr
   on_error, 2
 
-  self.columns = orderedhash()
+  self.fold_case = keyword_set(fold_case)
+  self.columns = orderedhash(fold_case=self.fold_case)
   self.n_rows_to_print = mg_default(n_rows_to_print, 20L)
 
   type = size(data, /type)
@@ -700,7 +702,8 @@ pro mg_table__define
            n_rows: 0L, $
            n_rows_to_print: 0L, $
            row_names: ptr_new(), $
-           columns: obj_new()}
+           columns: obj_new(), $
+           fold_case: 0B}
 end
 
 
