@@ -63,7 +63,15 @@ pro mg_column::setProperty, format=format
 
   if (n_elements(format) gt 0L) then begin
     self.format = format
-    ; TODO: set self.width as well
+    re = '%([[:digit:]])?(.[[:digit:]]+)?[[:alpha:]]'
+    tokens = stregex(format, re, /extract, /subexpr)
+    if (tokens[1] eq '') then begin
+      ; TODO: should capture [[:alpha:]] and lookup default width
+      width = mg_default_format(self.type, /width)
+    endif else begin
+      width = long(tokens[1])
+    endelse
+    self.width = width
   endif
 end
 
