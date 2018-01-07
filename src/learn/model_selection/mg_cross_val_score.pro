@@ -1,6 +1,26 @@
 ; docformat = 'rst'
 
-function mg_cross_val_score, estimator, x, y, $
+;+
+; Calculate an array of scores for a predictor using cross-validation.
+;
+; :Returns:
+;   `fltarr` of length `CROSS_VALIDATION` `N_SPLITS`
+;
+; :Params:
+;   predictor : in, required, type=mg_predictor
+;     predictor object to score
+;   x : in, required, type="fltarr(n_features, n_samples)"
+;     data to learn on
+;   y : in, required, type=lonarr(n_samples)
+;     results for `x` data; values must be -1 or 1
+;
+; :Keywords:
+;   cross_validation : in, optional, type=integer or object
+;     either a cross-validation object such as `mg_kfoldcv` with a `split`
+;     method or an integer specifying the number of folds in an `mg_kfoldcv`
+;     object
+;-
+function mg_cross_val_score, predictor, x, y, $
                              cross_validation=cross_validation
   compile_opt strictarr
 
@@ -17,8 +37,8 @@ function mg_cross_val_score, estimator, x, y, $
     _cross_validation->split, x, y, $
                               training_indices=training_indices, $
                               test_indices=test_indices
-    estimator->fit, x[*, training_indices], y[training_indices]
-    scores[s] = estimator->score(x[*, test_indices], y[test_indices])
+    predictor->fit, x[*, training_indices], y[training_indices]
+    scores[s] = predictor->score(x[*, test_indices], y[test_indices])
   endfor
 
   if (~obj_valid(cross_validation)) then begin
