@@ -1,5 +1,22 @@
 ; docformat = 'rst'
 
+;= export methods
+
+function mg_column::to_html
+  compile_opt strictarr
+
+  n_rows = n_elements(*self.data)
+
+  html = strarr(n_rows)
+  for r = 0L, n_rows - 1L do begin
+    html[r] = strtrim(string((*self.data)[r], format=self.format), 2)
+  endfor
+  html = '<td>' + html + '</td>'
+
+  return, html
+end
+
+
 ;= overload methods
 
 pro mg_column::_overloadBracketsLeftSide, col, value, is_range, ss1

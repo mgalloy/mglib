@@ -320,10 +320,26 @@ end
 ;+
 ; Export HTML representing the table.
 ;-
-pro mg_table::to_html
+function mg_table::to_html, class=class, id=id
   compile_opt strictarr
 
-  ; TODO: implement
+  html = strarr(self.n_rows + 3L)
+  c = 0L
+  foreach col, self.columns, name do begin
+    html[1] += '<th>' + name + '</th>'
+    html[2:-2] += col->to_html()
+    c += 1L
+  endforeach
+
+  _class = n_elements(class) gt 0L ? string(class, format='(%" class=\"%s\"")') : ''
+  _id = n_elements(id) gt 0L ? string(id, format='(%" id=\"%s\"")') : ''
+
+  html[0] = '<table' + _class + _id + '>'
+  html[1] = '<tr>' + html[1] + '</tr>'
+  html[2:-2] = '<tr>' + html[2:-2] + '</tr>'
+  html[-1] = '</table>'
+
+  return, html
 end
 
 
