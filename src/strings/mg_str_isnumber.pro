@@ -4,6 +4,9 @@
 ; Returns whether `value` can be validly converted to the given type (float by
 ; default) -- even if conversion would be a loss of precision.
 ;
+; :Uses:
+;   mg_default
+;
 ; :Returns:
 ;   `1B` if possible to convert, `0B` if not possible
 ;
