@@ -187,7 +187,7 @@ function mg_load_digits
 
   return, {data: data[0:63, *], $
            target: reform(data[64, *]), $
-           target_names: [''], $
+           target_names: '', $
            feature_names: strtrim(indgen(64), 2)}
 end
 
@@ -239,6 +239,7 @@ end
 ; Load one of the example machine learning datasets.
 ;
 ; :Returns:
+;   structure with fields `data`, `target`, `target_names`, and `feature_names`
 ;
 ; :Params:
 ;   name : in, required, type=string
@@ -247,8 +248,10 @@ end
 ; :Keywords:
 ;   n_samples : in, optional, type=integer
 ;     number of samples for the synthetic datasets, i.e., wave
+;   mldata : in, optional, type=boolean
+;     set to load a data set from mldata.org
 ;-
-function mg_learn_dataset, name, n_samples=n_samples
+function mg_learn_dataset, name, n_samples=n_samples, mldata=mldata
   compile_opt strictarr
 
   case name of
@@ -265,7 +268,13 @@ function mg_learn_dataset, name, n_samples=n_samples
         return, {data: reform(x, 1, _n_samples), target: y, $
                  target_names: ['y'], feature_names: ['x']}
       end
-    else: message, 'unknown dataset ' + name
+    else: begin
+        if (keyword_set(mldata)) then begin
+          return, mg_get_mldata(name)
+        endif else begin
+          message, 'unknown dataset ' + name
+        endelse
+      end
   endcase
 end
 

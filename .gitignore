@@ -16,3 +16,4 @@ TestIDLVersion.c
 build
 *.so.tar.gz
 /src/learn/data/lfw
+/src/learn/data/mldata
