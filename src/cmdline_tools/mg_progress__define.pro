@@ -267,7 +267,9 @@ pro mg_progress::advance, work=work, current=current
     self.current += work
     self.current <= self.total
   endif
-  if (n_elements(current) gt 0L) then self.current = current < self.total
+  if (n_elements(current) gt 0L) then begin
+    self.current = current < self.total
+  endif
 
   self->_display
 end
