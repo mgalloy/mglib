@@ -168,6 +168,86 @@ function mg_progress::_termcolumns, default=default
 end
 
 
+pro mg_progress::_display
+  compile_opt strictarr
+
+  ; don't display anything if already done
+  if (self.done) then return
+
+  if (self.start_time eq 0.0D) then self.start_time = systime(/seconds)
+  now = systime(/seconds)
+
+  c = self.in_foreach ? self.foreach_key : self.current
+  t = self.in_foreach ? self.foreach_end : self.total
+
+  n_cols = self->_termcolumns() - 1L
+
+  n_width = floor(alog10(t)) + 1L
+
+  elapsed_time = now - self.start_time
+  if (c eq 0) then begin
+    est_time = '--:--'
+    est_width = 5L
+  endif else begin
+    est_time = elapsed_time / c * t
+    est_time = self->_secs2minsec(est_time, width=est_width)
+  endelse
+  elapsed_time = self->_secs2minsec(elapsed_time, width=est_width)
+
+  bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width $
+                 - strlen(self.title)
+
+  done_length = round(bar_length * c / t) < bar_length
+  todo_length = bar_length - done_length
+
+  done_char = '#'
+  todo_char = '-'
+
+  done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
+  todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
+
+  format = mg_format('%s%3d%% |%s%s| %*d/%*d [%s/%s]', lonarr(2) + n_width)
+  msg = string(self.title, $
+               round(100L * c / t), $
+               done, todo, $
+               c, t, $
+               elapsed_time, est_time, $
+               format=format)
+
+  if (self.in_foreach) then begin
+    more_elements = self.foreach_key lt self.foreach_end
+  endif else begin
+    more_elements = self.current lt self.total
+  endelse
+
+  if (self.label_widget gt 0L) then begin
+    widget_control, self.label_widget, set_value=msg
+  endif else begin
+    if (more_elements) then begin
+      mg_statusline, msg
+    endif else begin
+      mg_statusline, /clear
+      print, msg
+      self.done = 1B
+    endelse
+  endelse
+end
+
+
+;= API
+
+;+
+; Indicate the progress bar is done.
+;-
+pro mg_progress::done
+  compile_opt strictarr
+
+  self.current = self.total
+  self->_display
+  self.done = 1B
+end
+
+
 ;+
 ; Advance the progress bar a step. This is useful for using `MG_PROGRESS` with a
 ; when the `TOTAL` keyword is needed, i.e., when the amount of progress each
@@ -175,18 +255,18 @@ end
 ; bar iself.
 ; 
 ; :Keywords:
-;   work : in, required, type=float
+;   work : in, optional, type=float
 ;     amount to add to current amount of work done
+;   current : in, optional, type=float
+;     amount to set current progress to
 ;-
-pro mg_progress::advance, work=work
+pro mg_progress::advance, work=work, current=current
   compile_opt strictarr
 
-  if (self.manual) then begin
-    new_i = self.counter eq 0L ? !null : self.counter
-    not_done = self->_overloadForeach(new_element, new_i)
-  endif
-
   if (n_elements(work) gt 0L) then self.current += work
+  if (n_elements(current) gt 0L) then self.current = current
+
+  self->_display
 end
 
 
@@ -208,77 +288,47 @@ function mg_progress::_overloadForeach, value, key
   compile_opt strictarr
   on_error, 2
 
-  if (n_elements(key) eq 0L) then self.start_time = systime(/seconds)
-  now = systime(/seconds)
+  self.in_foreach = 1B
 
   iterable = *self.iterable
   if (isa(iterable, 'IDL_OBJECT')) then begin
+    if (n_elements(key) eq 0L) then self.foreach_key = 0L else self.foreach_key += 1
     more_elements = iterable->_overloadForeach(value, key)
   endif else begin
     if (n_elements(key) eq 0L) then key = 0L else key += 1
-    more_elements = key lt self.n
-    value = iterable[key < (self.n - 1)]
+    more_elements = key lt self.foreach_end
+    value = iterable[key < (self.foreach_end - 1)]
+    self.foreach_key = key
   endelse
 
-  self.counter = (self.counter + 1) < self.n
-
-  if (~self.hide) then begin
-    c = self.use_total ? self.current : (self.counter < self.n)
-    t = self.use_total ? self.total : self.n
-
-    n_cols = self->_termcolumns() - 1L
-
-    n_width = floor(alog10(t)) + 1L
-
-    elapsed_time = now - self.start_time
-    if (c ne 0) then begin
-      est_time = elapsed_time / c * t
-      est_time = self->_secs2minsec(est_time, width=est_width)
-    endif else begin
-      est_time = '--:--'
-      est_width = 5L
-    endelse
-    elapsed_time = self->_secs2minsec(elapsed_time, width=est_width)
-
-    format = string(n_width, n_width, $
-                    format='(%"(%%\"%%s%%3d%%%% |%%s%%s| %%%dd/%%%dd [%%s/%%s]\")")')
-
-    bar_length = n_cols - 5L - 2L - 1L - 1L - 2 * n_width - 4L - 2 * est_width $
-                   - strlen(self.title)
-
-    done_length = round(bar_length * c / t)
-    todo_length = bar_length - done_length
-
-    done_char = '#'
-    todo_char = '-'
-
-    done = done_length le 0L ? '' : string(bytarr(done_length) + (byte(done_char))[0])
-    todo = todo_length le 0L ? '' : string(bytarr(todo_length) + (byte(todo_char))[0])
-
-    msg = string(self.title, $
-                 round(100L * c / t), $
-                 done, todo, $
-                 self.counter, self.n, $
-                 elapsed_time, est_time, $
-                 format=format)
-
-    if (self.label_widget gt 0L) then begin
-      widget_control, self.label_widget, set_value=msg
-    endif else begin
-      if (more_elements) then begin
-        mg_statusline, msg
-      endif else begin
-        mg_statusline, /clear
-        print, msg
-      endelse
-    endelse
-  endif
+  if (more_elements) then self->_display else self->done
 
   return, more_elements
 end
 
 
+;= property access
+
+pro mg_progress::getProperty, current=current, total=total, $
+                               foreach_key=foreach_key, $
+                               foreach_end=foreach_end
+  compile_opt strictarr
+
+  if (arg_present(current)) then current = self.current
+  if (arg_present(total)) then total = self.total
+  if (arg_present(foreach_key)) then foreach_key = self.foreach_key
+  if (arg_present(foreach_end)) then foreach_end = self.foreach_end
+end
+
+
 ;= lifecycle methods
+
+pro mg_progress::cleanup
+  compile_opt strictarr
+
+  ptr_free, self.iterable
+end
+
 
 ;+
 ; Instantiate the progress object.
@@ -290,26 +340,22 @@ end
 ;   iterable : in, required, type=array/object
 ;     either an array or an object of class `IDL_Object`
 ;-
-function mg_progress::init, iterable, total=total, title=title, manual=manual, $
-                            hide=hide, label_widget=label_widget
+function mg_progress::init, iterable, total=total, title=title, $
+                             hide=hide, label_widget=label_widget
   compile_opt strictarr
 
   self.iterable = ptr_new(iterable)
-  self.n = n_elements(iterable)
-  self.counter = 0L
+  self.foreach_end = n_elements(iterable)
 
-  self.label_widget = n_elements(label_widget) eq 0L ? -1L : label_widget
+  self.current = 0.0D
+  self.total = n_elements(total) eq 0L ? n_elements(iterable) : total
+
+  self.done = 0B
 
   self.title = n_elements(title) eq 0L ? '' : (title + ' ')
-
-  self.manual = keyword_set(manual)
   self.hide = keyword_set(hide)
 
-  if (n_elements(total) gt 0L) then begin
-    self.use_total = 1B
-    self.current = 0.0
-    self.total = total
-  endif
+  self.label_widget = n_elements(label_widget) eq 0L ? -1L : label_widget
 
   return, 1
 end
@@ -324,20 +370,29 @@ pro mg_progress__define
   !null = { mg_progress, inherits IDL_Object, $
             iterable: ptr_new(), $
             label_widget: 0L, $
-            manual: 0B, $
             hide: 0B, $
             title: '', $
-            n: 0L, $
-            counter: 0L, $
-            use_total: 0B, $
-            current: 0.0, $
-            total: 0.0, $
-            start_time: 0.0D $
+            start_time: 0.0D, $
+            in_foreach: 0B, $
+            foreach_key: 0L, $
+            foreach_end: 0L, $
+            current: 0.0D, $
+            total: 0.0D, $
+            done: 0B $
           }
 end
 
 
 ; main-level example program
+
+p = mg_progress(total=100.0)
+for i = 0, 99 do begin
+  p->advance, current=i
+  wait, 0.1
+endfor
+p->done
+
+obj_destroy, p
 
 n = 16
 letters = string(reform(bindgen(n) + (byte('a'))[0], 1, n))
@@ -356,33 +411,24 @@ endforeach
 ; example with pre-calculation
 
 print, 'Updating progress with pre-calculation gives a constant estimated time'
-p = mg_progress(h, total=total(work_amount), title='Pre-calculation')
-foreach w, p, i do begin
-  wait, w
-  p->advance, work=w
-endforeach
-
-; example of looping on the hash and manually advancing progress bar
-
-print, 'Looping over hash and manually advancing progress bar'
-p = mg_progress(h, total=total(work_amount), title='Manual', /manual)
+p = mg_progress(total=total(work_amount), title='Pre-calculation')
 foreach w, h, i do begin
   wait, w
   p->advance, work=w
 endforeach
-; extra advance needed when not looping on the progress bar and using TOTAL
-p->advance
+p->done
 
 ; example of using with a FOR loop
 
 idl_dir = filepath('')
 print, idl_dir, format='(%"Finding files in IDL distribution: %s")'
 files = file_search(idl_dir, '*', count=n_files)
-p = mg_progress(files, title='Checking files', /manual)
+p = mg_progress(files, title='Checking files')
 for f = 0L, n_files - 1L do begin
   ; process files[f]
   p->advance
 endfor
+p->done
 print, 'Done'
 
 end
