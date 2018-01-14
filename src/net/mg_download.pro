@@ -29,8 +29,7 @@ function mg_download_progress, status_info, progress_info, callback_data
 
   if (obj_valid(callback_data) && obj_isa(callback_data, 'mg_progress')) then begin
     current_bytes = progress_info[2]
-    ;print, current_bytes, progress_info[1], format='(%"%10d/%10d")'
-    callback_data->advance, current=current_bytes / 1024
+     callback_data->advance, current=current_bytes / 1024
   endif
 
   return, 1
