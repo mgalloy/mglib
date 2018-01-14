@@ -263,8 +263,11 @@ end
 pro mg_progress::advance, work=work, current=current
   compile_opt strictarr
 
-  if (n_elements(work) gt 0L) then self.current += work
-  if (n_elements(current) gt 0L) then self.current = current
+  if (n_elements(work) gt 0L) then begin
+    self.current += work
+    self.current <= self.total
+  endif
+  if (n_elements(current) gt 0L) then self.current = current < self.total
 
   self->_display
 end
