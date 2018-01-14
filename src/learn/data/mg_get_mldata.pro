@@ -10,7 +10,7 @@
 ;   name : in, required, type=string
 ;     name of the data set on mldata.org
 ;-
-function mg_get_mldata, name
+function mg_get_mldata, name, interactive=interactive
   compile_opt strictarr
   on_error, 2
 
@@ -21,9 +21,7 @@ function mg_get_mldata, name
   if (~file_test(filename, /regular)) then begin
     mldata_base_url = mg_format('http://mldata.org/repository/data/download/%s/')
     url = string(name, format=mldata_base_url)
-    ourl = IDLnetURL()
-    filename = ourl->get(filename=filename, url=url)
-    obj_destroy, ourl
+    mg_download, url, filename, interactive=interactive
   endif
 
   varnames= mg_h5_getdata(filename, '/data_descr/ordering')
@@ -71,11 +69,28 @@ end
 
 ; main-level example program
 
-names = ['mnist-original', 'mhc-nips11-v2']
-for n = 0L, n_elements(names) - 1L do begin
-  data = mg_get_mldata(names[n])
-  print, names[n], format=mg_format('Name: %s')
-  help, data
+; names = ['mnist-original', 'mhc-nips11-v2']
+; for n = 0L, n_elements(names) - 1L do begin
+;   data = mg_get_mldata(names[n])
+;   print, names[n], format=mg_format('Name: %s')
+;   help, data
+; endfor
+
+data = mg_get_mldata('mnist-original', /interactive)
+scale = 4
+n = 5
+xsize = 28
+ysize = 28
+dims = size(data.data, /dimensions)
+n_samples = dims[1]
+samples = mg_sample(n_samples, n)
+title = string(strjoin(strtrim(long(data.target[samples]), 2), ', '), $
+               format='(%"MNIST digits: %s")')
+window, xsize=xsize * scale * n, ysize=ysize * scale, /free, title=title
+for i = 0L, n - 1L do begin
+  im = reform(data.data[*, samples[i]], xsize, ysize)
+  im = rotate(im, 7)
+  tvscl, rebin(im, xsize * scale, ysize * scale), i
 endfor
 
 end
