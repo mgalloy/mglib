@@ -139,6 +139,8 @@ end
 function mg_table::_output, first_row, last_row
   compile_opt strictarr
 
+  if (self.columns->count() eq 0L) then return, '{}'
+
   ; define the start and end rows
   _first_row = mg_default(first_row, 0L) > 0L
   _last_row = mg_default(last_row, _first_row + self.n_rows_to_print) < (self.n_rows - 1L)
@@ -254,7 +256,7 @@ end
 ;
 ; :Params:
 ;   names : in, required, type=string/strarr
-;    string or array of strings representing column names
+;     string or array of strings representing column names
 ;-
 function mg_table::_names2indices, names
   compile_opt strictarr
@@ -272,6 +274,66 @@ function mg_table::_names2indices, names
   endfor
 
   return, size(names, /dimensions) eq 0 ? indices[0] : indices
+end
+
+
+;+
+; Helper routine to convert an array of column indices to column names.
+;
+; :Returns:
+;   string/strarr
+;
+; :Params:
+;   indices : in, required, type=lonarr
+;     index array or range
+;-
+function mg_table::_indices2names, is_range, indices
+  compile_opt strictarr
+
+  self->getProperty, column_names=column_names
+  n_columns = n_elements(column_names)
+
+  if (is_range) then begin
+    if (indices[1] lt n_columns) then begin
+      names = column_names[indices[0]:indices[1]:indices[2]]
+    endif else begin
+      new_indices = lindgen(indices[1] + 1)
+      return, self->_indices2names(0B, new_indices[indices[0]:indices[1]:indices[2]])
+    endelse
+  endif else begin
+    if (max(indices) lt n_columns) then begin
+      names = column_names[indices]
+    endif else begin
+      names = strarr(n_elements(indices))
+      c = n_columns + 1L
+      for i = 0L, n_elements(indices) - 1L do begin
+        if (indices[i] lt n_columns) then begin
+          names[i] = column_names[indices[i]]
+        endif else begin
+          suggested_name = string(c++, format='(%"c%d")')
+          while (self->has_column(suggested_name)) do begin
+            suggested_name = string(c++, format='(%"c%d")')
+          endwhile
+          names[i] = suggested_name
+        endelse
+      endfor
+    endelse
+  endelse
+
+  return, names
+end
+
+
+pro mg_table::_assign_column, name, value
+  compile_opt strictarr
+
+  n_rows = n_elements(value)
+
+  if (self.n_rows ne 0L && n_rows ne self.n_rows) then begin
+    message, 'new column must have the same number of rows as table'
+  endif else self.n_rows = n_rows   ; adding column to empty table
+
+  (self.columns)[name] = mg_column(value)
 end
 
 
@@ -381,7 +443,7 @@ end
 
 ;= stats methods
 
-pro mg_table::describe, percentiles=percentiles
+function mg_table::stats, percentiles=percentiles
   compile_opt strictarr
 
   _percentiles = mg_default(percentiles, [0.25, 0.50, 0.75])
@@ -399,9 +461,16 @@ pro mg_table::describe, percentiles=percentiles
 
   self->getProperty, column_names=column_names
   row_names = ['mean', 'std dev', 'min', string(100.0 * _percentiles, format='(F0.1)') + '%', 'max']
-  description = mg_table(result, column_names=column_names, row_names=row_names)
-  print, description
-  obj_destroy, description
+  return, mg_table(result, column_names=column_names, row_names=row_names)
+end
+
+
+pro mg_table::describe, percentiles=percentiles, description_table=description_table
+  compile_opt strictarr
+
+  description_table = self->stats(percentiles=percentiles)
+  print, description_table
+  if (~arg_present(description_table)) then obj_destroy, description_table
 end
 
 
@@ -410,7 +479,8 @@ end
 pro mg_table::drop_column, name
   compile_opt strictarr
 
-  self.columns->remove, name
+  _name = size(name, /type) eq 7 ? name : self->_indices2names(0, name)
+  self.columns->remove, _name
 end
 
 
@@ -462,22 +532,69 @@ end
 
 pro mg_table::_overloadBracketsLeftSide, table, value, is_range, ss1, ss2
   compile_opt strictarr
-  ;on_error, 2
+  on_error, 2
 
-  ; TODO: handle when ss1 is more than a single value
-  ; TODO: handle ss2
+  ; TODO: handle indexing rows, i.e., use is_range[1] and ss2
+  if (n_elements(ss2) gt 0L) then message, 'indexing rows on assignment not implemented'
 
-  if (self->has_column(ss1)) then begin
-    obj_destroy, (self.columns)[ss1]
-    col = size(value, /type) eq 11 ? value : mg_column(value)
-    (self.columns)[ss1] = col
+  col_names = size(ss1, /type) eq 7 ? ss1 : self->_indices2names(is_range[0], ss1)
+
+  n_columns = n_elements(col_names)
+
+  if (size(value, /type) eq 11) then begin
+    is_column = obj_isa(value, 'mg_column')
+    case 1 of
+      obj_isa(value, 'mg_table'):
+      n_elements(is_column) eq 1 && is_column[0] eq 1:
+      mg_all(is_column):
+      else: message, 'assigned value must be a table, column, array of columns, or numeric array'
+    endcase
   endif else begin
-    ; handles the case of t[new_name] = data
-    col = size(value, /type) eq 11 ? value : mg_column(value)
-    if (self.n_rows ne 0L && col.n_rows ne self.n_rows) then begin
-      message, 'new column must have the same number of rows as table'
-    endif else self.n_rows = col.n_rows
-    (self.columns)[ss1] = col
+    n_dims = size(value, /n_dimensions)
+    if (n_dims ne 1 && n_dims ne 2) then begin
+      message, 'assigned value must be 1- or 2-dimensional'
+    endif
+
+    dims = size(value, /dimensions)
+
+    case 1 of
+      n_dims eq 1: n_rows = n_elements(value)
+      dims[0] ne n_columns: message, 'mismatching number of columns in assignment'
+      else: n_rows = dims[1]  ; everything OK
+    endcase
+
+    case 1 of
+      self.n_rows eq 0L:
+      n_rows ne self.n_rows: message, 'mismatching number of rows in column'
+      else:   ; everything OK
+    endcase
+  endelse
+
+  if (size(value, /type) eq 11) then begin
+    ; could be an array of columns, a column, or a table
+    is_column = obj_isa(value, 'mg_column')
+    case 1 of
+      n_elements(is_column) gt 1L: begin
+          for c = 0L, n_columns - 1L do begin
+            self->_assign_column, col_names[c], value[c]
+          endfor
+        end
+      obj_isa(value, 'mg_column'): for c = 0L, n_columns - 1L do self->_assign_column, col_names[c], value
+      obj_isa(value, 'mg_table'): begin
+          value->getProperty, columns=cols
+          c = 0
+          foreach col, cols do begin
+            self->_assign_column, col_names[c], col
+            c += 1
+          endforeach
+        end
+      else:
+    endcase
+  endif else begin
+    for c = 0L, n_columns - 1L do begin
+      self->_assign_column, col_names[c], $
+                            size(value, /n_dimensions) eq 1 ? value : value[c, *]
+    endfor
   endelse
 end
 
@@ -573,7 +690,7 @@ end
 
 ;= creation methods
 
-pro mg_table::_append_array, array, column_names=names
+pro mg_table::append_array, array, column_names=names
   compile_opt strictarr
 
   dims = size(array, /dimensions)
@@ -584,7 +701,7 @@ pro mg_table::_append_array, array, column_names=names
 end
 
 
-pro mg_table::_append_structarr, structarr, column_names=names
+pro mg_table::append_structarr, structarr, column_names=names
   compile_opt strictarr
   on_error, 2
 
@@ -600,7 +717,7 @@ pro mg_table::_append_structarr, structarr, column_names=names
 end
 
 
-pro mg_table::_append_arrstruct, arrstruct, column_names=names
+pro mg_table::append_arrstruct, arrstruct, column_names=names
   compile_opt strictarr
 
   n_columns = n_tags(arrstruct)
@@ -627,6 +744,7 @@ pro mg_table::getProperty, array=array, $
                            data=data, $
                            format=format, $
                            n_rows=n_rows, $
+                           row_names=row_names, $
                            types=types, $
                            widths=widths
   compile_opt strictarr
@@ -656,6 +774,7 @@ pro mg_table::getProperty, array=array, $
   endif
 
   if (arg_present(n_rows)) then n_rows = self.n_rows
+  if (arg_present(row_names)) then row_names = *self.row_names
 
   if (arg_present(types)) then begin
     types = strarr(self.columns->count())
@@ -704,12 +823,12 @@ function mg_table::init, data, $
   if (type eq 8) then begin
     ; either array of structures or structure of arrays
     if (n_elements(data) eq 1L) then begin
-      self->_append_structarr, data, column_names=column_names
+      self->append_structarr, data, column_names=column_names
     endif else begin
-      self->_append_arrstruct, data, column_names=column_names
+      self->append_arrstruct, data, column_names=column_names
     endelse
   endif else begin
-    self->_append_array, data, column_names=column_names
+    self->append_array, data, column_names=column_names
   endelse
 
   self.row_names = ptr_new(row_names)

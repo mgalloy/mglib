@@ -113,13 +113,35 @@ pro mg_column::cleanup
 end
 
 
+;+
+; Create column from some data or another column.
+;
+; :Returns:
+;   1 for success, 0 for failure
+;
+; :Params:
+;   data : in, required, type=mg_column or numeric array
+;     data of the column, if `mg_column`, creates a copy
+;-
 function mg_column::init, data
   compile_opt strictarr
 
-  self.data = ptr_new(data)
-  self.type = size(data, /type)
-  self.format = mg_default_format(self.type)
-  self.width = mg_default_format(self.type, /width)
+  if (size(data, /type) eq 11) then begin
+    is_column = obj_isa(data, 'mg_column')
+    if (n_elements(is_column) eq 1 && is_column) then begin
+      self.data = ptr_new(data.data)
+      self.type = data.type
+      self.format = data.format
+      self.width = data.width
+    endif else begin
+      message, 'invalid column data object'
+    endelse
+  endif else begin
+    self.data = ptr_new(data)
+    self.type = size(data, /type)
+    self.format = mg_default_format(self.type)
+    self.width = mg_default_format(self.type, /width)
+  endelse
 
   return, 1
 end
