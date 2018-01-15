@@ -76,7 +76,7 @@ end
 ;   help, data
 ; endfor
 
-data = mg_get_mldata('mnist-original', /interactive)
+data = mg_get_mldata('mnist-original', interactive=~lmgr(/demo))
 scale = 4
 n = 5
 xsize = 28
