@@ -27,8 +27,8 @@ function mg_recall_score, y_true, y_predict, positive_label=positive_label
   endif else n_tp = 0L
 
   if (n_false gt 0L) then begin
-    fn_ind = where(y_predict[false_ind] ne _positive_class, n_fn)
+    fn_ind = where(y_predict[false_ind] ne _positive_label, n_fn)
   endif else n_fn = 0L
 
-  return, float(n_tp) / (n_tp + n_fn)
+  return, (n_tp + n_fn) eq 0 ? 0.0 : (float(n_tp) / (n_tp + n_fn))
 end

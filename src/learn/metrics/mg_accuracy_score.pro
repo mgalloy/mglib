@@ -24,10 +24,10 @@ function mg_accuracy_score, y_true, y_predict, normalize=normalize, weights=weig
 
   if (n_elements(weights) eq 0L) then begin
     n_correct = total(y_true eq y_predict, /integer)
-    norm = n_elements(y_true)
+    norm = float(n_elements(y_true))
   endif else begin
     n_correct = total(weights * (y_true eq y_predict), /preserve_type)
-    norm = total(weights, /preserve_type)
+    norm = float(total(weights, /preserve_type))
   endelse
   
   return, keyword_set(normalize) ? (n_correct / norm) : n_correct

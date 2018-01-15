@@ -27,8 +27,8 @@ function mg_precision_score, y_true, y_predict, positive_label=positive_label
   endif else n_tp = 0L
 
   if (n_false gt 0L) then begin
-    fp_ind = where(y_predict[false_ind] eq _positive_class, n_fp)
+    fp_ind = where(y_predict[false_ind] eq _positive_label, n_fp)
   endif else n_fp = 0L
 
-  return, float(n_tp) / (n_tp + n_fp)
+  return, (n_tp + n_fp) eq 0 ? 0.0 : (float(n_tp) / (n_tp + n_fp))
 end
