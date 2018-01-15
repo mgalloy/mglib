@@ -464,14 +464,21 @@ pro mg_table::_overloadBracketsLeftSide, table, value, is_range, ss1, ss2
   compile_opt strictarr
   ;on_error, 2
 
-  ; TODO: implement both column creation and reassignment to existing columns
+  ; TODO: handle when ss1 is more than a single value
+  ; TODO: handle ss2
 
-  ; TODO: this only handles the special case of t[new_name] = data
-  col = size(value, /type) eq 11 ? value : mg_column(value)
-  if (self.n_rows ne 0L && col.n_rows ne self.n_rows) then begin
-    message, 'new column must have the same number of rows as table'
-  endif else self.n_rows = col.n_rows
-  (self.columns)[ss1] = col
+  if (self->has_column(ss1)) then begin
+    obj_destroy, (self.columns)[ss1]
+    col = size(value, /type) eq 11 ? value : mg_column(value)
+    (self.columns)[ss1] = col
+  endif else begin
+    ; handles the case of t[new_name] = data
+    col = size(value, /type) eq 11 ? value : mg_column(value)
+    if (self.n_rows ne 0L && col.n_rows ne self.n_rows) then begin
+      message, 'new column must have the same number of rows as table'
+    endif else self.n_rows = col.n_rows
+    (self.columns)[ss1] = col
+  endelse
 end
 
 
@@ -494,8 +501,8 @@ end
 ;-
 function mg_table::_overloadBracketsRightSide, is_range, ss1, ss2
   compile_opt strictarr
+  on_error, 2
 
-  ; TODO: handle column names instead of indices
   _ss1 = size(ss1, /type) eq 7 ? self->_names2indices(ss1) : ss1
   if (n_elements(is_range) eq 1L) then begin
     is_range = [is_range[0], 1]
