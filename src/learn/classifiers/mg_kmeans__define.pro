@@ -66,7 +66,7 @@ end
 function mg_kmeans::predict, x, y, score=score
   compile_opt strictarr
 
-  return, cluster(x, *self._centers, n_clusters=self.n_clusters, double=self.double)
+  return, reform(cluster(x, *self._centers, n_clusters=self.n_clusters, double=self.double))
 end
 
 
