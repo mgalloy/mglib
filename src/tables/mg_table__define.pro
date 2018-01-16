@@ -901,11 +901,13 @@ tvlct, 0, 0, 0, 255
 
 b = mg_learn_dataset('boston')
 df = mg_table(b.data, column=b.feature_names)
+mg_window, xsize=4, ysize=4, /inches, title='NOX vs AGE', /free
 df->scatter, 'NOX', 'AGE', $
              psym=mg_usersym(/circle, /fill), $
              symsize=0.5, $
              color=bytscl(df['RAD'], top=253) + 1B
-df->scatter
+mg_window, xsize=8, ysize=8, /inches, title='Scatterplot matrix', /free
+df->scatter, bar_color=200, xticks=1, yticks=1
 
 print, df
 obj_destroy, df
