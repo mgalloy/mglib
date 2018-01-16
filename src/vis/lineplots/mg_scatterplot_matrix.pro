@@ -1,5 +1,17 @@
 ; docformat = 'rst'
 
+function mg_scatterplot_matrix_format, axis, index, value
+  compile_opt strictarr
+  common mg_scatterplot_matrix_common, display_axis, _ticks, _xformat, _yformat
+
+  if (~display_axis[axis] || index eq 0 || index eq _ticks[axis]) then return, ' '
+  if (axis eq 0 && n_elements(_xformat) gt 0L) then return, string(value, format=_xformat)
+  if (axis eq 1 && n_elements(_yformat) gt 0L) then return, string(value, format=_yformat)
+
+  return, value
+end
+
+
 ;+
 ; Compute normal coordinates for subplot.
 ;
@@ -68,8 +80,28 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
                            axis_color=axis_color, color=color, $
                            position=position, $
                            n_bins=n_bins, $
-                           xticks=xticks, yticks=yticks, _extra=e
+                           xticks=xticks, yticks=yticks, $
+                           xtickformat=xtickformat, $
+                           ytickformat=ytickformat, $
+                           _extra=e
   compile_opt strictarr
+  on_error, 2
+  common mg_scatterplot_matrix_common, display_axis, _ticks, _xformat, _yformat
+
+  if (n_elements(xtickformat) gt 0L) then _xformat = xtickformat
+  if (n_elements(ytickformat) gt 0L) then _yformat = ytickformat
+
+  _xticks = mg_default(xticks, 1) + 2
+  _yticks = mg_default(yticks, 1) + 2
+  _ticks = [_xticks, _yticks]
+
+  show_xtickname = strarr(_xticks + 1) + ''
+  show_xtickname[[0, _xticks]] = ' '
+  hide_xtickname = strarr(40) + ' '
+
+  show_ytickname = strarr(_yticks + 1) + ''
+  show_ytickname[[0, _yticks]] = ' '
+  hide_ytickname = strarr(40) + ' '
 
   _psym = n_elements(psym) eq 0L ? 3 : psym
   if (size(data, /type) eq 8) then begin
@@ -79,11 +111,14 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
     is_struct = 0B
     dims = size(data, /dimensions)
   endelse
-  _column_names = n_elements(column_names) eq 0L ? strarr(dims[1]) : column_names
+  _column_names = n_elements(column_names) eq 0L ? strarr(dims[0]) : column_names
+
+  if (n_elements(_column_names) ne dims[0]) then message, 'invalid number of column names'
 
   x_range = fltarr(2, dims[0])
   y_range = fltarr(2, dims[0])
 
+  ; plot histograms on diagonal
   _n_bins = mg_default(n_bins, 20)
   for row = 0L, dims[0] - 1L do begin
     col = row
@@ -94,15 +129,18 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
                  xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
                  xrange=x_range[*, col], yrange=[0, max(h) * 1.10], $
                  xstyle=1, ystyle=1, $
-                 xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
+                 xtickname=strarr(40) + ' ', $
                  yticks=1, yminor=1, ytickname=strarr(2) + ' ', $
                  xticklen=0.000001, $  ; bug in IDL? 0.0 doesn't work
                  /noerase, _extra=e
     x_range[*, row] = !x.crange
   endfor
 
+  ; plot one scatterplot per row and store y-range so later scatterplots have
+  ; the exact same range
   for row = 0L, dims[0] - 1L do begin
     col = (row + dims[0] - 1) mod dims[0]
+    display_axis = [row eq [dims[0] - 1], col eq 0L]
     plot, is_struct ? data.(col) : data[col, *], is_struct ? data.(row) : data[row, *], $
           /nodata, /noerase, $
           xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
@@ -111,9 +149,11 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
           position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
           xrange=x_range[*, col], $
           xstyle=1, /ynozero, $
-          xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
-          ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
-          xticks=xticks, yticks=yticks, $
+          xtickname=row eq [dims[0] - 1] ? show_xtickname : hide_xtickname, $
+          ytickname=col eq 0L ? show_ytickname : hide_ytickname, $
+          xticks=_xticks, yticks=_yticks, $
+          xtickformat='mg_scatterplot_matrix_format', $
+          ytickformat='mg_scatterplot_matrix_format', $
           _extra=e
     y_range[*, row] = !y.crange
     mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
@@ -121,10 +161,17 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               psym=_psym, color=color, symsize=symsize, _extra=e
   endfor
 
+  ; plot scatterplots
   for row = 0L, dims[0] - 1L do begin
     for col = 0L, dims[0] - 1L do begin
+      ; skip subdiagonal (and upper right) where already plotted to get ranges
       if (col eq (row + dims[0] - 1) mod dims[0]) then continue
+
+      ; upper left corner is special: need to get axis for scatterplots
+      ; instead of the histogram that is displayed next to it (XSTYLE/YSTYLE
+      ; differ from other plots and no MG_PLOTS)
       if (row eq 0 && col eq 0) then begin
+        display_axis = [row eq [dims[0] - 1], col eq 0L]
         plot, is_struct ? data.(col) : data[col, *], $
               is_struct ? data.(row) : data[row, *], $
               /nodata, /noerase, $
@@ -134,12 +181,36 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
               xrange=x_range[*, col], yrange=y_range[*, row], $
               xstyle=5, ystyle=9, $
-              xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
-              ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
-              xticks=xticks, yticks=yticks, $
+              xtickname=row eq [dims[0] - 1] ? show_xtickname : hide_xtickname, $
+              ytickname=col eq 0L ? show_ytickname : hide_ytickname, $
+              xticks=_xticks, yticks=_yticks, $
+              xtickformat='mg_scatterplot_matrix_format', $
+              ytickformat='mg_scatterplot_matrix_format', $
               _extra=e
       endif
+
+      if ((row eq dims[0] - 1) && (col eq dims[0] - 1)) then begin
+        display_axis = [row eq [dims[0] - 1], col eq 0L]
+        plot, is_struct ? data.(col) : data[col, *], $
+              is_struct ? data.(row) : data[row, *], $
+              /nodata, /noerase, $
+              xtitle=row eq (dims[0] - 1) ? _column_names[col] : '', $
+              ytitle=col eq 0L ? _column_names[row] : '', $
+              color=axis_color, $
+              position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
+              xrange=x_range[*, col], yrange=y_range[*, row], $
+              xstyle=9, ystyle=5, $
+              xtickname=row eq [dims[0] - 1] ? show_xtickname : hide_xtickname, $
+              ytickname=col eq 0L ? show_ytickname : hide_ytickname, $
+              xticks=_xticks, yticks=_yticks, $
+              xtickformat='mg_scatterplot_matrix_format', $
+              ytickformat='mg_scatterplot_matrix_format', $
+              _extra=e
+      endif
+
+      ; plot scatterplots
       if (col ne row) then begin
+        display_axis = [row eq [dims[0] - 1], col eq 0L]
         plot, is_struct ? data.(col) : data[col, *], $
               is_struct ? data.(row) : data[row, *], $
               /nodata, /noerase, $
@@ -149,9 +220,11 @@ pro mg_scatterplot_matrix, data, column_names=column_names, $
               position=mg_scatterplot_matrix_position(col, row, dimension=dims[0], position=position), $
               xrange=x_range[*, col], yrange=y_range[*, row], $
               xstyle=1, ystyle=1, $
-              xtickname=strarr(40) + (row eq [dims[0] - 1] ? '' : ' '), $
-              ytickname=strarr(40) + (col eq 0L ? '' : ' '), $
-              xticks=xticks, yticks=yticks, $
+              xtickname=row eq [dims[0] - 1] ? show_xtickname : hide_xtickname, $
+              ytickname=col eq 0L ? show_ytickname : hide_ytickname, $
+              xticks=_xticks, yticks=_yticks, $
+              xtickformat='mg_scatterplot_matrix_format', $
+              ytickformat='mg_scatterplot_matrix_format', $
               _extra=e
         mg_plots, is_struct ? data.(col) : reform(data[col, *]), $
                   is_struct ? data.(row) : reform(data[row, *]), $
@@ -169,8 +242,9 @@ if (n_elements(ps) eq 0L) then ps = 0
 
 mg_constants
 
-m = 4
+m = 10
 n = 40
+column_names = string(reform(byte((byte('A'))[0] + lindgen(m)), 1, m))
 
 size = [10, 10]
 dims = [1000, 1000]
@@ -190,17 +264,26 @@ endelse
 
 mg_window, xsize=size[0], ysize=size[1], /inches, title='mg_scatterplot_matrix example'
 
-device, decomposed=0
+mg_decomposed, 0, old_decomposed=odec
+
+loadct, 0, ncolors=254
+tvlct, 255, 128, 0, 255
 
 data = randomu(seed, m, n)
 
 mg_scatterplot_matrix, data, $
                        psym=mg_usersym(/circle), $
                        color=byte(randomu(seed, n) * 255), $
-                       bar_color=175, $
+                       axis_color=254, $
+                       bar_color=255, $
                        charsize=charsize, symsize=symsize, $
                        nbins=20, $
-                       column_names=['A', 'B', 'C', 'D']
+                       column_names=column_names, $
+                       yticks=3, xticks=1, $
+                       xtickformat='(F0.2)', $
+                       ytickformat='(F0.2)'
+
+mg_decomposed, odec
 
 if (keyword_set(ps)) then begin
   mg_psend
