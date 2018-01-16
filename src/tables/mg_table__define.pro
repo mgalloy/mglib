@@ -419,7 +419,7 @@ end
 ;-
 pro mg_table::scatter, x, y, psym=psym, _extra=e
   compile_opt strictarr
-;  on_error, 2
+  on_error, 2
 
   self->getProperty, column_names=column_names
   case n_params() of
@@ -907,7 +907,8 @@ df->scatter, 'NOX', 'AGE', $
              symsize=0.5, $
              color=bytscl(df['RAD'], top=253) + 1B
 mg_window, xsize=8, ysize=8, /inches, title='Scatterplot matrix', /free
-df->scatter, bar_color=200, xticks=1, yticks=1
+df->scatter, bar_color=200, charsize=0.7, $
+             xticks=1, yticks=1, xtickformat='(F0.1)', ytickformat='(F0.1)'
 
 print, df
 obj_destroy, df
