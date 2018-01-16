@@ -8,7 +8,7 @@ function mg_scatterplot_matrix_format, axis, index, value
   if (axis eq 0 && n_elements(_xformat) gt 0L) then return, string(value, format=_xformat)
   if (axis eq 1 && n_elements(_yformat) gt 0L) then return, string(value, format=_yformat)
 
-  return, value
+  return, strtrim(value, 2)
 end
 
 
