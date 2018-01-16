@@ -46,6 +46,15 @@ function mg_concatenate, x, y, dimension=dimension
   endif else begin
     _x_dims = x_dims
     _y_dims = y_dims
+
+    ; stacking vectors horizontally should not just concatenate them, so let's
+    ; add a dimension
+    if (x_ndims eq 1 && y_ndims eq 1 $
+          && _x_dims[0] eq _y_dims[0] $
+          && _dimension eq 1) then begin
+      _x_dims = [1L, _x_dims]
+      _y_dims = [1L, _y_dims]
+    endif
   endelse
 
   case _dimension of
