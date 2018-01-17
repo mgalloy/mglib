@@ -46,13 +46,9 @@ pro mg_rotate_log, basename, max_version=max_version
         v = valid_versions[sorted_valid_indices[i]]
         if (has_max && (v + 1L gt max_version)) then begin
           file_delete, string(basename, v, format=log_format)
-          print, string(basename, v, format=log_format), format='(%"deleting %s")'
         endif else begin
           file_move, string(basename, v, format=log_format), $
                      string(basename, v + 1L, format=log_format)
-          print, string(basename, v, format=log_format), $
-                 string(basename, v + 1L, format=log_format), $
-                 format='(%"%s -> %s")'
         endelse
       endfor
     endif
@@ -60,5 +56,4 @@ pro mg_rotate_log, basename, max_version=max_version
 
   ; move aside basename
   file_move, basename, basename + '.1'
-  print, basename, basename + '.1', format='(%"%s -> %s")'
 end

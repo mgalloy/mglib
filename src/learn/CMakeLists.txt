@@ -5,6 +5,7 @@ file(GLOB PRO_FILES "*.pro")
 
 add_subdirectory(data)
 add_subdirectory(classifiers)
+add_subdirectory(deep)
 add_subdirectory(estimators)
 add_subdirectory(metrics)
 add_subdirectory(model_selection)
