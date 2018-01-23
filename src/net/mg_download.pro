@@ -48,8 +48,11 @@ end
 ; :Keywords:
 ;   interactive : in, optional, type=boolean
 ;     display a progress bar on the command line
+;   _ref_extra : out, optional, type=keywords
+;     keywords that represent properties of `IDLnetURL`, e.g., `RESPONSE_CODE`
+;     and `RESPONSE_HEADER`
 ;-
-pro mg_download, url, filename, interactive=interactive
+pro mg_download, url, filename, interactive=interactive, _ref_extra=e
   compile_opt strictarr
 
   ourl = IDLnetURL(callback_function='mg_download_progress')
@@ -60,6 +63,7 @@ pro mg_download, url, filename, interactive=interactive
     p->done
     obj_destroy, p
   endif
+  ourl->getProperty, _extra=e
   obj_destroy, ourl
 end
 
