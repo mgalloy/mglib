@@ -21,10 +21,15 @@ function mg_get_mldata, name, interactive=interactive
   if (~file_test(filename, /regular)) then begin
     mldata_base_url = mg_format('http://mldata.org/repository/data/download/%s/')
     url = string(name, format=mldata_base_url)
-    mg_download, url, filename, interactive=interactive
+    mg_download, url, filename, interactive=interactive, response_code=rc
   endif
 
-  varnames= mg_h5_getdata(filename, '/data_descr/ordering')
+  is_h5 = h5f_is_hdf5(filename)
+  if (~is_h5) then begin
+    message, 'check documentation for dataset type and how to read it'
+  endif
+
+  varnames = mg_h5_getdata(filename, '/data_descr/ordering')
   feature_names = mg_h5_getdata(filename, '/data_descr/names', error=error)
   if (error ne 0L) then feature_names = ''
 
