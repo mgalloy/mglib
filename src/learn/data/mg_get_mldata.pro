@@ -26,6 +26,7 @@ function mg_get_mldata, name, interactive=interactive
 
   is_h5 = h5f_is_hdf5(filename)
   if (~is_h5) then begin
+    message, 'data in ' + filename, /info
     message, 'check documentation for dataset type and how to read it'
   endif
 
