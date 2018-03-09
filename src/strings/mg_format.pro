@@ -21,8 +21,12 @@
 ;     C-style format string
 ;   args : in, optional, type=lonarr
 ;     optional widths and precisions
+;
+; :Keywords:
+;   simple : in, optional, type=boolean
+;     set to return simple C format string, i.e., without the `%""`
 ;-
-function mg_format, format, args
+function mg_format, format, args, simple=simple
   compile_opt strictarr
   on_error, 2
 
@@ -93,7 +97,9 @@ function mg_format, format, args
   endif
 
   result += _format
-  result = '(%"' + result + '")'   ; add IDL's C-style indicators
+  if (~keyword_set(simple)) then begin
+    result = '(%"' + result + '")'   ; add IDL's C-style indicators
+  endif
 
   return, result
 end
