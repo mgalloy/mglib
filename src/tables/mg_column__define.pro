@@ -75,7 +75,7 @@ end
 
 ;= property access methods
 
-pro mg_column::setProperty, format=format
+pro mg_column::setProperty, format=format, width=width
   compile_opt strictarr
 
   if (n_elements(format) gt 0L) then begin
@@ -84,11 +84,11 @@ pro mg_column::setProperty, format=format
     tokens = stregex(format, re, /extract, /subexpr)
     if (tokens[1] eq '') then begin
       ; TODO: should capture [[:alpha:]] and lookup default width
-      width = mg_default_format(self.type, /width)
+      default_width = mg_default_format(self.type, /width)
     endif else begin
-      width = long(tokens[1])
+      default_width = long(tokens[1])
     endelse
-    self.width = width
+    self.width = mg_default(width, default_width)
   endif
 end
 
