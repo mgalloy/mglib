@@ -88,7 +88,12 @@ pro mg_column::setProperty, format=format, width=width
     endif else begin
       default_width = long(tokens[1])
     endelse
-    self.width = mg_default(width, default_width)
+    if (~self.width_set) then self.width = mg_default(width, default_width)
+  endif
+
+  if (n_elements(width) gt 0L) then begin
+    self.width = width
+    self.width_set = 1B
   endif
 end
 
@@ -126,6 +131,8 @@ end
 function mg_column::init, data
   compile_opt strictarr
 
+  self.width_set = 0B
+
   if (size(data, /type) eq 11) then begin
     is_column = obj_isa(data, 'mg_column')
     if (n_elements(is_column) eq 1 && is_column) then begin
@@ -154,6 +161,7 @@ pro mg_column__define
            type: 0L, $
            format: '', $
            width: 0L, $
+           width_set: 0B, $
            data: ptr_new()}
 end
 
