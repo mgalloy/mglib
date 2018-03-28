@@ -706,13 +706,13 @@ pro mg_table::append_structarr, structarr, column_names=names
   on_error, 2
 
   n_columns = n_tags(structarr)
-  if (n_elements(names) eq 0L) then names = tag_names(structarr)
+  _names = mg_default(names, tag_names(structarr))
   self.n_rows = n_elements(structarr.(0))
   for c = 0L, n_columns - 1L do begin
     if (n_elements(structarr.(c)) ne self.n_rows) then begin
       message, 'all columns must have the same number of elements'
     endif
-    (self.columns)[c] = mg_column(structarr.(c))
+    (self.columns)[_names[c]] = mg_column(structarr.(c))
   endfor
 end
 
