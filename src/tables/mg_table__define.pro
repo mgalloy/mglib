@@ -690,40 +690,50 @@ end
 
 ;= creation methods
 
-pro mg_table::append_array, array, column_names=names
+pro mg_table::append_array, array, column_names=names, column_widths=widths
   compile_opt strictarr
 
   dims = size(array, /dimensions)
   if (dims[0] eq 0L) then return
   self.n_rows = dims[1]
   if (n_elements(names) eq 0L) then names = 'c' + strtrim(lindgen(dims[0]) + 1L, 2)
-  for c = 0L, dims[0] - 1L do (self.columns)[names[c]] = mg_column(reform(array[c, *]))
+  for c = 0L, dims[0] - 1L do begin
+    col = mg_column(reform(array[c, *]))
+    if (n_elements(widths) gt 0L) then col.width = widths[c]
+    (self.columns)[names[c]] = col
+  endfor
 end
 
 
-pro mg_table::append_structarr, structarr, column_names=names
+pro mg_table::append_structarr, structarr, column_names=names, column_widths=widths
   compile_opt strictarr
   on_error, 2
 
   n_columns = n_tags(structarr)
-  if (n_elements(names) eq 0L) then names = tag_names(structarr)
+  _names = mg_default(names, tag_names(structarr))
   self.n_rows = n_elements(structarr.(0))
   for c = 0L, n_columns - 1L do begin
     if (n_elements(structarr.(c)) ne self.n_rows) then begin
       message, 'all columns must have the same number of elements'
     endif
-    (self.columns)[c] = mg_column(structarr.(c))
+    col = mg_column(structarr.(c))
+    if (n_elements(widths) gt 0L) then col.width = widths[c]
+    (self.columns)[_names[c]] = col
   endfor
 end
 
 
-pro mg_table::append_arrstruct, arrstruct, column_names=names
+pro mg_table::append_arrstruct, arrstruct, column_names=names, column_widths=widths
   compile_opt strictarr
 
   n_columns = n_tags(arrstruct)
   if (n_elements(names) eq 0L) then names = tag_names(arrstruct)
   self.n_rows = n_elements(arrstruct)
-  for c = 0L, n_columns - 1L do (self.columns)[names[c]] = mg_column(arrstruct.(c))
+  for c = 0L, n_columns - 1L do begin
+    col = mg_column(arrstruct.(c))
+    if (n_elements(widths) gt 0L) then col.width = widths[c]
+    (self.columns)[names[c]] = col
+  endfor
 end
 
 
@@ -809,6 +819,7 @@ end
 ;-
 function mg_table::init, data, $
                          column_names=column_names, $
+                         column_widths=column_widths, $
                          fold_case=fold_case, $
                          n_rows_to_print=n_rows_to_print, $
                          row_names=row_names
@@ -823,12 +834,18 @@ function mg_table::init, data, $
   if (type eq 8) then begin
     ; either array of structures or structure of arrays
     if (n_elements(data) eq 1L) then begin
-      self->append_structarr, data, column_names=column_names
+      self->append_structarr, data, $
+                              column_names=column_names, $
+                              column_widths=column_widths
     endif else begin
-      self->append_arrstruct, data, column_names=column_names
+      self->append_arrstruct, data, $
+                              column_names=column_names, $
+                              column_widths=column_widths
     endelse
   endif else begin
-    self->append_array, data, column_names=column_names
+    self->append_array, data, $
+                        column_names=column_names, $
+                        column_widths=column_widths
   endelse
 
   self.row_names = ptr_new(row_names)
