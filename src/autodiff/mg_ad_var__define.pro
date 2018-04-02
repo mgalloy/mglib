@@ -228,8 +228,9 @@ obj_destroy, [w1, w2]
 x = mg_ad_var(10.0 * findgen(100) / 99 - 5.0)
 y = 1.0 / (1 + mg_ad_exp(- x))
 
-plot, x.a, y.a, xstyle=9, ystyle=9    ; logistic values
-oplot, x.a, y.b, linestyle=1          ; derivative
+plot, x.a, y.a, xstyle=9, ystyle=9         ; logistic function values
+oplot, x.a, y.b, linestyle=1               ; derivative
+oplot, x.a, deriv(x.a, y.a), linestyle=2   ; derivative from DERIV
 
 !quiet = old_quiet
 
