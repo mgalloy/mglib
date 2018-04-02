@@ -1,4 +1,5 @@
 add_subdirectory(analysis)
+add_subdirectory(autodiff)
 add_subdirectory(calendar)
 add_subdirectory(cmdline_tools)
 add_subdirectory(collection)
