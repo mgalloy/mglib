@@ -73,6 +73,7 @@ function mgfflogger::_is_tty
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
+    message, /reset
     return, 0
   endif
 
