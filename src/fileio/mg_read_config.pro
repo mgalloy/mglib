@@ -88,6 +88,7 @@
 function mg_read_config, filename, $
                          defaults=defaults, $
                          error=error, $
+                         errmsg=errmsg, $
                          fold_case=fold_case, $
                          use_environment=use_environment
   compile_opt strictarr
@@ -97,12 +98,14 @@ function mg_read_config, filename, $
 
   if (~file_test(filename)) then begin
     error = -1L
-    message, string(filename, format='(%"%s not found")'), /informational
+    errmsg = string(filename, format='(%"%s not found")')
+    if (~arg_present(error)) then message, errmsg, /informational
+
     return, obj_new()
   endif
 
   ; start with copy of the defaults hash, if present, otherwise an empty hash
-  h = obj_new('mgffoptions', fold_case=fold_case, use_environment=use_environment)
+  h = mgffoptions(fold_case=fold_case, use_environment=use_environment)
   case 1 of
     isa(defaults, 'mgffoptions'): begin
         foreach section, defaults, section_name do begin
@@ -170,15 +173,17 @@ function mg_read_config, filename, $
             value += ' ' + strtrim(line, 2)
           endif else begin
             error = -2L
-            message, string(l, line, format='(%"invalid line %d: ''%s''")'), $
-                     /informational
+            errmsg = string(l, line, format='(%"invalid line %d: ''%s''")')
+            if (~arg_present(error)) then message, errmsg, /informational
+
             return, obj_new()
           endelse
         end
       else: begin
           error = -2L
-          message, string(l, line, format='(%"invalid line %d: ''%s''")'), $
-                   /informational
+          errmsg = string(l, line, format='(%"invalid line %d: ''%s''")')
+          if (~arg_present(error)) then message, errmsg, /informational
+
           return, obj_new()
         end
     endcase
