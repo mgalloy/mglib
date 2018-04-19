@@ -105,6 +105,9 @@
 ;     set to specify the message as informational
 ;   debug : in, optional, type=boolean
 ;     set to specify the message as debug
+;   check_math : in, optional, type=boolean
+;     set to put a message about the current `CHECK_MATH` state in the log, if
+;     the current state is not 0
 ;   last_error : in, optional, type=boolean
 ;     set to place a stack trace for the last error in the log; placed after
 ;     the logging of any normal message in this call
@@ -127,6 +130,7 @@ pro mg_log, msg, $
             name=name, $
             debug=debug, informational=informational, $
             warning=warning, error=error, critical=critical, $
+            check_math=check_math, $
             last_error=lastError, $
             execution_info=execution_info, $
             logger=logger, was_logged=was_logged, quit=quit, _extra=e
@@ -183,8 +187,9 @@ pro mg_log, msg, $
     logger->insert_execution_info, level=_level, back_levels=1
   endif
 
-  ; do after regular messages so that a regular message and the stack trace
-  ; can be logged with one call to MG_LOG
+  ; do after regular messages so that a regular message and the CHECK_MATH
+  ; status/stack trace can be logged with one call to MG_LOG
+  if (keyword_set(check_math)) then logger->insertCheckMath, back_levels=1, level=_level
   if (keyword_set(lastError)) then logger->insertLastError, back_levels=1
 
   ; do last so that a quitting message can be logged at the same time that the

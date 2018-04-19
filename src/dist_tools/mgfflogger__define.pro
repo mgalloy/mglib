@@ -271,6 +271,45 @@ end
 
 
 ;+
+; Insert possibly multiple message about the `CHECK_MATH` status in the
+; log. Does not insert any message if math status is 0.
+;
+; :Keywords:
+;    back_levels : in, optional, private, type=boolean
+;       number of levels to go back in the stack trace beyond the normal ones;
+;       should be set to 1 if calling this routine from `MG_LOG` for example
+;-
+pro mgfflogger::insertCheckMath, back_levels=back_levels, level=level
+  compile_opt strictarr
+
+  _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
+  _level = n_elements(level) eq 0L ? 5L : level
+
+  status = check_math()
+  if (status eq 0) then return
+
+  msgs = ['integer divided by zero', $          ; 1
+          'integer overflow', $                 ; 2
+          '', $                                 ; 4
+          '', $                                 ; 8
+          'floating-point divided by zero', $   ; 16
+          'floating-point underflow', $         ; 32
+          'floating-point overflow', $          ; 64
+          'floating-point operand error']       ; 128
+  stack = scope_traceback(/structure, /system)
+  stack = stack[0:n_elements(s) - 2L - back_levels]
+
+  ind = where(ishft(status, - indgen(n_elements(msgs))) mod 2, n_status_msgs)
+
+  for m = 0L, n_status_msgs - 1L do begin
+    msg = string(msgs[ind[m]], stack.routine, stack.line, $
+                 format='(%"%s on %s line %d")')
+    self->print, msg, level=_level, back_levels=_back_levels + 1L 
+  endfor
+end
+
+
+;+
 ; Insert the stack trace for the last error message into the log. Since stack
 ; traces are from run-time crashes they are considered to be at the CRITICAL
 ; level.
