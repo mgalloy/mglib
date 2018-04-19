@@ -297,7 +297,7 @@ pro mgfflogger::insertCheckMath, back_levels=back_levels, level=level
           'floating-point overflow', $          ; 64
           'floating-point operand error']       ; 128
   stack = scope_traceback(/structure, /system)
-  stack = stack[0:n_elements(s) - 2L - back_levels]
+  stack = stack[n_elements(s) - 2L - back_levels]
 
   ind = where(ishft(status, - indgen(n_elements(msgs))) mod 2, n_status_msgs)
 
