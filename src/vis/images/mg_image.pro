@@ -252,8 +252,8 @@ pro mg_image, im, x, y, $
     endif
   endif
 
-  _x = n_elements(x) eq 0L ? (findgen(dims[0]) / _scale) : x
-  _y = n_elements(y) eq 0L ? (findgen(dims[1]) / _scale) : y
+  _x = n_elements(x) eq 0L ? (findgen(dims[0] + 1L) / _scale) : x
+  _y = n_elements(y) eq 0L ? (findgen(dims[1] + 1L) / _scale) : y
 
   if (~keyword_set(axes)) then begin
     plot, _x, _y, xstyle=5, ystyle=5, /nodata, position=_position, $
