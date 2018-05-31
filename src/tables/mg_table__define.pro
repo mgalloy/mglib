@@ -460,8 +460,10 @@ function mg_table::stats, percentiles=percentiles
   endforeach
 
   self->getProperty, column_names=column_names
-  row_names = ['mean', 'std dev', 'min', string(100.0 * _percentiles, format='(F0.1)') + '%', 'max']
-  return, mg_table(result, column_names=column_names, row_names=row_names)
+  row_names = ['mean', 'std dev', 'min', $
+               string(100.0 * _percentiles, format='(F0.1)') + '%', 'max']
+  return, mg_table(result, column_names=column_names, row_names=row_names, $
+                   n_rows_to_print=n_elements(row_names))
 end
 
 
@@ -504,13 +506,13 @@ end
 
 function mg_table::_overloadPlus, left, right
   compile_opt strictarr
-  ;on_error, 2
+  on_error, 2
 
   if (left.n_rows ne right.n_rows) then begin
     message, 'can only concatenate tables with the same number of rows'
   endif
 
-  new_table = mg_table()
+  new_table = mg_table(n_rows_to_print=self.n_rows_to_print)
 
   foreach col, left.columns, key do begin
     print, key, format='(%"adding %s from left table")'
@@ -629,7 +631,9 @@ function mg_table::_overloadBracketsRightSide, is_range, ss1, ss2
   subset = self->_subset(is_range, _ss1, _ss2, column_names=column_names)
   if (n_tags(subset) eq 1L) then return, subset.(0)
 
-  return, mg_table(subset, column_names=column_names)
+  return, mg_table(subset, $
+                   column_names=column_names, $
+                   n_rows_to_print=self.n_rows_to_print)
 end
 
 
