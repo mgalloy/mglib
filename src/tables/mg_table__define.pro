@@ -739,8 +739,14 @@ end
 
 ;= property access methods
 
-pro mg_table::setProperty, column=column, _extra=e
+pro mg_table::setProperty, n_rows_to_print=n_rows_to_print, $
+                           column=column, $
+                           _extra=e
   compile_opt strictarr
+
+  if (n_elements(n_rows_to_print) gt 0L) then begin
+    self.n_rows_to_print = n_rows_to_print
+  endif
 
   if (n_elements(column) gt 0L) then begin
     (self.columns[column])->setProperty, _extra=e
