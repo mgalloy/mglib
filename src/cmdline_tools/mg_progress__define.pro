@@ -249,8 +249,8 @@ end
 
 
 ;+
-; Advance the progress bar a step. This is useful for using `MG_PROGRESS` with a
-; when the `TOTAL` keyword is needed, i.e., when the amount of progress each
+; Advance the progress bar a step. This is useful for using `MG_PROGRESS` when
+; the `TOTAL` keyword is needed, i.e., when the amount of progress each
 ; iteration is not the same, or when not using a `FOREACH` loop on the progress
 ; bar iself.
 ; 
@@ -267,8 +267,14 @@ pro mg_progress::advance, work=work, current=current
     self.current += work
     self.current <= self.total
   endif
+
   if (n_elements(current) gt 0L) then begin
     self.current = current < self.total
+  endif
+
+  if (n_elements(work) eq 0L && n_elements(current) eq 0L) then begin
+    self.current += 1L
+    self.current <= self.total
   endif
 
   self->_display
@@ -424,6 +430,18 @@ endforeach
 p->done
 
 ; example of using with a FOR loop
+
+print, format='(%"Simple FOR loop")'
+n_files = 10000L
+p = mg_progress(lonarr(n_files), title='FOR loop')
+for f = 0L, n_files - 1L do begin
+  ; process files[f]
+  wait, 0.25
+  p->advance
+endfor
+p->done
+print, 'Done'
+
 
 idl_dir = filepath('')
 print, idl_dir, format='(%"Finding files in IDL distribution: %s")'
