@@ -16,7 +16,8 @@
 pro mg_calendar_plot, year, dates, values, start_on=start_on, $
                       color_table=color_table, $
                       ct_number=ct_number, $
-                      n_ct_colors=n_ct_colors
+                      n_ct_colors=n_ct_colors, $
+                      labels=labels
   compile_opt strictarr
 
   ;; calendar calculations
@@ -87,6 +88,8 @@ pro mg_calendar_plot, year, dates, values, start_on=start_on, $
   ;; grouping values
   n_values = n_elements(values)
   h = mg_str_histogram(values, locations=unique_values, reverse_indices=ri)
+
+  _labels = n_elements(labels) eq 0L ? unique_values : labels
 
   fill_indices = lonarr(n_values)
   for u = 0L, n_elements(unique_values) - 1L do begin
@@ -176,13 +179,13 @@ pro mg_calendar_plot, year, dates, values, start_on=start_on, $
   legend_line_height = 0.025
   usersym, [-1, 1, 1, -1, -1], [1, 1, -1, -1, 1], /fill
   sorted_indices = sort(unique_values)
-  ;sorted_indices = lindgen(n_elements(unique_values))
 
   for u = 0L, n_elements(unique_values) - 1L do begin
+    i = n_elements(labels) gt 0L ? sorted_indices[u] : u
     x = 1.0 - right_margin + 6 * month_gap
-    y = 1.0 - top_margin - (u + 2) * legend_line_height
+    y = 1.0 - top_margin - (i + 2) * legend_line_height
     plots, x, y, psym=8, symsize=2.0, /normal, color=ct[sorted_indices[u]]
-    xyouts, x + month_gap, y - 0.0025, unique_values[sorted_indices[u]], $
+    xyouts, x + month_gap, y - 0.0025, _labels[sorted_indices[u]], $
             /normal, color=date_color
   endfor
 
