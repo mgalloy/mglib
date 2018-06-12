@@ -109,10 +109,10 @@ pro mg_table::_fix_widths, subset, widths
       n_rows = n_elements(subset.(c))
       for r = 0L, n_rows - 1L do begin
         if (strlen(col[r]) gt widths[c]) then begin
-          row_width = widths[r] - 3L
+          row_width = widths[c] - 3L
           ellipses = '...'
         endif else begin
-          row_width = widths[r]
+          row_width = widths[c]
           ellipses = ''
         endelse
         col[r] = string(col[r], ellipses, format=mg_format('%*s%s', - row_width))
