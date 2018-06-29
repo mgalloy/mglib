@@ -13,5 +13,5 @@
 function mg_epoch2julian, times
   compile_opt strictarr
 
-  return, julday(1, 1, 1970, 0, 0, 0) + times / (24. * 60. * 60.)
+  return, julday(1, 1, 1970, 0, 0, 0) + times / (24.0D * 60.0D * 60.0D)
 end
