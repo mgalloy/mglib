@@ -4,6 +4,9 @@
 ; Return a string representing a Julian date using a subset of the C strftime
 ; format codes.
 ;
+; Accepted codes: %y, %Y, %d, %a, %m, %b, %j, %H, %I, %M, %S, %f, %p, %c, %x,
+; and %X.
+;
 ; :Returns:
 ;   string
 ;
@@ -30,12 +33,21 @@ function mg_strftime, date, format
            '%a', day_of_week, $
            '%m', string(month, format='(%"%02d")'), $
            '%b', month_name, $
+           '%j', string(mg_ymd2doy(year, month, day), format='(%"%03d")'), $
            '%H', string(hour, format='(%"%02d")'), $
            '%I', string(hour gt 12 ? hour - 12 : hour, format='(%"%02d")'), $
            '%M', string(minute, format='(%"%02d")'), $
            '%S', string(second, format='(%"%02d")'), $
            '%f', string(1000000L * (second - long(second)), format='(%"%06d")'), $
-           '%p', ampm)
+           '%p', ampm, $
+           '%c', string(day_of_week, $
+                        month_name, $
+                        day, $
+                        hour, minute, second, $
+                        year, $
+                        format='(%"%s %s %02d %02d:%02d:%02d %04d")'), $
+           '%x', string(month, day, year, format='(%"%02d/%02d/%04d")'), $
+           '%X', string(hour, minute, second, format='(%"%02d:%02d:%02d")'))
   foreach value, s, code do result = mg_streplace(result, code, value, /global)
 
   return, result
