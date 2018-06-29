@@ -1,10 +1,13 @@
 ; docformat = 'rst'
 
 ;+
-; Return a Julian date corresponding to the `date` parsed according to `format`.
+; Return a date/time structure corresponding to the `date` parsed according to
+; `format`.
 ;
 ; :Returns:
-;   Julian date represented as a double
+;   structure of the form::
+;
+;     {year:0L, month:0L, day:0L, hour:0L, minute:0L, second:0.0D}
 ;
 ; :Params:
 ;   date : in, required, type=string
@@ -147,7 +150,7 @@ function mg_strptime, date, format
     endelse
   endwhile
 
-  return, julday(month, day, year, hour, minute,second)
+  return, {year: year, month: month, day: day, hour: hour, minute: minute, second: second}
 
   bad_format:
   message, string(token, format='(%"bad format in token \"%s\"")')
