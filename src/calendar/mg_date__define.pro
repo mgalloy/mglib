@@ -1,5 +1,14 @@
 ; docformat = 'rst'
 
+;= static methods
+
+function mg_date::strptime, date, format
+  compile_opt strictarr, static
+
+  return, mg_date(mg_strptime(date, format))
+end
+
+
 ;= API
 
 function mg_date::strftime, format
@@ -11,15 +20,20 @@ end
 
 ;= overload methods
 
+function mg_date::_overloadPrint
+  compile_opt strictarr
+
+  return, mg_strftime(self.jd, '%a %b %d %H:%M:%S %Y')
+end
+
+
 function mg_date::_overloadHelp, varname
   compile_opt strictarr
 
-  ; date_fmt = '%a %b %d %H:%M:%S %Y'
-  date_fmt = '", C(), %"'
-
-  fmt = string(date_fmt, format='(%"%%-15s %%s  <%s>")')
-
-  return, string(varname, obj_class(self), self.jd, format=fmt)
+  return, string(varname, $
+                 obj_class(self), $
+                 mg_strftime(self.jd, '%a %b %d %H:%M:%S %Y'), $
+                 format='(%"%-15s %s  <%s>")')
 end
 
 
@@ -37,11 +51,19 @@ pro mg_date::setProperty, date=date, epoch=epoch
 end
 
 
-pro mg_date::getProperty, year=year, month=month, day=day, doy=doy, $
+pro mg_date::getProperty, year=year, $
+                          month=month, mname=month_name, $
+                          day=day, doy=doy, $
                           hour=hour, minute=minute, second=second
   compile_opt strictarr
 
   caldat, self.jd, month, day, year, hour, minute, second
+  if (arg_present(doy)) then begin
+    doy = mg_ymd2doy(year, month, day)
+  endif
+  if (arg_present(month_name)) then begin
+    month_name = string(self.jd, format='(C(CMoA))')
+  endif
 end
 
 
@@ -54,11 +76,11 @@ pro mg_date::cleanup
 end
 
 
-function mg_date::init, date
+function mg_date::init, date, _extra=e
   compile_opt strictarr
 
   if (n_elements(date) gt 0L) then begin
-    self.setProperty, date=date
+    self.setProperty, date=date, _extra=e
   endif else begin
     self.setProperty, date=systime(/julian)
   endelse
