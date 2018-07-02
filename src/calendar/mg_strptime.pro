@@ -14,11 +14,17 @@
 ;     date string
 ;   format : in, required, type=string
 ;     format specification
+;   status : out, optional, type=long
+;     set to a named variable to retrieve whether the date was successfully
+;     parsed, no error message is printed if this is present
 ;-
-function mg_strptime, date, format
+function mg_strptime, date, format, status=status, error_message=error_message
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_format
+
+  status = 0L
+  error_message = ''
 
   year = 1900L
   month = 1L
@@ -65,7 +71,9 @@ function mg_strptime, date, format
             token = strmid(date, i_date, 2)
             month = long(token)
             if (month gt 12) then begin
-              message, string(month, format='(%"month %d too large for format %%m")')
+              status = 1L
+              error_message = string(month, format='(%"month %d too large for format %%m")')
+              if (~arg_present(error_message)) then message, error_message
             endif
             i_date += 2L
             i_format += 1L
@@ -76,7 +84,9 @@ function mg_strptime, date, format
                            'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
             month_index = where(token eq month_names, count)
             if (count eq 0L) then begin
-              message, string(token, format='(%"unknown month name \"%s\"")')
+              status = 1L
+              error_message = string(token, format='(%"unknown month name \"%s\"")')
+              if (~arg_present(error_message)) then message, error_message
             endif
             month = month_index[0] + 1L
             i_date += 3L
@@ -99,7 +109,9 @@ function mg_strptime, date, format
             token = strmid(date, i_date, 2)
             hour = long(token)
             if (hour gt 12) then begin
-              message, string(hour, format='(%"hour %d too large for format %%I")')
+              status = 1L
+              error_message = string(hour, format='(%"hour %d too large for format %%I")')
+              if (~arg_present(error_message)) then message, error_message
             endif
             i_date += 2L
             i_format += 1L
@@ -107,8 +119,10 @@ function mg_strptime, date, format
         'M': begin
             token = strmid(date, i_date, 2)
             minute = long(token)
-            if (minute gt 60) then begin
-              message, string(minute, format='(%"minute %d too large for format %%M")')
+            if (minute ge 60) then begin
+              status = 1L
+              error_message = string(minute, format='(%"minute %d too large for format %%M")')
+              if (~arg_present(error_message)) then message, error_message
             endif
             i_date += 2L
             i_format += 1L
@@ -116,8 +130,10 @@ function mg_strptime, date, format
         'S': begin
             token = strmid(date, i_date, 2)
             second = long(token)
-            if (second gt 60) then begin
-              message, string(second, format='(%"second %d too large for format %%S")')
+            if (second ge 60) then begin
+              status = 1L
+              error_message = string(second, format='(%"second %d too large for format %%S")')
+              if (~arg_present(error_message)) then message, error_message
             endif
             i_date += 2L
             i_format += 1L
@@ -133,17 +149,27 @@ function mg_strptime, date, format
             case strlowcase(token) of
               'am': if (hour eq 12) then hour = 0L
               'pm': if (hour lt 13) then hour += 12L
-              else: message, string(token, format='(%"unknown AM/PM indicator \"%s\"")')
+              else: begin
+                  status = 1L
+                  error_message = string(token, format='(%"unknown AM/PM indicator \"%s\"")')
+                  if (~arg_present(error_message)) then message, error_message
+                end
             endcase
             i_date += 2L
             i_format += 1L
           end
-        else: message, string(code, format='(%"unknown format code \"%%%s\"")')
+        else: begin
+            status = 1L
+            error_message = string(code, format='(%"unknown format code \"%%%s\"")')
+            if (~arg_present(error_message)) then message, error_message
+          end
       endcase
     endif else begin
       if (c ne strmid(date, i_date, 1)) then begin
-        message, string(date, format, i_date, $
-                        format='(%"date \"%s\" does not match format \"%s\" at position %d")')
+        status = 1L
+        error_message = string(date, format, i_date, $
+                               format='(%"date \"%s\" does not match format \"%s\" at position %d")')
+        if (~arg_present(error_message)) then message, error_message
       endif
       i_date += 1L
       i_format += 1L
@@ -153,7 +179,9 @@ function mg_strptime, date, format
   return, {year: year, month: month, day: day, hour: hour, minute: minute, second: second}
 
   bad_format:
-  message, string(token, format='(%"bad format in token \"%s\"")')
+  status = 1L
+  error_message = string(token, format='(%"bad format in token \"%s\"")')
+  if (~arg_present(error_message)) then message, error_message
 end
 
 
