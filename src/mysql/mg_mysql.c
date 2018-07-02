@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include <mysql_version.h>
-#include <my_global.h>
+//#include <my_global.h>
 #include <mysql.h>
 
 #include "mg_idl_export.h"
