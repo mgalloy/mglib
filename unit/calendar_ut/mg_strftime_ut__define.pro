@@ -1,5 +1,5 @@
 function mg_strftime_ut::test_basic
-  comiple_opt strictarr
+  compile_opt strictarr
 
   date = mg_strptime('2018-06-30T16:50:15', '%Y-%m-%dT%H:%M:%S')
 
