@@ -31,7 +31,9 @@ pro mg_rangeplot, x, y, $
   _clip_symsize   = mg_default(clip_symsize, 0.25)
   _clip_thick     = mg_default(clip_thick, 1.0)
 
-  plot, x, y, ystyle=ystyle or 1, yrange=yrange, _extra=e
+  _ystyle = mg_default(ystyle, 1)
+
+  plot, x, y, ystyle=_ystyle or 1, yrange=yrange, _extra=e
 
   big_ind = where(_y gt yrange[1], big_count, $
                   complement=good_ind, ncomplement=good_count)
