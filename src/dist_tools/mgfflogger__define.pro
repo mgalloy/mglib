@@ -363,6 +363,10 @@ end
 ; :Keywords:
 ;   level : in, optional, type=long
 ;     level of message
+;   from : in, optional, type=string
+;     routine name the message is from, defaults to the routine the message was
+;     actually sent from; useful for wrapper routines which want to pretend they
+;     are the wrapped routine
 ;   back_levels : in, optional, private, type=boolean
 ;     number of levels to go back in the stack trace beyond the normal ones;
 ;     should be set to 1 if calling this routine from `MG_LOG` for
@@ -372,8 +376,12 @@ end
 ;   was_logged : out, optional, type=boolean
 ;     set to a named variable to retrieve whether the message was logged
 ;-
-pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
-                       no_header=no_header, was_logged=was_logged
+pro mgfflogger::print, msg, $
+                       level=msg_level, $
+                       from=from, $
+                       back_levels=back_levels, $
+                       no_header=no_header, $
+                       was_logged=was_logged
   compile_opt strictarr
   on_error, 2
 
@@ -398,17 +406,19 @@ pro mgfflogger::print, msg, level=msg_level, back_levels=back_levels, $
     endif else begin
       stack = scope_traceback(/structure, /system)
       self->getProperty, fullname=fullname
-      vars = { time: string(systime(/julian), $
-                            format='(' + self.time_format + ')'), $
-               levelname: strupcase(self.levelNames[msg_level - 1L]), $
-               levelshortname: strupcase(self.levelShortNames[msg_level - 1L]), $
-               routine: stack[n_elements(stack) - 2L - _back_levels].routine, $
-               line: stack[n_elements(stack) - 2L - _back_levels].line, $
-               stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
-                                   '->'), $
-               name: self.name, $
-               fullname: fullname, $
-               message: msg $
+      vars = {time: string(systime(/julian), $
+                           format='(' + self.time_format + ')'), $
+              levelname: strupcase(self.levelNames[msg_level - 1L]), $
+              levelshortname: strupcase(self.levelShortNames[msg_level - 1L]), $
+              routine: n_elements(from) gt 0L $
+                         ? strupcase(from) $
+                         : stack[n_elements(stack) - 2L - _back_levels].routine, $
+              line: stack[n_elements(stack) - 2L - _back_levels].line, $
+              stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
+                                  '->'), $
+              name: self.name, $
+              fullname: fullname, $
+              message: msg $
              }
       s = mg_subs(self.format, vars)
     endelse

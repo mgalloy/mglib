@@ -95,6 +95,10 @@
 ; :Keywords:
 ;   name : in, optional, type=string
 ;     path to logger to send message to
+;   from : in, optional, type=string
+;     routine name the message is from, defaults to the routine the message was
+;     actually sent from; useful for wrapper routines which want to pretend they
+;     are the wrapped routine
 ;   critical : in, optional, type=boolean
 ;     set to specify the message as critical
 ;   error : in, optional, type=boolean
@@ -128,6 +132,7 @@ pro mg_log, msg, $
             arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, $
             arg11, arg12, $
             name=name, $
+            from=from, $
             debug=debug, informational=informational, $
             warning=warning, error=error, critical=critical, $
             check_math=check_math, $
@@ -179,7 +184,11 @@ pro mg_log, msg, $
   ; log messages
   was_logged = 0B
   if (n_params() gt 0L && obj_valid(logger)) then begin
-    logger->print, _msg, level=_level, back_levels=1, was_logged=was_logged
+    logger->print, _msg, $
+                   level=_level, $
+                   back_levels=1, $
+                   was_logged=was_logged, $
+                   from=from
   endif
 
   ; insert execution info at same level if requested
