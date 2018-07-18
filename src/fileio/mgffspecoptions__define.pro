@@ -132,6 +132,13 @@ end
 
 ;= lifecycle methods
 
+pro mgffspecoptions::cleanup
+  compile_opt strictarr
+
+  obj_destroy, self.spec
+end
+
+
 function mgffspecoptions::init, spec=spec, _extra=e
   compile_opt strictarr
 
