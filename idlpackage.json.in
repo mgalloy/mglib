@@ -1,0 +1,12 @@
+{
+  "Name": "mglib",
+  "Version": "@VERSION@",
+  "Author": "Michael Galloy",
+  "Date": "@mglib_BUILD_DATE@",
+  "Dependencies": [
+    {
+      "Name": "IDL",
+      "Version": ">8.5"
+    }   
+  ]
+}

@@ -136,6 +136,11 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${MGLIB_PACKAGE_VERSION}-${MG
 
 include(CPack)
 
+configure_file(idlpackage.json.in idlpackage.json @ONLY)
+install(FILES
+          ${CMAKE_CURRENT_BINARY_DIR}/idlpackage.json
+        DESTINATION .)
+
 install(FILES
           LICENSE
           INSTALL.rst
