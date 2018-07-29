@@ -84,13 +84,17 @@
 ;     for values)
 ;   use_environment : in, optional, type=boolean
 ;     set to use environment variables for substitution
+;   spec : in, optional, type=string
+;     filename of a specification file; if this is passed, then an
+;     `MGffSpecOptions` is returned
 ;-
 function mg_read_config, filename, $
                          defaults=defaults, $
                          error=error, $
                          errmsg=errmsg, $
                          fold_case=fold_case, $
-                         use_environment=use_environment
+                         use_environment=use_environment, $
+                         spec=spec
   compile_opt strictarr
   on_error, 2
 
@@ -105,7 +109,12 @@ function mg_read_config, filename, $
   endif
 
   ; start with copy of the defaults hash, if present, otherwise an empty hash
-  h = mgffoptions(fold_case=fold_case, use_environment=use_environment)
+  if (n_elements(spec) gt 0L) then begin
+    h = mgffspecoptions(spec=spec, fold_case=fold_case, use_environment=use_environment)
+  endif else begin
+    h = mgffoptions(fold_case=fold_case, use_environment=use_environment)
+  endelse
+
   case 1 of
     isa(defaults, 'mgffoptions'): begin
         foreach section, defaults, section_name do begin
