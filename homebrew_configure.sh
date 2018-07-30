@@ -28,6 +28,6 @@ cmake \
   -DHDF5_LA_LIBRARY:PATH=/usr/local/lib/libhdf5_hl.a \
   -DCURL_LIBRARY:PATH=/usr/lib/libcurl.dylib \
   -DSZ_LIBRARY:PATH=/usr/local/lib/libsz.a \
-  -DZ_LIBRARY:PATH=/usr/lib/libz.dylib \
+  -DZLIB_LIBRARY:PATH=/usr/lib/libz.dylib \
   ..
 
