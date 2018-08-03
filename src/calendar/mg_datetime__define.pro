@@ -48,6 +48,53 @@ function mg_datetime::_overloadMinus, dt1, dt2
 end
 
 
+function mg_datetime::_overloadLE, dt1, dt2
+  compile_opt strictarr
+
+  return, dt1->to_julian() le dt2->to_julian()
+end
+
+
+function mg_datetime::_overloadLT, dt1, dt2
+  compile_opt strictarr
+
+  return, dt1->to_julian() lt dt2->to_julian()
+end
+
+
+function mg_datetime::_overloadGE, dt1, dt2
+  compile_opt strictarr
+
+  return, dt1->to_julian() ge dt2->to_julian()
+end
+
+
+function mg_datetime::_overloadGT, dt1, dt2
+  compile_opt strictarr
+
+  return, dt1->to_julian() gt dt2->to_julian()
+end
+
+
+function mg_datetime::_overloadEQ, dt1, dt2
+  compile_opt strictarr
+
+  return, dt1.year eq dt2.year $
+            and dt1.month eq dt2.month $
+            and dt1.day eq dt2.day $
+            and dt1.hour eq dt2.hour $
+            and dt1.minute eq dt2.minute $
+            and abs(dt1.second - dt2.second) lt 0.001
+end
+
+
+function mg_datetime::_overloadNE, dt1, dt2
+  compile_opt strictarr
+
+  return, ~(dt1 eq dt2)
+end
+
+
 function mg_datetime::_overloadPlus, dt1, dt2
   compile_opt strictarr
   on_error, 2
@@ -101,14 +148,13 @@ pro mg_datetime::setProperty, date=date, epoch=epoch, format=format
     self.minute = minute
     self.second = second
   endelse
-
 end
 
 
 pro mg_datetime::getProperty, year=year, $
-                          month=month, mname=month_name, $
-                          day=day, doy=doy, $
-                          hour=hour, minute=minute, second=second
+                              month=month, mname=month_name, $
+                              day=day, doy=doy, $
+                              hour=hour, minute=minute, second=second
   compile_opt strictarr
 
   if (arg_present(year)) then year = self.year
