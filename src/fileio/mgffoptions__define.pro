@@ -456,33 +456,6 @@ end
 
 
 ;+
-; Convert value to boolean.
-;
-; :Private:
-;
-; :Params:
-;   value : in, required, type=string/strarr
-;     value to convert to booleans
-;-
-function mgffoptions::_convertBoolean, value
-  compile_opt strictarr
-
-  if (size(value, /n_dimensions) gt 0L) then begin
-    n = n_elements(value)
-    result = bytarr(n)
-    for i = 0L, n - 1L do result[i] = self->_convertBoolean(value[i])
-    return, result
-  endif
-
-  switch strlowcase(value) of
-    '1':
-    'yes':
-    'true': return, 1B
-    else: return, 0B
-  endswitch
-end
-
-;+
 ; Return value for a given option.
 ;
 ; :Returns:
@@ -577,7 +550,7 @@ function mgffoptions::get, option, $
     endelse
   endif
 
-  return, keyword_set(boolean) ? self->_convertBoolean(value) : fix(value, type=_type)
+  return, keyword_set(boolean) ? mg_convert_boolean(value) : fix(value, type=_type)
 end
 
 
