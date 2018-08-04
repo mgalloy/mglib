@@ -58,6 +58,8 @@ end
 function mg_cl_DEVICE_OP_ut::test
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   n = 10L
   for t = 0L, n_elements(*self.valid_codes) - 1L do begin
     hx = make_array([n], type=(*self.valid_codes)[t], /index)

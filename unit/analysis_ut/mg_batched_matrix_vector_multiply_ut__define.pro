@@ -1,6 +1,8 @@
 function mg_batched_matrix_vector_multiply_ut::test_alltypes
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_analysis'), 'MG_ANALYSIS DLM not found', /skip
+
   xsize = 10L
   ysize = 10L
   n_cameras = 2L
@@ -47,6 +49,8 @@ end
 function mg_batched_matrix_vector_multiply_ut::test_float
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_analysis'), 'MG_ANALYSIS DLM not found', /skip
+
   xsize = 10L
   ysize = 10L
   n_cameras = 2L
@@ -85,6 +89,8 @@ end
 
 function mg_batched_matrix_vector_multiply_ut::test_double
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_analysis'), 'MG_ANALYSIS DLM not found', /skip
 
   xsize = 10L
   ysize = 10L

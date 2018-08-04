@@ -53,6 +53,8 @@ end
 function mg_cl_ARR_ut::test_1darg
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dims = 5
   return, self->_test(dims)
 end
@@ -60,6 +62,8 @@ end
 
 function mg_cl_ARR_ut::test_1d
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dims = [5]
   return, self->_test(dims)
@@ -69,6 +73,8 @@ end
 function mg_cl_ARR_ut::test_2d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dims = [3, 5]
   return, self->_test(dims)
 end
@@ -76,6 +82,8 @@ end
 
 function mg_cl_ARR_ut::test_3d
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dims = [7, 3, 5]
   return, self->_test(dims)

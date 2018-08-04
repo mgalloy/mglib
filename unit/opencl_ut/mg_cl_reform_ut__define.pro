@@ -4,6 +4,8 @@
 function mg_cl_reform_ut::test_1d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   x = findgen(12)
   dx = mg_cl_putvar(x, error=err)
   assert, err eq 0, 'error transfering to dx: %s', mg_cl_error_message(err)
@@ -20,6 +22,8 @@ end
 
 function mg_cl_reform_ut::test_1d_array
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   x = findgen(12)
   dx = mg_cl_putvar(x, error=err)
@@ -39,6 +43,8 @@ end
 function mg_cl_reform_ut::test_2d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   x = lindgen(5, 7)
   dx = mg_cl_putvar(x, error=err)
   assert, err eq 0, 'error transfering to dx: %s', mg_cl_error_message(err)
@@ -55,6 +61,8 @@ end
 
 function mg_cl_reform_ut::test_2d_overwrite
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   x = lindgen(5, 7)
   dx = mg_cl_putvar(x, error=err)

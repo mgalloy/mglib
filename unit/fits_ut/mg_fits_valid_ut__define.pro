@@ -3,6 +3,8 @@
 function mg_fits_valid_ut::test_invalidfcb
   compile_opt strictarr
 
+  assert, self->have_routine('fits_open'), 'FITS_OPEN routine not found', /skip
+
   filename = filepath('20150428_223017_kcor_invalid.fts', root=self.fits_data_root)
   fits_open, filename, fcb, /no_abort
   valid = mg_fits_valid(fcb)
@@ -18,6 +20,8 @@ end
 function mg_fits_valid_ut::test_invalidfilename
   compile_opt strictarr
 
+  assert, self->have_routine('fits_open'), 'FITS_OPEN routine not found', /skip
+
   filename = filepath('20150428_223017_kcor_invalid.fts', root=self.fits_data_root)
 
   valid = mg_fits_valid(filename)
@@ -29,6 +33,8 @@ end
 
 function mg_fits_valid_ut::test_fcb
   compile_opt strictarr
+
+  assert, self->have_routine('fits_open'), 'FITS_OPEN routine not found', /skip
 
   filename = filepath('20150428_223017_kcor.fts', root=self.fits_data_root)
   fits_open, filename, fcb
@@ -43,6 +49,8 @@ end
 
 function mg_fits_valid_ut::test_filename
   compile_opt strictarr
+
+  assert, self->have_routine('fits_open'), 'FITS_OPEN routine not found', /skip
 
   filename = filepath('20150428_223017_kcor.fts', root=self.fits_data_root)
 

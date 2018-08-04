@@ -64,8 +64,8 @@ function mganrandom_ut::test_gaussians
           'must be connected to the Internet to use MGanRandom class'
 
   n = 10L
-  mean = 0.
-  stddev = 1.
+  mean = 0.0
+  stddev = 1.0
   tolerance = 0.5
 
   r = obj_new('MGanRandom')

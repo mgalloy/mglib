@@ -3,6 +3,8 @@
 function mg_cl_compile_ut::test_simple
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   kernel = mg_cl_compile('z[i] = 2. * x[i] + sin(y[i])', $
                          ['x', 'y', 'z'], $
                          lonarr(3) + 4L, $
@@ -16,6 +18,8 @@ end
 
 function mg_cl_compile_ut::test_simple_error
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   catch, error
   if (error ne 0L) then begin
@@ -36,6 +40,8 @@ end
 
 function mg_cl_compile_ut::test_full
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   kernel = mg_cl_compile('__kernel void my_kernel(__global float *x, __global float *y, __global float *z, const int n) { int i = get_global_id(0); if (i < n) z[i] = 2. * x[i] + sin(y[i]); }', $
                          ['x', 'y', 'z'], $

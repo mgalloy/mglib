@@ -3,6 +3,8 @@
 function mg_cl_execute_ut::test_simple
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   n = 10
   x = findgen(n)
   y = 2. * findgen(n)
@@ -35,6 +37,8 @@ end
 
 function mg_cl_execute_ut::test_full
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   n = 10
   x = findgen(n)

@@ -3,6 +3,8 @@
 function mg_cl_getvar_ut::test_basic
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   hx = findgen(10)
   dx = mg_cl_putvar(hx)
   x = mg_cl_getvar(dx)
@@ -19,6 +21,8 @@ end
 
 function mg_cl_getvar_ut::test_error
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   hx = findgen(10)
   dx = mg_cl_putvar(hx)

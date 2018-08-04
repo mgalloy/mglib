@@ -4,6 +4,8 @@
 function mg_cl_view_ut::test_1d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dx = mg_cl_lindgen(20, error=err)
   assert, err eq 0, 'error transfering to dx: %s', mg_cl_error_message(err)
 
@@ -26,6 +28,8 @@ end
 function mg_cl_view_ut::test_1d_short
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dx = mg_cl_indgen(20, error=err)
   assert, err eq 0, 'error transfering to dx: %s', mg_cl_error_message(err)
 
@@ -47,6 +51,8 @@ end
 
 function mg_cl_view_ut::test_2d
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dx = mg_cl_findgen(3, 4, error=err)
   assert, err eq 0, 'error transfering to dx: %s', mg_cl_error_message(err)

@@ -29,7 +29,6 @@ function mgffepochparser_ut::init, _extra=e
 
   self->addTestingRoutine, ['mgffepochparser__define', $
                             'mgffepochparser::cleanup', $
-                            'mgffepochparser::get', $
                             'mgffepochparser::getProperty', $
                             'mgffepochparser::setProperty']
   self->addTestingRoutine, ['mgffepochparser::init', $

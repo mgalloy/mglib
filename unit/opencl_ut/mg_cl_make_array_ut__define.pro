@@ -20,6 +20,8 @@ end
 function mg_cl_make_array_ut::test_1d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dims = 5
   x = make_array(dims)
   dx = mg_cl_make_array(dims, error=err)
@@ -34,6 +36,8 @@ end
 
 function mg_cl_make_array_ut::test_1d_index
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dims = 5
   x = make_array(dims, /index)
@@ -50,6 +54,8 @@ end
 function mg_cl_make_array_ut::test_2d
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   dims = [3, 4]
   x = make_array(dims)
   dx = mg_cl_make_array(dims, error=err)
@@ -65,6 +71,8 @@ end
 function mg_cl_make_array_ut::test_2d_args
   compile_opt strictarr
 
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
+
   x = make_array(3, 4)
   dx = mg_cl_make_array(3, 4, error=err)
 
@@ -78,6 +86,8 @@ end
 
 function mg_cl_make_array_ut::test_2d_index
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dims = [3, 4]
   x = make_array(dims, /index)
@@ -93,6 +103,8 @@ end
 
 function mg_cl_make_array_ut::test_2d_type
   compile_opt strictarr
+
+  assert, self->have_dlm('mg_opencl'), 'MG_OPENCL DLM not found', /skip
 
   dims = [3, 4]
   types = [1, 2, 3, 4, 5, 6, 9, 12, 13, 14, 15]
