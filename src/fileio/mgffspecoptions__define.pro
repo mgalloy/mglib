@@ -9,17 +9,24 @@
 ; :Returns:
 ;   1 if valid, 0 if not
 ;-
-function mgffspecoptions::is_valid
+function mgffspecoptions::is_valid, error_msg=error_msg
   compile_opt strictarr
+
+  error_msg = ''
 
   ; check that every option is in the spec
   self->mgffoptions::getProperty, sections=sections
   for s = 0L, n_elements(sections) - 1L do begin
+    if (sections[s] eq 'DEFAULT' || sections[s] eq '') then continue
     options = self->mgffoptions::options(section=sections[s], count=n_options)
     if (n_options gt 0L) then begin
       for o = 0L, n_options - 1L do begin
         spec_line = self.spec->get(options[o], section=sections[s], found=found)
-        if (~found) then return, 0B
+        if (~found) then begin
+          error_msg = string(sections[s], options[o], $
+                             format='(%"option %s/%s not found in specification")')
+          return, 0B
+        endif
       endfor
     endif
   endfor
@@ -38,7 +45,11 @@ function mgffspecoptions::is_valid
         value = self->mgffoptions::get(spec_options[o], $
                                        section=spec_sections[s], $
                                        found=found)
-        if (~found) then return, 0B
+        if (~found) then begin
+          error_msg = string(spec_sections[s], spec_options[o], $
+                             format='(%"option %s/%s not found and no default in specification")')
+          return, 0B
+        endif
       endif
     endfor
   endfor

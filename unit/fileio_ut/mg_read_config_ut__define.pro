@@ -301,7 +301,7 @@ function mg_read_config_ut::test_spec
 
   o = mg_read_config(config_filename, spec=spec_filename)
 
-  assert, o->is_valid(), 'valid config file marked invalid'
+  assert, o->is_valid(error_msg=msg), 'valid config file marked invalid: %s', msg
 
   obj_destroy, o
 
@@ -343,7 +343,9 @@ function mg_read_config_ut::init, _extra=e
                             'mgffoptions::cleanup', $
                             'mgffoptions::put', $
                             'mgffoptions::getProperty', $
-                            'mgffoptions::_overloadBracketsLeftSide']
+                            'mgffoptions::_overloadBracketsLeftSide', $
+                            'mgffspecoptions__define', $
+                            'mgffspecoptions::cleanup']
   self->addTestingRoutine, ['mg_read_config', $
                             'mgffoptions::init', $
                             'mgffoptions::get', $
@@ -353,7 +355,10 @@ function mg_read_config_ut::init, _extra=e
                             'mgffoptions::_overloadPrint', $
                             'mgffoptions::_overloadHelp', $
                             'mgffoptions::_overloadForeach', $
-                            'mgffoptions::_overloadBracketsRightSide'], $
+                            'mgffoptions::_overloadBracketsRightSide', $
+                            'mgffspecoptions::init', $
+                            'mgffspecoptions::get', $
+                            'mgffspecoptions::is_valid'], $
                            /is_function
 
   return, 1
