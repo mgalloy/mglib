@@ -12,7 +12,37 @@
 function mgffspecoptions::is_valid
   compile_opt strictarr
 
-  ; TODO: implement
+  ; check that every option is in the spec
+  self->mgffoptions::getProperty, sections=sections
+  for s = 0L, n_elements(sections) - 1L do begin
+    options = self->mgffoptions::options(section=sections[s], count=n_options)
+    if (n_options gt 0L) then begin
+      for o = 0L, n_options - 1L do begin
+        spec_line = self.spec->get(options[o], section=sections[s], found=found)
+        if (~found) then return, 0B
+      endfor
+    endif
+  endfor
+
+  ; check that every spec without a default is given
+  self.spec->getProperty, sections=spec_sections
+  for s = 0L, n_elements(spec_sections) - 1L do begin
+    spec_options = self.spec->options(section=spec_sections[s], count=n_options)
+    for o = 0L, n_options - 1L do begin
+      spec_line = self.spec->get(spec_options[o], section=spec_sections[s])
+      mg_parse_spec_line, spec_line, $
+                          type=type, $
+                          extract=extract, $
+                          default=default
+      if (n_elements(default) eq 0L) then begin
+        value = self->mgffoptions::get(spec_options[o], $
+                                       section=spec_sections[s], $
+                                       found=found)
+        if (~found) then return, 0B
+      endif
+    endfor
+  endfor
+
   return, 1B
 end
 
