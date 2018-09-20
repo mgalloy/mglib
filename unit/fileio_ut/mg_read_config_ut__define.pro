@@ -290,6 +290,50 @@ function mg_read_config_ut::test_boolean1
 end
 
 
+function mg_read_config_ut::test_spec
+  compile_opt strictarr
+
+  assert, mg_idlversion(require='8.0'), /skip, $
+          'test requires IDL 8.0, %s present', !version.release
+
+  spec_filename = filepath('spec.cfg', root=mg_src_root())
+  config_filename = filepath('valid_options.cfg', root=mg_src_root())
+
+  o = mg_read_config(config_filename, spec=spec_filename)
+
+  assert, o->is_valid(), 'valid config file marked invalid'
+
+  obj_destroy, o
+
+  return, 1
+end
+
+
+function mg_read_config_ut::test_invalid_spec
+  compile_opt strictarr
+
+  assert, mg_idlversion(require='8.0'), /skip, $
+          'test requires IDL 8.0, %s present', !version.release
+
+  spec_filename = filepath('spec.cfg', root=mg_src_root())
+  config_filename = filepath('missing_default.cfg', root=mg_src_root())
+
+  o = mg_read_config(config_filename, spec=spec_filename)
+  assert, ~o->is_valid(), 'invalid config file marked valid: %s', $
+          file_basename(config_filename)
+  obj_destroy, o
+
+  config_filename = filepath('missing_spec.cfg', root=mg_src_root())
+
+  o = mg_read_config(config_filename, spec=spec_filename)
+  assert, ~o->is_valid(), 'invalid config file marked valid: %s', $
+          file_basename(config_filename)
+  obj_destroy, o
+
+  return, 1
+end
+
+
 function mg_read_config_ut::init, _extra=e
   compile_opt strictarr
 
