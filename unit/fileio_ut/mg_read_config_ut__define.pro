@@ -303,6 +303,14 @@ function mg_read_config_ut::test_spec
 
   assert, o->is_valid(error_msg=msg), 'valid config file marked invalid: %s', msg
 
+  level = o->get('level', section='logging')
+  assert, size(level, /type) eq 2, 'wrong type for level'
+  assert, level eq 5, 'wrong value for level'
+
+  dir = o->get('dir', section='logging')
+  assert, size(dir, /type) eq 7, 'wrong type for dir'
+  assert, dir eq '/export/data1/Data/logs', 'wrong value for dir'
+
   obj_destroy, o
 
   return, 1
