@@ -12,6 +12,11 @@ function mg_get_type, name
         type = 1
         break
       end
+    '2':
+    'int': begin
+        type = 2
+        break
+      end
     '3':
     'long': begin
         type = 3
@@ -20,6 +25,11 @@ function mg_get_type, name
     '4':
     'float': begin
         type = 4
+        break
+      end
+    '5':
+    'double': begin
+        type = 5
         break
       end
     '7':
