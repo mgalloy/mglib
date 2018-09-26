@@ -8,6 +8,11 @@
 ;
 ; :Returns:
 ;   1 if valid, 0 if not
+;
+; :Keywords:
+;   error_msg : out, optional, type=string
+;     set to a named variable to retrieve an error message, empty string if
+;     valid
 ;-
 function mgffspecoptions::is_valid, error_msg=error_msg
   compile_opt strictarr
