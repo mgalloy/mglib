@@ -108,6 +108,7 @@ function mgffspecoptions::get, option, $
   if (found) then begin
     mg_parse_spec_line, spec_line, $
                         type=type, $
+                        boolean=boolean, $
                         extract=extract, $
                         default=default
   endif else begin
@@ -119,6 +120,7 @@ function mgffspecoptions::get, option, $
   value = self->mgffoptions::get(option, $
                                  section=section, $
                                  type=type, $
+                                 boolean=boolean, $
                                  extract=extract, $
                                  default=default, $
                                  found=found, $

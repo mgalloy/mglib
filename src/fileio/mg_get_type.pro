@@ -1,17 +1,19 @@
 ; docformat = 'rst'
 
-function mg_get_type, name
+function mg_get_type, name, boolean=boolean
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_format
 
+  boolean = 0B
   switch strlowcase(name) of
-    '1':
     'bool':
-    'boolean': begin
+    'boolean': boolean = 1B
+    '1': begin
         type = 1
         break
       end
+
     '2':
     'int': begin
         type = 2
