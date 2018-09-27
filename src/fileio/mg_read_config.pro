@@ -131,6 +131,8 @@ function mg_read_config, filename, $
 
   ; read file
   nlines = file_lines(filename)
+  if (nlines eq 0) then return, h
+
   lines = strarr(nlines)
   openr, lun, filename, /get_lun
   readf, lun, lines
