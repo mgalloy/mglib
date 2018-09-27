@@ -190,6 +190,7 @@ end
 pro mgfflogger::getProperty, level=level, $
                              color=color, $
                              format=format, time_format=time_format, $
+                             max_width=max_width, $
                              name=name, $
                              fullname=fullname, $
                              filename=filename, $
@@ -201,6 +202,7 @@ pro mgfflogger::getProperty, level=level, $
   if (arg_present(children)) then children = self.children
   if (arg_present(format)) then format = self.format
   if (arg_present(time_format)) then time_format = self.time_format
+  if (arg_present(max_width)) then max_width = self.max_width
   if (arg_present(name)) then name = self.name
   if (arg_present(fullname)) then begin
     if (obj_valid(self.parent)) then begin
@@ -231,6 +233,7 @@ pro mgfflogger::setProperty, level=level, $
                              critical=critical, $
                              color=color, $
                              format=format, time_format=time_format, $
+                             max_width=max_width, $
                              filename=filename, $
                              widget_identifier=widget_identifier, $
                              clobber=clobber
@@ -260,6 +263,7 @@ pro mgfflogger::setProperty, level=level, $
 
   if (n_elements(format) gt 0L) then self.format = format
   if (n_elements(time_format) gt 0L) then self.time_format = time_format
+  if (n_elements(max_width) gt 0L) then self.max_width = max_width
   if (n_elements(filename) gt 0L) then self.filename = filename
   if (n_elements(widget_identifier) gt 0L) then begin
     self.widget_identifier = widget_identifier
@@ -417,27 +421,46 @@ pro mgfflogger::print, msg, $
               stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
                                   '->'), $
               name: self.name, $
-              fullname: fullname, $
-              message: msg $
+              fullname: fullname $
              }
-      s = mg_subs(self.format, vars)
+      s = mg_subs(self.format, create_struct(vars, 'message', msg))
+
+      if ((self.widget_identifier eq 0L) $
+             && (self.max_width gt 0L) $
+             && (strlen(s) gt self.max_width) $
+             && (strpos(self.format, '%(message)') ge 0L)) then begin
+        overhead = strlen(s) - strlen(msg)
+        msg_per_line = self.max_width - overhead - 1L
+        n_lines = ceil(float(strlen(msg)) / float(msg_per_line))
+        s = strarr(n_lines)
+        for i = 0L, n_lines - 1L do begin
+          s[i] = mg_subs(self.format, $
+                         create_struct(vars, $
+                                       'message', $
+                                       strtrim(strmid(msg, $
+                                                      i * msg_per_line, $
+                                                      msg_per_line), $
+                                               2))) + (i eq n_lines - 1L ? '' : '|')
+        endfor
+      endif
     endelse
 
     if (self.widget_identifier gt 0L) then begin
       widget_control, self.widget_identifier, set_value=s, /append
     endif else begin
       ; use color if set or display to stdout
-      if ((self.color_set && self.color) || (~self.color_set && self.is_tty && lun lt 0)) then begin
+      if ((self.color_set && self.color) $
+             || (~self.color_set && self.is_tty && lun lt 0)) then begin
         case msg_level of
-          1: s = mg_ansicode(s, /red)
-          2: s = mg_ansicode(s, /magenta)
-          3: s = mg_ansicode(s, /yellow)
-          4: s = mg_ansicode(s, /cyan)
+          1: for i = 0L, n_elements(s) - 1L do s[i] = mg_ansicode(s[i], /red)
+          2: for i = 0L, n_elements(s) - 1L do s[i] = mg_ansicode(s[i], /magenta)
+          3: for i = 0L, n_elements(s) - 1L do s[i] = mg_ansicode(s[i], /yellow)
+          4: for i = 0L, n_elements(s) - 1L do s[i] = mg_ansicode(s[i], /cyan)
           5:
         endcase
       endif
 
-      printf, lun, s
+      for i = 0L, n_elements(s) - 1L do printf, lun, s[i]
     endelse
 
     was_logged = 1B
@@ -476,6 +499,7 @@ function mgfflogger::init, parent=parent, name=name, _extra=e
 
   self.time_format = 'C(CYI4.4, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2)'
   self.format = '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
+  self.max_width = -1L
 
   ; settings to determine whether to use color
   self.is_tty = self->_is_tty()
@@ -533,6 +557,7 @@ pro mgfflogger__define
              filename: '', $
              widget_identifier: 0L, $
              time_format: '', $
-             format: '' $
+             format: '', $
+             max_width: 0L $
            }
 end
