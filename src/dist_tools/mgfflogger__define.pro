@@ -434,13 +434,15 @@ pro mgfflogger::print, msg, $
         n_lines = ceil(float(strlen(msg)) / float(msg_per_line))
         s = strarr(n_lines)
         for i = 0L, n_lines - 1L do begin
+          line_msg = strtrim(strmid(msg, $
+                                    i * msg_per_line, $
+                                    msg_per_line), $
+                             2)
+          n_padding = msg_per_line - strlen(line_msg)
+          padding = n_padding eq 0 ? '' : strjoin(strarr(n_padding) + ' ')
           s[i] = mg_subs(self.format, $
-                         create_struct(vars, $
-                                       'message', $
-                                       strtrim(strmid(msg, $
-                                                      i * msg_per_line, $
-                                                      msg_per_line), $
-                                               2))) + (i eq n_lines - 1L ? '' : '|')
+                         create_struct(vars, 'message', line_msg)) $
+                   + padding + '|'
         endfor
       endif
     endelse
