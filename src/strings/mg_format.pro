@@ -37,17 +37,14 @@ function mg_format, format, args, simple=simple
 
   a = 0L
   while (a le n_elements(args) - 1L) do begin
-print, a
     per_locs = stregex(_format, '%%', length=per_len)
-help, _format
+
     locs = stregex(_format, re, length=len, /subexpr)
-print, locs
     if ((per_locs[0] ge 0L) && ((locs[0] lt 0L) || (per_locs[0] lt locs[0]))) then begin
       result += strmid(_format, 0, per_locs[0] + per_len[0])
       if (strlen(_format) gt (per_locs[0] + per_len[0] + 1)) then begin
         _format = strmid(_format, per_locs[0] + per_len[0])
       endif else _format = ''
-print, _format
       continue
     endif
 
