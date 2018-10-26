@@ -243,14 +243,18 @@ function mg_fits_diff, filename1, filename2, $
                        ignore_whitespace=ignore_whitespace, $
                        tolerance=tolerance, $
                        differences=differences, $
-                       headers_only=headers_only
+                       headers_only=headers_only, $
+                       error_msg=error_msg
   compile_opt strictarr
 
   fits_open, filename1, fcb1
   fits_open, filename2, fcb2
 
-  fits_read, fcb1, data1, header1
-  fits_read, fcb2, data2, header2
+  fits_read, fcb1, data1, header1, /no_abort, message=error_msg
+  if (error_msg ne '') then return, !null
+
+  fits_read, fcb2, data2, header2, /no_abort, message=error_msg
+  if (error_msg ne '') then return, !null
 
   if (arg_present(differences)) then _differences = list()
 
@@ -278,8 +282,10 @@ function mg_fits_diff, filename1, filename2, $
   diff or= extend_diff
 
   for e = 0L, (fcb1.nextend < fcb2.nextend) - 1L do begin
-    fits_read, fcb1, data1, header1, exten_no=e
-    fits_read, fcb2, data2, header2, exten_no=e
+    fits_read, fcb1, data1, header1, exten_no=e, /no_abort, message=error_msg
+    if (error_msg ne '') then return, !null
+    fits_read, fcb2, data2, header2, exten_no=e, /no_abort, message=error_msg
+    if (error_msg ne '') then return, !null
 
     diff or= mg_fits_diff_checkkeywords(header1, filename1, $
                                         header2, filename2, $
