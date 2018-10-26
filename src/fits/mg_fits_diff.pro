@@ -237,6 +237,9 @@ end
 ;     `!null` if no differences found
 ;   headers_only : in, optional, type=boolean
 ;     set to only compare headers
+;   error_msg : out, optional, type=string
+;     set to a named variable to retrieve any error messages from reading the
+;     FITS files; will be the empty string if no error
 ;-
 function mg_fits_diff, filename1, filename2, $
                        ignore_keywords=ignore_keywords, $
