@@ -250,14 +250,27 @@ function mg_fits_diff, filename1, filename2, $
                        error_msg=error_msg
   compile_opt strictarr
 
-  fits_open, filename1, fcb1
-  fits_open, filename2, fcb2
+  fits_open, filename1, fcb1, /no_abort, message=error_msg
+  if (error_msg ne '') then begin
+    error_msg = string(filename1, format='(%"%s not valid")')
+    return, !null
+  endif
+  if (error_msg ne '') then begin
+    error_msg = string(filename2, format='(%"%s not valid")')
+    return, !null
+  endif
 
   fits_read, fcb1, data1, header1, /no_abort, message=error_msg
-  if (error_msg ne '') then return, !null
+  if (error_msg ne '') then begin
+    error_msg = string(filename1, format='(%"%s not valid")')
+    return, !null
+  endif
 
   fits_read, fcb2, data2, header2, /no_abort, message=error_msg
-  if (error_msg ne '') then return, !null
+  if (error_msg ne '') then begin
+    error_msg = string(filename2, format='(%"%s not valid")')
+    return, !null
+  endif
 
   if (arg_present(differences)) then _differences = list()
 
@@ -286,9 +299,15 @@ function mg_fits_diff, filename1, filename2, $
 
   for e = 0L, (fcb1.nextend < fcb2.nextend) - 1L do begin
     fits_read, fcb1, data1, header1, exten_no=e, /no_abort, message=error_msg
-    if (error_msg ne '') then return, !null
+    if (error_msg ne '') then begin
+      error_msg = string(filename1, format='(%"error reading %s")')
+      return, !null
+    endif
     fits_read, fcb2, data2, header2, exten_no=e, /no_abort, message=error_msg
-    if (error_msg ne '') then return, !null
+    if (error_msg ne '') then begin
+      error_msg = string(filename2, format='(%"error reading %s")')
+      return, !null
+    endif
 
     diff or= mg_fits_diff_checkkeywords(header1, filename1, $
                                         header2, filename2, $
