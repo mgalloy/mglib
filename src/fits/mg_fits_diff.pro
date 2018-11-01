@@ -255,6 +255,8 @@ function mg_fits_diff, filename1, filename2, $
     error_msg = string(filename1, format='(%"%s not valid")')
     return, !null
   endif
+
+  fits_open, filename2, fcb2, /no_abort, message=error_msg
   if (error_msg ne '') then begin
     error_msg = string(filename2, format='(%"%s not valid")')
     return, !null
