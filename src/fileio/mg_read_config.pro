@@ -174,7 +174,7 @@ function mg_read_config, filename, $
 
           tokens = stregex(line, '^([^=:]+)[[:space:]]*[=:](.*)', $
                            /extract, /subexpr)
-          name = tokens[1]
+          name = strtrim(tokens[1], 2)
           value = strtrim(tokens[2], 2)
 
           continuing = 1B
