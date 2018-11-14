@@ -30,7 +30,7 @@ function mg_format, format, args, simple=simple
   compile_opt strictarr
   on_error, 2
 
-  re = '([^%]|^)%([[:digit:]\*]+\.)?([[:digit:]\*]+)([[:alpha:]])'
+  re = '([^%]|^)%([-+])?([[:digit:]\*]+\.)?([[:digit:]\*]+)([[:alpha:]])'
 
   _format = format
   result = ''
@@ -38,14 +38,13 @@ function mg_format, format, args, simple=simple
   a = 0L
   while (a le n_elements(args) - 1L) do begin
     per_locs = stregex(_format, '%%', length=per_len)
-    locs = stregex(_format, re, length=len, /subexpr)
 
+    locs = stregex(_format, re, length=len, /subexpr)
     if ((per_locs[0] ge 0L) && ((locs[0] lt 0L) || (per_locs[0] lt locs[0]))) then begin
       result += strmid(_format, 0, per_locs[0] + per_len[0])
       if (strlen(_format) gt (per_locs[0] + per_len[0] + 1)) then begin
         _format = strmid(_format, per_locs[0] + per_len[0])
       endif else _format = ''
-
       continue
     endif
 
@@ -55,9 +54,14 @@ function mg_format, format, args, simple=simple
 
     result += strmid(_format, 0, locs[1] + len[1]) + '%'
 
-    ; handle width
+    ; handle +-
     if (locs[2] ne -1) then begin
-      width = strmid(_format, locs[2], len[2])
+      result += strmid(_format, locs[2], len[2])
+    endif
+
+    ; handle width
+    if (locs[3] ne -1) then begin
+      width = strmid(_format, locs[3], len[3])
       if (width eq '*.') then begin
         result += string(args[a], format='(%"%d.")')
         a += 1L
@@ -67,8 +71,8 @@ function mg_format, format, args, simple=simple
     endif
 
     ; handle precision
-    if (locs[3] ne -1L) then begin
-      precision = strmid(_format, locs[3], len[3])
+    if (locs[4] ne -1L) then begin
+      precision = strmid(_format, locs[4], len[4])
       if (precision eq '*') then begin
         if (a ge n_elements(args)) then message, 'invalid format: not enough arguments'
 
@@ -80,7 +84,7 @@ function mg_format, format, args, simple=simple
     endif
 
     ; add specifier
-    result += strmid(_format, locs[4], len[4])
+    result += strmid(_format, locs[5], len[5])
 
     ; remove used part of _format
     if (strlen(_format) gt (locs[0] + len[0] + 1)) then begin
@@ -89,10 +93,10 @@ function mg_format, format, args, simple=simple
   endwhile
 
   locs = stregex(_format, re, length=len, /subexpr)
-  if ((locs[2] ne -1L) && (strmid(_format, locs[2], len[2]) eq '*.')) then begin
+  if ((locs[3] ne -1L) && (strmid(_format, locs[3], len[3]) eq '*.')) then begin
     message, 'invalid format: not enough arguments'
   endif
-  if ((locs[3] ne -1L) && (strmid(_format, locs[3], len[3]) eq '*')) then begin
+  if ((locs[4] ne -1L) && (strmid(_format, locs[4], len[4]) eq '*')) then begin
     message, 'invalid format: not enough arguments'
   endif
 

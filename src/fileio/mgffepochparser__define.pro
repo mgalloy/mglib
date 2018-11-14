@@ -124,17 +124,20 @@ function mgffepochparser::get, option, datetime=datetime
 
   ; get datetimes (sections) of epoch file and sort them chronologically
   dts = self.epochs->sections()
-  dts = dts[sort(dts)]
-  date_index = value_locate(dts, _datetime->strftime('%Y%m%d.%H%M%S'))
 
-  ; search for option in datetime/sections from current backwards
   found = 0B
-  for d = date_index, 0L, -1L do begin
-    value = self.epochs->get(option, section=dts[d], $
-                             found=found, $
+  if (n_elements(dts) gt 0L) then begin
+    dts = dts[sort(dts)]
+    date_index = value_locate(dts, _datetime->strftime('%Y%m%d.%H%M%S'))
+
+    ; search for option in datetime/sections from current backwards
+    for d = date_index, 0L, -1L do begin
+      value = self.epochs->get(option, section=dts[d], $
+                               found=found, $
                              type=type, extract=extract)
-    if (found) then break
-  endfor
+      if (found) then break
+    endfor
+  endif
 
   ; use default if not found
   if (~found) then begin

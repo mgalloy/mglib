@@ -16,13 +16,25 @@ function mg_fits_valid, f
 
   case size(f, /type) of
     7: begin
-        if (~file_test(f)) then is_valid = 0 else begin
-          fits_open, f, fcb
-          is_valid = size(fcb, /type) eq 8
+        if (~file_test(f)) then is_valid = 0B else begin
+          fits_open, f, fcb, /no_abort, message=msg
+          if (msg ne '') then is_valid = 0B else begin
+            is_valid = size(fcb, /type) eq 8
+            if (is_valid) then begin
+              fits_read, fcb, data, header, /no_abort, message=msg
+              is_valid = msg eq ''
+            endif
+          endelse
           fits_close, fcb
         endelse
       end
-    8: is_valid = size(f, /type) eq 8
+    8: begin
+        is_valid = size(f, /type) eq 8
+        if (is_valid) then begin
+          fits_read, f, data, header, /no_abort, message=msg
+          is_valid = msg eq ''
+        endif
+      end
     else: is_valid = 0B
   endcase
 
