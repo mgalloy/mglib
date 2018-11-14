@@ -40,7 +40,7 @@ pro mg_parse_spec_line, spec_line, $
     case strlowcase(tokens[0]) of
       'type': type = mg_get_type(tokens[1], boolean=boolean)
       'default': begin
-          default = tokens[1]
+          default = n_tokens gt 1L ? tokens[1] : ''
           default_found = 1B
         end
       'extract': begin
