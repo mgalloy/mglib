@@ -1,7 +1,65 @@
 ; docformat = 'rst'
 
-;= API
+;= helper methods
 
+;+
+; Create a string representation of the config file.
+;
+; :Returns:
+;   `strarr`
+;
+; :Keywords:
+;   substitute : in, optional, type=boolean
+;     set to perform substitutions
+;-
+function mgffspecoptions::_toString, substitute=substitute
+  compile_opt strictarr
+
+  first_line = 1B
+  output_list = list()
+
+  max_width = 0L
+  foreach sec, self.sections do begin
+    foreach option, sec, o do begin
+      max_width >= strlen(o)
+    endforeach
+  endforeach
+
+  format = string(max_width, format='(%"(\%\"\%-%ds \%s \%s\"\)")')
+
+  if (self.sections->hasKey('')) then begin
+    default_sec = (self.sections)['']
+    foreach option, default_sec, o do begin
+      first_line = 0B
+      output_list->add, string(o, self.output_separator, option, format=format)
+    endforeach
+  endif
+
+  foreach sec, self.sections, s do begin
+    if (s eq '') then continue
+    if (~first_line) then output_list->add, '' else first_line = 0B
+
+    output_list->add, string(s, format='(%"[%s]")')
+    foreach option, sec, o do begin
+      option_value = keyword_set(substitute) ? self->get(o, section=s) : option
+
+      if (s ne 'DEFAULT') then begin
+        spec_line = self.spec->get(o, section=s)
+        mg_parse_spec_line, spec_line, boolean=boolean
+        if (keyword_set(boolean)) then option_value = long(option_value) ? 'YES' : 'NO'
+      endif
+
+      output_list->add, string(o, self.output_separator, option_value, format=format)
+    endforeach
+  endforeach
+
+  output = transpose(output_list->toArray())
+  obj_destroy, output_list
+  return, output
+end
+
+
+;= API
 
 ;+
 ; Determine if the options are valid by the specification.
