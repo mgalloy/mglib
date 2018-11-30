@@ -14,13 +14,15 @@
 ; :Keywords:
 ;   column_size : in, optional, type=long, default=76
 ;     size of rows to break output into
+;   encoded : in, optional, type=boolean
+;     set to indicate `im` is already in encoded in png or some other format
 ;-
-function mg_base64_image, im, column_size=column_size
+function mg_base64_image, im, column_size=column_size, encoded=encoded
   compile_opt strictarr
 
   _column_size = n_elements(column_size) eq 0L ? 76L : column_size
 
-  s = idl_base64(mg_encode_png(im))
+  s = idl_base64(keyword_set(encoded) ? im : mg_encode_png(im))
 
   n = strlen(s)
   if (n mod _column_size ne 0L) then begin
