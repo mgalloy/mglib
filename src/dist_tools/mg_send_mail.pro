@@ -48,18 +48,8 @@ pro mg_send_mail, address, subject, body, $
 
   if (keyword_set(html)) then begin
     _subject = string(subject, format='(%"%s\\nContent-Type: text/html")')
-    if (keyword_set(filename)) then begin
-      _body_filename = body[0]
-    endif else begin
-      _body = '<html><body><pre>' + mg_strmerge(body) + '</pre></body></html>'
-    endelse
   endif else begin
     _subject = subject
-    if (keyword_set(filename)) then begin
-      _body_filename = body[0]
-    endif else begin
-      _body = mg_strmerge(body)
-    endelse
   endelse
 
   mail_cmd = string(_subject, _attachments, _from, address, $
@@ -67,9 +57,9 @@ pro mg_send_mail, address, subject, body, $
 
   ; how to pipe to mail depends on whether a file or strarr
   if (keyword_set(filename)) then begin
-    cmd = string(mail_cmd, _body_filename, format='(%"%s < %s")')
+    cmd = string(mail_cmd, body[0], format='(%"%s < %s")')
   endif else begin
-    cmd = string(_body, mail_cmd, format='(%"echo -e \"%s\" | %s")')
+    cmd = string(mg_strmerge(body), mail_cmd, format='(%"echo -e \"%s\" | %s")')
   endelse
 
   spawn, cmd, result, error_result, exit_status=error
