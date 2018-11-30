@@ -82,6 +82,7 @@ function mgffoptions::_toString, substitute=substitute
     output_list->add, string(s, format='(%"[%s]")')
     foreach option, sec, o do begin
       option_value = keyword_set(substitute) ? self->get(o, section=s) : option
+      option_value = strtrim(option_value, 2)
       output_list->add, string(o, self.output_separator, option_value, format=format)
     endforeach
   endforeach
