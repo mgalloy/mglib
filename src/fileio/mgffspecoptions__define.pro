@@ -49,6 +49,8 @@ function mgffspecoptions::_toString, substitute=substitute
         if (keyword_set(boolean)) then option_value = long(option_value) ? 'YES' : 'NO'
       endif
 
+      option_value = strtrim(option_value, 2)
+
       output_list->add, string(o, self.output_separator, option_value, format=format)
     endforeach
   endforeach
