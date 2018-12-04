@@ -172,6 +172,10 @@ function mgffspecoptions::get, option, $
                         extract=extract, $
                         default=default
   endif else begin
+    if (strlowcase(section) ne 'default') then begin
+      message, string(option, section, $
+                      format='(%"option=%s, section=%s not found in spec")')
+    endif
     type = 7
     extract = 0B
     default = ''
@@ -185,6 +189,7 @@ function mgffspecoptions::get, option, $
                                  default=default, $
                                  found=found, $
                                  count=count)
+
   return, value
 end
 
