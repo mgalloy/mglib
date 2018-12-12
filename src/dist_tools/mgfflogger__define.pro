@@ -37,8 +37,8 @@
 ;       '%(time)s %(levelshortname)s: %(routine)s: %(message)s'
 ;
 ;     where the possible names to include are: "time", "levelname",
-;     "levelshortname", "routine", "stacktrace", "name", "fullname" and
-;     "message".
+;     "levelshortname", "routine", "stacktrace", "name", "fullname",
+;     "message", and "pid".
 ;
 ;     Note that the "time" argument will first be formatted using the
 ;     `TIME_FORMAT` specification
@@ -56,6 +56,25 @@
 ;     any keyword accepted by `MGffLogger::setProperty`
 ;-
 
+
+;+
+; Returns process ID as a string if `MG_PID` available, otherwise empty string.
+;
+; :Returns:
+;   string
+;-
+function mgfflogger::pid
+  compile_opt strictarr
+
+  catch, error
+  if (error ne 0L) then begin
+    catch, /cancel
+    return, ''
+  endif
+
+  pid = mg_pid()
+  return, pid
+end
 
 
 ;+
@@ -421,7 +440,8 @@ pro mgfflogger::print, msg, $
               stacktrace: strjoin(stack[0:n_elements(stack) - 2L - _back_levels].routine, $
                                   '->'), $
               name: self.name, $
-              fullname: fullname $
+              fullname: fullname, $
+              pid: self->pid() $
              }
       s = mg_subs(self.format, create_struct(vars, 'message', msg))
 
