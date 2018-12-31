@@ -21,7 +21,7 @@
 ;   length : out, optional, type=lonarr(2)
 ;     length of the header and trailer
 ;-
-function mg_zip_headertrailer, pdata, header=header, trailer=trailer, length=len
+function mg_zipfile_headertrailer, pdata, header=header, trailer=trailer, length=len
   compile_opt idl2, hidden
 
   if (~ptr_valid(pdata)) then return, 0
@@ -89,8 +89,8 @@ end
 ;   local_header : out, optional, type=bytarr
 ;     byte array buffer of local header
 ;-
-function mg_zip_localheader, header, trailer, comp_size, filename, $
-                             local_header=local_header
+function mg_zipfile_localheader, header, trailer, comp_size, filename, $
+                                 local_header=local_header
   compile_opt idl2, hidden
 
   if (~isa(header) || ~isa(trailer) || ~isa(comp_size) || ~isa(filename)) then $
@@ -171,13 +171,13 @@ end
 ;   central_dir : out, required, type=bytarr
 ;     central header
 ;-
-function mg_zip_centralheader, compHdr, $
-                               compTrailer, $
-                               compressed_size, $
-                               filename, $
-                               local_hdr_offset, $
-                               num_centralDir, $
-                               central_dir=centralDirHdr
+function mg_zipfile_centralheader, compHdr, $
+                                   compTrailer, $
+                                   compressed_size, $
+                                   filename, $
+                                   local_hdr_offset, $
+                                   num_centralDir, $
+                                   central_dir=centralDirHdr
   compile_opt idl2, hidden
 
   big_endian = (byte(1, 0, 2))[0] eq 0B
@@ -263,10 +263,10 @@ end
 ;   end_central_dir : out, required, type=bytarr
 ;     end of central header
 ;-
-function mg_zip_endcentralheader, centralDirSize, $
-                                  centralDir_offset, $
-                                  num_centralDir, $
-                                  end_central_dir=supp_endCentralDir
+function mg_zipfile_endcentralheader, centralDirSize, $
+                                      centralDir_offset, $
+                                      num_centralDir, $
+                                      end_central_dir=supp_endCentralDir
   compile_opt idl2, hidden
 
   big_endian = (byte(1, 0, 2))[0] eq 0B
@@ -328,7 +328,7 @@ end
 ;   error : out, optional, type=integer
 ;     error code from creating zip file, 0 for success and 1 for failure
 ;-
-pro mg_zip, zipfile, files, delete=delete, error=error
+pro mg_zipfile, zipfile, files, delete=delete, error=error
   compile_opt idl2, hidden
   on_ioerror, ioFailed
 
@@ -351,10 +351,10 @@ pro mg_zip, zipfile, files, delete=delete, error=error
       compressed_file_buffer = mg_compress(file_buffer, n_bytes=comp_size)
       pcompressed_file_buffer = ptr_new(compressed_file_buffer)
 
-      status = mg_zip_headertrailer(pcompressed_file_buffer, $
-                                    header=compHdr, $
-                                    trailer=compTrailer, $
-                                    length=hdrTrlLen)
+      status = mg_zipfile_headertrailer(pcompressed_file_buffer, $
+                                        header=compHdr, $
+                                        trailer=compTrailer, $
+                                        length=hdrTrlLen)
       if (status eq 0) then begin
         error = 1L
         return
@@ -367,11 +367,11 @@ pro mg_zip, zipfile, files, delete=delete, error=error
 
       localheader_offsets[i] = n_elements(zip_data)
 
-      status = mg_zip_localheader(compHdr, $
-                                  compTrailer, $
-                                  compressed_size[i], $
-                                  files[i],$
-                                  local_header=localHdr)
+      status = mg_zipfile_localheader(compHdr, $
+                                      compTrailer, $
+                                      compressed_size[i], $
+                                      files[i],$
+                                      local_header=localHdr)
       if (status eq 0) then begin
         error = 1L
         return
@@ -385,13 +385,13 @@ pro mg_zip, zipfile, files, delete=delete, error=error
   combined_centralDir = !null
   centralDir_offset = n_elements(supp_zipdata) + n_elements(centralDir)
   for i = 0L, nfiles - 1L do begin
-    status = mg_zip_centralheader(headers[i], $
-                                  trailers[i], $
-                                  compressed_size[i], $
-                                  files[i], $
-                                  localheader_offsets[i], $
-                                  nfiles, $
-                                  central_dir=centralDir)
+    status = mg_zipfile_centralheader(headers[i], $
+                                      trailers[i], $
+                                      compressed_size[i], $
+                                      files[i], $
+                                      localheader_offsets[i], $
+                                      nfiles, $
+                                      central_dir=centralDir)
     if (status eq 0) then begin
       error = 1L
       return
@@ -402,10 +402,10 @@ pro mg_zip, zipfile, files, delete=delete, error=error
   endfor
 
   ; create end cenral directory header
-  status = mg_zip_endcentralheader(n_elements(combined_centralDir), $
-                                   n_elements(zip_data), $
-                                   nfiles, $
-                                   end_central_dir=endCentralDir)
+  status = mg_zipfile_endcentralheader(n_elements(combined_centralDir), $
+                                       n_elements(zip_data), $
+                                       nfiles, $
+                                       end_central_dir=endCentralDir)
   if (status eq 0) then begin
     error = 1L
     return
