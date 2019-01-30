@@ -120,7 +120,9 @@ function mgffepochparser::get, option, datetime=datetime
   if (~spec_found) then begin
     message, string(option, format='(%"no specification for %s found")')
   endif
-  mg_parse_spec_line, spec_line, type=type, extract=extract, default=default
+  mg_parse_spec_line, spec_line, $
+                      type=type, boolean=boolean, $
+                      extract=extract, default=default
 
   ; get datetimes (sections) of epoch file and sort them chronologically
   dts = self.epochs->sections()
@@ -134,7 +136,7 @@ function mgffepochparser::get, option, datetime=datetime
     for d = date_index, 0L, -1L do begin
       value = self.epochs->get(option, section=dts[d], $
                                found=found, $
-                             type=type, extract=extract)
+                               type=type, boolean=boolean, extract=extract)
       if (found) then break
     endfor
   endif
