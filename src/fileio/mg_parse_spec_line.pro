@@ -13,6 +13,7 @@ pro mg_parse_spec_line, spec_line, $
                         type=type, $
                         boolean=boolean, $
                         extract=extract, $
+                        optional=optional, $
                         default=default
   compile_opt strictarr
 
@@ -20,6 +21,7 @@ pro mg_parse_spec_line, spec_line, $
   boolean = 0B
   default_found = 0B
   extract = 0B
+  optional = 0B
   default = !null
 
   expressions = strsplit(spec_line, ',', /extract, count=n_expressions)
@@ -43,6 +45,7 @@ pro mg_parse_spec_line, spec_line, $
           default = n_tokens gt 1L ? tokens[1] : ''
           default_found = 1B
         end
+      'optional': optional = mg_convert_boolean(tokens[1])
       'extract': begin
           extract = mg_convert_boolean(tokens[1])
         end

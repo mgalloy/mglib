@@ -96,7 +96,7 @@ function mgffspecoptions::is_valid, error_msg=error_msg
     endif
   endfor
 
-  ; check that every spec without a default is given
+  ; check that every spec without a default is given, unless optional
   self.spec->getProperty, sections=spec_sections
   for s = 0L, n_elements(spec_sections) - 1L do begin
     spec_options = self.spec->options(section=spec_sections[s], count=n_options)
@@ -105,8 +105,9 @@ function mgffspecoptions::is_valid, error_msg=error_msg
       mg_parse_spec_line, spec_line, $
                           type=type, $
                           extract=extract, $
+                          optional=optional, $
                           default=default
-      if (n_elements(default) eq 0L) then begin
+      if (n_elements(default) eq 0L && ~optional) then begin
         value = self->mgffoptions::get(spec_options[o], $
                                        section=spec_sections[s], $
                                        found=found)
@@ -138,23 +139,9 @@ end
 ;     section to search for option in
 ;   found : out, optional, type=boolean
 ;     set to a named variable to determine if the option is found
-;   raw : in, optional, type=boolean
-;     set to retrieve value with no processing
-;   extract : in, optional, type=boolean
-;     set to return an array of the elements in a value that is formatted like::
-;
-;       [0, 1, 2]
-;
-;   boolean : in, optional, type=boolean
-;     set to convert retrieved values to boolean values, 0B or 1B; accepts 1,
-;     "yes", "true" (either case) as true, everything else as false
-;   type : in, optional, type=integer
-;     type code to convert result to; default is a string
 ;   count : out, optional, type=long
 ;     set to a named variable to determine the number of elements returned (most
 ;     useful when using `EXTRACT`)
-;   default : in, optional, type=string
-;     default value to return if option is not found
 ;-
 function mgffspecoptions::get, option, $
                                section=section, $
@@ -170,6 +157,7 @@ function mgffspecoptions::get, option, $
                         type=type, $
                         boolean=boolean, $
                         extract=extract, $
+                        optional=optional, $
                         default=default
   endif else begin
     if (strlowcase(section) ne 'default') then begin
