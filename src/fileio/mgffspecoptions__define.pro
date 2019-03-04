@@ -46,7 +46,10 @@ function mgffspecoptions::_toString, substitute=substitute
       if (s ne 'DEFAULT') then begin
         spec_line = self.spec->get(o, section=s)
         mg_parse_spec_line, spec_line, boolean=boolean
-        if (keyword_set(boolean)) then option_value = long(option_value) ? 'YES' : 'NO'
+
+        if (keyword_set(boolean)) then begin
+          option_value = mg_convert_boolean(option_value) ? 'YES' : 'NO'
+        endif
       endif
 
       option_value = strtrim(option_value, 2)
