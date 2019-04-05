@@ -69,6 +69,7 @@ function mgfflogger::pid
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
+    message, /reset
     return, ''
   endif
 
