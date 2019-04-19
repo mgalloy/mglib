@@ -52,7 +52,8 @@ pro mg_stepchart_plotflats, x, y, thick=thick, fill=fill, color=color, _extra=e
                 [0, y[2 * s], y[2 * s + 1], 0], $
                 thick=thick, color=color, _extra=e
     endif
-    plots, [x[2 * s], x[2 * s + 1]], [y[2 * s], y[2 * s + 1]], thick=thick, color=color, _extra=e
+    plots, [x[2 * s], x[2 * s + 1]], [y[2 * s], y[2 * s + 1]], $
+           thick=thick, color=color, _extra=e
   endfor
 end
 
