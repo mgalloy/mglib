@@ -92,6 +92,8 @@ end
 ;     if set, indicates the input is a Encapsulated PostScript file
 ;   from_png : in, optional, type=boolean
 ;     if set, indicates the input is a PNG file
+;   from_gif : in, optional, type=boolean
+;     if set, indicates the input is a GIF file
 ;   from_ps : in, optional, type=boolean
 ;     if set, indicates the input is a PostScript file
 ;   max_dimensions : in, optional, type=lonarr(2)
@@ -102,6 +104,8 @@ end
 ;     if set, indicates the output should a Encapsulated Postscript file
 ;   to_png : in, optional, type=boolean
 ;     if set, indicates the output should a PNG image file
+;   to_gif : in, optional, type=boolean
+;     if set, indicates the output should a GIF image file
 ;   to_ps : in, optional, type=boolean
 ;     if set, indicates the output should a Postscript file
 ;   command : out, optional, type=string
@@ -115,6 +119,9 @@ end
 ;     set to keep output file even if `OUTPUT` is present
 ;   cleanup : in, optional, type=boolean
 ;     set to remove input file
+;   error : in, optional, type=long
+;     set to a named variable to retrieve the exit status of the `convert`
+;     command
 ;-
 pro mg_convert, basename, $
                 density=density, $
@@ -124,23 +131,29 @@ pro mg_convert, basename, $
                 from_extension=fromExtension, $
                 from_eps=fromEps, $
                 from_png=fromPng, $
+                from_gif=from_gif, $
                 from_ps=fromPs, $
                 to_extension=toExtension, $
                 to_eps=toEps, $
                 to_png=toPng, $
+                to_gif=toGif, $
                 to_ps=toPs, $
                 command=cmd, $
                 output=output, $
                 convert_location=convertLocation, $
                 keep_output=keep_output, $
-                cleanup=cleanup
+                cleanup=cleanup, $
+                error=error
   compile_opt strictarr
   on_error, 2
+
+  error = 0L
 
   case 1 of
     n_elements(fromExtension) gt 0L: inputExtension = fromExtension
     keyword_set(fromEps): inputExtension = 'eps'
     keyword_set(fromPng): inputExtension = 'png'
+    keyword_set(fromGif): inputExtension = 'gif'
     keyword_set(fromPs): inputExtension = 'ps'
     else: inputExtension = 'ps'
   endcase
@@ -149,6 +162,7 @@ pro mg_convert, basename, $
     n_elements(toExtension) gt 0L: outputExtension = toExtension
     keyword_set(toEps): outputExtension = 'eps'
     keyword_set(toPng): outputExtension = 'png'
+    keyword_set(toGif): outputExtension = 'gif'
     keyword_set(toPs): outputExtension = 'ps'
     else: outputExtension = 'png'
   endcase
@@ -191,8 +205,18 @@ pro mg_convert, basename, $
                outputExtension)
 
   ; run ImageMagick and check for an error
-  spawn, cmd, result, errorResult, exit_status=err
-  if (err ne 0L || strjoin(errorResult) ne '') then message, errorResult[0]
+  spawn, cmd, result, error_result, exit_status=error
+  if (arg_present(error)) then begin
+    if (error ne 0L) then return
+  endif else begin
+    if (error eq 0L) then begin
+      if (strjoin(error_result) ne '') then begin
+        message, mg_strmerge(error_result), /informational
+      endif
+    endif else begin
+      message, mg_strmerge(error_result)
+    endelse
+  endelse
 
   ; send output back if requested
   if (arg_present(output)) then begin
