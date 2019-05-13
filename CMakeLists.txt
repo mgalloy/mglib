@@ -166,3 +166,6 @@ add_custom_target(dist
 if (IDLdoc_FOUND)
   add_dependencies(dist doc userdoc)
 endif ()
+
+message(STATUS "mglib ${VERSION}")
+message(STATUS "Installation location = ${CMAKE_INSTALL_PREFIX}")
