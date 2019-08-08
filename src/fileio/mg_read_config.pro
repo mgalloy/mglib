@@ -103,7 +103,7 @@ function mg_read_config, filename, $
   if (~file_test(filename)) then begin
     error = -1L
     errmsg = string(filename, format='(%"%s not found")')
-    if (~arg_present(error)) then message, errmsg, /informational
+    if (~arg_present(error)) then message, errmsg
 
     return, obj_new()
   endif
