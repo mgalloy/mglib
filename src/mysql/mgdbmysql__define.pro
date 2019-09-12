@@ -375,7 +375,8 @@ function mgdbmysql::query, sql_query, $
                            status=status, $
                            error_message=error_message, $
                            n_affected_rows=n_affected_rows, $
-                           n_warnings=n_warnings
+                           n_warnings=n_warnings, $
+                           count=count
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -426,7 +427,7 @@ function mgdbmysql::query, sql_query, $
     endelse
   endif
 
-  query_result = self->_get_results(result, fields=fields)
+  query_result = self->_get_results(result, fields=fields, n_rows=count)
 
   mg_mysql_free_result, result
 
