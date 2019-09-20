@@ -501,6 +501,7 @@ pro mgdbmysql::execute, sql_query, $
   on_error, 2
   on_ioerror, bad_fmt
 
+  n_warnings = 0UL
   sql_query_fmt = '(%"' + sql_query + '")'
   case n_params() of
      0: _sql_query = ''
