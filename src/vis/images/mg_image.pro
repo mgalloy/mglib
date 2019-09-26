@@ -146,6 +146,9 @@ end
 ;    scale : in, optional, type=float, default=1.0
 ;       set to scale the creation of a new window to a fraction of the image
 ;       size
+;    smooth_kernel : in, optional, type="lonarr(2)"
+;       if present, smooth the image using `smooth_kernel` as the Gaussian
+;       kernel sizes
 ;    no_scale : in, optional, type=boolean
 ;       set to not scale the image values into the display range
 ;    no_data : in, optional, type=boolean
@@ -172,6 +175,7 @@ pro mg_image, im, x, y, $
               max_value=max_value, $
               axes=axes, $
               scale=scale, $
+              smooth_kernel=smooth_kernel, $
               new_window=newWindow, $
               no_scale=noScale, $
               no_data=noData, $
@@ -280,7 +284,10 @@ pro mg_image, im, x, y, $
   _min_value = n_elements(min_value) eq 0L ? min(im) : min_value
   _max_value = n_elements(max_value) eq 0L ? max(im) : max_value
 
+
+  im_nan_indices = where(finite(im) eq 0, im_nan_count)
   _im = (im < _max_value) > _min_value
+  if (im_nan_count gt 0L) then _im[im_nan_indices] = !values.f_nan
 
   ; stretch if requested
   _im = n_elements(stretch) eq 0L ? _im : hist_equal(_im, percent=stretch)
@@ -299,6 +306,23 @@ pro mg_image, im, x, y, $
     endif else begin
       displayIm = mg_image_resize(_im, displaySize[0], displaySize[1], $
                                   true=_true, _extra=e)
+
+      if (n_elements(smooth_kernel) gt 0L) then begin
+        kernel = gaussian_function(smooth_kernel)
+
+        after_resize_nan_indices = where(finite(displayIm) eq 0, $
+                                         after_resize_nan_count)
+
+        orig_min = min(displayIm, max=orig_max)
+        displayIm = convol(displayIm, kernel, /nan, /center, /edge_mirror)
+        new_min = min(displayIm, max=new_max)
+        displayIm = (orig_max - orig_min) * (displayIm - new_min) / (new_max - new_min) $
+                      + orig_min
+
+        if (after_resize_nan_count gt 0L) then begin
+          displayIm[after_resize_nan_indices] = !values.f_nan
+        endif
+      endif
       mg_image_tv, displayIm, lower[0] + lineThick, lower[1] + lineThick, $
                    true=_true, scale=scale, n_channels=nchannels, $
                    min_value=_min_value, max_value=_max_value, _extra=e
