@@ -28,7 +28,7 @@
 ;    outputs : in, required, type=1-dimensional array
 ;       output values corresponding to the `DIVIDERS` values
 ;-
-function mg_scaleimage, im, dividers=dividers, outputs=outputs
+function mg_image_scale_pwl, im, dividers=dividers, outputs=outputs
   compile_opt strictarr
 
   bins = value_locate(dividers, im)
@@ -39,8 +39,8 @@ function mg_scaleimage, im, dividers=dividers, outputs=outputs
     if (count eq 0L) then continue
 
     ; linearly scale elements in ind to _outputs[i].._outputs[i + 1]
-    result[ind] = mg_linear_function(dividers[b:b+1], outputs[b:b+1], $
-                                     data=im[ind])
+    f = mg_linear_function(dividers[b:b+1], outputs[b:b+1])
+    result[ind] = f[0] + f[1] * im[ind]
   endfor
 
   return, result
@@ -56,7 +56,7 @@ tvlct, mg_cpt2ct('ngdc/ETOPO1.cpt')
 mg_decomposed, 0, old_decomposed=odec
 
 mg_image, read_image(file_which('elev_t.jpg')), /new_window
-mg_image, mg_scaleimage(elev, dividers=[0, 1, 256], outputs=[0, 144, 256]), $
+mg_image, mg_image_scale_pwl(elev, dividers=[0, 1, 256], outputs=[0, 144, 256]), $
           /new_window
 
 mg_decomposed, odec

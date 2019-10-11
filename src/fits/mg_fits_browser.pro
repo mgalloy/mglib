@@ -715,6 +715,20 @@ pro mg_fits_browser::_handle_tree_event, event
     *self.current_header = header
     self.current_filename = filename
 
+    x_center = sxpar(header, 'CRPIX1', count=n_crpix1)
+    y_center = sxpar(header, 'CRPIX2', count=n_crpix2)
+    self.has_center = n_crpix1 eq 1L && n_crpix2 eq 1L
+    self.current_center = [x_center, y_center] - 1L
+    cdelt1 = sxpar(header, 'CDELT1', count=n_delt1)
+    cdelt2 = sxpar(header, 'CDELT2', count=n_delt2)
+    date_obs = sxpar(header, 'DATE-OBS', count=n_dateobs)
+    time_obs = sxpar(header, 'TIME-OBS', count=n_timeobs)
+    fmt = '%Y-%m-%dT%H:%M:%S'
+    d = mg_strptime(date_obs + 'T' + time_obs, fmt)
+    fractional_hour = d.hour + (d.minute + d.second / 60.0) / 60.0
+    sun, d.year, d.month, d.day, fractional_hour, sd=radsun
+    self.current_sunpix = [cdelt1, cdelt2] / radsun
+
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
     widget_control, header_widget, set_value=self->_filter_header(header)
@@ -823,8 +837,21 @@ pro mg_fits_browser::_set_status_for_draw, event
     ; nothing
   endif else if (self.currently_selected[1] lt 1) then begin
     value = (*self.current_data)[x, y]
-    self->set_status, string(x, y, value, $
-                             format='(%"x: %d, y: %d, value: ' + fc + '")'), $
+    if (self.has_center) then begin
+      xc = x - self.current_center[0]
+      yc = y - self.current_center[1]
+
+      r = sqrt((xc * self.current_sunpix[0])^2 + (yc * self.current_sunpix[1])^2)
+      theta = atan(yc, xc) * !radeg - 90.0
+      if (theta lt 0.0) then theta += 360.0
+
+      polar_coords = string(r, mg_deg2dms(theta), $
+                            format='(%"r: %0.2f R_sun, PA: %d deg %d'' %d'''', ")')
+    endif else begin
+      polar_coords = ''
+    endelse
+    self->set_status, string(x, y, polar_coords, value, $
+                             format='(%"x: %d, y: %d, %svalue: ' + fc + '")'), $
                       /secondary
   endif else begin
     self->set_status, string(x, y, $
@@ -1418,6 +1445,9 @@ pro mg_fits_browser__define
              current_filename: '', $
              current_data: ptr_new(), $
              current_header: ptr_new(), $
+             has_center: 0B, $
+             current_center: fltarr(2), $
+             current_sunpix: fltarr(2), $
              compare_filename: '', $
              compare_data: ptr_new(), $
              compare_header: ptr_new() $

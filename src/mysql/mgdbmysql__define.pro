@@ -375,7 +375,8 @@ function mgdbmysql::query, sql_query, $
                            status=status, $
                            error_message=error_message, $
                            n_affected_rows=n_affected_rows, $
-                           n_warnings=n_warnings
+                           n_warnings=n_warnings, $
+                           count=count
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
@@ -426,7 +427,7 @@ function mgdbmysql::query, sql_query, $
     endelse
   endif
 
-  query_result = self->_get_results(result, fields=fields)
+  query_result = self->_get_results(result, fields=fields, n_rows=count)
 
   mg_mysql_free_result, result
 
@@ -500,6 +501,7 @@ pro mgdbmysql::execute, sql_query, $
   on_error, 2
   on_ioerror, bad_fmt
 
+  n_warnings = 0UL
   sql_query_fmt = '(%"' + sql_query + '")'
   case n_params() of
      0: _sql_query = ''
@@ -893,6 +895,8 @@ end
 ;     name of section in `config_filename` containing connection information;
 ;     this section must contain `user` and `password` with optional values
 ;     for `host`, `database`, `port`, and `socket`
+;   multi_statements : in, optional, type=boolean
+;     set to allow multiple statements separated by ";"
 ;   status : out, optional, type=integer
 ;     set to a named variable to retrieve the status of the connection, 0 for
 ;     success; if not 0, `ERROR_MESSAGE` should be set to a non-empty message
@@ -907,6 +911,7 @@ pro mgdbmysql::connect, host=host, $
                         socket=socket, $
                         config_filename=config_filename, $
                         config_section=config_section, $
+                        multi_statements=multi_statements, $
                         status=status, $
                         error_message=error_message
   compile_opt strictarr
@@ -977,6 +982,7 @@ pro mgdbmysql::connect, host=host, $
   endelse
 
   flags = 0ULL
+  if (keyword_set(multi_statements)) then flags or= ishft(1ULL, 16)
 
   tmp = mg_mysql_real_connect(self.connection, $
                               self.host, _user, _password, $
