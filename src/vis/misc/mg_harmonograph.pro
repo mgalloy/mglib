@@ -15,8 +15,8 @@ end
 
 ; main-level example program
 
-n = 100L * 360L 
-t = findgen(n) * !dtor
+n = 10000L
+t = 100.0 * findgen(n) / (n - 1)  ; 0.0 ... 100.0
 coords = mg_harmonograph(3, 4, 0.01, 0.02, t, phi1=0.0, phi2=sqrt(2))
 
 window, xsize=1000, ysize=1000
