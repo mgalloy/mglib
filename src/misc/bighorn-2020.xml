@@ -1,0 +1,46 @@
+<timeline start="9-16-2019" end="7-31-2020" ticks="weeks" color="black">
+  <activity report="weekly" name="!4week!X" level="0.1" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46</activity>
+  <activity report="weekly" name="!4year week!X" level="0.25" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31</activity>
+
+  <activity report="weekly" name="!4week!X" level="7.9" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46</activity>
+  <activity report="weekly" name="!4year week!X" level="7.75" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31</activity>
+
+  <event color="red" date="3-28-2020" level="0.5">Fire on the Bayou</event>
+  <event color="red" date="6-13-2020" level="0.5">!4Regionals?!X</event>
+  <event color="red" date="7-17-2020" level="0.5">!4Masters Nationals!X</event>
+
+  <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="26">1 2 0 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18</activity>
+
+
+  <interval start="9-16-2019" end="11-28-2019" name="!4Phase I:!X Aerobic base!CGoal: run 30 min continuously" level="2.75" color="orange"/>
+
+  <interval start="11-18-2019" end="12-30-2019" name="!4Phase II:!X Aerobic base!CGoal: run 5K fast" level="3.0" color="orange"/>
+
+  <interval start="12-30-2019" end="2-10-2020" name="!4Phase III:!X Ultimate fitness!CGoal: fast beep test" level="3.25" color="orange"/>
+
+  <interval start="2-10-2020" end="3-23-2020" name="!4Phase IV:!X Pre-season" level="2.75" color="orange"/>
+
+  <interval start="3-23-2020" end="5-4-2020" name="!4Phase V:!X In-season 1" level="3.0" color="orange"/>
+
+  <interval start="5-4-2020" end="6-15-2020" name="!4Phase VI:!X In-season 2" level="3.25" color="orange"/>
+
+  <interval start="6-15-2020" end="7-20-2020" name="!4Phase VII:!X Maintenance" level="3.5" color="orange"/>
+
+
+
+  <interval start="10-14-2019" end="11-12-2019" name="!4Phase 1:!X Strength!C5-3-1" level="5.0" color="dodgerblue"/>
+  <interval start="11-18-2019" end="12-16-2019" name="!4Phase 2:!X Strength!C5-3-1" level="5.25" color="dodgerblue"/>
+  <interval start="12-23-2019" end="1-20-2020" name="!4Phase 3:!X Strength!C5-3-1" level="5.5" color="dodgerblue"/>
+  <interval start="1-27-2020" end="2-24-2020" name="!4Phase 4:!X Power" level="5.0" color="dodgerblue"/>
+  <interval start="3-2-2020" end="3-30-2020" name="!4Phase 5:!X Power" level="5.25" color="dodgerblue"/>
+  <interval start="4-6-2020" end="5-4-2020" name="!4Phase 6:!X Power Endurance" level="5.0" color="dodgerblue"/>
+  <interval start="5-11-2020" end="6-8-2020" name="!4Phase 7:!X Power Endurance" level="5.25" color="dodgerblue"/>
+  <interval start="6-15-2020" end="7-20-2020" name="!4Phase 8:!X Maintenance" level="5.0" color="dodgerblue"/>
+
+  <interval start="10-5-2019" end="3-8-2020" name="!4Goaltimate!X" level="6.0" color="violet"/>
+
+  <interval start="9-8-2019" end="11-12-2019" name="!4Fall league!X" level="6.5" color="pink"/>
+  <interval start="3-15-2020" end="5-18-2020" name="!4Spring league?!X" level="6.5" color="pink"/>
+  <interval start="5-31-2020" end="8-17-2020" name="!4Summer league?!X" level="6.5" color="pink"/>
+
+</timeline>

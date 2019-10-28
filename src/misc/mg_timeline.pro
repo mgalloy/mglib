@@ -866,8 +866,8 @@ end
 
 ; main-level program
 
-filename = filepath('athletic.xml', root=mg_src_root())
+filename = filepath('bighorn-2020.xml', root=mg_src_root())
 
-mg_timeline, filename, 'athletic.ps'
+mg_timeline, filename, 'bighorn-2020.ps'
 
 end
