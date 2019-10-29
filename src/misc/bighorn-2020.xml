@@ -1,13 +1,13 @@
-<timeline start="9-16-2019" end="7-31-2020" ticks="weeks" color="black">
-  <activity report="weekly" name="!4week!X" level="0.1" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46</activity>
-  <activity report="weekly" name="!4year week!X" level="0.25" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31</activity>
+<timeline start="9-16-2019" end="8-3-2020" ticks="weeks" color="black">
+  <activity report="weekly" name="!4week!X" level="0.1" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48</activity>
+  <activity report="weekly" name="!4year week!X" level="0.25" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33</activity>
 
-  <activity report="weekly" name="!4week!X" level="7.9" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46</activity>
-  <activity report="weekly" name="!4year week!X" level="7.75" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31</activity>
+  <activity report="weekly" name="!4week!X" level="7.9" color="orange">   1   2   3   4   5   6   7   8   9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48</activity>
+  <activity report="weekly" name="!4year week!X" level="7.75" color="orange">38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33</activity>
 
-  <event color="red" date="3-28-2020" level="0.75">Fire on the Bayou</event>
-  <event color="red" date="6-13-2020" level="0.75">!4Regionals?!X</event>
-  <event color="red" date="7-17-2020" level="0.75">!4Masters Nationals!X</event>
+  <event color="red" date="3-28-2020" level="0.75">Fire on the Bayou!C3/28-29</event>
+  <event color="red" date="6-13-2020" level="0.75">!4Regionals!X!C6/13?</event>
+  <event color="red" date="7-17-2020" level="0.75">!4Masters Nationals!X!C7/17-19</event>
 
   <interval color="orange" start="11-3-2019" end="3-8-2020" level="0.5" name="Non-daylight savings time"/>
 
@@ -15,7 +15,7 @@
   <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="29">3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18</activity>
 
 
-  <interval start="9-16-2019" end="11-28-2019" name="!4Phase I:!X Aerobic base!CGoal: run 30 min continuously" level="2.75" color="green"/>
+  <interval start="9-16-2019" end="11-18-2019" name="!4Phase I:!X Aerobic base!CGoal: run 30 min continuously" level="2.75" color="green"/>
 
   <interval start="11-18-2019" end="12-30-2019" name="!4Phase II:!X Aerobic base!CGoal: run 5K fast" level="3.0" color="green"/>
 

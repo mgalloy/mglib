@@ -686,7 +686,8 @@ pro mg_timeline, filename, outputFilename
         minor_length = 7.
         major_length = n_elements(major_length) eq 0L ? 4. : major_length
         minor = major_length - 1L
-        major = (endDate - startDate) / minor_length / major_length + 1.
+        major = ceil((endDate - startDate) / minor_length / major_length + 1.0)
+        endDate = startDate + (major - 1L) * major_length * minor_length
       end
   endcase
 
