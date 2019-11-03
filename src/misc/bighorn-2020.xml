@@ -9,10 +9,10 @@
   <event color="red" date="6-13-2020" level="0.75">!4Regionals!X!C6/13?</event>
   <event color="red" date="7-17-2020" level="0.75">!4Masters Nationals!X!C7/17-19</event>
 
-  <interval color="orange" start="11-3-2019" end="3-8-2020" level="0.5" name="Non-daylight savings time"/>
+  <interval color="orange" start="11-3-2019" end="3-8-2020" level="0.5" name="Standard time"/>
 
-  <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="26">1 2</activity>
-  <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="29">3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18</activity>
+  <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="25">1 2 3</activity>
+  <activity report="weekly" name="!4practice!X" level="1.25" color="green" start="29">4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19</activity>
 
 
   <interval start="9-16-2019" end="11-18-2019" name="!4Phase I:!X Aerobic base!CGoal: run 30 min continuously" level="2.75" color="green"/>
