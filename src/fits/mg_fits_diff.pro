@@ -109,7 +109,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
   if (n_notfound_keywords2 gt 0L) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"keywords in %s not found in %s: %s%s")'
-      differences->add, string(filename1, filename2, $
+      differences->add, string(filename2, filename1, $
                                strjoin(keywords2[notfound_ind2], ', '), $
                                _extension, $
                                format=fmt)
