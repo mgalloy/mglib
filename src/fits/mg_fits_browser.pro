@@ -724,7 +724,7 @@ pro mg_fits_browser::_handle_tree_event, event
     date_obs = sxpar(header, 'DATE-OBS', count=n_dateobs)
     time_obs = sxpar(header, 'TIME-OBS', count=n_timeobs)
     fmt = '%Y-%m-%dT%H:%M:%S'
-    d = mg_strptime(date_obs + 'T' + time_obs, fmt)
+    d = mg_strptime(mg_normalize_datetime(date_obs + 'T' + time_obs), fmt)
     fractional_hour = d.hour + (d.minute + d.second / 60.0) / 60.0
     sun, d.year, d.month, d.day, fractional_hour, sd=radsun
     self.current_sunpix = [cdelt1, cdelt2] / radsun
