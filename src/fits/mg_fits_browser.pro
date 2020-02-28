@@ -917,18 +917,26 @@ pro mg_fits_browser::_compute_box_stats, event
   y = [y1 < y2, y1 > y2]
 
   values = float((*self.current_data)[x[0]:x[1], y[0]:y[1]])
+  finite_indices = where(finite(values), n_finite_values, /null)
+  finite_values = values[finite_indices]
   n_values = n_elements(values)
   fc = self->_format_code_for_data()
 
-  if (n_values eq 1) then begin
+  if (n_values le 1) then begin
     msg = string(x[0], y[0], values[0], $
                  format='(%"x: %d, y: %d, value: ' + fc + '")')
+  endif else if (n_finite_values le 1) then begin
+    msg = string(x, y, $
+                 format='(%"x: %d:%d, y: %d:%d, no values in annulus")')
   endif else begin
     msg = string(x, y, $
-                 mean(values), median(values), stddev(values), $
-                 min(values, max=max_value), max_value, $
-                 n_values, $
-                 format='(%"x: %d:%d, y: %d:%d, mean: %0.1f, median: %0.1f, std dev: %0.1f, range: [' + fc + ', ' + fc + '] (%d values)")')
+                 mean(finite_values, /nan), $
+                 median(finite_values), $
+                 stddev(finite_values, /nan), $
+                 min(finite_values, max=max_value, /nan), $
+                 max_value, $
+                 n_finite_values, $
+                 format='(%"x: %d:%d, y: %d:%d, mean: %0.1f, median: %0.1f, std dev: %0.1f, range: [' + fc + ', ' + fc + '] (%d values in annulus)")')
   endelse
   self->set_status, msg
 end
