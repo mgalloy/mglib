@@ -34,8 +34,17 @@ end
 ;   verbose : in, optional, type=boolean
 ;     set to display descriptions of the versions instead of just version
 ;     numbers and release dates
+;   quiet : in, optional, type=boolean
+;     set to not print anything, overrides `VERBOSE` keyword
+;   releases : in, optional, type="array of structures"
+;     set to a named variable to retrieve an array of structures representing
+;     releases; each release is a structure with fields `id`, `product`,
+;     `version`, `build_id`, `date`, `download_url`, `description`, `license`,
+;     and `info_url`
 ;-
-pro mg_check_idl_updates, version=version, verbose=verbose
+pro mg_check_idl_updates, version=version, $
+                          verbose=verbose, quiet=quiet, $
+                          releases=releases
   compile_opt strictarr
 
   base_url = 'http://updates.harrisgeospatial.com/checkupdate.php'
@@ -45,20 +54,22 @@ pro mg_check_idl_updates, version=version, verbose=verbose
                format='%s?platform=%s_%s&idl=%s')
 
   json_text = mg_get_url_content(url)
-  response = json_parse(json_text)
+  releases = json_parse(json_text, /toarray, /tostruct)
+
+  if (keyword_set(quiet)) then return
 
   if (keyword_set(verbose)) then termcolumns = mg_check_idl_updates_termcolumns()
 
-  for r = n_elements(response) - 1L, 0L, -1L do begin
-    release = response[r]
+  for r = n_elements(releases) - 1L, 0L, -1L do begin
+    release = releases[r]
 
-    title = string(release["version"], release["date"], format='%-6s [%s]')
+    title = string(release.version, release.date, format='%-6s [%s]')
     print, title
 
     if (keyword_set(verbose)) then begin
       underline = string(bytarr(strlen(title)) + (byte('-'))[0])
       print, underline
-      description = mg_strunmerge(release["description"])
+      description = mg_strunmerge(release.description)
       for d = 0L, n_elements(description) - 1L do begin
         description_line = mg_strwrap(description[d], $
                                       width=termcolumns, $
