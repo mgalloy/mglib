@@ -185,6 +185,19 @@ function mgffspecoptions::get, option, $
 end
 
 
+;= property access
+
+pro mgffspecoptions::getProperty, spec=spec, _ref_extra=e
+  compile_opt strictarr
+
+  if (arg_present(spec)) then spec = self.spec
+
+  if (n_elements(e) gt 0L) then begin
+    self->mgffoptions::getProperty, _strict_extra=e
+  endif
+end
+
+
 ;= lifecycle methods
 
 pro mgffspecoptions::cleanup
