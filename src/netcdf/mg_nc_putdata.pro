@@ -58,11 +58,16 @@ end
 ; :Keywords:
 ;   dim_names : in, optional, type=strarr
 ;     string array of dimension names
+;   fill_value : in, optional, type=numeric
+;     value to set the `_FillValue` attribute to, only valid if `descriptor` is
+;     a variable and creating a new file
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
 pro mg_nc_putdata_putvariable, parent_id, varname, data, $
-                               dim_names=dim_names, error=error
+                               dim_names=dim_names, $
+                               fill_value=fill_value, $
+                               error=error
   compile_opt strictarr
 
   catch, error
@@ -115,6 +120,20 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                               ushort=type eq 12, $
                               ulong=type eq 13, $
                               uint64=type eq 15)
+
+    ; add _FillValue attribute, if FILL_VALUE keyword has a value
+    if (n_elements(fill_value) gt 0L) then begin
+      ncdf_attput, parent_id, variable_id, '_FillValue', fill_value, $
+                   ubyte=type eq 1, $
+                   short=type eq 2, $
+                   long=type eq 3, $
+                   float=type eq 4, $
+                   double=type eq 5, $
+                   char=type eq 7, $
+                   ushort=type eq 12, $
+                   ulong=type eq 13, $
+                   uint64=type eq 15
+    endif
   endif
 
   ncdf_varput, parent_id, variable_id, data
@@ -192,10 +211,16 @@ end
 ; :Keywords:
 ;   dim_names : in, optional, type=strarr
 ;     string array of dimension names
+;   fill_value : in, optional, type=numeric
+;     value to set the `_FillValue` attribute to, only valid if `descriptor` is
+;     a variable and creating a new file
 ;   error : out, optional, type=long
 ;     error code, 0 for no errors
 ;-
-pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
+pro mg_nc_putdata, filename, descriptor, data, $
+                   dim_names=dim_names, $
+                   fill_value=fill_value, $
+                   error=error
   compile_opt strictarr
   on_error, 2
 
@@ -204,8 +229,10 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
   ; create an new netCDF file if it doesn't already exist
   if (file_test(filename)) then begin
     file_id = ncdf_open(filename, /write)
+    new_file = 0B
   endif else begin
     file_id = ncdf_create(filename, /netcdf4_format)
+    new_file = 1B
   endelse
 
   type = mg_nc_decompose(file_id, descriptor, $
@@ -215,6 +242,11 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
                          element_name=element_name, $
                          /write, error=error)
   if (error ne 0L) then return
+
+  if (n_elements(fill_value) gt 0L && (type ne 2 || new_file ne 1B)) then begin
+    ncdf_close, file_id
+    message, 'FILL_VALUE only valid for variables in new files'
+  endif
 
   case type of
     0: begin
@@ -244,7 +276,8 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
       end
     2: begin
          mg_nc_putdata_putvariable, parent_id, element_name, data, $
-                                    dim_names=dim_names, error=error
+                                    dim_names=dim_names, fill_value=fill_value, $
+                                    error=error
          if (error) then begin
            if (~arg_present(error)) then message, 'error writing variable', /informational
          endif
