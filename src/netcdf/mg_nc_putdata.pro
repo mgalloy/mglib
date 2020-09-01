@@ -67,7 +67,8 @@ end
 pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                                dim_names=dim_names, $
                                fill_value=fill_value, $
-                               error=error
+                               error=error, $
+                               _extra=e
   compile_opt strictarr
 
   catch, error
@@ -98,11 +99,11 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
       if (i ge n_elements(dim_names)) then begin
         dim_ids[i] = ncdf_dimdef(parent_id, $
                                  varname + '_' + strtrim(i, 2), $
-                                 dims[i])
+                                 dims[i], _extra=e)
       endif else begin
         dim_ids[i] = mg_nc_putdata_checkdimname(parent_id, dim_names[i], found=found)
         if (~found) then begin
-          dim_ids[i] = ncdf_dimdef(parent_id, dim_names[i], dims[i])
+          dim_ids[i] = ncdf_dimdef(parent_id, dim_names[i], dims[i], _extra=e)
         endif
       endelse
     endfor
@@ -119,7 +120,8 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                               char=type eq 7, $
                               ushort=type eq 12, $
                               ulong=type eq 13, $
-                              uint64=type eq 15)
+                              uint64=type eq 15, $
+                              _extra=e)
 
     ; add _FillValue attribute, if FILL_VALUE keyword has a value
     if (n_elements(fill_value) gt 0L) then begin
@@ -132,11 +134,12 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                    char=type eq 7, $
                    ushort=type eq 12, $
                    ulong=type eq 13, $
-                   uint64=type eq 15
+                   uint64=type eq 15, $
+                   _extra=e
     endif
   endif
 
-  ncdf_varput, parent_id, variable_id, data
+  ncdf_varput, parent_id, variable_id, data, _extra=e
 end
 
 
@@ -159,7 +162,7 @@ end
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
-pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
+pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error, _extra=e
   compile_opt strictarr
 
   catch, error
@@ -180,7 +183,8 @@ pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
                  char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
-                 uint64=type eq 15
+                 uint64=type eq 15, $
+                 _extra=e
     
   endif else begin
     ncdf_attput, group_id, parent_id, attname, data, $
@@ -192,7 +196,8 @@ pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
                  char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
-                 uint64=type eq 15
+                 uint64=type eq 15, $
+                 _extra=e
   endelse
 end
 
@@ -220,7 +225,7 @@ end
 pro mg_nc_putdata, filename, descriptor, data, $
                    dim_names=dim_names, $
                    fill_value=fill_value, $
-                   error=error
+                   error=error, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -229,10 +234,8 @@ pro mg_nc_putdata, filename, descriptor, data, $
   ; create an new netCDF file if it doesn't already exist
   if (file_test(filename)) then begin
     file_id = ncdf_open(filename, /write)
-    new_file = 0B
   endif else begin
     file_id = ncdf_create(filename, /netcdf4_format)
-    new_file = 1B
   endelse
 
   type = mg_nc_decompose(file_id, descriptor, $
@@ -242,11 +245,6 @@ pro mg_nc_putdata, filename, descriptor, data, $
                          element_name=element_name, $
                          /write, error=error)
   if (error ne 0L) then return
-
-  if (n_elements(fill_value) gt 0L && (type ne 2 || new_file ne 1B)) then begin
-    ncdf_close, file_id
-    message, 'FILL_VALUE only valid for variables in new files'
-  endif
 
   case type of
     0: begin
@@ -258,12 +256,12 @@ pro mg_nc_putdata, filename, descriptor, data, $
            2: begin
                mg_nc_putdata_putattribute, group_id, parent_id, $
                                            element_name, data, $
-                                           error=error
+                                           error=error, _extra=e
              end
            3: begin
                mg_nc_putdata_putattribute, parent_id, parent_id, $
                                            element_name, data, $
-                                           error=error
+                                           error=error, _extra=e
              end
            else: begin
                error = -1L
@@ -277,7 +275,7 @@ pro mg_nc_putdata, filename, descriptor, data, $
     2: begin
          mg_nc_putdata_putvariable, parent_id, element_name, data, $
                                     dim_names=dim_names, fill_value=fill_value, $
-                                    error=error
+                                    error=error, _extra=e
          if (error) then begin
            if (~arg_present(error)) then message, 'error writing variable', /informational
          endif
@@ -299,12 +297,20 @@ end
 
 filename = 'test.nc'
 
-mg_nc_putdata, filename, 'x', findgen(10, 20), error=error
-mg_nc_putdata, filename, 'y', dindgen(10), error=error
-mg_nc_putdata, filename, 'z', lindgen(10), error=error
+; mg_nc_putdata, filename, 'x', findgen(10, 20), error=error
+; mg_nc_putdata, filename, 'y', dindgen(10), error=error
+; mg_nc_putdata, filename, 'z', lindgen(10), error=error
+;
+; help, error
+;
+; mg_nc_dump, filename
 
-help, error
+filename = 'test.h5'
+if (file_test(filename)) then file_delete, filename
 
-mg_nc_dump, filename
+; mg_h5_putdata, filename, 'scalar', 1.0
+; mg_h5_putdata, filename, 'array', findgen(10)
+; mg_h5_putdata, filename, 'reference', 'scalar', /reference
+mg_h5_putdata, filename, 'group/another_scalar', 1.0
 
 end
