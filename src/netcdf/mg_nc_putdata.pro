@@ -297,20 +297,12 @@ end
 
 filename = 'test.nc'
 
-; mg_nc_putdata, filename, 'x', findgen(10, 20), error=error
-; mg_nc_putdata, filename, 'y', dindgen(10), error=error
-; mg_nc_putdata, filename, 'z', lindgen(10), error=error
-;
-; help, error
-;
-; mg_nc_dump, filename
+mg_nc_putdata, filename, 'x', findgen(10, 20), error=error
+mg_nc_putdata, filename, 'y', dindgen(10), error=error
+mg_nc_putdata, filename, 'z', lindgen(10), error=error
 
-filename = 'test.h5'
-if (file_test(filename)) then file_delete, filename
+help, error
 
-; mg_h5_putdata, filename, 'scalar', 1.0
-; mg_h5_putdata, filename, 'array', findgen(10)
-; mg_h5_putdata, filename, 'reference', 'scalar', /reference
-mg_h5_putdata, filename, 'group/another_scalar', 1.0
+mg_nc_dump, filename
 
 end
