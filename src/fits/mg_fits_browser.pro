@@ -718,16 +718,23 @@ pro mg_fits_browser::_handle_tree_event, event
     x_center = sxpar(header, 'CRPIX1', count=n_crpix1)
     y_center = sxpar(header, 'CRPIX2', count=n_crpix2)
     self.has_center = n_crpix1 eq 1L && n_crpix2 eq 1L
+
     self.current_center = [x_center, y_center] - 1L
     cdelt1 = sxpar(header, 'CDELT1', count=n_delt1)
     cdelt2 = sxpar(header, 'CDELT2', count=n_delt2)
     date_obs = sxpar(header, 'DATE-OBS', count=n_dateobs)
     time_obs = sxpar(header, 'TIME-OBS', count=n_timeobs)
     fmt = '%Y-%m-%dT%H:%M:%S'
-    d = mg_strptime(mg_normalize_datetime(date_obs + 'T' + time_obs), fmt)
-    fractional_hour = d.hour + (d.minute + d.second / 60.0) / 60.0
-    sun, d.year, d.month, d.day, fractional_hour, sd=radsun
-    self.current_sunpix = [cdelt1, cdelt2] / radsun
+
+    if (n_crpix1 eq 1 && n_crpix2 eq 1 && n_delt1 eq 1 && n_delt2 eq 1 $
+          && n_dateobs eq 1 && n_timeobs eq 1) then begin
+      d = mg_strptime(mg_normalize_datetime(date_obs + 'T' + time_obs), fmt)
+      fractional_hour = d.hour + (d.minute + d.second / 60.0) / 60.0
+      sun, d.year, d.month, d.day, fractional_hour, sd=radsun
+      self.current_sunpix = [cdelt1, cdelt2] / radsun
+    endif else begin
+      self.current_sunpix = fltarr(2) + !values.f_nan
+    endelse
 
     ; set header
     header_widget = widget_info(self.tlb, find_by_uname='fits_header')
@@ -837,7 +844,7 @@ pro mg_fits_browser::_set_status_for_draw, event
     ; nothing
   endif else if (self.currently_selected[1] lt 1) then begin
     value = (*self.current_data)[x, y]
-    if (self.has_center) then begin
+    if (self.has_center && total(finite(self.current_sunpix), /integer) eq 2) then begin
       xc = x - self.current_center[0]
       yc = y - self.current_center[1]
 
