@@ -58,11 +58,17 @@ end
 ; :Keywords:
 ;   dim_names : in, optional, type=strarr
 ;     string array of dimension names
+;   fill_value : in, optional, type=numeric
+;     value to set the `_FillValue` attribute to, only valid if `descriptor` is
+;     a variable and creating a new file
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
 pro mg_nc_putdata_putvariable, parent_id, varname, data, $
-                               dim_names=dim_names, error=error
+                               dim_names=dim_names, $
+                               fill_value=fill_value, $
+                               error=error, $
+                               _extra=e
   compile_opt strictarr
 
   catch, error
@@ -93,11 +99,11 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
       if (i ge n_elements(dim_names)) then begin
         dim_ids[i] = ncdf_dimdef(parent_id, $
                                  varname + '_' + strtrim(i, 2), $
-                                 dims[i])
+                                 dims[i], _extra=e)
       endif else begin
         dim_ids[i] = mg_nc_putdata_checkdimname(parent_id, dim_names[i], found=found)
         if (~found) then begin
-          dim_ids[i] = ncdf_dimdef(parent_id, dim_names[i], dims[i])
+          dim_ids[i] = ncdf_dimdef(parent_id, dim_names[i], dims[i], _extra=e)
         endif
       endelse
     endfor
@@ -114,10 +120,26 @@ pro mg_nc_putdata_putvariable, parent_id, varname, data, $
                               char=type eq 7, $
                               ushort=type eq 12, $
                               ulong=type eq 13, $
-                              uint64=type eq 15)
+                              uint64=type eq 15, $
+                              _extra=e)
+
+    ; add _FillValue attribute, if FILL_VALUE keyword has a value
+    if (n_elements(fill_value) gt 0L) then begin
+      ncdf_attput, parent_id, variable_id, '_FillValue', fill_value, $
+                   ubyte=type eq 1, $
+                   short=type eq 2, $
+                   long=type eq 3, $
+                   float=type eq 4, $
+                   double=type eq 5, $
+                   char=type eq 7, $
+                   ushort=type eq 12, $
+                   ulong=type eq 13, $
+                   uint64=type eq 15, $
+                   _extra=e
+    endif
   endif
 
-  ncdf_varput, parent_id, variable_id, data
+  ncdf_varput, parent_id, variable_id, data, _extra=e
 end
 
 
@@ -140,7 +162,7 @@ end
 ;   error : out, optional, type=long
 ;     set to a named variable to return error status
 ;-
-pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
+pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error, _extra=e
   compile_opt strictarr
 
   catch, error
@@ -161,7 +183,8 @@ pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
                  char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
-                 uint64=type eq 15
+                 uint64=type eq 15, $
+                 _extra=e
     
   endif else begin
     ncdf_attput, group_id, parent_id, attname, data, $
@@ -173,7 +196,8 @@ pro mg_nc_putdata_putattribute, group_id, parent_id, attname, data, error=error
                  char=type eq 7, $
                  ushort=type eq 12, $
                  ulong=type eq 13, $
-                 uint64=type eq 15
+                 uint64=type eq 15, $
+                 _extra=e
   endelse
 end
 
@@ -192,10 +216,16 @@ end
 ; :Keywords:
 ;   dim_names : in, optional, type=strarr
 ;     string array of dimension names
+;   fill_value : in, optional, type=numeric
+;     value to set the `_FillValue` attribute to, only valid if `descriptor` is
+;     a variable and creating a new file
 ;   error : out, optional, type=long
 ;     error code, 0 for no errors
 ;-
-pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
+pro mg_nc_putdata, filename, descriptor, data, $
+                   dim_names=dim_names, $
+                   fill_value=fill_value, $
+                   error=error, _extra=e
   compile_opt strictarr
   on_error, 2
 
@@ -226,12 +256,12 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
            2: begin
                mg_nc_putdata_putattribute, group_id, parent_id, $
                                            element_name, data, $
-                                           error=error
+                                           error=error, _extra=e
              end
            3: begin
                mg_nc_putdata_putattribute, parent_id, parent_id, $
                                            element_name, data, $
-                                           error=error
+                                           error=error, _extra=e
              end
            else: begin
                error = -1L
@@ -244,7 +274,8 @@ pro mg_nc_putdata, filename, descriptor, data, dim_names=dim_names, error=error
       end
     2: begin
          mg_nc_putdata_putvariable, parent_id, element_name, data, $
-                                    dim_names=dim_names, error=error
+                                    dim_names=dim_names, fill_value=fill_value, $
+                                    error=error, _extra=e
          if (error) then begin
            if (~arg_present(error)) then message, 'error writing variable', /informational
          endif

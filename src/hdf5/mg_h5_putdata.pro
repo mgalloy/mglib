@@ -149,7 +149,7 @@ pro mg_h5_putdata_putvariable, filename, name, data, reference=reference
   loc = fileId
 
   ; loop over tokens except last one
-  groups = lonarr(ntokens)   ; one too big, but makes sure not zero-length
+  groups = ulon64arr(ntokens)   ; one too big, but makes sure not zero-length
   for t = 0L, ntokens - 2L do begin
     if (mg_h5_putdata_varexists(loc, tokens[t])) then begin
       loc = h5g_open(loc, tokens[t])
@@ -192,7 +192,7 @@ pro mg_h5_putdata_putvariable, filename, name, data, reference=reference
     h5t_close, datatypeId
   endif
 
-  for t = ntokens - 2L, 0L, -1L do h5g_close, groups[t]
+  for t = ntokens - 2L, 0L, - 1L do h5g_close, groups[t]
   if (keyword_set(reference)) then h5g_close, rgroup
   h5f_close, fileId
 end
