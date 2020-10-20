@@ -87,9 +87,9 @@ function mgffoptions::_toString, substitute=substitute
     endforeach
   endforeach
 
-  output = transpose(output_list->toArray())
+  output = output_list->toArray()
   obj_destroy, output_list
-  return, output
+  return, n_elements(output) gt 1L ? transpose(output) : output
 end
 
 

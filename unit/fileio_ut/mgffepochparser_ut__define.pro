@@ -74,6 +74,29 @@ function mgffepochparser_ut::test_invalid
 end
 
 
+function mgffepochparser_ut::test_filter
+  compile_opt strictarr
+
+  epochs_filename = filepath('epochs.cfg', root=mg_src_root())
+  spec_filename = filepath('epochs_spec.cfg', root=mg_src_root())
+  epochs = mgffepochparser(epochs_filename, spec_filename)
+
+  subset = epochs->filter('cal_file')
+  sections = subset->sections(count=n_sections)
+  assert, n_sections eq 1, 'wrong number of sections in filtered subset'
+  assert, array_equal(sections, ['20180101']), 'wrong sections in filtered subset'
+
+  options = subset->options(section=sections[0], count=n_options)
+  assert, n_options eq 1, 'wrong number of options in filtered subset'
+  option_value = subset->get(options[0], section=sections[0])
+  assert, option_value eq 'cal-0001.nc', 'wrong value for option'
+
+  obj_destroy, [epochs, subset]
+
+  return, 1
+end
+
+
 function mgffepochparser_ut::init, _extra=e
   compile_opt strictarr
 
