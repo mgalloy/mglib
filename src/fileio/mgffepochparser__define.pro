@@ -137,7 +137,6 @@ function mgffepochparser::get, option, datetime=datetime, found=found, $
   spec_line = self.spec->get(option, section='DEFAULT', found=spec_found)
   if (~spec_found) then begin
     error_message = string(option, format='(%"no specification for ''%s'' found")')
-    help, error_message
     if (arg_present(found)) then begin
       value = !null
       goto, done
@@ -177,6 +176,7 @@ function mgffepochparser::get, option, datetime=datetime, found=found, $
       endelse
     endif else begin
       value = default
+      found = 1B
     endelse
   endif
 
