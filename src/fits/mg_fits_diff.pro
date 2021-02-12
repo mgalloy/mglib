@@ -70,7 +70,8 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
                                      header2, filename2, $
                                      ignore_keywords=ignore_keywords, $
                                      extension=extension, $
-                                     differences=differences
+                                     differences=differences, $
+                                     tolerance=tolerance
   compile_opt strictarr
 
   _extension = n_elements(extension) eq 0L $
@@ -126,7 +127,24 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
     key = keywords1[k]
     v1 = mg_fits_getkeyword(header1, key)
     v2 = mg_fits_getkeyword(header2, key)
-    if (v1 ne v2) then begin
+    type1 = size(v1, /type)
+    type2 = size(v2, /type)
+    if (type1 ne type2) then begin
+      values_different = 1B
+    endif else begin
+      if ((type1 eq 4 || type1 eq 5) && (n_elements(tolerance) gt 0L)) then begin
+        values_different = abs(v1 - v2) gt tolerance
+      endif else values_different = v1 ne v2
+    endelse
+    if (values_different) then begin
+      help, key
+      help, v1, v2
+      help, v1 - v2, tolerance
+      print, v1 - v2
+      print, tolerance
+      help, values_different
+    endif
+    if (values_different) then begin
       if (obj_valid(differences)) then begin
         fmt = '(%"value for keyword %s not the same, %s ne %s%s")'
         differences->add, string(key, strtrim(v1, 2), strtrim(v2, 2), $
@@ -280,14 +298,16 @@ function mg_fits_diff, filename1, filename2, $
   diff or= mg_fits_diff_checkkeywords(header1, filename1, $
                                       header2, filename2, $
                                       ignore_keywords=ignore_keywords, $
-                                      differences=_differences)
+                                      differences=_differences, $
+                                      tolerance=tolerance)
 
   ; check data
 
   if (not keyword_set(headers_only)) then begin
     diff or= mg_fits_diff_checkdata(data1, filename1, $
                                     data2, filename2, $
-                                    differences=_differences)
+                                    differences=_differences, $
+                                    tolerance=tolerance)
   endif
 
   extend_diff = fcb1.nextend ne fcb1.nextend
@@ -315,13 +335,15 @@ function mg_fits_diff, filename1, filename2, $
                                         header2, filename2, $
                                         ignore_keywords=ignore_keywords, $
                                         extension=e, $
-                                        differences=_differences)
+                                        differences=_differences, $
+                                        tolerance=tolerance)
 
-    if (not keyword_set(headers_only)) then begin
+    if (~keyword_set(headers_only)) then begin
       diff or= mg_fits_diff_checkdata(data1, filename1, $
                                       data2, filename2, $
                                       extension=e, $
-                                      differences=_differences)
+                                      differences=_differences, $
+                                      tolerance=tolerance)
     endif
   endfor
 
