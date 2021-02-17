@@ -6,7 +6,7 @@
 ; :Returns:
 ;   string
 ;
-; :Parmas:
+; :Params:
 ;   type : in, required, type=integer
 ;     type code as returned by `SIZE`
 ;

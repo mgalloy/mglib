@@ -94,6 +94,6 @@ end
 pro mg_featureunion__define
   compile_opt strictarr
 
-  !null = {mgfeatureunion, inherits mg_estimator, $
+  !null = {mg_featureunion, inherits mg_estimator, $
            transformers: ptr_new()}
 end

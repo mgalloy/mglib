@@ -119,7 +119,7 @@ function mg_logisticregression::init, c=c, _extra=e
 
   if (~self->mg_classifier::init(_extra=e)) then return, 0
 
-  self.type eq 'classifier'
+  self.type = 'classifier'
 
   self->setProperty, c=mg_default(c, 1.0)
 

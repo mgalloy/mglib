@@ -28,7 +28,7 @@
 ; :Keywords:
 ;   n_components : out, optional, type=long
 ;     set to a named variable to retrieve the number of components found
-;   max_componnents : in, optional, type=integer, default=20
+;   max_components : in, optional, type=integer, default=20
 ;     set to the maximum number of components to look for
 ;
 ; :Examples:
@@ -39,7 +39,7 @@
 ;     IDL> y = sin(2 * x) + 1.5 * sin(5 * x) + 0.25 * cos(7 * x) + 0.5 * randomu(seed, n)
 ;     IDL> imf = mg_emd(y, 0.3, dt=!dtor, n_components=n_components)
 ;
-; :Authors:
+; :Author:
 ;   Michael Galloy <mgalloy@gmail.com>
 ;
 ;   adapted from code written by Jaume Terradas Calafell
@@ -48,7 +48,7 @@
 ;   email: jaume.terradas@uib.es
 ;
 ; :History:
-;   slight modifiaction of emdecomp.pro
+;   slight modification of emdecomp.pro
 ;   Written by:     Jaume Terradas, 29 Dec 2001
 ;   Jaume Terradas, 20 Jan 2002, option to add characteristic waves at ends
 ;   Ramon Oliver, 2004, routines written in nice idl format

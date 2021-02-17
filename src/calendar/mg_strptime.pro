@@ -14,9 +14,14 @@
 ;     date string
 ;   format : in, required, type=string
 ;     format specification
+;
+; :Keywords:
 ;   status : out, optional, type=long
 ;     set to a named variable to retrieve whether the date was successfully
 ;     parsed, no error message is printed if this is present
+;   error_message : out, optional, type=string
+;     set to a named variable to retrieve an error message from the attempted
+;     parsing if `STATUS` is not 0
 ;-
 function mg_strptime, date, format, status=status, error_message=error_message
   compile_opt strictarr
