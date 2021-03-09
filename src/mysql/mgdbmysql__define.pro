@@ -98,6 +98,50 @@
 ;-
 
 
+;= reporting methods to be implemented by superclasses
+
+;+
+; Hook for superclasses.
+;
+; :Params:
+;   sql_statement : in, required, type=string
+;     SQL statement to report
+;-
+pro mgdbmysql::report_statement, sql_statement
+  compile_opt strictarr
+end
+
+
+;+
+; Hook for superclasses.
+;
+; :Keywords:
+;   sql_statement : in, required, type=string
+;     SQL statement
+;   status : in, required, type=long
+;      status code from the statement, 0 for success
+;   error_message : in, required, type=string
+;      MySQL error message; "Success" if not error
+;-
+pro mgdbmysql::report_error, sql_statement=sql_cmd, $
+                             status=status, $
+                             error_message=error_message
+  compile_opt strictarr
+end
+
+
+;+
+; Hook for superclasses.
+;
+; :Keywords:
+;   n_warnings : in, required, type=long
+;     number of warnings
+;-
+pro mgdbmysql::report_warnings, n_warnings=n_warnings
+  compile_opt strictarr
+end
+
+
 ;= helper methods
 
 ;+
@@ -378,7 +422,7 @@ function mgdbmysql::query, sql_query, $
                            n_warnings=n_warnings, $
                            count=count
   compile_opt strictarr
-  on_error, 2
+  ;on_error, 2
   on_ioerror, bad_fmt
 
   case n_params() of
@@ -406,11 +450,13 @@ function mgdbmysql::query, sql_query, $
     21: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, format='(%"' + sql_query + '")')
   endcase
 
+  self->report_statement, _sql_query
   status = mg_mysql_query(self.connection, _sql_query)
   if (status ne 0) then begin
     error_message = self->last_error_message()
     if (self.quiet || arg_present(status) || arg_present(error_message)) then begin
-      return, !null
+      query_result = !null
+      goto, reporting
     endif else begin
       message, error_message
     endelse
@@ -435,9 +481,13 @@ function mgdbmysql::query, sql_query, $
     n_affected_rows = mg_mysql_affected_rows(self.connection)
   endif
 
-  if (arg_present(n_warnings)) then begin
-    n_warnings = mg_mysql_warning_count(self.connection)
-  endif
+  reporting:
+  n_warnings = mg_mysql_warning_count(self.connection)
+
+  self->report_error, sql_statement=_sql_query, $
+                      status=status, $
+                      error_message=error_message
+  self->report_warnings, n_warnings=n_warnings
 
   return, query_result
 
@@ -750,25 +800,26 @@ pro mgdbmysql::execute, sql_query, $
                             format=sql_query_fmt)
   endcase
 
+  self->report_statement, _sql_query
   status = mg_mysql_query(self.connection, _sql_query)
   if (status ne 0) then begin
     error_message = self->last_error_message()
-    if (self.quiet || arg_present(status) || arg_present(error_message)) then begin
-      return
-    endif else begin
+    if (~self.quiet && ~arg_present(status) && ~arg_present(error_message)) then begin
       message, error_message
-    endelse
+    endif
   endif else begin
     error_message = 'Success'
   endelse
 
-  if (arg_present(n_affected_rows)) then begin
+  if (status eq 0L && arg_present(n_affected_rows)) then begin
     n_affected_rows = mg_mysql_affected_rows(self.connection)
   endif
 
-  if (arg_present(n_warnings)) then begin
-    n_warnings = mg_mysql_warning_count(self.connection)
-  endif
+  n_warnings = mg_mysql_warning_count(self.connection)
+  self->report_error, sql_statement=_sql_query, $
+                      status=status, $
+                      error_message=error_message
+  self->report_warnings, n_warnings=n_warnings
 
   return
 
