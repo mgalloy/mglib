@@ -1149,7 +1149,7 @@ pro mgdbmysql::getProperty, quiet=quiet, $
 
   quiet = self.quiet
   if (arg_present(client_info)) then client_info = mg_mysql_get_client_info()
-  if (arg_present(client_version)) then version = mg_mysql_get_client_version()
+  if (arg_present(client_version)) then client_version = mg_mysql_get_client_version()
   connected = self.connected
   if (arg_present(proto_info)) then proto_info = mg_mysql_get_proto_info(self.connection)
   if (arg_present(host_info)) then host_info = mg_mysql_get_host_info(self.connection)
