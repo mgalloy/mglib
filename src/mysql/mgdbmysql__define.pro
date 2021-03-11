@@ -137,7 +137,7 @@ end
 ;   n_warnings : in, required, type=long
 ;     number of warnings
 ;-
-pro mgdbmysql::report_warnings, n_warnings=n_warnings
+pro mgdbmysql::report_warnings, sql_statement=sql_cmd, n_warnings=n_warnings
   compile_opt strictarr
 end
 
@@ -487,7 +487,7 @@ function mgdbmysql::query, sql_query, $
   self->report_error, sql_statement=_sql_query, $
                       status=status, $
                       error_message=error_message
-  self->report_warnings, n_warnings=n_warnings
+  self->report_warnings, sql_statement=_sql_query, n_warnings=n_warnings
 
   return, query_result
 
@@ -819,7 +819,7 @@ pro mgdbmysql::execute, sql_query, $
   self->report_error, sql_statement=_sql_query, $
                       status=status, $
                       error_message=error_message
-  self->report_warnings, n_warnings=n_warnings
+  self->report_warnings, sql_statement=_sql_query, n_warnings=n_warnings
 
   return
 
