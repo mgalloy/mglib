@@ -422,7 +422,7 @@ function mgdbmysql::query, sql_query, $
                            n_warnings=n_warnings, $
                            count=count
   compile_opt strictarr
-  ;on_error, 2
+  on_error, 2
   on_ioerror, bad_fmt
 
   case n_params() of
