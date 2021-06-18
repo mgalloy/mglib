@@ -137,14 +137,6 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
       endif else values_different = v1 ne v2
     endelse
     if (values_different) then begin
-      help, key
-      help, v1, v2
-      help, v1 - v2, tolerance
-      print, v1 - v2
-      print, tolerance
-      help, values_different
-    endif
-    if (values_different) then begin
       if (obj_valid(differences)) then begin
         fmt = '(%"value for keyword %s not the same, %s ne %s%s")'
         differences->add, string(key, strtrim(v1, 2), strtrim(v2, 2), $
