@@ -152,7 +152,7 @@ end
 
 
 ;+
-; Helper routine to check the data in a FITS header for differences.
+; Helper routine to check the data in a FITS file for differences.
 ;
 ; :Private:
 ;
@@ -186,24 +186,51 @@ function mg_fits_diff_checkdata, data1, filename1,$
 
   data_diff = array_equal(size(data1), size(data2)) eq 0
 
-  if (data_diff gt 0L && obj_valid(differences)) then begin
-    fmt = '(%"data in %s not the same size/type as in %s%s")'
-    differences->add, string(filename1, filename2, _extension, format=fmt)
+  if (data_diff gt 0L) then begin
+    if (obj_valid(differences)) then begin
+      fmt = '(%"data in %s not the same size/type as in %s%s")'
+      differences->add, string(filename1, filename2, _extension, format=fmt)
+    endif
+    return, 1B
   endif
 
-  if (n_elements(tolerence) gt 0L) then begin
-    ind = where(abs(data1 - data2) gt tolerance, count)
-    data_diff = count gt 0L
+  finite_indices1 = where(finite(data1), n_finite1)
+  finite_indices2 = where(finite(data2), n_finite2)
+
+  if (n_finite1 ne n_finite2) then begin
+    if (obj_valid(differences)) then begin
+      fmt = '(%"data in %s has different number of NaNs as in %s%s")'
+      differences->add, string(filename1, filename2, _extension, format=fmt)
+    endif
+    return, 1B
   endif else begin
-    data_diff = array_equal(data1, data2) eq 0
+    if (n_finite1 gt 0L && ~array_equal(finite_indices1, finnite_indices2)) then begin
+      if (obj_valid(differences)) then begin
+        fmt = '(%"data in %s has different NaNs as in %s%s")'
+        differences->add, string(filename1, filename2, _extension, format=fmt)
+      endif
+      return, 1B
+    endif else begin  ; all NaNs
+      if (n_finite1 eq n_elements(data1)) then return, 0B
+    endelse
   endelse
 
-  if (data_diff gt 0L && obj_valid(differences)) then begin
-    fmt = '(%"data in %s not the same as in %s%s")'
-    differences->add, string(filename1, filename2, _extension, format=fmt)
+  if (n_elements(tolerence) gt 0L) then begin
+    ind = where(abs(data1[finite_indices1] - data2[finite_indices2]) gt tolerance, count)
+    data_diff = count gt 0L
+  endif else begin
+    data_diff = array_equal(data1[finite_indices1], data2[finite_indices2]) eq 0
+  endelse
+
+  if (data_diff gt 0L) then begin
+    if (obj_valid(differences)) then begin
+      fmt = '(%"data in %s not the same as in %s%s")'
+      differences->add, string(filename1, filename2, _extension, format=fmt)
+    endif
+    return, 1B
   endif
 
-  return, data_diff
+  return, 0B
 end
 
 
