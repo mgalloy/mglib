@@ -204,7 +204,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
     endif
     return, 1B
   endif else begin
-    if (n_finite1 gt 0L && ~array_equal(finite_indices1, finnite_indices2)) then begin
+    if (n_finite1 gt 0L && ~array_equal(finite_indices1, finite_indices2)) then begin
       if (obj_valid(differences)) then begin
         fmt = '(%"data in %s has different NaNs as in %s%s")'
         differences->add, string(filename1, filename2, _extension, format=fmt)
