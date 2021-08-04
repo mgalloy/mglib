@@ -193,13 +193,13 @@ pro mg_log, msg, $
 
   ; insert execution info at same level if requested
   if (keyword_set(execution_info)) then begin
-    logger->insert_execution_info, level=_level, back_levels=1
+    logger->insert_execution_info, from=from, level=_level, back_levels=1
   endif
 
   ; do after regular messages so that a regular message and the CHECK_MATH
   ; status/stack trace can be logged with one call to MG_LOG
-  if (keyword_set(check_math)) then logger->insertCheckMath, back_levels=1, level=_level
-  if (keyword_set(lastError)) then logger->insertLastError, back_levels=1
+  if (keyword_set(check_math)) then logger->insertCheckMath, from=from, back_levels=1, level=_level
+  if (keyword_set(lastError)) then logger->insertLastError, from=from, back_levels=1
 
   ; do last so that a quitting message can be logged at the same time that the
   ; logger is shutdown

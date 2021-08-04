@@ -69,7 +69,6 @@ function mgfflogger::pid
   catch, error
   if (error ne 0L) then begin
     catch, /cancel
-    message, /reset
     return, ''
   endif
 
@@ -303,7 +302,7 @@ end
 ;       number of levels to go back in the stack trace beyond the normal ones;
 ;       should be set to 1 if calling this routine from `MG_LOG` for example
 ;-
-pro mgfflogger::insertCheckMath, back_levels=back_levels, level=level
+pro mgfflogger::insertCheckMath, from=from, back_levels=back_levels, level=level
   compile_opt strictarr
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
@@ -328,7 +327,7 @@ pro mgfflogger::insertCheckMath, back_levels=back_levels, level=level
   for m = 0L, n_status_msgs - 1L do begin
     msg = string(msgs[ind[m]], stack.routine, stack.line, $
                  format='(%"%s on %s line %d")')
-    self->print, msg, level=_level, back_levels=_back_levels + 1L 
+    self->print, msg, from=from, level=_level, back_levels=_back_levels + 1L 
   endfor
 end
 
@@ -343,7 +342,7 @@ end
 ;       number of levels to go back in the stack trace beyond the normal ones;
 ;       should be set to 1 if calling this routine from `MG_LOG` for example
 ;-
-pro mgfflogger::insertLastError, back_levels=back_levels
+pro mgfflogger::insertLastError, from=from, back_levels=back_levels
   compile_opt strictarr
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
@@ -351,8 +350,8 @@ pro mgfflogger::insertLastError, back_levels=back_levels
   help, /last_message, output=helpOutput
   if (n_elements(helpOutput) eq 1L && helpOutput[0] eq '') then return
 
-  self->print, 'Stack trace for error', level=1, back_levels=_back_levels + 1L
-  self->print, transpose(helpOutput), level=1, /no_header
+  self->print, 'Stack trace for error', from=from, level=1, back_levels=_back_levels + 1L
+  self->print, transpose(helpOutput), from=from, level=1, /no_header
 end
 
 
@@ -367,13 +366,13 @@ end
 ;     should be set to 1 if calling this routine from `MG_LOG` for
 ;     example
 ;-
-pro mgfflogger::insert_execution_info, level=level, back_levels=back_levels
+pro mgfflogger::insert_execution_info, from=from, level=level, back_levels=back_levels
   compile_opt strictarr
 
   _back_levels = n_elements(back_levels) eq 0L ? 0 : back_levels
   s = scope_traceback(/system)
   s = s[0:n_elements(s) - 2L - back_levels]
-  self->print, transpose(s), level=level, /no_header
+  self->print, transpose(s), from=from, level=level, /no_header
 end
 
 
