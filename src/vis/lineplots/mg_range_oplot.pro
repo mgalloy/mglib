@@ -1,20 +1,17 @@
 ; docformat = 'rst'
 
 ;+
-; Create a standard direct graphics line plot, but clip y-axis to a given range
-; and indicate clipped values.
+; Overplot onto a plot produced my `mg_range_plot`.
+;
 ;-
-pro mg_rangeplot, x, y, $
-                  ystyle=ystyle, $
-                  yrange=yrange, $
-                  clip_color=clip_color, $
-                  clip_psym=clip_psym, $
-                  clip_linestyle=clip_linestyle, $
-                  clip_symsize=clip_symsize, $
-                  clip_thick=clip_thick, $
-                  _extra=e
+pro mg_range_oplot, x, y, $
+                    clip_color=clip_color, $
+                    clip_psym=clip_psym, $
+                    clip_linestyle=clip_linestyle, $
+                    clip_symsize=clip_symsize, $
+                    clip_thick=clip_thick, $
+                    _extra=e
   compile_opt strictarr
-  on_error, 2
 
   case n_params() of
     1: begin
@@ -34,17 +31,16 @@ pro mg_rangeplot, x, y, $
   _clip_symsize   = mg_default(clip_symsize, 0.25)
   _clip_thick     = mg_default(clip_thick, 1.0)
 
-  _ystyle = mg_default(ystyle, 1)
+  good_indices = where(_y ge !y.crange[0] and _y le !y.crange[1], n_good)
+  if (n_good gt 0L) then oplot, _x[good_indices], _y[good_indices], _extra=e
 
-  plot, _x, _y, ystyle=_ystyle or 1, yrange=yrange, _extra=e
-
-  big_ind = where(_y gt yrange[1], big_count, $
+  big_ind = where(_y gt !y.crange[1], big_count, $
                   complement=good_ind, ncomplement=good_count)
   if (big_count gt 0L) then begin
     big_y = _y
-    big_y[big_ind] = yrange[1]
+    big_y[big_ind] = !y.crange[1]
     big_y[good_ind] = !values.f_nan
-
+    
     plots, _x, big_y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
@@ -53,13 +49,13 @@ pro mg_rangeplot, x, y, $
            thick=_clip_thick
   endif
 
-  small_ind = where(_y lt yrange[0], small_count, $
+  small_ind = where(_y lt !y.crange[0], small_count, $
                     complement=good_ind, ncomplement=good_count)
-  if (big_count gt 0L) then begin
+  if (small_count gt 0L) then begin
     small_y = _y
-    small_y[small_ind] = yrange[0]
+    small_y[small_ind] = !y.crange[0]
     small_y[good_ind] = !values.f_nan
-
+    
     plots, _x, small_y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
@@ -74,16 +70,27 @@ end
 
 n = 2L
 x = findgen(n * 360) * !dtor
-y = sin(x)
+y1 = sin(x)
 
 k = 10L
 coeffs = randomu(seed, k)
 periods = 10.0 * randomu(seed, k)
-for i = 0L, k - 1L do y += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
+for i = 0L, k - 1L do y1 += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
 
 device, decomposed=1
-mg_rangeplot, x, y, xstyle=9, ystyle=8, yrange=[-1.0, 1.0], $
+mg_rangeplot, x, y, $
+              xstyle=9, ystyle=8, yrange=[-1.0, 1.0], $
               linestyle=4, $
               clip_color='0000ff'x, clip_thick=5.0
+
+y2 = sin(x)
+coeffs = randomu(seed, k)
+periods = 10.0 * randomu(seed, k)
+for i = 0L, k - 1L do y2 += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
+x = x[0:*:5]
+y = y[0:*:5]
+mg_range_oplot, x, y2, $
+                psym=2, symsize=1.0, $
+                clip_color='00ff00'x, clip_psym=4, clip_symsize=1.0
 
 end
