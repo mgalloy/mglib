@@ -78,10 +78,10 @@ periods = 10.0 * randomu(seed, k)
 for i = 0L, k - 1L do y1 += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
 
 device, decomposed=1
-mg_rangeplot, x, y, $
-              xstyle=9, ystyle=8, yrange=[-1.0, 1.0], $
-              linestyle=4, $
-              clip_color='0000ff'x, clip_thick=5.0
+mg_range_plot, x, y, $
+               xstyle=9, ystyle=8, yrange=[-1.0, 1.0], $
+               linestyle=4, $
+               clip_color='0000ff'x, clip_thick=5.0
 
 y2 = sin(x)
 coeffs = randomu(seed, k)
