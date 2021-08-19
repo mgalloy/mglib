@@ -78,7 +78,7 @@ periods = 10.0 * randomu(seed, k)
 for i = 0L, k - 1L do y1 += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
 
 device, decomposed=1
-mg_range_plot, x, y, $
+mg_range_plot, x, y1, $
                xstyle=9, ystyle=8, yrange=[-1.0, 1.0], $
                linestyle=4, $
                clip_color='0000ff'x, clip_thick=5.0
@@ -88,7 +88,7 @@ coeffs = randomu(seed, k)
 periods = 10.0 * randomu(seed, k)
 for i = 0L, k - 1L do y2 += 0.25 * (coeffs[i] - 0.5) * sin(periods[i] * x)
 x = x[0:*:5]
-y = y[0:*:5]
+y = y2[0:*:5]
 mg_range_oplot, x, y2, $
                 psym=2, symsize=1.0, $
                 clip_color='00ff00'x, clip_psym=4, clip_symsize=1.0
