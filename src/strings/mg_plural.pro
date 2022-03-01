@@ -6,11 +6,9 @@
 ; :Examples:
 ;   For example::
 ;
-;     IDL> n = 5
-;     IDL> print, n, mg_plural(n, 'file'), format='%d %s'
+;     IDL> print, mg_plural(5, 'file')
 ;     5 files
-;     IDL> n = 1
-;     IDL> print, n, mg_plural(n, 'file'), format='%d %s'
+;     IDL> print, mg_plural(1, 'file')
 ;     1 file
 ;
 ; :Returns:
@@ -24,10 +22,16 @@
 ;   plural : in, optional, type=string
 ;     string to return if value is not 1, if not present, the default is the
 ;     singular value with 's' appended
+;
+; :Keywords:
+;   format : in, optional, type=string, default="%d"
+;     C-style format code for `value`
 ;-
-function mg_plural, value, singular, plural
+function mg_plural, value, singular, plural, format=format
   compile_opt strictarr
 
-  return, value eq 1 ? singular : mg_default(plural, singular + 's')
+  label = value eq 1 ? singular : mg_default(plural, singular + 's')
+  fmt = mg_format(mg_default(format, '%d') + ' %s')
+  return, string(value, label, format=fmt)
 end
 
