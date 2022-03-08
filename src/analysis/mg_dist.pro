@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Returns an `n` by `n` array where every element is the euclidean distance to
+; Returns an `m` by `n` array where every element is the Euclidean distance to
 ; a fixed location.
 ;
 ; The fixed location is the center of the array if `CENTER` is set, i.e., the
@@ -24,28 +24,35 @@
 ;           2.12132      1.58114      1.58114      2.12132
 ;
 ; :Returns:
-;   `fltarr(n, n)`
+;   `fltarr(m, n)`
 ;
 ; :Params:
-;   n : in, required, type=integer
-;     size of required output
+;   m : in, required, type=integer
+;     xsize, and ysize if `n` not provided, of required output
+;   n : in, optional, type=integer, default=n
+;     ysize of required output
 ;
 ; :Keywords:
 ;   center : in, optional, type=boolean
 ;     set to find distance from center of array
-;   theta : out, optional, type="fltarr(n, n)"
+;   theta : out, optional, type="fltarr(m, n)"
 ;     set to a named variable to retrieve the angle, in radians, from a location
 ;     to the fixed location
 ;   degrees : in, optional, type=boolean
 ;     set to retrieve `THETA` in degrees
 ;-
-function mg_dist, n, center=center, theta=theta, degrees=degrees
+function mg_dist, m, n, center=center, theta=theta, degrees=degrees
   compile_opt strictarr
 
-  x = findgen(n) + (n mod 2 eq 0 ? 0.5 : 0.0) - n / 2
-  if (~keyword_set(center)) then x = shift(x, n / 2)
-  x = rebin(x, n, n)
-  y = transpose(x)
+  _n = n_elements(n) eq 0L ? m : n
+
+  x = findgen(m) + (m mod 2 eq 0 ? 0.5 : 0.0) - m / 2
+  if (~keyword_set(center)) then x = shift(x, m / 2)
+  x = rebin(reform(x, m, 1), m, _n)
+
+  y = findgen(_n) + (_n mod 2 eq 0 ? 0.5 : 0.0) - _n / 2
+  if (~keyword_set(center)) then y = shift(y, _n / 2)
+  y = rebin(reform(y, 1, _n), m, _n)
 
   if (arg_present(theta)) then begin
     theta = (2.0 * !pi + atan(y, x)) mod (2.0 * !pi)
