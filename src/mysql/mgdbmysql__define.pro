@@ -358,6 +358,8 @@ end
 function mgdbmysql::escape_string, from
   compile_opt strictarr
 
+  if (n_elements(from) eq 0L) then return, 'NULL'
+
   n_bytes = mg_typesize(size(from, /type)) * n_elements(from)
   to = bytarr(2 * n_bytes + 1)
   n_bytes_to = mg_mysql_real_escape_string(self.connection, to, from, n_bytes)
