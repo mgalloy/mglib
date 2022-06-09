@@ -215,7 +215,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
     endelse
   endelse
 
-  if (n_elements(tolerence) gt 0L) then begin
+  if (n_elements(tolerance) gt 0L) then begin
     ind = where(abs(data1[finite_indices1] - data2[finite_indices2]) gt tolerance, count)
     data_diff = count gt 0L
   endif else begin
