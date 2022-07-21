@@ -31,14 +31,17 @@ pro mg_range_oplot, x, y, $
   _clip_symsize   = mg_default(clip_symsize, 0.25)
   _clip_thick     = mg_default(clip_thick, 1.0)
 
-  good_indices = where(_y ge !y.crange[0] and _y le !y.crange[1], n_good)
+  good_indices = where(_x ge !x.crange[0] and _x le !x.crange[1] $
+                         and _y ge !y.crange[0] and _y le !y.crange[1], $
+                         n_good)
+
   if (n_good gt 0L) then oplot, _x[good_indices], _y[good_indices], _extra=e
 
-  big_ind = where(_y gt !y.crange[1], big_count, $
-                  complement=good_ind, ncomplement=good_count)
-  if (big_count gt 0L) then begin
+  big_y_ind = where(_y gt !y.crange[1], big_y_count, $
+                    complement=good_ind, ncomplement=good_count)
+  if (big_y_count gt 0L) then begin
     big_y = _y
-    big_y[big_ind] = !y.crange[1]
+    big_y[big_y_ind] = !y.crange[1]
     big_y[good_ind] = !values.f_nan
     
     plots, _x, big_y, $
@@ -49,14 +52,44 @@ pro mg_range_oplot, x, y, $
            thick=_clip_thick
   endif
 
-  small_ind = where(_y lt !y.crange[0], small_count, $
-                    complement=good_ind, ncomplement=good_count)
-  if (small_count gt 0L) then begin
+  small_y_ind = where(_y lt !y.crange[0], small_y_count, $
+                      complement=good_ind, ncomplement=good_count)
+  if (small_y_count gt 0L) then begin
     small_y = _y
-    small_y[small_ind] = !y.crange[0]
+    small_y[small_y_ind] = !y.crange[0]
     small_y[good_ind] = !values.f_nan
     
     plots, _x, small_y, $
+           color=_clip_color, $
+           linestyle=_clip_linestyle, $
+           psym=_clip_psym, $
+           symsize=_clip_symsize, $
+           thick=_clip_thick
+  endif
+
+  big_x_ind = where(_x gt !x.crange[1], big_x_count, $
+                    complement=good_ind, ncomplement=good_count)
+  if (big_x_count gt 0L) then begin
+    big_x = _x
+    big_x[big_x_ind] = !x.crange[1]
+    big_x[good_ind] = !values.f_nan
+    
+    plots, big_x, _y, $
+           color=_clip_color, $
+           linestyle=_clip_linestyle, $
+           psym=_clip_psym, $
+           symsize=_clip_symsize, $
+           thick=_clip_thick
+  endif
+  
+  small_x_ind = where(_x lt !x.crange[0], small_x_count, $
+                      complement=good_ind, ncomplement=good_count)
+  if (small_x_count gt 0L) then begin
+    small_x = _x
+    small_x[small_x_ind] = !x.crange[0]
+    small_x[good_ind] = !values.f_nan
+    
+    plots, small_x, _y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
            psym=_clip_psym, $
