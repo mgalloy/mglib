@@ -326,8 +326,8 @@ function mgdbmysql::_get_results, result, fields=fields, n_rows=n_rows
         1: query_result[r].(f) = byte(fix(_result))
         2: query_result[r].(f) = fix(_result)
         3: query_result[r].(f) = long(_result)
-        4: query_result[r].(f) = float(_result)
-        5: query_result[r].(f) = double(_result)
+        4: query_result[r].(f) = _result eq '' ? !values.f_nan : float(_result)
+        5: query_result[r].(f) = _result eq '' ? !values.d_nan : double(_result)
         7: query_result[r].(f) = _result
         10: begin
             if (lengths[f] gt 0) then begin
