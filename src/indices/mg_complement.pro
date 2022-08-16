@@ -25,7 +25,7 @@
 ;     set to a named variable to return the number of elements in the
 ;     complement
 ;-
-function mg_complement, indices, n, count=ncomplement
+function mg_complement, indices, n, count=ncomplement, null=null
   compile_opt strictarr, strictarrsubs
 
   _n = size(n, /n_dimensions) eq 0L ? n : n_elements(n)
@@ -36,5 +36,5 @@ function mg_complement, indices, n, count=ncomplement
     if (n_valid gt 0L) then all[indices[valid_indices]] = 1B
   endif
 
-  return, where(all eq 0B, ncomplement)
+  return, where(all eq 0B, ncomplement, null=null)
 end
