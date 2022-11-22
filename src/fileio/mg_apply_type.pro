@@ -9,7 +9,7 @@ function mg_apply_type, value, type_code, extract=extract
     if (strmid(_value, 0, 1) eq '[' $
           && strmid(_value, 0, 1, /reverse_offset) eq ']') then begin
       _value = strmid(_value, 1, strlen(_value) - 2)
-    endif 
+    endif
     _value = strtrim(strsplit(_value, ',', /extract), 2)
   endif else _value = value
 

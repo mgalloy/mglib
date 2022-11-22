@@ -2,9 +2,9 @@
 
 ;+
 ; Calculates given percentiles of a data set.
-; 
+;
 ; :Returns:
-;   the return value is either a scalar or vector of data values corresponding to 
+;   the return value is either a scalar or vector of data values corresponding to
 ;    the number of percentiles asked for with the `Percentiles` keyword, or a -1 if
 ;    there is an error in the program.
 ;

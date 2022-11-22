@@ -17,7 +17,7 @@
 ;     level will be logged
 ;   debug : type=boolean
 ;     convenience keyword to set level as debug (5)
-;   informational : type=boolean 
+;   informational : type=boolean
 ;     convenience keyword to set level as informational (4)
 ;   warning : type=boolean
 ;     convenience keyword to set level as warning (3)
@@ -327,7 +327,7 @@ pro mgfflogger::insertCheckMath, from=from, back_levels=back_levels, level=level
   for m = 0L, n_status_msgs - 1L do begin
     msg = string(msgs[ind[m]], stack.routine, stack.line, $
                  format='(%"%s on %s line %d")')
-    self->print, msg, from=from, level=_level, back_levels=_back_levels + 1L 
+    self->print, msg, from=from, level=_level, back_levels=_back_levels + 1L
   endfor
 end
 

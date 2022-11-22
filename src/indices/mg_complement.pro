@@ -8,7 +8,7 @@
 ;
 ;     IDL> print, mg_complement([0, 9, 3, 6, 7], 10)
 ;                1           2           4           5           8
-;     IDL> print, mg_complement(-1, 5) 
+;     IDL> print, mg_complement(-1, 5)
 ;                0           1           2           3           4
 ;
 ; :Returns:

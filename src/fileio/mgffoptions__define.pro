@@ -87,9 +87,9 @@ function mgffoptions::_toString, substitute=substitute
     endforeach
   endforeach
 
-  output = output_list->toArray()
+  output = transpose(output_list->toArray())
   obj_destroy, output_list
-  return, n_elements(output) gt 1L ? transpose(output) : output
+  return, output
 end
 
 
@@ -616,7 +616,7 @@ end
 ;-
 pro mgffoptions__define
   compile_opt strictarr
-  
+
   dummy = { MGffOptions, inherits IDL_Object, $
             fold_case: 0B, $
             use_environment: 0B, $

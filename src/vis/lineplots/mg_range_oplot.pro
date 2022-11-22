@@ -43,7 +43,7 @@ pro mg_range_oplot, x, y, $
     big_y = _y
     big_y[big_y_ind] = !y.crange[1]
     big_y[good_ind] = !values.f_nan
-    
+
     plots, _x, big_y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
@@ -58,7 +58,7 @@ pro mg_range_oplot, x, y, $
     small_y = _y
     small_y[small_y_ind] = !y.crange[0]
     small_y[good_ind] = !values.f_nan
-    
+
     plots, _x, small_y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
@@ -73,7 +73,7 @@ pro mg_range_oplot, x, y, $
     big_x = _x
     big_x[big_x_ind] = !x.crange[1]
     big_x[good_ind] = !values.f_nan
-    
+
     plots, big_x, _y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $
@@ -81,14 +81,14 @@ pro mg_range_oplot, x, y, $
            symsize=_clip_symsize, $
            thick=_clip_thick
   endif
-  
+
   small_x_ind = where(_x lt !x.crange[0], small_x_count, $
                       complement=good_ind, ncomplement=good_count)
   if (small_x_count gt 0L) then begin
     small_x = _x
     small_x[small_x_ind] = !x.crange[0]
     small_x[good_ind] = !values.f_nan
-    
+
     plots, small_x, _y, $
            color=_clip_color, $
            linestyle=_clip_linestyle, $

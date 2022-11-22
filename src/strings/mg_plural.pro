@@ -34,4 +34,3 @@ function mg_plural, value, singular, plural, format=format
   fmt = mg_format(mg_default(format, '%d') + ' %s')
   return, string(value, label, format=fmt)
 end
-

@@ -95,7 +95,7 @@ function mg_fits_getkeyword, header, name, $
         test = strmid(svalue[i], 1, strlen(svalue[i]) - 1)
         next_char = 0
         off = 0
-        value = '' 
+        value = ''
 
         next_singlequote:
         end_singlequote = strpos(test, "'", next_char)   ; ending single quote
@@ -110,11 +110,11 @@ function mg_fits_getkeyword, header, name, $
 
         ; test if next char is single quote, if so, then just an escaped single
         ; quote
-        if (strmid(test, end_singlequote + 1, 1) eq "'") then begin    
+        if (strmid(test, end_singlequote + 1, 1) eq "'") then begin
           value = value + "'"
           next_char = end_singlequote + 2
           goto, next_singlequote
-        endif      
+        endif
 
         ; extract the comment, if any
         slash = strpos(test, '/', end_singlequote)
@@ -123,7 +123,7 @@ function mg_fits_getkeyword, header, name, $
         endif else begin
           comment = strmid(test, slash + 1L, strlen(test) - slash - 1L)
         endelse
-        
+
         ; check to make sure string is not continued on next line:
         ;   1. ends with '&'
         ;   2. next line is CONTINUE
@@ -134,7 +134,7 @@ function mg_fits_getkeyword, header, name, $
         if (strlen(val) gt 0) && $
             (strmid(val, strlen(val) - 1L, 1) eq '&') && $
             (strmid(header[match_ind[i] + off], 0, 8) eq 'CONTINUE') then begin
-          if (~array_equal(all_keywords eq 'LONGSTRN', 0B)) then begin 
+          if (~array_equal(all_keywords eq 'LONGSTRN', 0B)) then begin
             value = strmid(val, 0, strlen(val) - 1)
             test = header[match_ind[i] + off]
             test = strmid(test, 8, strlen(test) - 8L)
@@ -166,18 +166,18 @@ function mg_fits_getkeyword, header, name, $
         value = mg_strtoken(test2, ' ')
         if (value eq 'T') then value = 1b else begin
           if (value eq 'F') then value = 0b else begin
-            
+
             ; test if value is complex number: complex if value and the next
             ; word are both valid
             if (strlen(test2) eq 0L) then goto, not_complex
-            value2 = mg_strtoken(test2, ' ') 
+            value2 = mg_strtoken(test2, ' ')
             if (value2 eq '') then goto, not_complex
 
             on_ioerror, not_complex
             value2 = float(value2)
             value = complex(value, value2)
             goto, value_correct
-            
+
             ; if value is not a complex number, decide between a float, double,
             ; or long
             not_complex:
@@ -195,15 +195,15 @@ function mg_fits_getkeyword, header, name, $
               lmax = 2.0D^31 - 1.0d
               lmin = -2.0D^31
               value = long64(value)
-              if (value ge lmin) && (value le lmax) then value = long(value) 
+              if (value ge lmin) && (value le lmax) then value = long(value)
             endelse
           endelse
-          
+
           value_correct:
           on_ioerror, null
         endelse
       endelse
-      
+
       ; add to vector if required
       if (contains_wildcard) then begin
         ; set result type and allocate results first time through
@@ -212,7 +212,7 @@ function mg_fits_getkeyword, header, name, $
           result = make_array(count, type=result_type)
           names = strarr(count)
           comments = strarr(count)
-        endif 
+        endif
 
         ; change type, if necessary
         if (size(value, /type) gt result_type) then begin

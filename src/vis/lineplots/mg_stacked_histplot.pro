@@ -37,4 +37,3 @@ pro mg_stacked_histplot, x, y, colors=colors, _extra=e
      mg_histplot, _x, reform(cumulative_y[i, *]), color=colors[i], /overplot, _extra=e
   endfor
 end
-

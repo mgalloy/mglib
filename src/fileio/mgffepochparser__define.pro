@@ -41,9 +41,9 @@ end
 ; :Returns:
 ;   1 if valid, 0 if not
 ;
-; :Keywords: 
-;   error_msg : out, optional, type=string 
-;     set to a named variable to retrieve an error message, empty string if 
+; :Keywords:
+;   error_msg : out, optional, type=string
+;     set to a named variable to retrieve an error message, empty string if
 ;     valid
 ;-
 function mgffepochparser::is_valid, error_msg=error_msg

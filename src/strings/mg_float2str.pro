@@ -8,7 +8,7 @@
 ;
 ;     IDL> help, mg_float2str(123456.1234, n_places=5, n_digits=3)
 ;     <Expression>    STRING    = '1.23e+05'
-;     IDL> help, mg_float2str(12345.1234, n_places=5, n_digits=3) 
+;     IDL> help, mg_float2str(12345.1234, n_places=5, n_digits=3)
 ;     <Expression>    STRING    = '12345.123'
 ;
 ; :Returns:
