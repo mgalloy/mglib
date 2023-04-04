@@ -427,6 +427,7 @@ function mgdbmysql::query, sql_query, $
   compile_opt strictarr
   on_error, 2
   on_ioerror, bad_fmt
+  count = 0L
 
   case n_params() of
      0: _sql_query = ''
