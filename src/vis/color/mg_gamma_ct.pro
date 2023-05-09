@@ -32,7 +32,7 @@
 ;     all values in the color table will be corrected.
 ;
 ; :history:
-;   DMS, Oct, 1990. Added ability shift intensities of colors, rather 
+;   DMS, Oct, 1990. Added ability shift intensities of colors, rather
 ;     than the mapping of the colors. DMS, April, 1991.
 ;-
 pro mg_gamma_ct, gamma, current=current, intensity=intensity, n_colors=n_colors
