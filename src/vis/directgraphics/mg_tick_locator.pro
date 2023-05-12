@@ -30,6 +30,7 @@ function mg_tick_locator, range, months=months
       v->add, next_month
       next_month = mg_tick_locator_next_month(next_month)
     endwhile
+    if (v->isEmpty()) then v->add, next_month
     months_array = v->toArray()
     obj_destroy, v
     return, months_array
