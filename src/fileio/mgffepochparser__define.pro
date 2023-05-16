@@ -18,6 +18,13 @@ function mg_epoch_parse_datetime, datetime
   compile_opt strictarr
   on_error, 2
 
+  n_datetimes = n_elements(datetime)
+  if (n_datetimes gt 1L) then begin
+    dts = objarr(n_datetimes)
+    for d = 0L, n_datetimes - 1L do dts[d] = mg_epoch_parse_datetime(datetime[d])
+    return, dts
+  endif
+
   case 1 of
     size(datetime, /type) eq 11: return, datetime
     stregex(datetime, '[[:digit:]]{8}', /boolean): begin
@@ -95,35 +102,47 @@ end
 ; Retrieve a value from an epoch file.
 ;
 ; :Returns:
-;   value of option (str, int, float, double, or array of those)
+;   value of option (str, int, float, double, or array of those), or if
+;   `datetime` is an array of 2 elements, then a `list` of values
 ;
 ; :Params:
 ;   option : in, required, type=string
 ;     name of option to lookup
 ;
 ; :Keywords:
-;   datetime : in, optional, type=string/object
+;   datetime : in, optional, type=string/object, strarr(2)/objarr(2)
 ;     `mg_datetime` object or string in the form 'YYYYMMDD' or 'YYYYMMDD.HHMMSS'
+;     or range of the above
 ;   found : out, optional, type=boolean
 ;     set to a named variable to retrieve whether `option` was found, if `FOUND`
 ;     is present, errors will not be generated
+;   changed : out, optional, type=boolean
+;     set to a named variable to retrieve whether the value returned for
+;     `option` changed in the time interval given by `DATETIME` (only useful if
+;     `DATETIME` was set to more than a single value)
 ;   error_message : out, optional, type=string
 ;     set to a named variable to retrieve the error message generated when
 ;     `FOUND` is false
 ;-
-function mgffepochparser::get, option, datetime=datetime, found=found, $
+function mgffepochparser::get, option, datetime=datetime, $
+                               found=found, changed=changed, $
                                error_message=error_message
   compile_opt strictarr
   on_error, 2
 
-  _datetime = n_elements(datetime) gt 0L $
-                ? mg_epoch_parse_datetime(datetime) $
-                : self.datetime
+  n_datetimes = n_elements(datetime)
+  if (n_datetimes eq 0L) then begin
+    _datetime = self.datetime
+    n_datetimes = 1L
+  endif else begin
+    _datetime = mg_epoch_parse_datetime(datetime)
+  endelse
 
   found = 0B
+  multiple = 0B
   error_message = ''
 
-  if (~obj_valid(_datetime)) then begin
+  if (n_elements(obj_valid(_datetime)) ne n_datetimes) then begin
     error_message = 'no date for access given'
     if (arg_present(found)) then begin
       value = !null
@@ -153,14 +172,22 @@ function mgffepochparser::get, option, datetime=datetime, found=found, $
 
   if (n_elements(dts) gt 0L) then begin
     dts = dts[sort(dts)]
-    date_index = value_locate(dts, _datetime->strftime('%Y%m%d.%H%M%S'))
+
+    if (n_datetimes gt 1L) then begin
+      date_index = value_locate(dts, (_datetime[1])->strftime('%Y%m%d.%H%M%S'))
+    endif else begin
+      date_index = value_locate(dts, _datetime->strftime('%Y%m%d.%H%M%S'))
+    endelse
 
     ; search for option in datetime/sections from current backwards
     for d = date_index, 0L, -1L do begin
       value = self.epochs->get(option, section=dts[d], $
                                found=found, $
                                type=type, boolean=boolean, extract=extract)
-      if (found) then break
+      if (found) then begin
+        changed = dts[d] gt (_datetime[0])->strftime('%Y%m%d.%H%M%S')
+        break
+      endif
     endfor
   endif
 
@@ -183,9 +210,7 @@ function mgffepochparser::get, option, datetime=datetime, found=found, $
   done:
 
   ; if we created a mg_datetime object, destroy it
-  if (n_elements(datetime) gt 0L && ~obj_valid(datetime)) then begin
-    obj_destroy, _datetime
-  endif
+  if (n_elements(datetime) gt 0L) then obj_destroy, _datetime
 
   return, value
 end
