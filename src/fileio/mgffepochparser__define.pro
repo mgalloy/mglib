@@ -139,7 +139,7 @@ function mgffepochparser::get, option, datetime=datetime, $
   endelse
 
   found = 0B
-  multiple = 0B
+  changed = 0B
   error_message = ''
 
   if (n_elements(obj_valid(_datetime)) ne n_datetimes) then begin
