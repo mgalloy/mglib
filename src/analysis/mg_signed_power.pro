@@ -1,0 +1,27 @@
+; docformat = 'rst'
+
+;+
+; Apply a power to signed data for display purposes.
+;
+; :Returns:
+;   numeric array
+;
+; :Params:
+;   x : in, required, type=numeric array
+;     array with potential negative values to be taken to a power
+;   power : in, required, type=float
+;     exponent to raise `x` to
+;-
+function mg_signed_power, x, power
+  compile_opt strictarr
+
+  negative_indices = where(x lt 0.0, /null)
+
+  _x = x
+  _x[negative_indices] = - _x[negative_indices]
+
+  result = _x^power
+  result[negative_indices] = - result[negative_indices]
+
+  return, result
+end
