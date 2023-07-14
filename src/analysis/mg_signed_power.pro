@@ -15,13 +15,17 @@
 function mg_signed_power, x, power
   compile_opt strictarr
 
-  negative_indices = where(x lt 0.0, /null)
+  negative_indices = where(x lt 0.0, n_negative_indices)
 
   _x = x
-  _x[negative_indices] = - _x[negative_indices]
+  if (n_negative_indices gt 0L) then begin
+    _x[negative_indices] = - _x[negative_indices]
+  endif
 
   result = _x^power
-  result[negative_indices] = - result[negative_indices]
+  if (n_negative_indices gt 0L) then begin
+    result[negative_indices] = - result[negative_indices]
+  endif
 
   return, result
 end
