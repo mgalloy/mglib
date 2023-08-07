@@ -24,7 +24,7 @@ function mg_fits_diff_getkeywords, header, $
                                    n_keywords=n_keywords
   compile_opt strictarr
 
-  keywords = (stregex(header, '(.{8})=', /subexpr, /extract))[1, *]
+  keywords = (stregex(header, '^(.{8})=', /subexpr, /extract))[1, *]
   keywords_ind = where(keywords ne '', n_keywords)
   if (n_keywords gt 0L) then begin
     keywords = strtrim(keywords[keywords_ind], 2)
