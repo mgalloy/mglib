@@ -15,7 +15,7 @@ function mg_tick_locator_next_month, jd, is_start=is_start
     year += 1L
   endif
 
-  return, julday(month, day, year)
+  return, julday(month, day, year, 0, 0, 0)
 end
 
 
