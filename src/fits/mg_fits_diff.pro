@@ -299,13 +299,13 @@ function mg_fits_diff, filename1, filename2, $
     return, !null
   endif
 
-  fits_read, fcb1, data1, header1, /no_abort, message=error_msg
+  fits_read, fcb1, data1, header1, /no_abort, message=error_msg, exten_no=0
   if (error_msg ne '') then begin
     error_msg = string(filename1, format='(%"%s not valid")')
     return, !null
   endif
 
-  fits_read, fcb2, data2, header2, /no_abort, message=error_msg
+  fits_read, fcb2, data2, header2, /no_abort, message=error_msg, exten_no=0
   if (error_msg ne '') then begin
     error_msg = string(filename2, format='(%"%s not valid")')
     return, !null
@@ -338,7 +338,7 @@ function mg_fits_diff, filename1, filename2, $
   endif
   diff or= extend_diff
 
-  for e = 0L, (fcb1.nextend < fcb2.nextend) - 1L do begin
+  for e = 0L, (fcb1.nextend < fcb2.nextend) do begin
     fits_read, fcb1, data1, header1, exten_no=e, /no_abort, /no_pdu, message=error_msg
     if (error_msg ne '') then begin
       error_msg = string(filename1, format='(%"error reading %s")')
