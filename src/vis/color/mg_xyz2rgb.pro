@@ -27,17 +27,17 @@ function mg_xyz2rgb, xyz
   b = x * 0.0557  + y * (-0.2040) + z * 1.0570
 
   r_mask = r gt 0.0031308
-  r = r_mask * (1.055 * r ^ (1 / 2.4) - 0.055) + (1B - r_mask) * (12.92 * r)
+  r = r_mask * (1.055 * r ^ (1.0 / 2.4) - 0.055) + (1B - r_mask) * (12.92 * r)
 
   g_mask = g gt 0.0031308
-  g = g_mask * (1.055 * g ^ (1 / 2.4) - 0.055) + (1B - g_mask) * (12.92 * g)
+  g = g_mask * (1.055 * g ^ (1.0 / 2.4) - 0.055) + (1B - g_mask) * (12.92 * g)
 
   b_mask = b gt 0.0031308
-  b = b_mask * (1.055 * b ^ (1 / 2.4) - 0.055) + (1B - b_mask) * (12.92 * b)
+  b = b_mask * (1.055 * b ^ (1.0 / 2.4) - 0.055) + (1B - b_mask) * (12.92 * b)
 
-  r = round(255.0 * r)
-  g = round(255.0 * g)
-  b = round(255.0 * b)
+  r = byte(0 > round(255.0 * r) < 255)
+  g = byte(0 > round(255.0 * g) < 255)
+  b = byte(0 > round(255.0 * b) < 255)
 
   return, n_dims eq 2 ? [[r], [g], [b]] : [r, g, b]
 end
