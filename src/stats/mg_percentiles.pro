@@ -44,7 +44,7 @@ end
 n = 10000L
 x = randomn(seed, n)
 print, mg_range(x), median(x)
-p = mg_percentiles(x, per=findgen(11) / 10.0)
+p = mg_percentiles(x, percentiles=findgen(11) / 10.0)
 print, p
 
 end
