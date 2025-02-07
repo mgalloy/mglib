@@ -158,10 +158,21 @@ function mgffncfile::dump, indent=indent
   result += string(self.filename, format='(%"+ FILE <%s>")')
 
   info = ncdf_inquire(self.id)
+  attributes_result = []
   for a = 0L, info.ngatts - 1L do begin
-    result += self->_printAttribute(self.id, self.id, a, indent=indent, /global)
+    attributes_result = [attributes_result, $
+                         self->_printAttribute(self.id, self.id, a, indent=indent, /global)]
   endfor
-
+  ; sort system attributes that begin with an underscore to the beginning
+  if (info.ngatts gt 0L) then begin
+    ; The "X" is in location 12 in ". ATTRIBUTE X"
+    system_attrs = where(strmid(strtrim(strmid(attributes_result, 1), 1), 12, 1) eq '_', $
+                         complement=user_attrs, /null)
+    attributes_result = [attributes_result[system_attrs], attributes_result[user_attrs]]
+    attributes_result = strjoin(attributes_result)
+  endif else attributes_result = ''
+  result += attributes_result
+  
   self->getProperty, groups=groups
   foreach group_name, groups do begin
     result += self[group_name]->dump(indent=_indent + '  ')
