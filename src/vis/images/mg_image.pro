@@ -152,7 +152,7 @@ end
 ;    no_scale : in, optional, type=boolean
 ;       set to not scale the image values into the display range
 ;    no_data : in, optional, type=boolean
-;       set to not diplay the image
+;       set to not display the image
 ;    new_window : in, optional, type=boolean
 ;       set to create a new window of the correct size as the image
 ;    position : in, optional, type=fltarr(4)
