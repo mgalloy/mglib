@@ -1063,7 +1063,7 @@ pro mgdbmysql::execute, sql_query, $
                             arg51, arg52, arg53, arg54, arg55, arg56, arg57, $
                             arg58, arg59, arg60, arg61, arg62, arg63, arg64, $
                             arg65, arg66, arg67, arg68, arg69, arg70, arg71, $
-                            arg72, arg73, arg74, arg76, $
+                            arg72, arg73, arg74, arg75, $
                             format=sql_query_fmt)
   endcase
 
