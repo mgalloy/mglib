@@ -217,6 +217,46 @@ end
 
 
 ;+
+; Find all the changes for a given option.
+;
+; :Returns:
+;   array of structures with fields `datetime` and `value`
+;
+; :Params:
+;   option_name : in, required, type=string
+;     name of the option to check for changes
+;-
+function mgffepochparser::changes, option_name
+  compile_opt strictarr
+
+  changes = list()
+
+  spec_line = self.spec->get(option_name, section='DEFAULT', found=spec_found)
+  mg_parse_spec_line, spec_line, $
+                      type=type, boolean=boolean, $
+                      extract=extract, default=default
+
+  if (n_elements(default) ne 0L) then begin
+    changes->add, {datetime: 'DEFAULT', value: default}
+  endif
+
+  sections = self.epochs->sections(count=n_epochs)
+  for s = 0L, n_epochs - 1L do begin
+    epoch_options = self.epochs->options(section=sections[s])
+    !null = where(epoch_options eq option_name, found)
+    if (found) then begin
+      value = self.epochs->get(option_name, section=sections[s], type=type)
+      changes->add, {datetime: sections[s], value: value}
+    endif
+  endfor
+
+  changes_array = changes->toArray()
+  obj_destroy, changes
+  return, changes_array
+end
+
+
+;+
 ; Find a filtered subset of the epochs that change the value of one of the
 ; given options.
 ;
