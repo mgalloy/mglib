@@ -1100,7 +1100,7 @@ pro mgdbmysql::execute, sql_query, $
                             arg51, arg52, arg53, arg54, arg55, arg56, arg57, $
                             arg58, arg59, arg60, arg61, arg62, arg63, arg64, $
                             arg65, arg66, arg67, arg68, arg69, arg70, arg71, $
-                            arg72, arg73, arg74, arg75, arg76, arg78, $
+                            arg72, arg73, arg74, arg75, arg76, arg77, arg78, $
                             format=sql_query_fmt)
     80: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
                             arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
@@ -1112,7 +1112,8 @@ pro mgdbmysql::execute, sql_query, $
                             arg51, arg52, arg53, arg54, arg55, arg56, arg57, $
                             arg58, arg59, arg60, arg61, arg62, arg63, arg64, $
                             arg65, arg66, arg67, arg68, arg69, arg70, arg71, $
-                            arg72, arg73, arg74, arg75, arg76, arg78, arg79, $
+                            arg72, arg73, arg74, arg75, arg76, arg77, arg78, $
+                            arg79, $
                             format=sql_query_fmt)
     81: _sql_query = string(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, $
                             arg9, arg10, arg11, arg12, arg13, arg14, arg15, $
@@ -1124,8 +1125,8 @@ pro mgdbmysql::execute, sql_query, $
                             arg51, arg52, arg53, arg54, arg55, arg56, arg57, $
                             arg58, arg59, arg60, arg61, arg62, arg63, arg64, $
                             arg65, arg66, arg67, arg68, arg69, arg70, arg71, $
-                            arg72, arg73, arg74, arg75, arg76, arg78, arg79, $
-                            arg80, $
+                            arg72, arg73, arg74, arg75, arg76, arg77, arg78, $
+                            arg79, arg80, $
                             format=sql_query_fmt)
   endcase
 
