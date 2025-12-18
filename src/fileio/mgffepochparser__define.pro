@@ -245,7 +245,7 @@ function mgffepochparser::changes, option_name
     epoch_options = self.epochs->options(section=sections[s])
     !null = where(epoch_options eq option_name, found)
     if (found) then begin
-      value = self.epochs->get(option_name, section=sections[s], type=type)
+      value = self.epochs->get(option_name, section=sections[s], type=type, extract=extract)
       changes->add, {datetime: sections[s], value: value}
     endif
   endfor
