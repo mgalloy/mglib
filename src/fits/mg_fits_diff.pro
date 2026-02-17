@@ -59,6 +59,10 @@ end
 ;     filenames of FITS files, used for logging
 ;
 ; :Keywords:
+;   name1 : in, optional, type=string
+;     if present, name to refer `filename1` by
+;   name2 : in, optional, type=string
+;     if present, name to refer `filename2` by
 ;   ignore_keywords : in, optional, type=strarr
 ;     keywords to ignore, may contain wildcards `*` and `?`
 ;   extension : in, optional, type=long
@@ -68,6 +72,7 @@ end
 ;-
 function mg_fits_diff_checkkeywords, header1, filename1, $
                                      header2, filename2, $
+                                     name1=name1, name2=name2, $
                                      ignore_keywords=ignore_keywords, $
                                      extension=extension, $
                                      differences=differences, $
@@ -96,7 +101,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
   if (n_notfound_keywords1 gt 0L) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"keywords in %s not found in %s: %s%s")'
-      differences->add, string(filename1, filename2, $
+      differences->add, string(name1, name2, $
                                strjoin(keywords1[notfound_ind1], ', '), $
                                _extension, $
                                format=fmt)
@@ -110,7 +115,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
   if (n_notfound_keywords2 gt 0L) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"keywords in %s not found in %s: %s%s")'
-      differences->add, string(filename2, filename1, $
+      differences->add, string(name2, name1, $
                                strjoin(keywords2[notfound_ind2], ', '), $
                                _extension, $
                                format=fmt)
@@ -166,6 +171,10 @@ end
 ;     filenames of FITS files, used for logging
 ;
 ; :Keywords:
+;   name1 : in, optional, type=string
+;     if present, name to refer `filename1` by
+;   name2 : in, optional, type=string
+;     if present, name to refer `filename2` by
 ;   tolerance : in, optional, type=float, default=0.0
 ;     tolerance to use when comparing data elements
 ;   extension : in, optional, type=long
@@ -175,6 +184,7 @@ end
 ;-
 function mg_fits_diff_checkdata, data1, filename1,$
                                  data2, filename2, $
+                                 name1=name1, name2=name2, $
                                  tolerance=tolerance, $
                                  extension=extension, $
                                  differences=differences
@@ -189,7 +199,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
   if (data_diff gt 0L) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"data in %s not the same size/type as in %s%s")'
-      differences->add, string(filename1, filename2, _extension, format=fmt)
+      differences->add, string(name1, name2, _extension, format=fmt)
     endif
     return, 1B
   endif
@@ -200,7 +210,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
   if (n_finite1 ne n_finite2) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"data in %s has different number of NaNs as in %s%s (%d -> %d)")'
-      differences->add, string(filename1, filename2, _extension, $
+      differences->add, string(name1, name2, _extension, $
                                n_finite1, n_finite2, $
                                format=fmt)
     endif
@@ -209,7 +219,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
     if (n_finite1 gt 0L && ~array_equal(finite_indices1, finite_indices2)) then begin
       if (obj_valid(differences)) then begin
         fmt = '(%"data in %s has different NaNs as in %s%s")'
-        differences->add, string(filename1, filename2, _extension, format=fmt)
+        differences->add, string(name1, name2, _extension, format=fmt)
       endif
       return, 1B
     endif else begin  ; all NaNs
@@ -227,7 +237,7 @@ function mg_fits_diff_checkdata, data1, filename1,$
   if (data_diff gt 0L) then begin
     if (obj_valid(differences)) then begin
       fmt = '(%"data in %s not the same as in %s%s")'
-      differences->add, string(filename1, filename2, _extension, format=fmt)
+      differences->add, string(name1, name2, _extension, format=fmt)
     endif
     return, 1B
   endif
@@ -265,6 +275,10 @@ end
 ;     filenames of two files to compare
 ;
 ; :Keywords:
+;   name1 : in, optional, type=string
+;     if present, name to refer `filename1` by
+;   name2 : in, optional, type=string
+;     if present, name to refer `filename2` by
 ;   ignore_keywords : in, optional, type=strarr
 ;     keywords to ignore, may contain wildcards `*` and `?`
 ;   ignore_whitespace : in, optional, type=boolean
@@ -281,6 +295,7 @@ end
 ;     FITS files; will be the empty string if no error
 ;-
 function mg_fits_diff, filename1, filename2, $
+                       name1=name1, name2=name2, $
                        ignore_keywords=ignore_keywords, $
                        ignore_whitespace=ignore_whitespace, $
                        tolerance=tolerance, $
@@ -289,27 +304,30 @@ function mg_fits_diff, filename1, filename2, $
                        error_msg=error_msg
   compile_opt strictarr
 
+  _name1 = n_elements(name1) gt 0L ? name1 : filename1
+  _name2 = n_elements(name2) gt 0L ? name2 : filename2
+
   fits_open, filename1, fcb1, /no_abort, message=error_msg
   if (error_msg ne '') then begin
-    error_msg = string(filename1, format='(%"%s not valid")')
+    error_msg = string(_name1, format='(%"%s not valid")')
     return, !null
   endif
 
   fits_open, filename2, fcb2, /no_abort, message=error_msg
   if (error_msg ne '') then begin
-    error_msg = string(filename2, format='(%"%s not valid")')
+    error_msg = string(_name2, format='(%"%s not valid")')
     return, !null
   endif
 
   fits_read, fcb1, data1, header1, /no_abort, message=error_msg, exten_no=0
   if (error_msg ne '') then begin
-    error_msg = string(filename1, format='(%"%s not valid")')
+    error_msg = string(_name1, format='(%"%s not valid")')
     return, !null
   endif
 
   fits_read, fcb2, data2, header2, /no_abort, message=error_msg, exten_no=0
   if (error_msg ne '') then begin
-    error_msg = string(filename2, format='(%"%s not valid")')
+    error_msg = string(_name2, format='(%"%s not valid")')
     return, !null
   endif
 
@@ -318,6 +336,7 @@ function mg_fits_diff, filename1, filename2, $
   diff = 0B
   diff or= mg_fits_diff_checkkeywords(header1, filename1, $
                                       header2, filename2, $
+                                      name1=_name1, name2=_name2, $
                                       ignore_keywords=ignore_keywords, $
                                       differences=_differences, $
                                       tolerance=tolerance)
@@ -327,6 +346,7 @@ function mg_fits_diff, filename1, filename2, $
   if (not keyword_set(headers_only)) then begin
     diff or= mg_fits_diff_checkdata(data1, filename1, $
                                     data2, filename2, $
+                                    name1=_name1, name2=_name2, $
                                     differences=_differences, $
                                     tolerance=tolerance)
   endif
@@ -335,7 +355,7 @@ function mg_fits_diff, filename1, filename2, $
   if (extend_diff gt 0) then begin
     if (arg_present(differences)) then begin
       fmt = '(%"number of extensions in %s not the same as in %s (%d -> %d)")'
-      _differences->add, string(filename1, filename2, $
+      _differences->add, string(_name1, _name2, $
                                 fcb1.nextend, fcb2.nextend, $
                                 format=fmt)
     endif
@@ -345,17 +365,18 @@ function mg_fits_diff, filename1, filename2, $
   for e = 0L, (fcb1.nextend < fcb2.nextend) do begin
     fits_read, fcb1, data1, header1, exten_no=e, /no_abort, /no_pdu, message=error_msg
     if (error_msg ne '') then begin
-      error_msg = string(filename1, format='(%"error reading %s")')
+      error_msg = string(_name1, format='(%"error reading %s")')
       return, !null
     endif
     fits_read, fcb2, data2, header2, exten_no=e, /no_abort, /no_pdu, message=error_msg
     if (error_msg ne '') then begin
-      error_msg = string(filename2, format='(%"error reading %s")')
+      error_msg = string(_name2, format='(%"error reading %s")')
       return, !null
     endif
 
     diff or= mg_fits_diff_checkkeywords(header1, filename1, $
                                         header2, filename2, $
+                                        name1=_name1, name2=_name2, $
                                         ignore_keywords=ignore_keywords, $
                                         extension=e, $
                                         differences=_differences, $
@@ -364,6 +385,7 @@ function mg_fits_diff, filename1, filename2, $
     if (~keyword_set(headers_only)) then begin
       diff or= mg_fits_diff_checkdata(data1, filename1, $
                                       data2, filename2, $
+                                      name1=_name1, name2=_name2, $
                                       extension=e, $
                                       differences=_differences, $
                                       tolerance=tolerance)
