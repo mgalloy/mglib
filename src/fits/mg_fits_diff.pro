@@ -81,7 +81,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
 
   _extension = n_elements(extension) eq 0L $
                  ? '' $
-                 : string(extension, format='(%" (extension %d)")')
+                 : string(extension, format='(%" (ext %d)")')
 
   keywords1 = mg_fits_diff_getkeywords(header1, $
                                        ignore_keywords=ignore_keywords, $
@@ -143,7 +143,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
     endelse
     if (values_different) then begin
       if (obj_valid(differences)) then begin
-        fmt = '(%"value for keyword %s not the same, %s -> %s%s")'
+        fmt = '(%"%s changed: %s -> %s%s")'
         differences->add, string(key, strtrim(v1, 2), strtrim(v2, 2), $
                                  _extension, $
                                  format=fmt)
