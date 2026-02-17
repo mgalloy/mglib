@@ -138,7 +138,7 @@ function mg_fits_diff_checkkeywords, header1, filename1, $
     endelse
     if (values_different) then begin
       if (obj_valid(differences)) then begin
-        fmt = '(%"value for keyword %s not the same, %s ne %s%s")'
+        fmt = '(%"value for keyword %s not the same, %s -> %s%s")'
         differences->add, string(key, strtrim(v1, 2), strtrim(v2, 2), $
                                  _extension, $
                                  format=fmt)
@@ -199,8 +199,10 @@ function mg_fits_diff_checkdata, data1, filename1,$
 
   if (n_finite1 ne n_finite2) then begin
     if (obj_valid(differences)) then begin
-      fmt = '(%"data in %s has different number of NaNs as in %s%s")'
-      differences->add, string(filename1, filename2, _extension, format=fmt)
+      fmt = '(%"data in %s has different number of NaNs as in %s%s (%d -> %d)")'
+      differences->add, string(filename1, filename2, _extension, $
+                               n_finite1, n_finite2, $
+                               format=fmt)
     endif
     return, 1B
   endif else begin
@@ -329,11 +331,13 @@ function mg_fits_diff, filename1, filename2, $
                                     tolerance=tolerance)
   endif
 
-  extend_diff = fcb1.nextend ne fcb1.nextend
+  extend_diff = fcb1.nextend ne fcb2.nextend
   if (extend_diff gt 0) then begin
     if (arg_present(differences)) then begin
-      fmt = '(%"number of extensions in %s not the same as in %s")'
-      _differences->add, string(filename1, filename2, format=fmt)
+      fmt = '(%"number of extensions in %s not the same as in %s (%d -> %d)")'
+      _differences->add, string(filename1, filename2, $
+                                fcb1.nextend, fcb2.nextend, $
+                                format=fmt)
     endif
   endif
   diff or= extend_diff
