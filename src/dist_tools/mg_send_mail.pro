@@ -25,14 +25,18 @@
 ;   attachments : in, optional, type=strarr
 ;     filenames of attachments, not compatible with `/HTML`
 ;   error : out, optional, type=long
-;     error status, 0 if no error
+;     set to a named variable to retrieve the error status, 0 if no error
+;   status_message : out, optional, type=string
+;     set to a named variable to retrieve the error status message, empty string
+;     if no error
 ;-
 pro mg_send_mail, address, subject, body, $
                   html=html, $
                   from=from, $
                   filename=filename, $
                   attachments=attachments, $
-                  error=error
+                  error=error, $
+                  status_message=error_result
   compile_opt strictarr
   on_error, 2
 
