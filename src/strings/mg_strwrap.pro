@@ -83,10 +83,9 @@ function mg_strwrap, str, width=width, indent=indent, first_indent=firstIndent
     result = n_elements(result) eq 0L $
                ? firstIndentString + line $
                : [result, indentString + line]
-
   endwhile
 
-  return, result
+  return, n_elements(result) eq 0L ? [''] : result
 end
 
 
